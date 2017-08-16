@@ -1,0 +1,6 @@
+org.osgi:org.osgi.service.jaxrs:0.0.0-SNAPSHOT
+org.osgi:org.osgi.service.jaxrs:1.0.0-SNAPSHOT
+org.osgi:org.osgi.service.jaxrs.whiteboard:1.0.0-SNAPSHOT
+org.osgi:org.osgi.util.function:1.1.0-SNAPSHOT
+org.osgi:org.osgi.util.promise:1.1.0-SNAPSHOT
+org.osgi:org.osgi.util.pushstream:1.0.0-SNAPSHOT

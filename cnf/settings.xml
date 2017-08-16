@@ -1,0 +1,9 @@
+<settings>
+	<servers>
+		<server>
+			<id>http://devel.data-in-motion.biz</id>
+			<username>admin</username>
+			<password>DIM8477@nexus_</password>
+		</server>
+	</servers>
+</settings>
