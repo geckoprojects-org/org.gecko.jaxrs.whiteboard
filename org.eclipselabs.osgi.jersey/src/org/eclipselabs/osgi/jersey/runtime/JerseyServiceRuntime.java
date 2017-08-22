@@ -56,9 +56,6 @@ import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.namespace.implementation.ImplementationNamespace;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime;
 import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntimeConstants;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
@@ -117,13 +114,11 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsJerseyHan
 	 * @param ctx the component context
 	 * @throws ConfigurationException 
 	 */
-	@Activate
 	public void activate(ComponentContext ctx) throws ConfigurationException {
 		this.context = ctx;
 		System.out.println("activate " + this.toString());
 		updateProperties(context);
 		createServerAndContext();
-		startServer();
 	}
 
 	/* 
@@ -148,7 +143,6 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsJerseyHan
 	 * (non-Javadoc)
 	 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsJerseyHandler#teardown()
 	 */
-	@Deactivate
 	public void teardown() {
 		/*
 		 * Unregister the default application
@@ -167,7 +161,6 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsJerseyHan
 	 * (non-Javadoc)
 	 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsJerseyHandler#modified(org.osgi.service.component.ComponentContext)
 	 */
-	@Modified
 	public void modified(ComponentContext ctx) throws ConfigurationException {
 		System.out.println("modify " + this.toString());
 		Integer oldPort = port;

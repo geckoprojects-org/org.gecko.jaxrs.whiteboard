@@ -83,6 +83,7 @@ public class JaxRsRuntimeComponent {
 		}
 		// now register default application
 		runtime.registerApplication(defaultApplication);
+		runtime.startup();
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put("service.changecount", changeCount.incrementAndGet());
 		properties.put(JaxRSServiceRuntimeConstants.JAX_RS_SERVICE_ENDPOINT, urls);
