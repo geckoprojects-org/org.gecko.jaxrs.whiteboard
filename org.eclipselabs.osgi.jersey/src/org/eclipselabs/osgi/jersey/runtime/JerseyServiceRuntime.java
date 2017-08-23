@@ -289,7 +289,7 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsJerseyHan
 			ServiceReferenceDTO srDTO = DTOConverter.toServiceReferenceDTO(serviceRef);
 			runtimeDTO.serviceDTO = srDTO;
 			// the defaults application service id is the same, like this, because it comes from here
-			runtimeDTO.defaultApplication.serviceId = srDTO.id;
+//			runtimeDTO.defaultApplication.serviceId = srDTO.id;
 		}
 		runtimeDTO.applicationDTOs = appDTOList.toArray(new ApplicationDTO[appDTOList.size()]);
 	}
@@ -390,6 +390,7 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsJerseyHan
 		ResourceConfig config = createResourceConfig(application);
 
 		ServletContainer container = new ServletContainer(config);
+		applicationProvider.setServletContainer(container);
 		ServletHolder servlet = new ServletHolder(container);
 		String applicationPath = JaxRsHelper.getServletPath(application);
 		contextHandler.addServlet(servlet, applicationPath);

@@ -36,6 +36,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime;
 import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntimeConstants;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
@@ -54,12 +55,9 @@ public class JaxRsRuntimeComponent {
 	private volatile AtomicLong changeCount = new AtomicLong();
 	private volatile JaxRsJerseyHandler runtime = null;
 	private volatile String name;
-	private volatile boolean strict = false;
-	private volatile ComponentContext context;
-	private ServiceReference<JaxRsApplicationProvider> defaultApplicationRef;
+	private JaxRsApplicationProvider defaultApplicationProvider;
+	private JerseyApplication defaultApplication;
 	private final List<ServiceReference<?>> resourcesRefList = new LinkedList<>();
-	private final List<ServiceReference<?>> extensionRefList = new LinkedList<>();
-	private JaxRsApplicationProvider defaultApplication;
 
 	/**
 	 * Called on component activation
@@ -69,7 +67,6 @@ public class JaxRsRuntimeComponent {
 	@SuppressWarnings("unchecked")
 	@Activate
 	public void activate(ComponentContext context) throws ConfigurationException {
-		this.context = context;
 		updateProperties(context);
 		if (runtime != null) {
 			runtime.teardown();;
@@ -78,11 +75,15 @@ public class JaxRsRuntimeComponent {
 		String[] urls = runtime.getURLs(context);
 		// activate and start server
 		runtime.initialize(context);
-		if (defaultApplication == null) {
-			defaultApplication = new JerseyApplicationProvider(name, new JerseyApplication(name, context.getBundleContext()));
+		if (defaultApplicationProvider == null) {
+			defaultApplicationProvider = new JerseyApplicationProvider(name, new JerseyApplication(".default", context.getBundleContext()));
+			defaultApplication = (JerseyApplication) defaultApplicationProvider.getJaxRsApplication();
+			resourcesRefList.forEach((sr)->{
+				defaultApplication.addResourceReference(sr);
+			});
 		}
 		// now register default application
-		runtime.registerApplication(defaultApplication);
+		runtime.registerApplication(defaultApplicationProvider);
 		runtime.startup();
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put("service.changecount", changeCount.incrementAndGet());
@@ -93,11 +94,10 @@ public class JaxRsRuntimeComponent {
 			runtime.updateRuntimeDTO(serviceRuntime.getReference());
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Error starting JaxRsRuntimeService ", e);
-		} finally {
 			if (serviceRuntime != null) {
 				serviceRuntime.unregister();
 			}
-		}
+		} 
 	}
 
 	/**
@@ -133,43 +133,31 @@ public class JaxRsRuntimeComponent {
 
 	}
 	
-//	@Reference(name="defaultApplication", cardinality=ReferenceCardinality.MANDATORY, updated="modifyDefaultUpplication", unbind="unsetDefaultApplication")
-	public void setDefaultApplication(ServiceReference<JaxRsApplicationProvider>defaultAppProviderRef) {
-		this.defaultApplicationRef = defaultAppProviderRef;
+	/**
+	 * Called, when a new resource implementation, that matches this filter criteria can be added
+	 * Left the target filter out, it should be propagated via configuration admin
+	 * rootResource.target=(&(osgi.jaxrs.resource=true)(osgi.jaxrs.whiteboard.target=${osgi.jaxrs.name}))
+	 * @param jaxrsResourceRef the service reference instance to add
+	 */
+	@Reference(name="rootResource", cardinality=ReferenceCardinality.MULTIPLE, 
+			policy=ReferencePolicy.DYNAMIC, target="(osgi.jaxrs.resource=true)")
+	public void addResource(ServiceReference<Object> jaxrsResourceRef) {
+		boolean added = resourcesRefList.add(jaxrsResourceRef);
+		if (defaultApplication != null && added) {
+			defaultApplication.addResourceReference(jaxrsResourceRef);
+			runtime.reloadApplication(defaultApplicationProvider);
+		}
+		if (added) {
+			incrementChangeCount();
+			ServiceReference<?> serviceRef = serviceRuntime == null ? null : serviceRuntime.getReference();
+			runtime.updateRuntimeDTO(serviceRef);
+		}
 	}
-	public void unsetDefaultApplication(ServiceReference<JaxRsApplicationProvider>defaultAppProviderRef) {
-		this.defaultApplicationRef = defaultAppProviderRef;
-	}
-	public void modifyDefaultApplication(ServiceReference<JaxRsApplicationProvider>defaultAppProviderRef) {
-		this.defaultApplicationRef = defaultAppProviderRef;
-	}
-
-//	/**
-//	 * Called, when a new resource implementation, that matches this filter criteria can be added
-//	 * Left the target filter out, it should be propagated via configuration admin
-//	 * rootResource.target=(&(osgi.jaxrs.resource=true)(osgi.jaxrs.whiteboard.target=${osgi.jaxrs.name}))
-//	 * @param jaxrsResourceRef the service reference instance to add
-//	 */
-//	@Reference(name="rootResource", cardinality=ReferenceCardinality.MULTIPLE, 
-//			policy=ReferencePolicy.DYNAMIC)
-//	public void addResource(ServiceReference<Object> jaxrsResourceRef) {
-//		boolean added = resourcesRefList.add(jaxrsResourceRef);
-//		System.out.println("added " + jaxrsResourceRef.getProperty("component.name"));
-//		if (defaultApplication != null && added) {
-//			defaultApplication..get.addResourceReference(jaxrsResourceRef);
-//			runtime.reloadApplication(defaultApplication);
-//		}
-//		if (added) {
-//			incrementChangeCount();
-//			ServiceReference<?> serviceRef = serviceRuntime == null ? null : serviceRuntime.getReference();
-//			runtime.updateRuntimeDTO(serviceRef);
-//		}
-//	}
 
 	/**
 	 * Increments the change count and updates the service properties
 	 */
-	private void incrementChangeCount() {
+	public void incrementChangeCount() {
 		long changecount = changeCount.incrementAndGet();
 		if (serviceRuntime != null) {
 			ServiceReference<JerseyServiceRuntime> ref = serviceRuntime.getReference();
@@ -185,21 +173,21 @@ public class JaxRsRuntimeComponent {
 		}
 	}
 
-//	/**
-//	 * Called when removing
-//	 * @param jaxrsResourceRef
-//	 */
-//	public void removeResource(ServiceReference<?> jaxrsResourceRef) {
-//		boolean removed = resourcesRefList.remove(jaxrsResourceRef);
-//		if (defaultApplication != null && removed) {
-//			defaultApplication.removeResourceReference(jaxrsResourceRef);
-//			runtime.reloadApplication(defaultApplication);
-//		}
-//		if (removed) {
-//			ServiceReference<?> serviceRef = serviceRuntime == null ? null : serviceRuntime.getReference();
-//			runtime.updateRuntimeDTO(serviceRef);
-//		}
-//	}
+	/**
+	 * Called when removing
+	 * @param jaxrsResourceRef
+	 */
+	public void removeResource(ServiceReference<?> jaxrsResourceRef) {
+		boolean removed = resourcesRefList.remove(jaxrsResourceRef);
+		if (defaultApplication != null && removed) {
+			defaultApplication.removeResourceReference(jaxrsResourceRef);
+			runtime.reloadApplication(defaultApplicationProvider);
+		}
+		if (removed) {
+			ServiceReference<?> serviceRef = serviceRuntime == null ? null : serviceRuntime.getReference();
+			runtime.updateRuntimeDTO(serviceRef);
+		}
+	}
 
 	/**
 	 * Updates the fields that are provided by service properties.
@@ -217,7 +205,6 @@ public class JaxRsRuntimeComponent {
 				throw new ConfigurationException(JaxRSWhiteboardConstants.JAX_RS_NAME, "No name was defined for the whiteboard");
 			}
 		}
-		strict = JerseyHelper.getPropertyWithDefault(ctx, JerseyConstants.JERSEY_STRICT_MODE, false);
 	}
 
 }

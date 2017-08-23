@@ -11,15 +11,12 @@
  */
 package org.eclipselabs.osgi.jersey.tests.services;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ServiceScope;
-
 /**
  * Sample implementation
  * @author Mark Hoffmann
  * @since 12.07.2017
  */
-@Component(property="osgi.jaxrs.resource=org.eclipselabs.osgi.jersey.tests.services.TestImpl", scope=ServiceScope.PROTOTYPE, service=Object.class)
+//@Component(property="osgi.jaxrs.resource=org.eclipselabs.osgi.jersey.tests.services.TestImpl", scope=ServiceScope.PROTOTYPE, service=Object.class)
 public class TestImpl implements ITest {
 	
 	/* 

@@ -251,14 +251,6 @@ public class JerseyWhiteboardIntegrationTest {
 		
 		assertNotNull(service);
 		
-		CountDownLatch cdl = new CountDownLatch(1);
-		cdl.await(5, TimeUnit.SECONDS);
-		
-		webTarget = jerseyClient.target(url + "/hello");
-		get = webTarget.request().buildGet();
-		response = get.invoke();
-		assertEquals(200, response.getStatus());
-		
 		CountDownLatch deleteLatch = new CountDownLatch(1);
 		TestServiceCustomizer<JaxRSServiceRuntime, JaxRSServiceRuntime> c = new TestServiceCustomizer<>(context, null, deleteLatch);
 		configuration.delete();

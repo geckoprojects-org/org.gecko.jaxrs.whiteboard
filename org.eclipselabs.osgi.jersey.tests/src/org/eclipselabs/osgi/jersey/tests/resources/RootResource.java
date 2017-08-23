@@ -26,7 +26,7 @@ import org.osgi.service.component.annotations.ServiceScope;
 @Path("/")
 @Component(name="RootResource", 
 	service=Object.class, 
-	property= {"osgi.jaxrs.whiteboard.target=test_wb", "osgi.jaxrs.resource=true"}, 
+	property= {"osgi.jaxrs.resource=true"}, 
 	scope=ServiceScope.PROTOTYPE)
 public class RootResource {
 	

@@ -38,12 +38,12 @@ public class JerseyApplication extends Application {
 	
 	private volatile Map<ServiceReference<?>, Class<?>> classesMap = new ConcurrentHashMap<>();
 	private volatile Map<ServiceReference<?>, Object> singletonMap = new ConcurrentHashMap<>();
-	private final String whiteboardName;
+	private final String applicationName;
 	private final BundleContext context;
 	private final Logger log = Logger.getLogger("o.e.o.j.application");
 	
-	public JerseyApplication(String whiteboardName, BundleContext context) {
-		this.whiteboardName = whiteboardName;
+	public JerseyApplication(String applicationName, BundleContext context) {
+		this.applicationName = applicationName;
 		this.context = context;
 	}
 	
@@ -69,8 +69,8 @@ public class JerseyApplication extends Application {
 	 * Returns the name of the whiteboard
 	 * @return the name of the whiteboard
 	 */
-	public String getWhiteboardName() {
-		return whiteboardName;
+	public String getApplicationName() {
+		return applicationName;
 	}
 	
 	/**
@@ -87,7 +87,7 @@ public class JerseyApplication extends Application {
 		if (context == null) {
 			throw new IllegalStateException("No bundle context was given to the JerseyApplication");
 		}
-		if (whiteboardName == null) {
+		if (applicationName == null) {
 			throw new IllegalStateException("No whiteboard name was given to the JerseyApplication");
 		}
 		String resource = (String) resourceRef.getProperty(JaxRSWhiteboardConstants.JAX_RS_RESOURCE);
@@ -95,13 +95,6 @@ public class JerseyApplication extends Application {
 		if (!Boolean.parseBoolean(resource) && !Boolean.parseBoolean(extension)) {
 			if (log != null) {
 				log.log(Level.WARNING, "The given service reference is not marked as JaxRs resource or extension. Expected property 'osgi.jaxrs.resource=true' or 'osgi.jaxrs.extension=true'");
-			}
-			return;
-		}
-		String whiteboardTarget = (String) resourceRef.getProperty(JaxRSWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET);
-		if (!whiteboardName.equalsIgnoreCase(whiteboardTarget)) {
-			if (log != null) {
-				log.log(Level.WARNING, "The given service reference of the resource is not targeted to this whiteboard name");
 			}
 			return;
 		}
