@@ -23,6 +23,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
@@ -200,6 +201,137 @@ public class JerseySimpleWhiteboardIntegrationTest {
 		get = webTarget.request().buildGet();
 		response = get.invoke();
 		assertEquals(200, response.getStatus());
+		
+		/*
+		 * Tear-down the system
+		 */
+		CountDownLatch deleteLatch = new CountDownLatch(1);
+		TestServiceCustomizer<JaxRSServiceRuntime, JaxRSServiceRuntime> c = new TestServiceCustomizer<>(context, null, deleteLatch);
+		configuration.delete();
+		awaitRemovedService(JaxRSServiceRuntime.class, c);
+		deleteLatch.await(10, TimeUnit.SECONDS);
+		// wait for server shutdown
+		Thread.sleep(2000L);
+		assertNotNull(get);
+		try {
+			get.invoke();
+			fail("Not expected to reach this line of code");
+		} catch (ProcessingException e) {
+			assertNotNull(e.getCause());
+			assertTrue(e.getCause() instanceof ConnectException);
+		}
+		
+	}
+	
+	/**
+	 * Tests simple start and lazy start of REST resources
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws InvalidSyntaxException 
+	 */
+	@Test
+	public void testSimpleWhiteboard2() throws IOException, InterruptedException, InvalidSyntaxException {
+		/*
+		 *  The server runs on localhost port 8185 using context path test: http://localhost:8185/test
+		 *  We mount the system with a resource RootResource under http://localhost:8185/test that will return a 
+		 *  HTTP::200 using a GET request
+		 */
+		int port = 8185;
+		String contextPath = "test";
+		String url = "http://localhost:" + port + "/" + contextPath;
+		
+		/*
+		 * Initial setup for the REST runtime 
+		 */
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
+		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
+		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
+		
+		ConfigurationAdmin configAdmin = context.getService(configAdminRef);
+		assertNotNull(configAdmin);
+		Configuration configuration = configAdmin.getConfiguration("JaxRsRuntimeComponent", "?");
+		assertNotNull(configuration);
+		assertEquals(1, configuration.getChangeCount());
+		Dictionary<String,Object> factoryProperties = configuration.getProperties();
+		assertNull(factoryProperties);
+		configuration.update(properties);
+		
+		/*
+		 * Check that the REST runtime service become available 
+		 */
+		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
+		assertNotNull(runtimeRef);
+		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
+		assertNotNull(runtime);
+		
+		CountDownLatch cdl = new CountDownLatch(1);
+		cdl.await(1, TimeUnit.SECONDS);
+		
+		/*
+		 * Check if our RootResource is available under http://localhost:8185/test
+		 */
+		System.out.println("Checking URL is available" + url);
+		AtomicInteger noConnectionCount = new AtomicInteger();
+		AtomicInteger checkCount = new AtomicInteger();
+		JerseyInvocation get = null;
+		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
+		JerseyWebTarget webTarget = jerseyClient.target(url);
+		get = webTarget.request().buildGet();
+		Response response = get.invoke();
+		assertEquals(200, response.getStatus());
+		
+		/*
+		 * Check if http://localhost:8185/test/hello is not available yet. 
+		 * We will mount this in a moment
+		 */
+		System.out.println("Checking URL is not available " + url + "/hello");
+		webTarget = jerseyClient.target(url + "/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(404, response.getStatus());
+		
+		/*
+		 * Mount the resource HelloResource that will become available under:
+		 * http://localhost:8185/test/hello
+		 */
+		Dictionary<String, Object> helloProps = new Hashtable<>();
+		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Hello");
+		System.out.println("Register resource for uri /hello");
+		ServiceRegistration<Object> helloRegistration = null;//context.registerService(Object.class, new HelloResource(), helloProps);
+		boolean helloAvailable = false;
+		long time = System.currentTimeMillis();
+		webTarget = jerseyClient.target(url);
+		JerseyInvocation rootGet = webTarget.request().buildGet();
+		webTarget = jerseyClient.target(url + "/hello");
+		JerseyInvocation helloGet = webTarget.request().buildGet();
+		while (checkCount.get() < 2000) {
+			checkCount.incrementAndGet();
+			response = rootGet.invoke();
+			if (response.getStatus() == 404) {
+				noConnectionCount.incrementAndGet();
+			}
+			response = helloGet.invoke();
+			if (response.getStatus() == 200) {
+				helloAvailable = true;
+			}
+			if (checkCount.get() == 1000) {
+				helloRegistration = context.registerService(Object.class, new HelloResource(), helloProps);
+			}
+		}
+		long took = System.currentTimeMillis() - time;
+		
+		System.out.println("Checks " + checkCount.get() + " within " + took + "ms");
+		System.out.println("No found count " + noConnectionCount.get());
+		
+		helloRegistration.unregister();
+		
+		/*
+		 * Wait a short time to reload the configuration dynamically
+		 */
+		cdl = new CountDownLatch(1);
+		cdl.await(1, TimeUnit.SECONDS);
 		
 		/*
 		 * Tear-down the system
