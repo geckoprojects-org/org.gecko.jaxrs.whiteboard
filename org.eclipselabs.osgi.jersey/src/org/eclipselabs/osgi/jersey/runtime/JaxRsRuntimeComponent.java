@@ -76,7 +76,7 @@ public class JaxRsRuntimeComponent {
 		// activate and start server
 		runtime.initialize(context);
 		if (defaultApplicationProvider == null) {
-			defaultApplicationProvider = new JerseyApplicationProvider(name, new JerseyApplication(".default", context.getBundleContext()));
+			defaultApplicationProvider = new JerseyApplicationProvider(name, "/*", new JerseyApplication(".default", context.getBundleContext()));
 			defaultApplication = (JerseyApplication) defaultApplicationProvider.getJaxRsApplication();
 			resourcesRefList.forEach((sr)->{
 				defaultApplication.addResourceReference(sr);

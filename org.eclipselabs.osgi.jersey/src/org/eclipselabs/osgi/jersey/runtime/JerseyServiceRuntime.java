@@ -147,7 +147,7 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsJerseyHan
 		/*
 		 * Unregister the default application
 		 */
-		unregisterApplication(new JerseyApplicationProvider(".default", defaultApplication));
+		unregisterApplication(new JerseyApplicationProvider(".default", "/*", defaultApplication));
 		stopContextHandler();
 		stopServer();
 		binder.dispose();
@@ -174,7 +174,7 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsJerseyHan
 		}
 		// if port changed, both parts need to be restarted, no matter, if the context path has changed
 		if (portChanged || pathChanged) {
-			unregisterApplication(new JerseyApplicationProvider(".default", defaultApplication));
+			unregisterApplication(new JerseyApplicationProvider(".default", "/*", defaultApplication));
 			stopContextHandler();
 			stopServer();
 			createServerAndContext();

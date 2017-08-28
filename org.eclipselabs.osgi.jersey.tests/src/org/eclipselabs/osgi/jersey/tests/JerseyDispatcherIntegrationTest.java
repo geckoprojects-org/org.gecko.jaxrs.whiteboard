@@ -13,6 +13,8 @@ package org.eclipselabs.osgi.jersey.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.times;
 
 import java.io.IOException;
 import java.util.Dictionary;
@@ -25,9 +27,12 @@ import java.util.concurrent.TimeUnit;
 import javax.ws.rs.core.Application;
 
 import org.eclipselabs.osgi.jersey.JaxRsApplicationDispatcher;
+import org.eclipselabs.osgi.jersey.JaxRsApplicationProvider;
 import org.eclipselabs.osgi.jersey.JaxRsJerseyRuntime;
+import org.eclipselabs.osgi.jersey.tests.resources.HelloApplication;
 import org.eclipselabs.osgi.jersey.tests.resources.HelloResource;
 import org.eclipselabs.osgi.jersey.tests.resources.RootResource;
+import org.eclipselabs.osgi.jersey.tests.resources.RuntimeMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -76,7 +81,7 @@ public class JerseyDispatcherIntegrationTest {
 	}
 
 	/**
-	 * Tests simple add and remove of a runtime
+	 * Tests simple add and remove of a runtime using DS registered {@link JaxRsJerseyRuntime} as well
 	 * @throws IOException
 	 * @throws InterruptedException
 	 * @throws InvalidSyntaxException 
@@ -86,21 +91,21 @@ public class JerseyDispatcherIntegrationTest {
 
 		JaxRsApplicationDispatcher dispatcher = getService(JaxRsApplicationDispatcher.class, 3000l);
 		assertNotNull(dispatcher);
-		assertEquals(0, dispatcher.getRuntimes().size());
+		assertEquals(1, dispatcher.getRuntimes().size());//RuntimeMock
 
 		ServiceRegistration<JaxRsJerseyRuntime> runtimeRegistration = context.registerService(JaxRsJerseyRuntime.class, jerseyRuntime, null);
 		registrations.add(runtimeRegistration);
 
 		CountDownLatch cdl = new CountDownLatch(1);
 		cdl.await(1, TimeUnit.SECONDS);
-		assertEquals(1, dispatcher.getRuntimes().size());
+		assertEquals(2, dispatcher.getRuntimes().size());
 
 		runtimeRegistration.unregister();
 		registrations.remove(runtimeRegistration);
 
 		cdl = new CountDownLatch(1);
 		cdl.await(1, TimeUnit.SECONDS);
-		assertEquals(0, dispatcher.getRuntimes().size());
+		assertEquals(1, dispatcher.getRuntimes().size());
 	}
 
 	/**
@@ -137,7 +142,8 @@ public class JerseyDispatcherIntegrationTest {
 	}
 
 	/**
-	 * Tests simple add and remove of an application 
+	 * Tests simple add and remove of an application and an DS application (HelloApplication)
+	 * This test also checks for the property osgi.jaxrs.application.base
 	 * @throws IOException
 	 * @throws InterruptedException
 	 * @throws InvalidSyntaxException 
@@ -147,7 +153,7 @@ public class JerseyDispatcherIntegrationTest {
 
 		JaxRsApplicationDispatcher dispatcher = getService(JaxRsApplicationDispatcher.class, 3000l);
 		assertNotNull(dispatcher);
-		assertEquals(0, dispatcher.getApplications().size());
+		assertEquals(1, dispatcher.getApplications().size());// HelloApplication
 
 		ServiceRegistration<Application> applicationRegistration = context.registerService(Application.class, new Application(), null);
 		registrations.add(applicationRegistration);
@@ -159,9 +165,21 @@ public class JerseyDispatcherIntegrationTest {
 		applicationRegistration.unregister();
 		registrations.remove(applicationRegistration);
 		
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "dummy");
+		applicationRegistration = context.registerService(Application.class, new Application(), properties);
+		registrations.add(applicationRegistration);
+		
 		cdl = new CountDownLatch(1);
 		cdl.await(1, TimeUnit.SECONDS);
-		assertEquals(0, dispatcher.getApplications().size());
+		assertEquals(2, dispatcher.getApplications().size());
+		
+		applicationRegistration.unregister();
+		registrations.remove(applicationRegistration);
+		
+		cdl = new CountDownLatch(1);
+		cdl.await(1, TimeUnit.SECONDS);
+		assertEquals(1, dispatcher.getApplications().size());
 	}
 
 	/**
@@ -175,37 +193,72 @@ public class JerseyDispatcherIntegrationTest {
 
 		JaxRsApplicationDispatcher dispatcher = getService(JaxRsApplicationDispatcher.class, 3000l);
 		assertNotNull(dispatcher);
-		assertEquals(0, dispatcher.getApplications().size());
+		assertEquals(1, dispatcher.getApplications().size());// HelloApplication
+		assertEquals(1, dispatcher.getRuntimes().size());//RuntimeMock
 
 		ServiceRegistration<JaxRsJerseyRuntime> runtimeRegistration = context.registerService(JaxRsJerseyRuntime.class, jerseyRuntime, null);
 		registrations.add(runtimeRegistration);
 
 		CountDownLatch cdl = new CountDownLatch(1);
 		cdl.await(1, TimeUnit.SECONDS);
-		assertEquals(1, dispatcher.getRuntimes().size());
+		assertEquals(2, dispatcher.getRuntimes().size());
 
-		ServiceRegistration<Application> applicationRegistration = context.registerService(Application.class, new Application(), null);
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "dummy");
+		ServiceRegistration<Application> applicationRegistration = context.registerService(Application.class, new Application(), properties);
 		registrations.add(applicationRegistration);
 
 		cdl = new CountDownLatch(1);
 		cdl.await(1, TimeUnit.SECONDS);
-		assertEquals(1, dispatcher.getApplications().size());
+		assertEquals(2, dispatcher.getApplications().size());
 
-		Mockito.verify(jerseyRuntime).registerApplication(Mockito.any());
+		Mockito.verify(jerseyRuntime, times(2)).registerApplication(Mockito.any());
 
 		applicationRegistration.unregister();
 		registrations.remove(applicationRegistration);
 
 		cdl = new CountDownLatch(1);
 		cdl.await(1, TimeUnit.SECONDS);
-		assertEquals(0, dispatcher.getApplications().size());
+		assertEquals(1, dispatcher.getApplications().size());
 
 		runtimeRegistration.unregister();
 		registrations.remove(runtimeRegistration);
 
 		cdl = new CountDownLatch(1);
 		cdl.await(1, TimeUnit.SECONDS);
-		assertEquals(0, dispatcher.getRuntimes().size());
+		assertEquals(1, dispatcher.getRuntimes().size());
+	}
+	
+	/**
+	 * Tests registration of an application in case, that the application is registered after the runtime
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws InvalidSyntaxException 
+	 */
+	@Test
+	public void testRegisterApplicationOnActivate() throws IOException, InterruptedException, InvalidSyntaxException {
+		
+		JaxRsApplicationDispatcher dispatcher = getService(JaxRsApplicationDispatcher.class, 3000l);
+		assertNotNull(dispatcher);
+		assertEquals(1, dispatcher.getApplications().size());// HelloApplication
+		assertEquals(1, dispatcher.getRuntimes().size());//RuntimeMock
+		
+		Filter filter = FrameworkUtil.createFilter("(component.name=JaxRsRuntimeMock)");
+		JaxRsJerseyRuntime mockedRuntime = getService(filter, 3000l);
+		assertNotNull(mockedRuntime);
+		assertTrue(mockedRuntime instanceof RuntimeMock);
+		RuntimeMock runtimeMock = (RuntimeMock) mockedRuntime;
+		
+		boolean helloApp = false;
+		int helloCnt = 0;
+		for (JaxRsApplicationProvider p : runtimeMock.getProviders()) {
+			if (p.getJaxRsApplication() instanceof HelloApplication) {
+				helloApp = true;
+				helloCnt++;
+			}
+		}
+		assertTrue(helloApp);
+		assertEquals(1, helloCnt);
 	}
 
 	/**
@@ -219,38 +272,40 @@ public class JerseyDispatcherIntegrationTest {
 
 		JaxRsApplicationDispatcher dispatcher = getService(JaxRsApplicationDispatcher.class, 3000l);
 		assertNotNull(dispatcher);
-		assertEquals(0, dispatcher.getApplications().size());
+		assertEquals(1, dispatcher.getApplications().size());
 
-		ServiceRegistration<Application> applicationRegistration = context.registerService(Application.class, new Application(), null);
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "dummy");
+		ServiceRegistration<Application> applicationRegistration = context.registerService(Application.class, new Application(), properties);
 		registrations.add(applicationRegistration);
 
 		CountDownLatch cdl = new CountDownLatch(1);
 		cdl.await(1, TimeUnit.SECONDS);
-		assertEquals(1, dispatcher.getApplications().size());
+		assertEquals(2, dispatcher.getApplications().size());
 
 		ServiceRegistration<JaxRsJerseyRuntime> runtimeRegistration = context.registerService(JaxRsJerseyRuntime.class, jerseyRuntime, null);
 		registrations.add(runtimeRegistration);
 
 		cdl = new CountDownLatch(1);
 		cdl.await(1, TimeUnit.SECONDS);
-		assertEquals(1, dispatcher.getRuntimes().size());
+		assertEquals(2, dispatcher.getRuntimes().size());
 
 
-		Mockito.verify(jerseyRuntime).registerApplication(Mockito.any());
+		Mockito.verify(jerseyRuntime, times(2)).registerApplication(Mockito.any());
 
 		applicationRegistration.unregister();
 		registrations.remove(applicationRegistration);
 
 		cdl = new CountDownLatch(1);
 		cdl.await(1, TimeUnit.SECONDS);
-		assertEquals(0, dispatcher.getApplications().size());
+		assertEquals(1, dispatcher.getApplications().size());
 
 		runtimeRegistration.unregister();
 		registrations.remove(runtimeRegistration);
 
 		cdl = new CountDownLatch(1);
 		cdl.await(1, TimeUnit.SECONDS);
-		assertEquals(0, dispatcher.getRuntimes().size());
+		assertEquals(1, dispatcher.getRuntimes().size());
 	}
 
 	/**

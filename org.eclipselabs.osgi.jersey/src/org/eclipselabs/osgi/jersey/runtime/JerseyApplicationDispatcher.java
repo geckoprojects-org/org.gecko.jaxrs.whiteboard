@@ -9,14 +9,19 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.eclipselabs.osgi.jersey;
+package org.eclipselabs.osgi.jersey.runtime;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ws.rs.core.Application;
 
+import org.eclipselabs.osgi.jersey.JaxRsApplicationDispatcher;
+import org.eclipselabs.osgi.jersey.JaxRsApplicationProvider;
+import org.eclipselabs.osgi.jersey.JaxRsJerseyRuntime;
 import org.eclipselabs.osgi.jersey.application.JerseyApplicationProvider;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -37,6 +42,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
 @Component(name="JerseyApplicationDispatcher", service=JaxRsApplicationDispatcher.class, immediate=true)
 public class JerseyApplicationDispatcher implements JaxRsApplicationDispatcher {
 	
+	private static final Logger logger = Logger.getLogger("JerseyApplicationDispatcher");
 	private volatile Set<ServiceReference<Application>> applicationCache = new HashSet<>();
 	private volatile Set<ServiceReference<?>> resourceCache = new HashSet<>();
 	private volatile Set<JaxRsJerseyRuntime> runtimeCache = new HashSet<>();
@@ -76,6 +82,7 @@ public class JerseyApplicationDispatcher implements JaxRsApplicationDispatcher {
 	@Activate
 	public void activate(ComponentContext context) {
 		bundleContext = context.getBundleContext();
+		logger.log(Level.INFO, "Activate dispatcher " + runtimeCache.size() + ", " + applicationCache.size());
 	}
 	
 	/**
@@ -93,6 +100,7 @@ public class JerseyApplicationDispatcher implements JaxRsApplicationDispatcher {
 	 */
 	@Reference(name="runtime", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeRuntime")
 	public void addRuntime(JaxRsJerseyRuntime runtimeRef) {
+		logger.log(Level.INFO, "Add runtime");
 		boolean added = runtimeCache.add(runtimeRef);
 		if (added) {
 			updateRuntimeOnAdd(runtimeRef);
@@ -116,6 +124,12 @@ public class JerseyApplicationDispatcher implements JaxRsApplicationDispatcher {
 	 */
 	@Reference(name="application", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeApplication")
 	public void addApplication(ServiceReference<Application> applicationRef) {
+		logger.log(Level.INFO, "Add application");
+		String base = (String) applicationRef.getProperty(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE);
+		if (base == null || base.isEmpty()) {
+			logger.log(Level.WARNING, "Cannot add application reference because of missing property '" + JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE + "'");
+			return;
+		}
 		boolean added = applicationCache.add(applicationRef);
 		if (added) {
 			updateApplicationOnAdd(applicationRef);
@@ -183,11 +197,16 @@ public class JerseyApplicationDispatcher implements JaxRsApplicationDispatcher {
 	 * @param applicationRef the application reference to be added to the runtime
 	 */
 	private void doAddApplication(JaxRsJerseyRuntime runtime, ServiceReference<Application> applicationRef) {
+		String context = (String) applicationRef.getProperty(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE);
+		String name = (String) applicationRef.getProperty(JaxRSWhiteboardConstants.JAX_RS_NAME);
+		if (name == null) {
+			name = context;
+		}
 		Application application = bundleContext.getService(applicationRef);
-		JaxRsApplicationProvider provider = new JerseyApplicationProvider("", application);
+		JaxRsApplicationProvider provider = new JerseyApplicationProvider(name, context, application);
 		runtime.registerApplication(provider);
 	}
-
+	
 	private void updateApplicationOnRemove(ServiceReference<Application> applicationRef) {
 		// TODO Auto-generated method stub
 		

@@ -28,10 +28,11 @@ import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
 public class JerseyApplicationProvider implements JaxRsApplicationProvider {
 	
 	private String name;
+	private String path;
 	private Application application;
 	private ServletContainer applicationContainer;
 
-	public JerseyApplicationProvider(String name, Application jaxRsApplication) {
+	public JerseyApplicationProvider(String name, String path, Application jaxRsApplication) {
 		this.name = name ;
 		this.application = jaxRsApplication;
 	}
