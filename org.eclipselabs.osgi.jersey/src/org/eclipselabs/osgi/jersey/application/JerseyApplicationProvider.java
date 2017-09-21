@@ -64,7 +64,7 @@ public class JerseyApplicationProvider implements JaxRsApplicationProvider {
 		// first validate all properties
 		validateProperties();
 		// create name after validation, because some fields are needed eventually
-		this.name = getApplicationName();
+		this.name = getApplicationName(properties);
 	}
 
 	/* 
@@ -281,14 +281,16 @@ public class JerseyApplicationProvider implements JaxRsApplicationProvider {
 
 	/**
 	 * Returns the application name or generates one
+	 * @param properties the properties to get the name from
 	 * @return the application name or a generated one
 	 */
-	private String getApplicationName() {
+	public static String getApplicationName(Map<String, Object> properties) {
 		String name = null;
 		if (properties != null) {
+			String baseProperty = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE);
 			name = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_NAME);
-			if (name == null && applicationBase != null) {
-				name = "." + applicationBase;
+			if (name == null && baseProperty != null) {
+				name = "." + baseProperty;
 			}
 		}
 		return name == null ? "." + UUID.randomUUID().toString() : name;

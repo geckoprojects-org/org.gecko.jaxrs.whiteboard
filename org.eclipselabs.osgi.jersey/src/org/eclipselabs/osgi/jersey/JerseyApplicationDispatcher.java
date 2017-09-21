@@ -14,6 +14,7 @@ package org.eclipselabs.osgi.jersey;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -205,11 +206,19 @@ public class JerseyApplicationDispatcher implements JaxRsApplicationDispatcher {
 	}
 
 	private void updateApplicationOnRemove(Application application, Map<String, Object> properties) {
-		String name = getApplicationName(properties);
-		JaxRsApplicationProvider provider = applicationProviderCache.remove(name);
+		String name = JerseyApplicationProvider.getApplicationName(properties);
+		JaxRsApplicationProvider provider = null;
+		if (!applicationProviderCache.containsKey(name)) {
+			Optional<JaxRsApplicationProvider> first = applicationProviderCache.values().stream().filter((p)->p.getJaxRsApplication().equals(application)).findFirst();
+			if (first.isPresent()) {
+				provider = applicationProviderCache.remove(first.get().getName());
+			}
+		} else {
+			provider = applicationProviderCache.remove(name);
+		}
 		if (provider != null) {
 			runtime.unregisterApplication(provider);
-		}
+		} 
 		
 	}
 
