@@ -49,14 +49,26 @@ public class JaxRsHelper {
 	 * @return the application path
 	 */
 	public static String toServletPath(String path) {
-		String applicationPath = "/*";
-		if (path == null) {
+		return "/" + toApplicationPath(path);
+	}
+	
+	/**
+	 * Returns a servlet registration path from the given path. If the path value is <code>null</code>,
+	 * the default /* is returned. If present the value is taken and transformed into a valid Servlet spec format with
+	 * leading '/' and trailing /* to make the resources work.
+	 * If no application instance id given the default value /* is returned.
+	 * @param application the JaxRs application instance
+	 * @return the application path
+	 */
+	public static String toApplicationPath(String path) {
+		String applicationPath = "*";
+		if (path == null || path.isEmpty() || path.equals("/")) {
 			return applicationPath;
 		}
 		applicationPath = path;
 		if (applicationPath != null && !applicationPath.isEmpty()) {
-			if (!applicationPath.startsWith("/")) {
-				applicationPath = "/" + applicationPath;
+			if (applicationPath.startsWith("/")) {
+				applicationPath = applicationPath.substring(1, applicationPath.length());
 			}
 			if (!applicationPath.endsWith("/") && !applicationPath.endsWith("/*")) {
 				applicationPath += "/*";

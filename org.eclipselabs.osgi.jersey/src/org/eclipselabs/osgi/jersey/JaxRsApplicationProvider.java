@@ -11,10 +11,13 @@
  */
 package org.eclipselabs.osgi.jersey;
 
+import java.util.Map;
+
 import javax.ws.rs.core.Application;
 
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
+import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
 
 /**
  * Wrapper interface to provide an JaxRs application with all neccessary properties
@@ -22,6 +25,8 @@ import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
  * @since 30.07.2017
  */
 public interface JaxRsApplicationProvider {
+	
+	static final int NO_FAILURE = -1;
 	
 	/**
 	 * Returns the application name which targets to the property osgi.jaxrs.name
@@ -42,8 +47,25 @@ public interface JaxRsApplicationProvider {
 	public Application getJaxRsApplication();
 	
 	/**
-	 * Returns the {@link ApplicationDTO} for this JaxRsApplication
-	 * @return the {@link ApplicationDTO} for this JaxRsApplication
+	 * Returns the application properties or an empty map
+	 * @return the application properties or an empty map
+	 */
+	public Map<String, Object> getApplicationProperties();
+	
+	/**
+	 * Returns <code>true</code>, if this application can handle the given properties.
+	 * If the application contains a whiteboard target select, than the properties are checked against
+	 * the select filter and returns the result.
+	 * If the application has no whiteboard select filter, the method returns <code>true</code>
+	 * @param runtimeProperties the properties of the whiteboard runtime
+	 * @return <code>true</code>, if the application can be handled by a whiteboard runtime with the given properties
+	 */
+	public boolean canHandleWhiteboard(Map<String, Object> runtimeProperties);
+	
+	/**
+	 * Returns the {@link ApplicationDTO} for this JaxRsApplication.
+	 * In case of an error a {@link FailedApplicationDTO} instance will be returned
+	 * @return the {@link ApplicationDTO} or {@link FailedApplicationDTO} for this JaxRsApplication
 	 */
 	public ApplicationDTO getApplicationDTO();
 	

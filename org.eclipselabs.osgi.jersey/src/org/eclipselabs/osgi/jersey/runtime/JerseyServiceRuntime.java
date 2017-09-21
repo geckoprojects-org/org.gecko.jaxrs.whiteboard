@@ -59,7 +59,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime;
 import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntimeConstants;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
-import org.osgi.service.jaxrs.runtime.dto.RequestInfoDTO;
 import org.osgi.service.jaxrs.runtime.dto.RuntimeDTO;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
 
@@ -97,16 +96,6 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsJerseyHan
 	@Override
 	public RuntimeDTO getRuntimeDTO() {
 		return runtimeDTO;
-	}
-
-	/* 
-	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime#calculateRequestInfoDTO(java.lang.String)
-	 */
-	@Override
-	public RequestInfoDTO calculateRequestInfoDTO(String path) {
-		RequestInfoDTO ridto = new RequestInfoDTO();
-		return ridto;
 	}
 
 	/**
@@ -147,7 +136,7 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsJerseyHan
 		/*
 		 * Unregister the default application
 		 */
-		unregisterApplication(new JerseyApplicationProvider(".default", defaultApplication));
+		unregisterApplication(new JerseyApplicationProvider(".default", defaultApplication, "/"));
 		stopContextHandler();
 		stopServer();
 		binder.dispose();
@@ -174,7 +163,7 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsJerseyHan
 		}
 		// if port changed, both parts need to be restarted, no matter, if the context path has changed
 		if (portChanged || pathChanged) {
-			unregisterApplication(new JerseyApplicationProvider(".default", defaultApplication));
+			unregisterApplication(new JerseyApplicationProvider(".default", defaultApplication, "/"));
 			stopContextHandler();
 			stopServer();
 			createServerAndContext();

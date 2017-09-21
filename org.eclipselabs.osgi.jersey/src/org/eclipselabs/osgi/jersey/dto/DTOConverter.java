@@ -42,6 +42,7 @@ import org.osgi.framework.ServiceObjects;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
+import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.ResourceDTO;
 import org.osgi.service.jaxrs.runtime.dto.ResourceMethodInfoDTO;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
@@ -66,6 +67,23 @@ public class DTOConverter {
 		ApplicationDTO dto = new JerseyApplicationDTO();
 		dto.name = applicationProvider.getName();
 		dto.base = applicationProvider.getPath();
+		return dto;
+	}
+	
+	/**
+	 * This mapping sequence was taken from:
+	 * @see https://github.com/njbartlett/osgi_jigsaw/blob/master/nbartlett-jigsaw-osgi/src/nbartlett.jigsaw_osgi/org/apache/felix/framework/DTOFactory.java
+	 * @param svc the service reference
+	 * @return the service reference dto
+	 */
+	public static FailedApplicationDTO toFailedApplicationDTO(JaxRsApplicationProvider applicationProvider, int reason) {
+		if (applicationProvider == null) {
+			throw new IllegalArgumentException("Expected an application provider to create an ApplicationDTO");
+		}
+		FailedApplicationDTO dto = new FailedApplicationDTO();
+		dto.name = applicationProvider.getName();
+		dto.base = applicationProvider.getPath();
+		dto.failureReason = reason;
 		return dto;
 	}
 

@@ -13,7 +13,10 @@ package org.eclipselabs.osgi.jersey;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.ws.rs.core.Application;
 
@@ -30,16 +33,17 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
 
 /**
- * Dispatcher component that assigns all resources and extensions to applications
+ * Dispatcher component that assigns all resources and extensions to applications and a given whiteboard
  * @author Mark Hoffmann
  * @since 28.08.2017
  */
 @Component(name="JerseyApplicationDispatcher", service=JaxRsApplicationDispatcher.class, immediate=true)
 public class JerseyApplicationDispatcher implements JaxRsApplicationDispatcher {
 	
-	private volatile Set<ServiceReference<Application>> applicationCache = new HashSet<>();
+	private volatile Map<String, JaxRsApplicationProvider> applicationProviderCache = new ConcurrentHashMap<>();
+	private volatile Set<Application> applicationCache = new HashSet<>();
 	private volatile Set<ServiceReference<?>> resourceCache = new HashSet<>();
-	private volatile Set<JaxRsJerseyRuntime> runtimeCache = new HashSet<>();
+	private volatile JaxRsJerseyRuntime runtime;
 	private volatile BundleContext bundleContext = null;
 	
 	/* 
@@ -47,8 +51,8 @@ public class JerseyApplicationDispatcher implements JaxRsApplicationDispatcher {
 	 * @see org.eclipselabs.osgi.jersey.JaxRsApplicationDispatcher#getApplications()
 	 */
 	@Override
-	public Set<ServiceReference<Application>> getApplications() {
-		return Collections.unmodifiableSet(applicationCache);
+	public Set<JaxRsApplicationProvider> getApplications() {
+		return Collections.unmodifiableSet(new HashSet<>(applicationProviderCache.values()));
 	}
 
 	/* 
@@ -62,11 +66,11 @@ public class JerseyApplicationDispatcher implements JaxRsApplicationDispatcher {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.eclipselabs.osgi.jersey.JaxRsApplicationDispatcher#getRuntimes()
+	 * @see org.eclipselabs.osgi.jersey.JaxRsApplicationDispatcher#getRuntime()
 	 */
 	@Override
-	public Set<JaxRsJerseyRuntime> getRuntimes() {
-		return Collections.unmodifiableSet(runtimeCache);
+	public JaxRsJerseyRuntime getRuntime() {
+		return runtime;
 	}
 
 	/**
@@ -91,12 +95,9 @@ public class JerseyApplicationDispatcher implements JaxRsApplicationDispatcher {
 	 * Adds a new jersey runtime 
 	 * @param runtime the runtime to add
 	 */
-	@Reference(name="runtime", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeRuntime")
+	@Reference(name="runtime", cardinality=ReferenceCardinality.MANDATORY, policy=ReferencePolicy.STATIC, unbind="removeRuntime")
 	public void addRuntime(JaxRsJerseyRuntime runtimeRef) {
-		boolean added = runtimeCache.add(runtimeRef);
-		if (added) {
-			updateRuntimeOnAdd(runtimeRef);
-		}
+		runtime = runtimeRef;
 	}
 	
 	/**
@@ -104,32 +105,31 @@ public class JerseyApplicationDispatcher implements JaxRsApplicationDispatcher {
 	 * @param runtime the runtime to remove
 	 */
 	public void removeRuntime(JaxRsJerseyRuntime runtimeRef) {
-		boolean removed = runtimeCache.remove(runtimeRef);
-		if (removed) {
-			updateRuntimeOnRemove(runtimeRef);
-		}
+		runtime = null;
 	}
 	
 	/**
 	 * Adds a new application
 	 * @param application the application to add
+	 * @param properties the service properties
 	 */
 	@Reference(name="application", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeApplication")
-	public void addApplication(ServiceReference<Application> applicationRef) {
-		boolean added = applicationCache.add(applicationRef);
+	public void addApplication(Application application, Map<String, Object> properties) {
+		boolean added = applicationCache.add(application);
 		if (added) {
-			updateApplicationOnAdd(applicationRef);
+			updateApplicationOnAdd(application, properties);
 		}
 	}
 	
 	/**
 	 * Removes a application 
 	 * @param application the application to remove
+	 * @param properties the service properties
 	 */
-	public void removeApplication(ServiceReference<Application> applicationRef) {
-		boolean removed = applicationCache.remove(applicationRef);
+	public void removeApplication(Application application, Map<String, Object> properties) {
+		boolean removed = applicationCache.remove(application);
 		if (removed) {
-			updateApplicationOnRemove(applicationRef);
+			updateApplicationOnRemove(application, properties);
 		}
 	}
 	
@@ -157,39 +157,59 @@ public class JerseyApplicationDispatcher implements JaxRsApplicationDispatcher {
 	}
 	
 	/**
-	 * Called, when a new runtime was added
-	 * @param runtime the runtaime that was added
-	 */
-	private void updateRuntimeOnAdd(JaxRsJerseyRuntime runtime) {
-		Collections.unmodifiableSet(applicationCache).forEach((appRef)->doAddApplication(runtime, appRef));
-	}
-
-	private void updateRuntimeOnRemove(JaxRsJerseyRuntime runtime) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	/**
 	 * Called when an new application reference was added.
-	 * @param applicationRef the new application reference
+	 * @param application the new application
+	 * @param properties the service properties
 	 */
-	private void updateApplicationOnAdd(ServiceReference<Application> applicationRef) {
-		Collections.unmodifiableSet(runtimeCache).forEach((runtime)->doAddApplication(runtime, applicationRef));
+	private void updateApplicationOnAdd(Application application, Map<String, Object> properties) {
+		JaxRsApplicationProvider provider = doAddApplication(application, properties);
+		if (provider.canHandleWhiteboard(runtime.getProperties())) {
+			runtime.registerApplication(provider);
+		}
 	}
 	
 	/**
 	 * Adds the given application reference to the given runtime
 	 * @param runtime the runtime to add the application
-	 * @param applicationRef the application reference to be added to the runtime
+	 * @param application the application reference to be added to the runtime
+	 * @param properties the service properties
+	 * @return the application provider
 	 */
-	private void doAddApplication(JaxRsJerseyRuntime runtime, ServiceReference<Application> applicationRef) {
-		Application application = bundleContext.getService(applicationRef);
-		JaxRsApplicationProvider provider = new JerseyApplicationProvider("", application);
-		runtime.registerApplication(provider);
+	private JaxRsApplicationProvider doAddApplication(Application application, Map<String, Object> properties) {
+		JaxRsApplicationProvider provider = new JerseyApplicationProvider(application, properties);
+		String name = provider.getName();
+		applicationProviderCache.put(name, provider);
+		return provider;
 	}
 
-	private void updateApplicationOnRemove(ServiceReference<Application> applicationRef) {
-		// TODO Auto-generated method stub
+	/**
+	 * Returns the application name or generates one
+	 * @param properties the service properties
+	 * @return the application name or a generated one
+	 */
+	private String getApplicationName(Map<String, Object> properties) {
+		String name = null;
+		if (properties != null) {
+			Long serviceId = (Long) properties.get("service.id");
+			Long componentId = (Long) properties.get("component.id");
+			name = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_NAME);
+			if (name == null) {
+				if (serviceId != null) {
+					name = ".sid" + serviceId.toString();
+				} else if (componentId != null) {
+					name = ".cid" + componentId.toString();
+				} 
+			}
+		}
+		return name == null ? "." + UUID.randomUUID().toString() : name;
+	}
+
+	private void updateApplicationOnRemove(Application application, Map<String, Object> properties) {
+		String name = getApplicationName(properties);
+		JaxRsApplicationProvider provider = applicationProviderCache.remove(name);
+		if (provider != null) {
+			runtime.unregisterApplication(provider);
+		}
 		
 	}
 

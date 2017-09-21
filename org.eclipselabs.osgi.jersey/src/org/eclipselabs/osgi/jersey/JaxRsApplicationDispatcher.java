@@ -13,8 +13,6 @@ package org.eclipselabs.osgi.jersey;
 
 import java.util.Set;
 
-import javax.ws.rs.core.Application;
-
 import org.osgi.framework.ServiceReference;
 
 /**
@@ -28,7 +26,7 @@ public interface JaxRsApplicationDispatcher {
 	 * Returns all cached applications of the dispatcher or an empty set
 	 * @return all cached applications of the dispatcher or an empty set
 	 */
-	public Set<ServiceReference<Application>> getApplications();
+	public Set<JaxRsApplicationProvider> getApplications();
 	
 	/**
 	 * Returns all cached resources and extensions of the dispatcher or an empty set
@@ -36,9 +34,9 @@ public interface JaxRsApplicationDispatcher {
 	 */
 	public Set<ServiceReference<?>> getResources();
 	/**
-	 * Returns all cached runtimes of the dispatcher or an empty set
-	 * @return all cached runtimes of the dispatcher or an empty set
+	 * Returns the added runtime of the dispatcher
+	 * @return the added runtime of the dispatcher
 	 */
-	public Set<JaxRsJerseyRuntime> getRuntimes();
+	public JaxRsJerseyRuntime getRuntime();
 
 }
