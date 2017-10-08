@@ -41,6 +41,8 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
+		assertTrue(provider.isLegacy());
+		
 		ApplicationDTO dto = provider.getApplicationDTO();
 		assertTrue(dto instanceof FailedApplicationDTO);
 		FailedApplicationDTO failedDto = (FailedApplicationDTO) dto;
@@ -59,6 +61,8 @@ public class JaxRsApplicationProviderTest {
 		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
+		
+		assertTrue(provider.isLegacy());
 		
 		ApplicationDTO dto = provider.getApplicationDTO();
 		assertTrue(dto instanceof FailedApplicationDTO);
@@ -79,6 +83,8 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
+		assertTrue(provider.isLegacy());
+		
 		ApplicationDTO dto = provider.getApplicationDTO();
 		assertTrue(dto instanceof FailedApplicationDTO);
 		FailedApplicationDTO failedDto = (FailedApplicationDTO) dto;
@@ -96,6 +102,8 @@ public class JaxRsApplicationProviderTest {
 		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
+		
+		assertTrue(provider.isLegacy());
 		
 		ApplicationDTO dto = provider.getApplicationDTO();
 		assertFalse(dto instanceof FailedApplicationDTO);
@@ -119,6 +127,7 @@ public class JaxRsApplicationProviderTest {
 		
 		assertEquals("test/*", provider.getPath());
 		assertEquals("myTest", provider.getName());
+		assertTrue(provider.isLegacy());
 	}
 	
 	@Test
@@ -129,6 +138,8 @@ public class JaxRsApplicationProviderTest {
 		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(hallo=bla");
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
+		
+		assertTrue(provider.isLegacy());
 		
 		Map<String, Object> runtimeProperties = new HashMap<>();
 		assertFalse(provider.canHandleWhiteboard(runtimeProperties));
@@ -158,6 +169,8 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
+		assertTrue(provider.isLegacy());
+		
 		Map<String, Object> runtimeProperties = new HashMap<>();
 		assertFalse(provider.canHandleWhiteboard(runtimeProperties));
 		
@@ -184,6 +197,8 @@ public class JaxRsApplicationProviderTest {
 		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(|(role=bla)(mandant=eTest))");
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
+		
+		assertTrue(provider.isLegacy());
 		
 		Map<String, Object> runtimeProperties = new HashMap<>();
 		assertFalse(provider.canHandleWhiteboard(runtimeProperties));
@@ -223,6 +238,8 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
+		assertTrue(provider.isLegacy());
+		
 		Map<String, Object> runtimeProperties = new HashMap<>();
 		assertFalse(provider.canHandleWhiteboard(runtimeProperties));
 		
@@ -259,6 +276,8 @@ public class JaxRsApplicationProviderTest {
 		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(|(role=bla)(mandant=eTest))");
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
+		
+		assertTrue(provider.isLegacy());
 		
 		assertFalse(provider.canHandleWhiteboard(null));
 		

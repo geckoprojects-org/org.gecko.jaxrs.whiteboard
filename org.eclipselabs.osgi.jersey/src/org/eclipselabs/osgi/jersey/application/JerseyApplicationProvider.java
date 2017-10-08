@@ -167,6 +167,79 @@ public class JerseyApplicationProvider implements JaxRsApplicationProvider {
 		}
 	}
 
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.osgi.jersey.JaxRsApplicationProvider#isLegacy()
+	 */
+	@Override
+	public boolean isLegacy() {
+		return Application.class == application.getClass();
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.osgi.jersey.JaxRsApplicationProvider#addResource(java.lang.Object, java.util.Map)
+	 */
+	@Override
+	public boolean addResource(Object resource, Map<String, Object> properties) {
+		if (isLegacy()) {
+			logger.log(Level.WARNING, "This application is a legacy application and therefore not extensible: " + getName());
+			return false;
+		}
+		if (properties == null) {
+			properties = Collections.emptyMap();
+		}
+		String resourceProp = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_RESOURCE);
+		if (!Boolean.parseBoolean(resourceProp)) {
+			logger.log(Level.WARNING, "The resource to add is not declared with the resource property: " + JaxRSWhiteboardConstants.JAX_RS_RESOURCE);
+			return false;
+		}
+		boolean filterValid = isApplicationFilterValid(properties);
+		return filterValid;
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.osgi.jersey.JaxRsApplicationProvider#removeResource(java.lang.Object, java.util.Map)
+	 */
+	@Override
+	public boolean removeResource(Object resource, Map<String, Object> properties) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.osgi.jersey.JaxRsApplicationProvider#addExtension(java.lang.Object, java.util.Map)
+	 */
+	@Override
+	public boolean addExtension(Object extension, Map<String, Object> properties) {
+		if (isLegacy()) {
+			logger.log(Level.WARNING, "This application is a legacy application and therefore not extensible: " + getName());
+			return false;
+		}
+		if (properties == null) {
+			properties = Collections.emptyMap();
+		}
+		String resourceProp = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_EXTENSION);
+		if (!Boolean.parseBoolean(resourceProp)) {
+			logger.log(Level.WARNING, "The extension to add is not declared with the extension resource property: " + JaxRSWhiteboardConstants.JAX_RS_RESOURCE);
+			return false;
+		}
+		boolean filterValid = isApplicationFilterValid(properties);
+		return filterValid;
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.osgi.jersey.JaxRsApplicationProvider#removeExtension(java.lang.Object, java.util.Map)
+	 */
+	@Override
+	public boolean removeExtension(Object extension, Map<String, Object> properties) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 	/**
 	 * Adds a service reference for a resource to the default application
 	 * @param resourceRef the reference to register
@@ -267,6 +340,36 @@ public class JerseyApplicationProvider implements JaxRsApplicationProvider {
 	}
 
 	/**
+	 * Returns <code>true</code>, if the application filter property handling is valid.
+	 * @param properties the resource/extension properties
+	 * @return <code>true</code>, if the handling is valid
+	 */
+	private boolean isApplicationFilterValid(Map<String, Object> properties) {
+		if (isDefaultApplication()) {
+			logger.log(Level.WARNING, "There is no application select filter valid for the default application");
+			return false;
+		}
+		String applicationFilter = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT);
+		if (applicationFilter != null) {
+			try {
+				Filter filter = FrameworkUtil.createFilter(applicationFilter);
+				boolean applicationMatch = filter.matches(getApplicationProperties());
+				if (!applicationMatch) {
+					logger.log(Level.WARNING, "The given application select filter does not math to this application for this resource/extension: " + getName());
+					return false;
+				}
+			} catch (InvalidSyntaxException e) {
+				logger.log(Level.WARNING, "The given application select filter is invalid: " + applicationFilter, e);
+				return false;
+			}
+		} else {
+			logger.log(Level.WARNING, "There is no application select filter");
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Updates the status. 
 	 * @param newStatus
 	 */
@@ -277,6 +380,14 @@ public class JerseyApplicationProvider implements JaxRsApplicationProvider {
 		if (status == NO_FAILURE) {
 			status = newStatus;
 		}
+	}
+
+	/**
+	 * Returns <code>true</code>, if this application is the default application
+	 * @return <code>true</code>, if this application is the default application
+	 */
+	private boolean isDefaultApplication() {
+		return getName().equals(".default");
 	}
 
 	/**
