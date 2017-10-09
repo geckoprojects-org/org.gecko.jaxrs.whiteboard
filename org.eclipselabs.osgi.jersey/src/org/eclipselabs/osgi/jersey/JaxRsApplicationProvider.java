@@ -24,9 +24,7 @@ import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
  * @author Mark Hoffmann
  * @since 30.07.2017
  */
-public interface JaxRsApplicationProvider {
-	
-	static final int NO_FAILURE = -1;
+public interface JaxRsApplicationProvider extends JaxRsConstants {
 	
 	/**
 	 * Returns the application name which targets to the property osgi.jaxrs.name
@@ -87,6 +85,12 @@ public interface JaxRsApplicationProvider {
 	 * @return <code>true</code>, if the container contains a legacy application, otherwise <code>false</code>
 	 */
 	public boolean isLegacy();
+	
+	/**
+	 * Returns <code>true</code>, if the application provider is the default application.
+	 * @return <code>true</code>, if the application provider is the default application., otherwise <code>false</code>
+	 */
+	public boolean isDefault();
 	
 	/**
 	 * Adds a new resource to the application provider. The call returns <code>true</code>,

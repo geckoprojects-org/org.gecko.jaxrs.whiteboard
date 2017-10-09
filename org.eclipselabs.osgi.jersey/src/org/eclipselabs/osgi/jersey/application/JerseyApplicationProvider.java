@@ -21,12 +21,12 @@ import javax.ws.rs.core.Application;
 
 import org.eclipselabs.osgi.jaxrs.helper.JaxRsHelper;
 import org.eclipselabs.osgi.jersey.JaxRsApplicationProvider;
+import org.eclipselabs.osgi.jersey.JaxRsResourceProvider;
 import org.eclipselabs.osgi.jersey.dto.DTOConverter;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
@@ -38,7 +38,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
  */
 public class JerseyApplicationProvider implements JaxRsApplicationProvider {
 
-	private static final Logger logger = Logger.getLogger("jersey.applicationDispatcher");
+	private static final Logger logger = Logger.getLogger("jersey.applicationProvider");
 	private final String name;
 	private final Map<String, Object> properties;
 	private Application application;
@@ -65,6 +65,9 @@ public class JerseyApplicationProvider implements JaxRsApplicationProvider {
 		validateProperties();
 		// create name after validation, because some fields are needed eventually
 		this.name = getApplicationName(properties);
+		if (isLegacy()) {
+			this.application = new JerseyApplication(this.name);
+		}
 	}
 
 	/* 
@@ -178,6 +181,14 @@ public class JerseyApplicationProvider implements JaxRsApplicationProvider {
 
 	/* 
 	 * (non-Javadoc)
+	 * @see org.eclipselabs.osgi.jersey.JaxRsApplicationProvider#isDefault()
+	 */
+	public boolean isDefault() {
+		return getName().equals(".default");
+	}
+
+	/* 
+	 * (non-Javadoc)
 	 * @see org.eclipselabs.osgi.jersey.JaxRsApplicationProvider#addResource(java.lang.Object, java.util.Map)
 	 */
 	@Override
@@ -189,12 +200,16 @@ public class JerseyApplicationProvider implements JaxRsApplicationProvider {
 		if (properties == null) {
 			properties = Collections.emptyMap();
 		}
-		String resourceProp = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_RESOURCE);
-		if (!Boolean.parseBoolean(resourceProp)) {
+		JaxRsResourceProvider provider = new JerseyResource(resource, properties);
+		if (!provider.isResource()) {
 			logger.log(Level.WARNING, "The resource to add is not declared with the resource property: " + JaxRSWhiteboardConstants.JAX_RS_RESOURCE);
 			return false;
 		}
-		boolean filterValid = isApplicationFilterValid(properties);
+		boolean filterValid = provider.canHandleApplication(this);
+		if (filterValid && !isLegacy()) {
+			JerseyApplication ja = (JerseyApplication) application;
+			ja.addResource(provider);
+		}
 		return filterValid;
 	}
 
@@ -204,8 +219,23 @@ public class JerseyApplicationProvider implements JaxRsApplicationProvider {
 	 */
 	@Override
 	public boolean removeResource(Object resource, Map<String, Object> properties) {
-		// TODO Auto-generated method stub
-		return false;
+		if (isLegacy()) {
+			logger.log(Level.WARNING, "This application is a legacy application and therefore there is nothing to remove: ");
+			return false;
+		}
+		if (properties == null) {
+			properties = Collections.emptyMap();
+		}
+		JaxRsResourceProvider provider = new JerseyResource(resource, properties);
+		if (!provider.isResource()) {
+			logger.log(Level.WARNING, "The resource to be removed is not declared with the resource property: " + JaxRSWhiteboardConstants.JAX_RS_RESOURCE);
+			return false;
+		}
+		if (application instanceof JerseyApplication) {
+			JerseyApplication ja = (JerseyApplication) application;
+			ja.removeResource(provider);
+		}
+		return true;
 	}
 
 	/* 
@@ -241,58 +271,6 @@ public class JerseyApplicationProvider implements JaxRsApplicationProvider {
 	}
 
 	/**
-	 * Adds a service reference for a resource to the default application
-	 * @param resourceRef the reference to register
-	 */
-	public void addResourceReference(ServiceReference<?> resourceRef) {
-		if (application == null) {
-			throw new IllegalStateException("This application provider does not contain an application, but should have one to add a resource reference");
-		}
-		if (application instanceof JerseyApplication) {
-			((JerseyApplication)application).addResourceReference(resourceRef);
-		}
-	}
-
-	/**
-	 * Removed a resource service reference from the default application
-	 * @param resourceRef the service reference of the resource to be removed
-	 */
-	public void removeResourceReference(ServiceReference<?> resourceRef) {
-		if (application == null) {
-			throw new IllegalStateException("This application provider does not contain an application, but should have one to remove a resource reference");
-		}
-		if (application instanceof JerseyApplication) {
-			((JerseyApplication)application).removeResourceReference(resourceRef);
-		}
-	}
-
-	/**
-	 * Adds a service reference for a extension to the default application
-	 * @param extensionRef the reference to register
-	 */
-	public void addExtensionReference(ServiceReference<?> extensionRef) {
-		if (application == null) {
-			throw new IllegalStateException("This application provider does not contain an application, but should have one to add a resource reference");
-		}
-		if (application instanceof JerseyApplication) {
-			((JerseyApplication)application).addResourceReference(extensionRef);
-		}
-	}
-
-	/**
-	 * Removed a extension service reference from the default application
-	 * @param extensionRef the service reference of the extension to be removed
-	 */
-	public void removeExtensionReference(ServiceReference<?> extensionRef) {
-		if (application == null) {
-			throw new IllegalStateException("This application provider does not contain an application, but should have one to remove a resource reference");
-		}
-		if (application instanceof JerseyApplication) {
-			((JerseyApplication)application).removeResourceReference(extensionRef);
-		}
-	}
-
-	/**
 	 * Sets an application instance
 	 * @param application the application to set
 	 */
@@ -305,7 +283,7 @@ public class JerseyApplicationProvider implements JaxRsApplicationProvider {
 
 	/**
 	 * Validates the application properties for required values and updates the DTO
-	 * It first starts checking for required properties, than the whiteboard target filter and extension select filter, if given.
+	 * It first starts checking for required properties, then the whiteboard target filter and extension select filter, if given.
 	 */
 	private void validateProperties() {
 		updateStatus(NO_FAILURE);
@@ -345,7 +323,7 @@ public class JerseyApplicationProvider implements JaxRsApplicationProvider {
 	 * @return <code>true</code>, if the handling is valid
 	 */
 	private boolean isApplicationFilterValid(Map<String, Object> properties) {
-		if (isDefaultApplication()) {
+		if (isDefault()) {
 			logger.log(Level.WARNING, "There is no application select filter valid for the default application");
 			return false;
 		}
@@ -380,14 +358,6 @@ public class JerseyApplicationProvider implements JaxRsApplicationProvider {
 		if (status == NO_FAILURE) {
 			status = newStatus;
 		}
-	}
-
-	/**
-	 * Returns <code>true</code>, if this application is the default application
-	 * @return <code>true</code>, if this application is the default application
-	 */
-	private boolean isDefaultApplication() {
-		return getName().equals(".default");
 	}
 
 	/**

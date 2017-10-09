@@ -76,10 +76,10 @@ public class JaxRsRuntimeComponent {
 		// activate and start server
 		runtime.initialize(context);
 		if (defaultApplicationProvider == null) {
-			defaultApplicationProvider = new JerseyApplicationProvider(name, new JerseyApplication(".default", context.getBundleContext()), "/");
+			defaultApplicationProvider = new JerseyApplicationProvider(name, new JerseyApplication(".default"), "/");
 			defaultApplication = (JerseyApplication) defaultApplicationProvider.getJaxRsApplication();
 			resourcesRefList.forEach((sr)->{
-				defaultApplication.addResourceReference(sr);
+//				defaultApplication.addResourceReference(sr);
 			});
 		}
 		// now register default application
@@ -144,7 +144,7 @@ public class JaxRsRuntimeComponent {
 	public void addResource(ServiceReference<Object> jaxrsResourceRef) {
 		boolean added = resourcesRefList.add(jaxrsResourceRef);
 		if (defaultApplication != null && added) {
-			defaultApplication.addResourceReference(jaxrsResourceRef);
+//			defaultApplication.addResourceReference(jaxrsResourceRef);
 			runtime.reloadApplication(defaultApplicationProvider);
 		}
 		if (added) {
@@ -180,7 +180,7 @@ public class JaxRsRuntimeComponent {
 	public void removeResource(ServiceReference<?> jaxrsResourceRef) {
 		boolean removed = resourcesRefList.remove(jaxrsResourceRef);
 		if (defaultApplication != null && removed) {
-			defaultApplication.removeResourceReference(jaxrsResourceRef);
+//			defaultApplication.removeResourceReference(jaxrsResourceRef);
 			runtime.reloadApplication(defaultApplicationProvider);
 		}
 		if (removed) {

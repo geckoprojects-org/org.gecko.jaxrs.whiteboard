@@ -22,11 +22,7 @@ import java.util.logging.Logger;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceObjects;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
+import org.eclipselabs.osgi.jersey.JaxRsResourceProvider;
 
 /**
  * 
@@ -35,18 +31,16 @@ import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
  */
 @ApplicationPath("/")
 public class JerseyApplication extends Application {
-	
-	private volatile Map<ServiceReference<?>, Class<?>> classesMap = new ConcurrentHashMap<>();
-	private volatile Map<ServiceReference<?>, Object> singletonMap = new ConcurrentHashMap<>();
+
+	private volatile Map<String, Class<?>> classesMap = new ConcurrentHashMap<>();
+	private volatile Map<String, Object> singletonMap = new ConcurrentHashMap<>();
 	private final String applicationName;
-	private final BundleContext context;
 	private final Logger log = Logger.getLogger("o.e.o.j.application");
-	
-	public JerseyApplication(String applicationName, BundleContext context) {
+
+	public JerseyApplication(String applicationName) {
 		this.applicationName = applicationName;
-		this.context = context;
 	}
-	
+
 	/* 
 	 * (non-Javadoc)
 	 * @see javax.ws.rs.core.Application#getClasses()
@@ -55,7 +49,7 @@ public class JerseyApplication extends Application {
 	public Set<Class<?>> getClasses() {
 		return Collections.unmodifiableSet(new HashSet<>(classesMap.values()));
 	}
-	
+
 	/* 
 	 * (non-Javadoc)
 	 * @see javax.ws.rs.core.Application#getSingletons()
@@ -64,7 +58,7 @@ public class JerseyApplication extends Application {
 	public Set<Object> getSingletons() {
 		return Collections.unmodifiableSet(new HashSet<>(singletonMap.values()));
 	}
-	
+
 	/**
 	 * Returns the name of the whiteboard
 	 * @return the name of the whiteboard
@@ -72,80 +66,51 @@ public class JerseyApplication extends Application {
 	public String getApplicationName() {
 		return applicationName;
 	}
-	
+
 	/**
-	 * Adds a service reference for a resource to the default application
-	 * @param resourceRef the reference to register
+	 * Adds a resource provider to the application
+	 * @param resourceProvider the provider to register
 	 */
-	public void addResourceReference(ServiceReference<?> resourceRef) {
-		if (resourceRef == null) {
+	public void addResource(JaxRsResourceProvider resourceProvider) {
+		if (resourceProvider == null) {
 			if (log != null) {
-				log.log(Level.WARNING, "A null service reference was given to register as a JaxRs resource");
+				log.log(Level.WARNING, "A null service resource provider was given to register as a JaxRs resource");
 			}
 			return;
 		}
-		if (context == null) {
-			throw new IllegalStateException("No bundle context was given to the JerseyApplication");
+		String name = resourceProvider.getName();
+		if (resourceProvider.isSingleton()) {
+			Object resource = resourceProvider.getResource();
+			singletonMap.put(name, resource);
+		} else {
+			Class<?> resourceClass = resourceProvider.getResourceClass();
+			classesMap.put(name, resourceClass);
 		}
-		if (applicationName == null) {
-			throw new IllegalStateException("No whiteboard name was given to the JerseyApplication");
-		}
-		String resource = (String) resourceRef.getProperty(JaxRSWhiteboardConstants.JAX_RS_RESOURCE);
-		String extension = (String) resourceRef.getProperty(JaxRSWhiteboardConstants.JAX_RS_EXTENSION);
-		if (!Boolean.parseBoolean(resource) && !Boolean.parseBoolean(extension)) {
+	}
+
+	/**
+	 * Removes a resource from the application
+	 * @param resourceProvider the provider of the resource to be removed
+	 */
+	public void removeResource(JaxRsResourceProvider resourceProvider) {
+		if (resourceProvider == null) {
 			if (log != null) {
-				log.log(Level.WARNING, "The given service reference is not marked as JaxRs resource or extension. Expected property 'osgi.jaxrs.resource=true' or 'osgi.jaxrs.extension=true'");
+				log.log(Level.WARNING, "A null resource provider was given to unregister as a JaxRs resource");
 			}
 			return;
 		}
-		String scope = (String) resourceRef.getProperty("service.scope");
-		if (Constants.SCOPE_PROTOTYPE.equalsIgnoreCase(scope)) {
-			ServiceObjects<?> so = context.getServiceObjects(resourceRef);
-			if (so == null) {
-				if (log != null) {
-					log.log(Level.WARNING, "The prototype service of the given service references has gone");
-				}
-			} else {
-				Object o = so.getService();
-				if (o == null) {
-					if (log != null) {
-						log.log(Level.WARNING, "The prototype service of the given service references has gone");
-					}
-				} else {
-					classesMap.put(resourceRef, o.getClass());
-				}
+		String name = resourceProvider.getName();
+		if (resourceProvider.isSingleton()) {
+			synchronized (singletonMap) {
+				singletonMap.remove(name);
 			}
 		} else {
-			Object service = context.getService(resourceRef);
-			if (service == null) {
-				if (log != null) {
-					log.log(Level.WARNING, "The service of the given service references has gone");
-				}
-			} else {
-				singletonMap.put(resourceRef, service);
+			synchronized (classesMap) {
+				classesMap.remove(name);
 			}
 		}
 	}
-	
-	/**
-	 * Removed a resource service reference from the default application
-	 * @param resourceRef the service reference of the resource to be removed
-	 */
-	public void removeResourceReference(ServiceReference<?> resourceRef) {
-		if (resourceRef == null) {
-			if (log != null) {
-				log.log(Level.WARNING, "A null service reference was given to unregister as a JaxRs resource");
-			}
-			return;
-		}
-		synchronized (classesMap) {
-			classesMap.remove(resourceRef);
-		}
-		synchronized (singletonMap) {
-			singletonMap.remove(resourceRef);
-		}
-	}
-	
+
 	/**
 	 * Cleans up all resources
 	 */

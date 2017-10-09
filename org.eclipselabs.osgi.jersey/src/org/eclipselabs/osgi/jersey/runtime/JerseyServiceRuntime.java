@@ -171,7 +171,7 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsJerseyHan
 			 * Setup the default application
 			 */
 			if (defaultApplication == null) {
-				defaultApplication = new JerseyApplication(name, context.getBundleContext());
+				defaultApplication = new JerseyApplication(name);
 			} else {
 				defaultApplication.dispose();
 			}

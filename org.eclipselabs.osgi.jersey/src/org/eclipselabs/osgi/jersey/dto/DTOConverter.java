@@ -35,6 +35,7 @@ import javax.ws.rs.core.Application;
 
 import org.eclipselabs.osgi.jaxrs.helper.JaxRsHelper;
 import org.eclipselabs.osgi.jersey.JaxRsApplicationProvider;
+import org.eclipselabs.osgi.jersey.JaxRsResourceProvider;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -43,6 +44,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
+import org.osgi.service.jaxrs.runtime.dto.FailedResourceDTO;
 import org.osgi.service.jaxrs.runtime.dto.ResourceDTO;
 import org.osgi.service.jaxrs.runtime.dto.ResourceMethodInfoDTO;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
@@ -175,6 +177,64 @@ public class DTOConverter {
 			empty = false;
 		}
 		return empty ? null : dto;
+	}
+	
+	/**
+	 * Maps a object with properties and a base into a {@link ResourceDTO}
+	 * @param resource the resource instance, needed to be inspect
+	 * @param properties, service properties
+	 * @param base the application base
+	 * @return a {@link ResourceDTO} or <code>null</code>, if the given object is no JaxRs resource
+	 */
+	public static <T> ResourceDTO toResourceDTO(T resource, Map<String, Object> properties) {
+		// to service available
+		if (resource == null) {
+			return null;
+		}
+		if (properties == null) {
+			throw new IllegalArgumentException("Expected an resource properties to create a ResourceDTO");
+		}
+		ResourceDTO dto = new JerseyResourceDTO();
+		boolean empty = true;
+		Class<?> clazz = resource.getClass();
+		Path path = clazz.getAnnotation(Path.class);
+		if (path != null) {
+			dto.base = path.value();
+			empty = false;
+		}
+		String resourceName = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_NAME);
+		if (resourceName != null) {
+			dto.name = resourceName;
+			empty = false;
+		}
+		Long serviceId = (Long) properties.get(Constants.SERVICE_ID);
+		if (serviceId != null) {
+			dto.serviceId = serviceId.longValue();
+			empty = false;
+		}
+		
+		ResourceMethodInfoDTO[] rmiDTOs = getResourceMethodInfoDTOs(resource);
+		if (rmiDTOs != null) {
+			dto.resourceMethods = rmiDTOs;
+			empty = false;
+		}
+		return empty ? null : dto;
+	}
+	
+	/**
+	 * Maps resource provider into a {@link FailedResourceDTO}
+	 * @param resourceProvider the resource provider instance, needed to be inspect
+	 * @param reason the error reason
+	 * @return a {@link FailedResourceDTO} or <code>null</code>, if the given object is no JaxRs resource
+	 */
+	public static FailedResourceDTO toFailedResourceDTO(JaxRsResourceProvider resourceProvider, int reason) {
+		if (resourceProvider == null) {
+			throw new IllegalArgumentException("Expected an resource provider to create an ResourceDTO");
+		}
+		FailedResourceDTO dto = new FailedResourceDTO();
+		dto.name = resourceProvider.getName();
+		dto.failureReason = reason;
+		return dto;
 	}
 
 	/**
