@@ -65,7 +65,7 @@ public class JerseyApplicationProvider implements JaxRsApplicationProvider {
 		validateProperties();
 		// create name after validation, because some fields are needed eventually
 		this.name = getApplicationName(properties);
-		if (isLegacy()) {
+		if (!isLegacy()) {
 			this.application = new JerseyApplication(this.name);
 		}
 	}
