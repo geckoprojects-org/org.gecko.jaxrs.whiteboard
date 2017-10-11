@@ -1,0 +1,13 @@
+Bundle-Version: 1.0.0.${tstamp}
+Bundle-Copyright: Data In Motion Consulting
+Bundle-License: Eclipse Public License v1.0
+Bundle-Name: Jersey JaxRS API
+Bundle-Description: Jersey OSGi JaxRs Whiteboard API
+Bundle-Vendor: Data In Motion Consulting GmbH
+Export-Package: \
+	org.eclipselabs.jaxrs.jersey.provider,\
+	org.eclipselabs.jaxrs.jersey.helper,\
+	org.eclipselabs.jaxrs.jersey.provider.application,\
+	org.eclipselabs.jaxrs.jersey.provider.hk2,\
+	org.eclipselabs.jaxrs.jersey.provider.osgi,\
+	org.eclipselabs.jaxrs.jersey.provider.whiteboard

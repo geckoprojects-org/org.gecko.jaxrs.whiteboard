@@ -22,12 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.ws.rs.core.Application;
 
 import org.eclipselabs.osgi.jersey.application.JerseyApplicationProvider;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.component.ComponentContext;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -45,7 +41,6 @@ public class JerseyApplicationDispatcher implements JaxRsApplicationDispatcher {
 	private volatile Set<Application> applicationCache = new HashSet<>();
 	private volatile Set<ServiceReference<?>> resourceCache = new HashSet<>();
 	private volatile JaxRsJerseyRuntime runtime;
-	private volatile BundleContext bundleContext = null;
 	
 	/* 
 	 * (non-Javadoc)
@@ -74,24 +69,6 @@ public class JerseyApplicationDispatcher implements JaxRsApplicationDispatcher {
 		return runtime;
 	}
 
-	/**
-	 * Called on component activation
-	 * @param context the component context
-	 */
-	@Activate
-	public void activate(ComponentContext context) {
-		bundleContext = context.getBundleContext();
-	}
-	
-	/**
-	 * Called on component de-activation
-	 * @param context the component context
-	 */
-	@Deactivate
-	public void deactivate(ComponentContext context) {
-		
-	}
-	
 	/**
 	 * Adds a new jersey runtime 
 	 * @param runtime the runtime to add

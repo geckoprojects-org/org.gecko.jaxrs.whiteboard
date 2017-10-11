@@ -30,6 +30,7 @@ import javax.ws.rs.core.Application;
 
 import org.eclipselabs.osgi.jersey.JaxRsApplicationDispatcher;
 import org.eclipselabs.osgi.jersey.JaxRsJerseyRuntime;
+import org.eclipselabs.osgi.jersey.JerseyApplicationDispatcher;
 import org.eclipselabs.osgi.jersey.JerseyConstants;
 import org.eclipselabs.osgi.jersey.tests.resources.HelloResource;
 import org.eclipselabs.osgi.jersey.tests.resources.RootResource;
@@ -109,6 +110,24 @@ public class JerseyDispatcherIntegrationTest {
 
 		cdl = new CountDownLatch(1);
 		cdl.await(1, TimeUnit.SECONDS);
+		assertNull(dispatcher.getRuntime());
+	}
+	
+	/**
+	 * Tests simple add and remove of a runtime
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws InvalidSyntaxException 
+	 */
+	@Test
+	public void testAddRemoveRuntime2() throws IOException, InterruptedException, InvalidSyntaxException {
+		
+		JerseyApplicationDispatcher dispatcher = new JerseyApplicationDispatcher();
+		dispatcher.addRuntime(jerseyRuntime);
+		assertNotNull(dispatcher);
+		assertNotNull(dispatcher.getRuntime());
+		
+		dispatcher.removeRuntime(jerseyRuntime);
 		assertNull(dispatcher.getRuntime());
 	}
 

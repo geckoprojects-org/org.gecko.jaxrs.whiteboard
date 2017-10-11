@@ -17,7 +17,6 @@ import javax.ws.rs.core.Application;
 
 import org.eclipselabs.osgi.jaxrs.helper.JaxRsHelper;
 import org.eclipselabs.osgi.jersey.DispatcherApplication;
-import org.eclipselabs.osgi.jersey.dto.DTOConverter;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
 
 /**

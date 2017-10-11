@@ -9,11 +9,11 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.eclipselabs.osgi.jaxrs;
+package org.eclipselabs.jaxrs.jersey;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
-import org.eclipselabs.osgi.jaxrs.helper.JaxRsHelper;
+import org.eclipselabs.jaxrs.jersey.helper.JaxRsHelper;
 import org.junit.Test;
 
 /**
