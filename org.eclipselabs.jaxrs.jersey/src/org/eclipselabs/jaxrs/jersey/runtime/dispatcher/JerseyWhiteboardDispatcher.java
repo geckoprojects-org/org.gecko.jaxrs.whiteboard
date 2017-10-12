@@ -303,8 +303,8 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 				/*
 				 * Assign all resources and extension of our candidates to the applications
 				 */
-				assignContent(applications, applicationCandidates, resourceCandidates);
-				assignContent(applications, applicationCandidates, extensionCandidates);
+				assignContent(applications, applicationCandidates, resources);
+				assignContent(applications, applicationCandidates, extensions);
 				
 				/*
 				 * 
@@ -362,6 +362,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		applications.forEach((app)->{
 			content.forEach((c)->removeContentFromApplication(app, c));
 		});
+		content.forEach((c)->removeContentFromApplication(defaultProvider, c));
 	}
 
 	/**
@@ -444,9 +445,9 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		if (originalCollection == null) {
 			return null;
 		}
-		Collection<T> removed;
+		Set<T> removed;
 		synchronized (originalCollection) {
-			removed = Collections.unmodifiableCollection(originalCollection);
+			removed = new HashSet<>(originalCollection);
 			originalCollection.removeAll(removed);
 		}
 		return removed;
