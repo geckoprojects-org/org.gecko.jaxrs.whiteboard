@@ -21,6 +21,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.core.Application;
+
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsResourceProvider;
 import org.eclipselabs.jaxrs.jersey.resources.TestApplication;
@@ -50,7 +52,7 @@ public class JaxRsResourceProviderTest {
 		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
 		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "test");
 		
-		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new TestApplication(), applicationProperties);
+		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
 		ApplicationDTO dto = provider.getApplicationDTO();
 		assertFalse(dto instanceof FailedApplicationDTO);
@@ -72,12 +74,15 @@ public class JaxRsResourceProviderTest {
 		assertEquals(TestResource.class, resourceProvider.getObjectClass());
 		
 		assertFalse(resourceProvider.canHandleApplication(provider));
+		assertFalse(provider.addResource(resourceProvider));
 		
 		// invalid application filter
 		resourceProperties.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "test");
 		resourceProvider = new JerseyResourceProvider<TestResource>(new TestResource(), resourceProperties);
 		
 		assertFalse(resourceProvider.canHandleApplication(provider));
+		assertFalse(provider.addResource(resourceProvider));
+		
 		resourceDto = resourceProvider.getResourceDTO();
 		assertTrue(resourceDto instanceof FailedResourceDTO);
 		FailedResourceDTO failedDto = (FailedResourceDTO) resourceDto;
@@ -90,6 +95,8 @@ public class JaxRsResourceProviderTest {
 		resourceProvider = new JerseyResourceProvider<TestResource>(new TestResource(), resourceProperties);
 		
 		assertFalse(resourceProvider.canHandleApplication(provider));
+		assertFalse(provider.addResource(resourceProvider));
+		
 		resourceDto = resourceProvider.getResourceDTO();
 		assertFalse(resourceDto instanceof FailedResourceDTO);
 		assertTrue(resourceProvider.isResource());
@@ -100,6 +107,7 @@ public class JaxRsResourceProviderTest {
 		resourceProvider = new JerseyResourceProvider<TestResource>(new TestResource(), resourceProperties);
 		
 		assertTrue(resourceProvider.canHandleApplication(provider));
+		assertTrue(provider.addResource(resourceProvider));
 		resourceDto = resourceProvider.getResourceDTO();
 		assertFalse(resourceDto instanceof FailedResourceDTO);
 		assertTrue(resourceProvider.isResource());
@@ -109,7 +117,7 @@ public class JaxRsResourceProviderTest {
 	@Test
 	public void testApplicationProviderDefaultApplication() {
 		
-		JaxRsApplicationProvider provider = new JerseyApplicationProvider(".default", new TestApplication(), "/");
+		JaxRsApplicationProvider provider = new JerseyApplicationProvider(".default", new Application(), "/");
 		
 		ApplicationDTO dto = provider.getApplicationDTO();
 		assertFalse(dto instanceof FailedApplicationDTO);
@@ -117,6 +125,7 @@ public class JaxRsResourceProviderTest {
 		assertEquals("*", provider.getPath());
 		assertEquals(".default", provider.getName());
 		assertTrue(provider.isDefault());
+		assertFalse(provider.isLegacy());
 		
 		JaxRsResourceProvider resourceProvider = new JerseyResourceProvider<TestResource>(new TestResource(), Collections.emptyMap());
 		ResourceDTO resourceDto = resourceProvider.getResourceDTO();
@@ -136,6 +145,44 @@ public class JaxRsResourceProviderTest {
 		assertTrue(resourceProvider.isResource());
 		assertTrue(resourceProvider.isSingleton());
 		assertTrue(resourceProvider.canHandleApplication(provider));
+		assertTrue(provider.addResource(resourceProvider));
+		
+		assertNotNull(resourceProvider.getName());
+		assertEquals(TestResource.class, resourceProvider.getObjectClass());
+	}
+	
+	@Test
+	public void testApplicationProviderDefaultApplicationLegacy() {
+		
+		JaxRsApplicationProvider provider = new JerseyApplicationProvider(".default", new TestApplication(), "/");
+		
+		ApplicationDTO dto = provider.getApplicationDTO();
+		assertFalse(dto instanceof FailedApplicationDTO);
+		
+		assertEquals("*", provider.getPath());
+		assertEquals(".default", provider.getName());
+		assertTrue(provider.isDefault());
+		assertTrue(provider.isLegacy());
+		
+		JaxRsResourceProvider resourceProvider = new JerseyResourceProvider<TestResource>(new TestResource(), Collections.emptyMap());
+		ResourceDTO resourceDto = resourceProvider.getResourceDTO();
+		assertTrue(resourceDto instanceof FailedResourceDTO);
+		FailedResourceDTO failedDto = (FailedResourceDTO) resourceDto;
+		assertEquals(DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE, failedDto.failureReason);
+		assertFalse(resourceProvider.isResource());
+		assertTrue(resourceProvider.isSingleton());
+		
+		Map<String, Object> resourceProperties = new HashMap<>();
+		resourceProperties.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		
+		resourceProvider = new JerseyResourceProvider<TestResource>(new TestResource(), resourceProperties);
+		
+		resourceDto = resourceProvider.getResourceDTO();
+		assertFalse(resourceDto instanceof FailedResourceDTO);
+		assertTrue(resourceProvider.isResource());
+		assertTrue(resourceProvider.isSingleton());
+		assertTrue(resourceProvider.canHandleApplication(provider));
+		assertFalse(provider.addResource(resourceProvider));
 		
 		assertNotNull(resourceProvider.getName());
 		assertEquals(TestResource.class, resourceProvider.getObjectClass());

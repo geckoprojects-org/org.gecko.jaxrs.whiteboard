@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.core.Application;
 
-import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsResourceProvider;
+import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationContentProvider;
 
 /**
  * Special JaxRs application implementation that holds and updates all resource and extension given by the application provider
@@ -66,45 +66,49 @@ public class JerseyApplication extends Application {
 	}
 
 	/**
-	 * Adds a resource provider to the application
-	 * @param resourceProvider the provider to register
+	 * Adds a content provider to the application
+	 * @param contentProvider the provider to register
+	 * @return <code>true</code>, if content was added
 	 */
-	public void addResource(JaxRsResourceProvider resourceProvider) {
-		if (resourceProvider == null) {
+	public boolean addContent(JaxRsApplicationContentProvider contentProvider) {
+		if (contentProvider == null) {
 			if (log != null) {
-				log.log(Level.WARNING, "A null service resource provider was given to register as a JaxRs resource");
+				log.log(Level.WARNING, "A null service content provider was given to register as a JaxRs resource or extension");
 			}
-			return;
+			return false;
 		}
-		String name = resourceProvider.getName();
-		if (resourceProvider.isSingleton()) {
-			Object resource = resourceProvider.getObject();
-			singletonMap.put(name, resource);
+		String name = contentProvider.getName();
+		if (contentProvider.isSingleton()) {
+			Object resource = contentProvider.getObject();
+			Object result = singletonMap.put(name, resource);
+			return resource.equals(result) || result == null;
 		} else {
-			Class<?> resourceClass = resourceProvider.getObjectClass();
-			classesMap.put(name, resourceClass);
+			Class<?> resourceClass = contentProvider.getObjectClass();
+			Object result = classesMap.put(name, resourceClass);
+			return resourceClass.equals(result);
 		}
 	}
 
 	/**
-	 * Removes a resource from the application
-	 * @param resourceProvider the provider of the resource to be removed
+	 * Removes a content from the application
+	 * @param contentProvider the provider of the contents to be removed
+	 * @return Return <code>true</code>, if the content was removed
 	 */
-	public void removeResource(JaxRsResourceProvider resourceProvider) {
-		if (resourceProvider == null) {
+	public boolean removeContent(JaxRsApplicationContentProvider contentProvider) {
+		if (contentProvider == null) {
 			if (log != null) {
 				log.log(Level.WARNING, "A null resource provider was given to unregister as a JaxRs resource");
 			}
-			return;
+			return false;
 		}
-		String name = resourceProvider.getName();
-		if (resourceProvider.isSingleton()) {
+		String name = contentProvider.getName();
+		if (contentProvider.isSingleton()) {
 			synchronized (singletonMap) {
-				singletonMap.remove(name);
+				return singletonMap.remove(name) != null;
 			}
 		} else {
 			synchronized (classesMap) {
-				classesMap.remove(name);
+				return classesMap.remove(name) != null;
 			}
 		}
 	}

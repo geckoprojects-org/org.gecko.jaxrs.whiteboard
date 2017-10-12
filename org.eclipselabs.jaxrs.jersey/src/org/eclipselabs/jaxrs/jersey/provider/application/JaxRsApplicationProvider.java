@@ -88,6 +88,23 @@ public interface JaxRsApplicationProvider extends JaxRsProvider, JaxRsConstants 
 	public boolean isDefault();
 	
 	/**
+	 * Returns <code>true</code>, if the application is empty and doesn't have a resource or extension
+	 * @return <code>true</code>, if the application is empty and doesn't have a resource or extension
+	 */
+	public boolean isEmpty();
+	
+	/**
+	 * Returns <code>true</code>, if the provider has changed since the last change reset 
+	 * @return <code>true</code>, if the provider has changed since the last change reset
+	 */
+	public boolean isChanged();
+	
+	/**
+	 * Marks the provider as unchanged
+	 */
+	public void markUnchanged();
+	
+	/**
 	 * Adds a new resource to the application provider. The call returns <code>true</code>,
 	 * if adding was successful, otherwise <code>false</code>
 	 * @param resource resource to add
@@ -104,6 +121,20 @@ public interface JaxRsApplicationProvider extends JaxRsProvider, JaxRsConstants 
 	public boolean removeResource(Object resource, Map<String, Object> properties);
 	
 	/**
+	 * Adds a new resource to the application provider. The call returns <code>true</code>,
+	 * if adding was successful, otherwise <code>false</code>
+	 * @param provider resource provider to add
+	 */
+	public boolean addResource(JaxRsResourceProvider provider);
+	
+	/**
+	 * Removes a resource from the application provider. The call returns <code>true</code>,
+	 * if removing was successful, otherwise <code>false</code>
+	 * @param provider resource provider to be removed
+	 */
+	public boolean removeResource(JaxRsResourceProvider provider);
+	
+	/**
 	 * Adds a new extension to the application provider. The call returns <code>true</code>,
 	 * if adding was successful, otherwise <code>false</code>
 	 * @param extension extension to add
@@ -118,5 +149,19 @@ public interface JaxRsApplicationProvider extends JaxRsProvider, JaxRsConstants 
 	 * @param properties the resource service properties
 	 */
 	public boolean removeExtension(Object extension, Map<String, Object> properties);
+	
+	/**
+	 * Adds a new extension to the application provider. The call returns <code>true</code>,
+	 * if adding was successful, otherwise <code>false</code>
+	 * @param provider extension provider to add
+	 */
+	public boolean addExtension(JaxRsExtensionProvider provider);
+	
+	/**
+	 * Removes a extension from the application provider. The call returns <code>true</code>,
+	 * if removing was successful, otherwise <code>false</code>
+	 * @param provider extension provider to be removed
+	 */
+	public boolean removeExtension(JaxRsExtensionProvider provider);
 
 }

@@ -10,4 +10,5 @@ Private-Package: \
 	org.eclipselabs.jaxrs.jersey.dto,\
 	org.eclipselabs.jaxrs.jersey.runtime,\
 	org.eclipselabs.jaxrs.jersey.runtime.application,\
-	org.eclipselabs.jaxrs.jersey.jetty
+	org.eclipselabs.jaxrs.jersey.jetty,\
+	org.eclipselabs.jaxrs.jersey.runtime.dispatcher

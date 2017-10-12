@@ -1,3 +1,7 @@
+# This is the version of Mockito that will be used at build time and run time
+mockito: org.mockito.mockito-core;version="[1.9,2)",\
+  org.objenesis;version="[2.1,3)"
+  
 -buildpath: \
 	osgi.annotation;version=6.0.1,\
 	osgi.core;version=6.0,\
@@ -13,7 +17,8 @@
 	biz.aQute.bnd.annotation;version=3.3
 
 -testpath: \
-	${junit}
+	${junit},\
+	${mockito}
 
 javac.source: 1.8
 javac.target: 1.8

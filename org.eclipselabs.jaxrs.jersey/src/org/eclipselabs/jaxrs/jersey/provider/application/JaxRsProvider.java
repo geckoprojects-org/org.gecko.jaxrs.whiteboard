@@ -38,5 +38,15 @@ public interface JaxRsProvider {
 	 * @return the providers properties, which are usually the service properties or an empty map
 	 */
 	public Map<String, Object> getProviderProperties();
+	
+	/**
+	 * Returns <code>true</code>, if this application can handle the given properties.
+	 * If the application contains a whiteboard target select, than the properties are checked against
+	 * the select filter and returns the result.
+	 * If the application has no whiteboard select filter, the method returns <code>true</code>
+	 * @param runtimeProperties the properties of the whiteboard runtime
+	 * @return <code>true</code>, if the application can be handled by a whiteboard runtime with the given properties
+	 */
+	public boolean canHandleWhiteboard(Map<String, Object> runtimeProperties);
 
 }

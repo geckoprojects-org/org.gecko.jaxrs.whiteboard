@@ -12,17 +12,12 @@
 package org.eclipselabs.jaxrs.jersey.runtime;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.ws.rs.core.Application;
 
-import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider;
-import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider;
-import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsResourceProvider;
+import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher;
 import org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
-import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyApplicationProvider;
-import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyExtensionProvider;
-import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyResourceProvider;
+import org.eclipselabs.jaxrs.jersey.runtime.dispatcher.JerseyWhiteboardDispatcher;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -35,9 +30,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
  */
 public class JerseyWhiteboardComponent {
 
-	private volatile Map<String, JaxRsApplicationProvider> applicationProviderCache = new ConcurrentHashMap<>();
-	private volatile Map<String, JaxRsResourceProvider> resourceProviderCache = new ConcurrentHashMap<>();
-	private volatile Map<String, JaxRsExtensionProvider> extensionProviderCache = new ConcurrentHashMap<>();
+	private final JaxRsWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
 	private volatile JaxRsWhiteboardProvider whiteboard;
 
 	/**
@@ -47,14 +40,7 @@ public class JerseyWhiteboardComponent {
 	 */
 	@Reference(name="application", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeApplication")
 	public void addApplication(Application application, Map<String, Object> properties) {
-		JaxRsApplicationProvider provider = new JerseyApplicationProvider(application, properties);
-		String name = provider.getName();
-		if (!applicationProviderCache.containsKey(name)) {
-			applicationProviderCache.put(name, provider);
-			if (provider.canHandleWhiteboard(whiteboard.getProperties())) {
-				whiteboard.registerApplication(provider);
-			}
-		}
+		dispatcher.addApplication(application, properties);
 	}
 
 	/**
@@ -63,12 +49,7 @@ public class JerseyWhiteboardComponent {
 	 * @param properties the service properties
 	 */
 	public void removeApplication(Application application, Map<String, Object> properties) {
-		JaxRsApplicationProvider provider = new JerseyApplicationProvider(application, properties);
-		String name = provider.getName();
-		JaxRsApplicationProvider removed = applicationProviderCache.remove(name);
-		if (removed != null) {
-			whiteboard.unregisterApplication(provider);
-		} 
+		dispatcher.removeApplication(application, properties);
 	}
 
 	/**
@@ -78,16 +59,7 @@ public class JerseyWhiteboardComponent {
 	 */
 	@Reference(name="resource", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeResource", target="(" + JaxRSWhiteboardConstants.JAX_RS_RESOURCE + "='true')")
 	public void addResource(Object resource, Map<String, Object> properties) {
-		JaxRsResourceProvider provider = new JerseyResourceProvider<Object>(resource, properties);
-		String name = provider.getName();
-		if (!resourceProviderCache.containsKey(name)) {
-			resourceProviderCache.put(name, provider);
-			applicationProviderCache.values().forEach((ap)-> {
-				if (provider.canHandleApplication(ap)) {
-					ap.addResource(resource, properties);
-				}
-			});
-		}
+		dispatcher.addResource(resource, properties);
 	}
 
 	/**
@@ -96,12 +68,7 @@ public class JerseyWhiteboardComponent {
 	 * @param properties the service properties
 	 */
 	public void removeResource(Object resource, Map<String, Object> properties) {
-		JaxRsResourceProvider provider = new JerseyResourceProvider<Object>(resource, properties);
-		String name = provider.getName();
-		JaxRsResourceProvider removed = resourceProviderCache.remove(name);
-		if (removed != null) {
-			applicationProviderCache.values().forEach((ap)-> ap.removeResource(resource, properties));
-		}
+		dispatcher.removeResource(resource, properties);
 	}
 
 	/**
@@ -111,16 +78,7 @@ public class JerseyWhiteboardComponent {
 	 */
 	@Reference(name="extension", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeExtension", target="(" + JaxRSWhiteboardConstants.JAX_RS_EXTENSION + "='true')")
 	public void addExtension(Object extension, Map<String, Object> properties) {
-		JaxRsExtensionProvider provider = new JerseyExtensionProvider<Object>(extension, properties);
-		String name = provider.getName();
-		if (!extensionProviderCache.containsKey(name)) {
-			extensionProviderCache.put(name, provider);
-			applicationProviderCache.values().forEach((ap)-> {
-				if (provider.canHandleApplication(ap)) {
-					ap.addExtension(extension, properties);
-				}
-			});
-		}
+		dispatcher.addExtension(extension, properties);
 	}
 
 	/**
@@ -129,12 +87,7 @@ public class JerseyWhiteboardComponent {
 	 * @param properties the service properties
 	 */
 	public void removeExtension(Object extension, Map<String, Object> properties) {
-		JaxRsExtensionProvider provider = new JerseyExtensionProvider<Object>(extension, properties);
-		String name = provider.getName();
-		JaxRsExtensionProvider removed = extensionProviderCache.remove(name);
-		if (removed != null) {
-			applicationProviderCache.values().forEach((ap)-> ap.removeExtension(extension, properties));
-		}
+		dispatcher.removeExtension(extension, properties);
 	}
 
 }

@@ -23,7 +23,9 @@ import javax.ws.rs.core.Application;
 import org.eclipselabs.jaxrs.jersey.dto.DTOConverter;
 import org.eclipselabs.jaxrs.jersey.helper.JaxRsHelper;
 import org.eclipselabs.jaxrs.jersey.provider.application.AbstractJaxRsProvider;
+import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationContentProvider;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider;
+import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsResourceProvider;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.osgi.framework.Filter;
@@ -43,18 +45,21 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	private static final Logger logger = Logger.getLogger("jersey.applicationProvider");
 	private ServletContainer applicationContainer;
 	private String applicationBase;
-	private Filter whiteboardFilter;
 	private Filter extensionFilter;
+	private boolean legacy = false;
+	private boolean changed = false;
 
 	public JerseyApplicationProvider(String name, Application jaxRsApplication, String basePath) {
-		super(jaxRsApplication, createProperties(name, basePath));
+		this(jaxRsApplication, createProperties(name, basePath));
 	}
 
 	public JerseyApplicationProvider(Application jaxRsApplication, Map<String, Object> properties) {
 		super(jaxRsApplication, properties);
 		// create name after validation, because some fields are needed eventually
-		if (!isLegacy()) {
+		if (Application.class == jaxRsApplication.getClass()) {
 			setProviderObject(new JerseyApplication(getProviderName()));
+		} else {
+			legacy = true;
 		}
 	}
 	
@@ -118,27 +123,6 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.eclipselabs.osgi.jersey.JaxRsApplicationProvider#canHandleWhiteboard(java.util.Map)
-	 */
-	@Override
-	public boolean canHandleWhiteboard(Map<String, Object> runtimeProperties) {
-		// in case the application status is invalid, this application cannot be handled
-		if (getProviderStatus() != NO_FAILURE) {
-			return false;
-		}
-		if (whiteboardFilter == null) {
-			return true;
-		}
-		runtimeProperties = runtimeProperties == null ? Collections.emptyMap() : runtimeProperties;
-		boolean match = whiteboardFilter.matches(runtimeProperties);
-		if (!match) {
-			updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
-		}
-		return match;
-	}
-
-	/* 
-	 * (non-Javadoc)
 	 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsApplicationProvider#getApplicationDTO()
 	 */
 	@Override
@@ -160,7 +144,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 */
 	@Override
 	public boolean isLegacy() {
-		return Application.class == getProviderObject().getClass();
+		return legacy;
 	}
 
 	/* 
@@ -169,6 +153,33 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 */
 	public boolean isDefault() {
 		return getName().equals(".default");
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider#isEmpty()
+	 */
+	@Override
+	public boolean isEmpty() {
+		return getProviderObject().getClasses().isEmpty() && getProviderObject().getSingletons().isEmpty();
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider#isChanged()
+	 */
+	@Override
+	public boolean isChanged() {
+		return changed;
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider#markUnchanged()
+	 */
+	@Override
+	public void markUnchanged() {
+		changed = false;
 	}
 
 	/* 
@@ -185,16 +196,24 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 			properties = Collections.emptyMap();
 		}
 		JaxRsResourceProvider provider = new JerseyResourceProvider<Object>(resource, properties);
+		return addResource(provider);
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider#addResource(org.eclipselabs.jaxrs.jersey.provider.application.JaxRsResourceProvider)
+	 */
+	@Override
+	public boolean addResource(JaxRsResourceProvider provider) {
+		if (isLegacy()) {
+			logger.log(Level.WARNING, "This application is a legacy application and therefore not extensible for resources: " + getName());
+			return false;
+		}
 		if (!provider.isResource()) {
 			logger.log(Level.WARNING, "The resource to add is not declared with the resource property: " + JaxRSWhiteboardConstants.JAX_RS_RESOURCE);
 			return false;
 		}
-		boolean filterValid = provider.canHandleApplication(this);
-		if (filterValid && !isLegacy()) {
-			JerseyApplication ja = (JerseyApplication) getProviderObject();
-			ja.addResource(provider);
-		}
-		return filterValid;
+		return doAddContent(provider);
 	}
 
 	/* 
@@ -203,24 +222,32 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 */
 	@Override
 	public boolean removeResource(Object resource, Map<String, Object> properties) {
-		if (isLegacy()) {
-			logger.log(Level.WARNING, "This application is a legacy application and therefore there is nothing to remove: ");
-			return false;
-		}
 		if (properties == null) {
 			properties = Collections.emptyMap();
 		}
 		JaxRsResourceProvider provider = new JerseyResourceProvider<Object>(resource, properties);
+		return removeResource(provider);
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider#removeResource(org.eclipselabs.jaxrs.jersey.provider.application.JaxRsResourceProvider)
+	 */
+	@Override
+	public boolean removeResource(JaxRsResourceProvider provider) {
+		if (isLegacy()) {
+			logger.log(Level.WARNING, "This application is a legacy application and therefore there is nothing to remove: ");
+			return false;
+		}
+		if (provider == null) {
+			logger.log(Level.WARNING, "The resource provider is null. There is nothing to remove.");
+			return false;
+		}
 		if (!provider.isResource()) {
 			logger.log(Level.WARNING, "The resource to be removed is not declared with the resource property: " + JaxRSWhiteboardConstants.JAX_RS_RESOURCE);
 			return false;
 		}
-		Application application = getProviderObject();
-		if (application instanceof JerseyApplication) {
-			JerseyApplication ja = (JerseyApplication) application;
-			ja.removeResource(provider);
-		}
-		return true;
+		return doRemoveContent(provider);
 	}
 
 	/* 
@@ -230,7 +257,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	@Override
 	public boolean addExtension(Object extension, Map<String, Object> properties) {
 		if (isLegacy()) {
-			logger.log(Level.WARNING, "This application is a legacy application and therefore not extensible: " + getName());
+			logger.log(Level.WARNING, "This application is a legacy# application and therefore not extensible: " + getName());
 			return false;
 		}
 		if (properties == null) {
@@ -247,12 +274,53 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 
 	/* 
 	 * (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider#addExtension(org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider)
+	 */
+	@Override
+	public boolean addExtension(JaxRsExtensionProvider provider) {
+		if (isLegacy()) {
+			logger.log(Level.WARNING, "This application is a legacy application and therefore not extensible for extensions: " + getName());
+			return false;
+		}
+		if (!provider.isExtension()) {
+			logger.log(Level.WARNING, "The extension to add is not declared with the extension property: " + JaxRSWhiteboardConstants.JAX_RS_EXTENSION);
+			return false;
+		}
+		return doAddContent(provider);
+	}
+	
+	/* 
+	 * (non-Javadoc)
 	 * @see org.eclipselabs.osgi.jersey.JaxRsApplicationProvider#removeExtension(java.lang.Object, java.util.Map)
 	 */
 	@Override
 	public boolean removeExtension(Object extension, Map<String, Object> properties) {
-		// TODO Auto-generated method stub
-		return false;
+		if (properties == null) {
+			properties = Collections.emptyMap();
+		}
+		JaxRsExtensionProvider provider = new JerseyExtensionProvider<Object>(extension, properties);
+		return removeExtension(provider);
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider#removeExtension(org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider)
+	 */
+	@Override
+	public boolean removeExtension(JaxRsExtensionProvider provider) {
+		if (isLegacy()) {
+			logger.log(Level.WARNING, "This application is a legacy application and therefore there is nothing to remove: ");
+			return false;
+		}
+		if (provider == null) {
+			logger.log(Level.WARNING, "The extension provider is null. There is nothing to remove.");
+			return false;
+		}
+		if (!provider.isExtension()) {
+			logger.log(Level.WARNING, "The extension to be removed is not declared with the extension property: " + JaxRSWhiteboardConstants.JAX_RS_EXTENSION);
+			return false;
+		}
+		return doRemoveContent(provider);
 	}
 
 	/* 
@@ -287,17 +355,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 		if (baseProperty != null && !baseProperty.isEmpty()) {
 			applicationBase = baseProperty;
 		} 
-		String filter = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET);
-		if (filter != null) {
-			try {
-				whiteboardFilter = FrameworkUtil.createFilter(filter);
-			} catch (InvalidSyntaxException e) {
-				logger.log(Level.SEVERE, "The given whiteboard target filter is invalid: " + filter, e);
-				updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
-				return;
-			}
-		}
-		filter = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_EXTENSION_SELECT);
+		String filter = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_EXTENSION_SELECT);
 		if (filter != null) {
 			try {
 				extensionFilter = FrameworkUtil.createFilter(filter);
@@ -320,6 +378,36 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 		setProviderObject(application);
 	}
 	
+	/**
+	 * Adds content to the underlying {@link JerseyApplication}, if valid
+	 * @param provider the content provider to be added
+	 * @return <code>true</code>, if add was successful, otherwise <code>false</code>
+	 */
+	private boolean doAddContent(JaxRsApplicationContentProvider provider) {
+		boolean filterValid = provider.canHandleApplication(this);
+		if (filterValid && !isLegacy()) {
+			JerseyApplication ja = (JerseyApplication) getProviderObject();
+			changed = ja.addContent(provider);
+			return changed;
+		}
+		return filterValid;
+	}
+	
+	/**
+	 * Removed content from the underlying {@link JerseyApplication}, if valid
+	 * @param provider the content provider to be removed
+	 * @return <code>true</code>, if removal was successful, otherwise <code>false</code>
+	 */
+	private boolean doRemoveContent(JaxRsApplicationContentProvider provider) {
+		Application application = getProviderObject();
+		if (application instanceof JerseyApplication) {
+			JerseyApplication ja = (JerseyApplication) application;
+			changed = ja.removeContent(provider);
+			return changed;
+		}
+		return true;
+	}
+
 	/**
 	 * Returns <code>true</code>, if the application filter property handling is valid.
 	 * @param properties the resource/extension properties
