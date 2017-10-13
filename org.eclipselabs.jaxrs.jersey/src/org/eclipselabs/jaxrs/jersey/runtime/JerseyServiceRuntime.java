@@ -11,18 +11,20 @@
  */
 package org.eclipselabs.jaxrs.jersey.runtime;
 
-import static org.eclipselabs.jaxrs.jersey.runtime.JerseyConstants.JERSEY_CONTEXT_PATH;
-import static org.eclipselabs.jaxrs.jersey.runtime.JerseyConstants.JERSEY_HOST;
-import static org.eclipselabs.jaxrs.jersey.runtime.JerseyConstants.JERSEY_PORT;
-import static org.eclipselabs.jaxrs.jersey.runtime.JerseyConstants.JERSEY_SCHEMA;
-import static org.eclipselabs.jaxrs.jersey.runtime.JerseyConstants.WHITEBOARD_DEFAULT_CONTEXT_PATH;
-import static org.eclipselabs.jaxrs.jersey.runtime.JerseyConstants.WHITEBOARD_DEFAULT_HOST;
-import static org.eclipselabs.jaxrs.jersey.runtime.JerseyConstants.WHITEBOARD_DEFAULT_PORT;
-import static org.eclipselabs.jaxrs.jersey.runtime.JerseyConstants.WHITEBOARD_DEFAULT_SCHEMA;
+import static org.eclipselabs.jaxrs.jersey.provider.JerseyConstants.JERSEY_CONTEXT_PATH;
+import static org.eclipselabs.jaxrs.jersey.provider.JerseyConstants.JERSEY_HOST;
+import static org.eclipselabs.jaxrs.jersey.provider.JerseyConstants.JERSEY_PORT;
+import static org.eclipselabs.jaxrs.jersey.provider.JerseyConstants.JERSEY_SCHEMA;
+import static org.eclipselabs.jaxrs.jersey.provider.JerseyConstants.WHITEBOARD_DEFAULT_CONTEXT_PATH;
+import static org.eclipselabs.jaxrs.jersey.provider.JerseyConstants.WHITEBOARD_DEFAULT_HOST;
+import static org.eclipselabs.jaxrs.jersey.provider.JerseyConstants.WHITEBOARD_DEFAULT_PORT;
+import static org.eclipselabs.jaxrs.jersey.provider.JerseyConstants.WHITEBOARD_DEFAULT_SCHEMA;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -32,22 +34,24 @@ import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.servlet.ServletMapping;
 import org.eclipselabs.jaxrs.jersey.binder.PrototypeServiceBinder;
 import org.eclipselabs.jaxrs.jersey.dto.DTOConverter;
 import org.eclipselabs.jaxrs.jersey.factories.JerseyResourceInstanceFactory;
 import org.eclipselabs.jaxrs.jersey.helper.JaxRsHelper;
 import org.eclipselabs.jaxrs.jersey.helper.JerseyHelper;
 import org.eclipselabs.jaxrs.jersey.jetty.JettyServerRunnable;
+import org.eclipselabs.jaxrs.jersey.provider.JerseyConstants;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider;
 import org.eclipselabs.jaxrs.jersey.provider.osgi.PrototypeResourceProvider;
 import org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
-import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyApplication;
-import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyApplicationProvider;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
@@ -85,8 +89,6 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboar
 	private String contextPath = WHITEBOARD_DEFAULT_CONTEXT_PATH;
 	private ComponentContext context;
 	// hold all resource references of the default application 
-	//	private final List<ServiceReference<?>> resourcesRefList = new LinkedList<>();
-	private JerseyApplication defaultApplication;
 	private final Map<String, JaxRsApplicationProvider> applicationContainerMap = new ConcurrentHashMap<>();
 	private Logger logger = Logger.getLogger("o.e.o.j.serviceRuntime");
 
@@ -127,18 +129,9 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboar
 		}
 		// if port changed, both parts need to be restarted, no matter, if the context path has changed
 		if (portChanged || pathChanged) {
-			unregisterApplication(new JerseyApplicationProvider(".default", defaultApplication, "/"));
 			stopContextHandler();
 			stopServer();
 			createServerAndContext();
-			/*
-			 * Setup the default application
-			 */
-			if (defaultApplication == null) {
-				defaultApplication = new JerseyApplication(name);
-			} else {
-				defaultApplication.dispose();
-			}
 			startServer();
 		}
 	}
@@ -157,17 +150,9 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboar
 	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#teardown()
 	 */
 	public void teardown() {
-		/*
-		 * Unregister the default application
-		 */
-		unregisterApplication(new JerseyApplicationProvider(".default", defaultApplication, "/"));
 		stopContextHandler();
 		stopServer();
 		binder.dispose();
-		if (defaultApplication != null) {
-			defaultApplication.dispose();
-			defaultApplication = null;
-		}
 	}
 
 	/* 
@@ -240,11 +225,11 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboar
 		}
 		Application application = applicationProvider.getJaxRsApplication();
 		ResourceConfig config = createResourceConfig(application);
-
+		String path = applicationProvider.getPath();
 		ServletContainer container = new ServletContainer(config);
 		applicationProvider.setServletContainer(container);
 		ServletHolder servlet = new ServletHolder(container);
-		String applicationPath = JaxRsHelper.getServletPath(application);
+		String applicationPath = applicationProvider.isDefault() ? JaxRsHelper.getServletPath(application) : JaxRsHelper.toServletPath(path);
 		contextHandler.addServlet(servlet, applicationPath);
 		applicationContainerMap.put(applicationProvider.getName(), applicationProvider);
 	}
@@ -268,8 +253,34 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboar
 			return;
 		}
 		ServletContainer container = provider.getServletContainer();
-		if (container != null) {
-			logger.log(Level.SEVERE, "Implement the remove servlet here");
+		if (container != null && contextHandler != null) {
+			ServletHandler handler = contextHandler.getServletHandler();
+			List<ServletHolder> servlets = new ArrayList<ServletHolder>();
+			Set<String> names = new HashSet<String>();
+			for( ServletHolder holder : handler.getServlets()) {
+				/* If it is the class we want to remove, then just keep track of its name */
+				try {
+					if (container.equals(holder.getServlet())) {
+						names.add(holder.getName());
+					} else /* We keep it */ {
+						servlets.add(holder);
+					}
+				} catch (ServletException e) {
+					logger.log(Level.SEVERE, "Error unregistering servlets from holder with name: " + holder.getName());
+				}
+			}
+
+			List<ServletMapping> mappings = new ArrayList<ServletMapping>();
+			for( ServletMapping mapping : handler.getServletMappings() )  {
+				/* Only keep the mappings that didn't point to one of the servlets we removed */
+				if(!names.contains(mapping.getServletName())) {
+					mappings.add(mapping);
+				}
+			}
+
+			/* Set the new configuration for the mappings and the servlets */
+			handler.setServletMappings( mappings.toArray(new ServletMapping[0]) );
+			handler.setServlets( servlets.toArray(new ServletHolder[0]) );
 		}
 	}
 
@@ -291,7 +302,11 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboar
 				ServletContainer servletContainer = provider.getServletContainer();
 				if (servletContainer != null) {
 					ResourceConfig config = createResourceConfig(provider.getJaxRsApplication());
-					servletContainer.reload(config);
+					if (contextHandler != null && contextHandler.isStarted()) {
+						servletContainer.reload(config);
+					} else {
+						logger.log(Level.WARNING, "Jetty servlet context handler is not started yet");
+					}
 				}
 			}
 		}
@@ -409,7 +424,7 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboar
 			}
 			jettyServer = new Server(port);
 			contextHandler = new ServletContextHandler(jettyServer, contextPath);
-			logger.info("Started JaxRs white-board server and context handler for port: " + port + " and context: " + contextPath);
+			logger.info("Created white-board server context handler for context: " + contextPath);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Error starting JaxRs white-board because of an exception", e);
 		}
@@ -422,7 +437,7 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboar
 		if (jettyServer != null && contextHandler != null && !jettyServer.isRunning()) {
 			try {
 				Executors.newSingleThreadExecutor().submit(new JettyServerRunnable(jettyServer, port));
-				logger.info("Started JaxRs white-board server and context handler for port: " + port + " and context: " + contextPath);
+				logger.info("Started JaxRs white-board server for port: " + port + " and context: " + contextPath);
 			} catch (Exception e) {
 				logger.log(Level.SEVERE, "Error starting JaxRs white-board because of an exception", e);
 			}

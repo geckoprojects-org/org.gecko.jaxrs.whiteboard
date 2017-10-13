@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.Application;
 
 import org.eclipselabs.jaxrs.jersey.helper.JerseyHelper;
+import org.eclipselabs.jaxrs.jersey.provider.JerseyConstants;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher;
 import org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
 import org.eclipselabs.jaxrs.jersey.runtime.dispatcher.JerseyWhiteboardDispatcher;
@@ -72,6 +73,7 @@ public class JerseyWhiteboardComponent {
 		String[] urls = whiteboard.getURLs(context);
 		// activate and start server
 		whiteboard.initialize(context);
+		dispatcher.dispatch();
 		whiteboard.startup();
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put("service.changecount", changeCount.incrementAndGet());
@@ -105,6 +107,9 @@ public class JerseyWhiteboardComponent {
 	@Deactivate
 	public void deactivate(ComponentContext context) {
 		changeCount.set(0);
+		if (dispatcher != null) {
+			dispatcher.deactivate();
+		}
 		if (whiteboard != null) {
 			whiteboard.teardown();
 			whiteboard = null;
@@ -117,9 +122,6 @@ public class JerseyWhiteboardComponent {
 			} catch (Exception ise) {
 				logger.log(Level.SEVERE, "Error unregsitering JaxRsRuntime", ise);
 			}
-		}
-		if (dispatcher != null) {
-			dispatcher.deactivate();
 		}
 	}
 	/**
@@ -146,7 +148,7 @@ public class JerseyWhiteboardComponent {
 	 * @param resource the resource to add
 	 * @param properties the service properties
 	 */
-	@Reference(name="resource", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeResource", target="(" + JaxRSWhiteboardConstants.JAX_RS_RESOURCE + "='true')")
+	@Reference(name="resource", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeResource", target="(" + JaxRSWhiteboardConstants.JAX_RS_RESOURCE + "=true)")
 	public void addResource(Object resource, Map<String, Object> properties) {
 		dispatcher.addResource(resource, properties);
 	}

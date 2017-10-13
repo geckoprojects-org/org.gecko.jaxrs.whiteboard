@@ -79,6 +79,9 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	 */
 	@Override
 	public void setWhiteboardProvider(JaxRsWhiteboardProvider whiteboard) {
+		if (isDispatching()) {
+			throw new IllegalStateException("Error setting whiteboard provider, when dispatching is active");
+		}
 		this.whiteboard = whiteboard;
 	}
 
@@ -216,9 +219,11 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			throw new IllegalStateException("Dispatcher cannot be used without a whiteboard provider");
 		}
 		defaultProvider = new JerseyApplicationProvider(".default", new Application(), "/");
-		whiteboard.registerApplication(defaultProvider);
 		dispatching = true;
 		doDispatch();
+		if (!whiteboard.isRegistered(defaultProvider)) {
+			whiteboard.registerApplication(defaultProvider);
+		}
 	}
 
 	/* 
@@ -251,7 +256,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	public boolean isDispatching() {
 		return dispatching;
 	}
-	
+
 	/**
 	 * Checks the execution of doDispatch, in case it is active
 	 */
@@ -260,7 +265,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			doDispatch();
 		}
 	}
-	
+
 	/**
 	 * Does the dispatching work. We lock the dispatch work. If we dont get a lock, because there is currently work in progress,
 	 * we mark lockedChange so, that we know that there, is still work to do.
@@ -285,7 +290,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 				});
 				unassignContent(applications, remResources);
 				unassignContent(applications, remExtensions);
-				
+
 				/*
 				 * Determine all applications, resources and extension that fit to the whiteboard.
 				 * We only work with those, because all theses are possible candidates for the whiteboard
@@ -299,13 +304,13 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 				Set<JaxRsExtensionProvider> extensionCandidates = extensions.stream().
 						filter((e)->e.canHandleWhiteboard(getWhiteboardProvider().getProperties())).
 						collect(Collectors.toSet());
-				
+
 				/*
 				 * Assign all resources and extension of our candidates to the applications
 				 */
 				assignContent(applications, applicationCandidates, resourceCandidates);
 				assignContent(applications, applicationCandidates, extensionCandidates);
-				
+
 				/*
 				 * 
 				 */
@@ -317,7 +322,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 							// unregister applications that are now empty
 							if (app.isEmpty()) {
 								whiteboard.unregisterApplication(app);
-							// legacy application don't need a reload at all, all others are only reloaded, if they have changed
+								// legacy application don't need a reload at all, all others are only reloaded, if they have changed
 							} else if (!app.isLegacy() && app.isChanged()) {
 								whiteboard.reloadApplication(app);
 							}
@@ -328,7 +333,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 								whiteboard.registerApplication(app);
 							}
 						}
-					// the application doesn't fit to the whiteboard anymore
+						// the application doesn't fit to the whiteboard anymore
 					} else {
 						if (whiteboard.isRegistered(app)) {
 							whiteboard.unregisterApplication(app);
@@ -338,9 +343,13 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 					app.markUnchanged();
 				});
 				if (defaultProvider.isChanged()) {
-					whiteboard.reloadApplication(defaultProvider);
+					if (whiteboard.isRegistered(defaultProvider)) {
+						whiteboard.reloadApplication(defaultProvider);
+					}
 					defaultProvider.markUnchanged();
 				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			} finally {
 				lock.unlock();
 			}
@@ -352,7 +361,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			lockedChange.compareAndSet(false, true);
 		}
 	}
-	
+
 	/**
 	 * Removes content, that's services has been disappeared.
 	 * @param applications all applications

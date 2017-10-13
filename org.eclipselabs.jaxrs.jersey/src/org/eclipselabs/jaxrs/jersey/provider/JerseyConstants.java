@@ -9,7 +9,7 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.eclipselabs.jaxrs.jersey.runtime;
+package org.eclipselabs.jaxrs.jersey.provider;
 
 /**
  * Interface for constants used in Jersey
