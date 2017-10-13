@@ -47,6 +47,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	private String applicationBase;
 	private boolean legacy = false;
 	private boolean changed = false;
+	private Application sourceApplication;
 
 	public JerseyApplicationProvider(String name, Application jaxRsApplication, String basePath) {
 		this(jaxRsApplication, createProperties(name, basePath));
@@ -56,6 +57,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 		super(jaxRsApplication, properties);
 		// create name after validation, because some fields are needed eventually
 		if (Application.class == jaxRsApplication.getClass()) {
+			sourceApplication = jaxRsApplication;
 			setProviderObject(new JerseyApplication(getProviderName()));
 		} else {
 			legacy = true;
@@ -321,6 +323,17 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 		}
 		return doRemoveContent(provider);
 	}
+	
+	/* 
+	 * (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		Application application = sourceApplication == null ? getProviderObject() : sourceApplication;
+		Map<String, Object> properties = new HashMap<>(getProviderProperties());
+		return new JerseyApplicationProvider(application, properties);
+	}
 
 	/* 
 	 * (non-Javadoc)
@@ -378,8 +391,11 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 		boolean filterValid = provider.canHandleApplication(this);
 		if (filterValid && !isLegacy()) {
 			JerseyApplication ja = (JerseyApplication) getProviderObject();
-			changed = ja.addContent(provider);
-			return changed;
+			boolean added = ja.addContent(provider);
+			if (!changed && added) {
+				changed = added;
+			}
+			return added;
 		}
 		return filterValid;
 	}

@@ -11,6 +11,7 @@
  */
 package org.eclipselabs.jaxrs.jersey.runtime.application;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipselabs.jaxrs.jersey.dto.DTOConverter;
@@ -31,14 +32,6 @@ public class JerseyExtensionProvider<T extends Object> extends JerseyApplication
 		super(resource, properties);
 	}
 	
-	/**
-	 * Returns the {@link JaxRSWhiteboardConstants} for this resource type 
-	 * @return the {@link JaxRSWhiteboardConstants} for this resource type
-	 */
-	protected String getJaxRsResourceConstant() {
-		return JaxRSWhiteboardConstants.JAX_RS_EXTENSION;
-	}
-
 	/* 
 	 * (non-Javadoc)
 	 * @see org.eclipselabs.jaxrs.jersey.provider.JaxRsExtensionProvider#isExtension()
@@ -63,6 +56,25 @@ public class JerseyExtensionProvider<T extends Object> extends JerseyApplication
 		} else {
 			return DTOConverter.toFailedExtensionDTO(this, status == INVALID ? DTOConstants.FAILURE_REASON_NOT_AN_EXTENSION_TYPE : status);
 		}
+	}
+	
+	/* 
+	 * (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		Object extension = getProviderObject();
+		Map<String, Object> properties = new HashMap<>(getProviderProperties());
+		return new JerseyExtensionProvider<Object>(extension, properties);
+	}
+
+	/**
+	 * Returns the {@link JaxRSWhiteboardConstants} for this resource type 
+	 * @return the {@link JaxRSWhiteboardConstants} for this resource type
+	 */
+	protected String getJaxRsResourceConstant() {
+		return JaxRSWhiteboardConstants.JAX_RS_EXTENSION;
 	}
 
 }

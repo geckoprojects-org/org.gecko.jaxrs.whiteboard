@@ -22,7 +22,7 @@ import org.osgi.framework.Filter;
  * @author Mark Hoffmann
  * @since 11.10.2017
  */
-public interface JaxRsProvider {
+public interface JaxRsProvider extends Cloneable {
 	
 	/**
 	 * Returns the application name which targets to the property osgi.jaxrs.name

@@ -11,6 +11,7 @@
  */
 package org.eclipselabs.jaxrs.jersey.runtime.application;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipselabs.jaxrs.jersey.dto.DTOConverter;
@@ -55,6 +56,17 @@ public class JerseyResourceProvider<T extends Object> extends JerseyApplicationC
 		} else {
 			return DTOConverter.toFailedResourceDTO(this, status == INVALID ? DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE : status);
 		}
+	}
+	
+	/* 
+	 * (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		Object resource = getProviderObject();
+		Map<String, Object> properties = new HashMap<>(getProviderProperties());
+		return new JerseyResourceProvider<Object>(resource, properties);
 	}
 
 	/**

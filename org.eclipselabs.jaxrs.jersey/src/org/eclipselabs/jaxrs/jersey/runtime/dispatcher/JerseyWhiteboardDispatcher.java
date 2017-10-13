@@ -303,8 +303,8 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 				/*
 				 * Assign all resources and extension of our candidates to the applications
 				 */
-				assignContent(applications, applicationCandidates, resources);
-				assignContent(applications, applicationCandidates, extensions);
+				assignContent(applications, applicationCandidates, resourceCandidates);
+				assignContent(applications, applicationCandidates, extensionCandidates);
 				
 				/*
 				 * 
@@ -381,7 +381,9 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 					applications.forEach((app)->{
 						if (candidates.contains(app) && 
 								c.canHandleApplication(app)) {
-							matched.set(addContentToApplication(app, c));
+							if (!matched.get()) {
+								matched.set(addContentToApplication(app, c));
+							}
 						} else {
 							removeContentFromApplication(app, c);
 						}
@@ -391,7 +393,11 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		// add all other content to the default application or remove it, if the content fits to an other application now
 		content.stream().forEach((c)->{
 			if (contentCandidates.contains(c)) {
-				removeContentFromApplication(defaultProvider, c);
+				if (c.canHandleApplication(defaultProvider)) {
+					addContentToApplication(defaultProvider, c);
+				} else {
+					removeContentFromApplication(defaultProvider, c);
+				}
 			} else {
 				addContentToApplication(defaultProvider, c);
 			}

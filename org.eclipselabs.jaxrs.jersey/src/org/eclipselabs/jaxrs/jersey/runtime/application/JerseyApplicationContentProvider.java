@@ -90,7 +90,7 @@ public class JerseyApplicationContentProvider<T extends Object> extends Abstract
 		if (applicationFilter != null) {
 			try {
 				boolean applicationMatch = applicationFilter.matches(application.getApplicationProperties());
-				if (!applicationMatch && !application.isDefault()) {
+				if (!applicationMatch) {
 					logger.log(Level.WARNING, "The given application select filter does not match to this application for this resource/extension: " + getName());
 					return false;
 				}
@@ -102,6 +102,8 @@ public class JerseyApplicationContentProvider<T extends Object> extends Abstract
 			if (!application.isDefault()) {
 				logger.log(Level.INFO, "There is no application select filter defined, using default application");
 				return false;
+			} else {
+				return canHandleDefaultApplication();
 			}
 		}
 		return true;

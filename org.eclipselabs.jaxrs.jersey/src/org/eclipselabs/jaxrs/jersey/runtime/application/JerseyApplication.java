@@ -81,7 +81,7 @@ public class JerseyApplication extends Application {
 		if (contentProvider.isSingleton()) {
 			Object resource = contentProvider.getObject();
 			Object result = singletonMap.put(name, resource);
-			return resource.equals(result) || result == null;
+			return !resource.equals(result) || result == null;
 		} else {
 			Class<?> resourceClass = contentProvider.getObjectClass();
 			Object result = classesMap.put(name, resourceClass);
