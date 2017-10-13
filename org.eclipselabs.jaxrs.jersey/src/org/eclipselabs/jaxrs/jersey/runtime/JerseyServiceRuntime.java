@@ -121,7 +121,7 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboar
 		updateProperties(ctx);
 		boolean portChanged = !this.port.equals(oldPort);
 		boolean pathChanged = !this.contextPath.equals(oldContextPath);
-	
+
 		if (!pathChanged && !portChanged) {
 			return;
 		}
@@ -193,31 +193,40 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboar
 	}
 
 	/* 
-		 * (non-Javadoc)
-		 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsJerseyHandler#updateRuntimeDTO(org.osgi.framework.ServiceReference)
-		 */
-		public synchronized void updateRuntimeDTO(ServiceReference<?> serviceRef) {
-			List<ApplicationDTO> appDTOList = new LinkedList<>();
-			applicationContainerMap.forEach((name, ap)->{
-				ApplicationDTO appDTO = ap.getApplicationDTO();
-				if (name.equals(".default")) {
-					runtimeDTO.defaultApplication = appDTO;
-				} else {
-					appDTOList.add(appDTO);
-				}
-			});
-			if (serviceRef != null) {
-				ServiceReferenceDTO srDTO = DTOConverter.toServiceReferenceDTO(serviceRef);
-				runtimeDTO.serviceDTO = srDTO;
-				// the defaults application service id is the same, like this, because it comes from here
-	//			runtimeDTO.defaultApplication.serviceId = srDTO.id;
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#updateRuntimeDTO(org.osgi.framework.ServiceReference)
+	 */
+	public synchronized void updateRuntimeDTO(ServiceReference<?> serviceRef) {
+		List<ApplicationDTO> appDTOList = new LinkedList<>();
+		applicationContainerMap.forEach((name, ap)->{
+			ApplicationDTO appDTO = ap.getApplicationDTO();
+			if (name.equals(".default")) {
+				runtimeDTO.defaultApplication = appDTO;
+			} else {
+				appDTOList.add(appDTO);
 			}
-			runtimeDTO.applicationDTOs = appDTOList.toArray(new ApplicationDTO[appDTOList.size()]);
+		});
+		if (serviceRef != null) {
+			ServiceReferenceDTO srDTO = DTOConverter.toServiceReferenceDTO(serviceRef);
+			runtimeDTO.serviceDTO = srDTO;
+			// the defaults application service id is the same, like this, because it comes from here
+			//			runtimeDTO.defaultApplication.serviceId = srDTO.id;
 		}
+		runtimeDTO.applicationDTOs = appDTOList.toArray(new ApplicationDTO[appDTOList.size()]);
+	}
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsJerseyHandler#registerApplication(org.eclipselabs.osgi.jersey.runtime.JaxRsApplicationProvider)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#updateRuntimeDTO(org.osgi.service.jaxrs.runtime.dto.RuntimeDTO)
+	 */
+	@Override
+	public void updateRuntimeDTO(RuntimeDTO runtimeDTO) {
+
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#registerApplication(org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider)
 	 */
 	@Override
 	public void registerApplication(JaxRsApplicationProvider applicationProvider) {
@@ -242,7 +251,7 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboar
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsJerseyHandler#unregisterApplication(org.eclipselabs.osgi.jersey.runtime.JaxRsApplicationProvider)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#unregisterApplication(org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider)
 	 */
 	@Override
 	public void unregisterApplication(JaxRsApplicationProvider applicationProvider) {
@@ -266,7 +275,7 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboar
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsJerseyHandler#reloadApplication(org.eclipselabs.osgi.jersey.runtime.JaxRsApplicationProvider)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#reloadApplication(org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider)
 	 */
 	@Override
 	public void reloadApplication(JaxRsApplicationProvider applicationProvider) {

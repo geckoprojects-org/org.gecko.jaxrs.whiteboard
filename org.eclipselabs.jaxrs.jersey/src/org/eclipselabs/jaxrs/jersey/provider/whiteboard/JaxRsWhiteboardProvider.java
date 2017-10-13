@@ -14,8 +14,11 @@ package org.eclipselabs.jaxrs.jersey.provider.whiteboard;
 import java.util.Map;
 
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime;
+import org.osgi.service.jaxrs.runtime.dto.RuntimeDTO;
 
 /**
  * Provider for a whiteboard component
@@ -92,6 +95,16 @@ public interface JaxRsWhiteboardProvider {
 	 */
 	public boolean isRegistered(JaxRsApplicationProvider provider);
 	
+	/**
+	 * Update the runtime dto
+	 * @param serviceRef the service reference of the {@link JaxRSServiceRuntime}
+	 */
+	public void updateRuntimeDTO(ServiceReference<?> serviceRef);
 	
+	/**
+	 * Updates the runtime DTO with a given runtimeDTO
+	 * @param runtimeDTO the {@link RuntimeDTO} with the current information
+	 */
+	public void updateRuntimeDTO(RuntimeDTO runtimeDTO);
 
 }
