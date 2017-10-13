@@ -11,7 +11,10 @@
  */
 package org.eclipselabs.jaxrs.jersey.provider.application;
 
+import java.util.List;
 import java.util.Map;
+
+import org.osgi.framework.Filter;
 
 /**
  * Base interface that provides basic provider information
@@ -34,6 +37,12 @@ public interface JaxRsProvider {
 	public Long getServiceId();
 	
 	/**
+	 * Returns the service rank
+	 * @return the service rank
+	 */
+	public Integer getServiceRank();
+	
+	/**
 	 * Returns the providers properties, which are usually the service properties or an empty map
 	 * @return the providers properties, which are usually the service properties or an empty map
 	 */
@@ -48,5 +57,23 @@ public interface JaxRsProvider {
 	 * @return <code>true</code>, if the application can be handled by a whiteboard runtime with the given properties
 	 */
 	public boolean canHandleWhiteboard(Map<String, Object> runtimeProperties);
+	
+	/**
+	 * Returns <code>true</code>, if the is provider requires one or more extensions
+	 * @return <code>true</code>, if the is provider requires one or more extensions
+	 */
+	public boolean requiresExtensions();
+	
+	/**
+	 * Returns a {@link List} of {@link Filter} or an empty list
+	 * @return a {@link List} of {@link Filter} or an empty list
+	 */
+	public List<Filter> getExtensionFilters();
+	
+	/**
+	 * Returns <code>true</code>, if this provider is failed provider, which will result in a failed DTO
+	 * @return <code>true</code>, if this provider is failed provider, which will result in a failed DTO
+	 */
+	public boolean isFailed();
 
 }

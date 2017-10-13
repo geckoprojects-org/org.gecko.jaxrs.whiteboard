@@ -12,6 +12,8 @@
 package org.eclipselabs.jaxrs.jersey.provider.application;
 
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -37,10 +39,12 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 	private static final Logger logger = Logger.getLogger("jersey.abstractProvider");
 	private final Map<String, Object> properties;
 	private String name;
-	private Long serviceId = null;
+	private Long serviceId;
+	private Integer serviceRank;
 	private int status = NO_FAILURE;
 	private T object;
 	private Filter whiteboardFilter;
+	private List<Filter> extensionFilters = new LinkedList<>();
 
 	public AbstractJaxRsProvider(T object, Map<String, Object> properties) {
 		this.object = object;
@@ -68,28 +72,76 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 
 	/* 
 	 * (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsProvider#getServiceRank()
+	 */
+	@Override
+	public Integer getServiceRank() {
+		return serviceRank;
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsProvider#isFailed()
+	 */
+	@Override
+	public boolean isFailed() {
+		return getProviderStatus() != NO_FAILURE;
+	}
+
+	/* 
+	 * (non-Javadoc)
 	 * @see org.eclipselabs.jaxrs.jersey.provider.JaxRsProvider#getProviderProperties()
 	 */
 	@Override
 	public Map<String, Object> getProviderProperties() {
 		return Collections.unmodifiableMap(properties);
 	}
+	
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsProvider#requiresExtensions()
+	 */
+	@Override
+	public boolean requiresExtensions() {
+		return !extensionFilters.isEmpty();
+	}
 
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsProvider#canHandleWhiteboard(java.util.Map)
+	 */
 	@Override
 	public boolean canHandleWhiteboard(Map<String, Object> runtimeProperties) {
 		// in case the application status is invalid, this application cannot be handled
 		if (getProviderStatus() != NO_FAILURE) {
 			return false;
 		}
+		/* 
+		 * Spec table 151.2: osgi.jaxrs.whiteboard.target: ... If this property is not specified,
+		 * all JaxRs Whiteboards can handle this service
+		 */
 		if (whiteboardFilter == null) {
 			return true;
 		}
 		runtimeProperties = runtimeProperties == null ? Collections.emptyMap() : runtimeProperties;
 		boolean match = whiteboardFilter.matches(runtimeProperties);
+		/*
+		 * TODO Clearance
+		 * https://osgi.org/members/bugzilla/show_bug.cgi?id=3014
+		 */
 		if (!match) {
 			updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
 		}
 		return match;
+	}
+	
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsProvider#getExtensionFilters()
+	 */
+	@Override
+	public List<Filter> getExtensionFilters() {
+		return extensionFilters;
 	}
 
 	/**
@@ -135,13 +187,16 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 			String jaxRsName = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_NAME);
 			if (jaxRsName != null) {
 				providerName = jaxRsName;
+				if (jaxRsName.startsWith("osgi") || jaxRsName.startsWith(".")) {
+					updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
+				}
 			} else {
 				providerName = properties.toString();
 			}
 		}
 		return providerName;
 	}
-	
+
 	/**
 	 * Validates all properties which are usually the service properties. It starts with the name and serviceId and delegates to custom implementations
 	 */
@@ -152,6 +207,15 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 		if (serviceId == null) {
 			serviceId = (Long) properties.get(ComponentConstants.COMPONENT_ID);
 		}
+		Object sr = properties.get(Constants.SERVICE_RANKING);
+		if (sr != null && sr instanceof Integer) {
+			serviceRank = (Integer)sr;
+		} else {
+			serviceRank = Integer.valueOf(0);
+		}
+		if (serviceId == null) {
+			serviceId = (Long) properties.get(ComponentConstants.COMPONENT_ID);
+		}
 		String filter = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET);
 		if (filter != null) {
 			try {
@@ -159,6 +223,20 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 			} catch (InvalidSyntaxException e) {
 				logger.log(Level.SEVERE, "The given whiteboard target filter is invalid: " + filter, e);
 				updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
+			}
+		}
+		String[] filters = (String[]) properties.get(JaxRSWhiteboardConstants.JAX_RS_EXTENSION_SELECT);
+		if (filters != null) {
+			for (String f : filters) {
+				try {
+					Filter extensionFilter = FrameworkUtil.createFilter(f);
+					extensionFilters.add(extensionFilter);
+				} catch (InvalidSyntaxException e) {
+					logger.log(Level.SEVERE, "The given extension select filter is invalid: " + filter, e);
+					extensionFilters.clear();
+					updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
+					break;
+				}
 			}
 		}
 		doValidateProperties(properties);
@@ -180,6 +258,10 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 		}
 		if (status == NO_FAILURE) {
 			status = newStatus;
+		} else {
+			if (newStatus != status) {
+				status = newStatus;
+			}
 		}
 	}
 

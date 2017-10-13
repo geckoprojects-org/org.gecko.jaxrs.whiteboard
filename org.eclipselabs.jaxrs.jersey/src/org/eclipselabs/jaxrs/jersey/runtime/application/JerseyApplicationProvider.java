@@ -45,7 +45,6 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	private static final Logger logger = Logger.getLogger("jersey.applicationProvider");
 	private ServletContainer applicationContainer;
 	private String applicationBase;
-	private Filter extensionFilter;
 	private boolean legacy = false;
 	private boolean changed = false;
 
@@ -336,6 +335,8 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 			name = (String) providerProperties.get(JaxRSWhiteboardConstants.JAX_RS_NAME);
 			if (name == null && baseProperty != null) {
 				name = "." + baseProperty;
+			} else if (name != null && !name.equals(".default") && (name.startsWith(".") || name.startsWith("osgi"))) {
+				updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
 			}
 		}
 		return name == null ? "." + UUID.randomUUID().toString() : name;
@@ -355,16 +356,6 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 		if (baseProperty != null && !baseProperty.isEmpty()) {
 			applicationBase = baseProperty;
 		} 
-		String filter = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_EXTENSION_SELECT);
-		if (filter != null) {
-			try {
-				extensionFilter = FrameworkUtil.createFilter(filter);
-			} catch (InvalidSyntaxException e) {
-				logger.log(Level.SEVERE, "The given extension select filter is invalid: " + filter, e);
-				updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
-				return;
-			}
-		}
 	}
 
 	/**

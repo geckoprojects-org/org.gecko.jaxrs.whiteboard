@@ -99,26 +99,22 @@ public class DTOConverter {
 			throw new IllegalArgumentException("Expected an resource provider to create an ResourceDTO");
 		}
 		ResourceDTO dto = new JerseyResourceDTO();
-		boolean empty = true;
 		Class<?> clazz = resourceProvider.getObjectClass();
 		Path path = clazz.getAnnotation(Path.class);
 		if (path != null) {
 			dto.base = path.value();
-			empty = false;
 		}
 		dto.name = resourceProvider.getName();
 		Long serviceId = resourceProvider.getServiceId();
 		dto.serviceId = -1;
 		if (serviceId != null) {
 			dto.serviceId = serviceId.longValue();
-			empty = false;
 		} 
 		ResourceMethodInfoDTO[] rmiDTOs = getResourceMethodInfoDTOs(resourceProvider.getObject());
 		if (rmiDTOs != null) {
 			dto.resourceMethods = rmiDTOs;
-			empty = false;
 		}
-		return empty ? null : dto;
+		return dto;
 	}
 	
 	/**
@@ -154,26 +150,22 @@ public class DTOConverter {
 			throw new IllegalArgumentException("Expected an application content provider to create an ExtensionDTO");
 		}
 		ExtensionDTO dto = new JerseyExtensionDTO();
-		boolean empty = true;
 		Class<?> clazz = provider.getObjectClass();
 		Produces produces = clazz.getAnnotation(Produces.class);
 		if (produces != null) {
 			dto.produces = produces.value();
-			empty = false;
 		}
 		Consumes consumes = clazz.getAnnotation(Consumes.class);
 		if (consumes != null) {
 			dto.consumes = consumes.value();
-			empty = false;
 		}
 		dto.name = provider.getName();
 		Long serviceId = provider.getServiceId();
 		dto.serviceId = -1;
 		if (serviceId != null) {
 			dto.serviceId = serviceId.longValue();
-			empty = false;
 		} 
-		return empty ? null : dto;
+		return dto;
 	}
 	
 	/**

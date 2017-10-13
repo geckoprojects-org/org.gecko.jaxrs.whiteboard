@@ -11,6 +11,7 @@
  */
 package org.eclipselabs.jaxrs.jersey.provider.application;
 
+import java.util.Collection;
 import java.util.Map;
 
 import org.eclipselabs.jaxrs.jersey.provider.JaxRsConstants;
@@ -56,5 +57,21 @@ public interface JaxRsApplicationContentProvider extends JaxRsProvider, JaxRsCon
 	 * @return <code>true</code>, if the resource can be handled by a whiteboard runtime with the given properties
 	 */
 	public boolean canHandleApplication(JaxRsApplicationProvider application);
+	
+	/**
+	 * Returns <code>true</code>, if this resource can be handled by the default application. If no application select is given.
+	 * If the application select is given an the application name matches .default, this call returns <code>true</code>, as well 
+	 * @return <code>true</code>, if the resource can be handled by the default application. 
+	 */
+	public boolean canHandleDefaultApplication();
+	
+	/**
+	 * Returns <code>true</code>, if this resource can handle one of theses applications or the default application.
+	 * If neither the default application nor any other application can handle this content, this results in an 
+	 * VALIDATION FAILED status and so in a failed DTO.
+	 * @param applications the application providers
+	 * @return <code>true</code>, if the content can be handled by by one of theses applications or the default application
+	 */
+	public boolean validateApplications(Collection<JaxRsApplicationProvider> applications);
 	
 }

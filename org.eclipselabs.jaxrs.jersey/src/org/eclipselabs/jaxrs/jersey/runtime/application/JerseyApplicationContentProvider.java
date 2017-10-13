@@ -11,6 +11,8 @@
  */
 package org.eclipselabs.jaxrs.jersey.runtime.application;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,9 +35,8 @@ import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
  */
 public class JerseyApplicationContentProvider<T extends Object> extends AbstractJaxRsProvider<T> implements JaxRsApplicationContentProvider {
 
-	private static final Logger logger = Logger.getLogger("jersey.rande");
+	private static final Logger logger = Logger.getLogger("jersey.contentProvider");
 	private Filter applicationFilter;
-	private Filter extensionFilter;
 
 	public JerseyApplicationContentProvider(T resource, Map<String, Object> properties) {
 		super(resource, properties);
@@ -90,7 +91,7 @@ public class JerseyApplicationContentProvider<T extends Object> extends Abstract
 			try {
 				boolean applicationMatch = applicationFilter.matches(application.getApplicationProperties());
 				if (!applicationMatch && !application.isDefault()) {
-					logger.log(Level.WARNING, "The given application select filter does not math to this application for this resource/extension: " + getName());
+					logger.log(Level.WARNING, "The given application select filter does not match to this application for this resource/extension: " + getName());
 					return false;
 				}
 			} catch (Exception e) {
@@ -99,11 +100,42 @@ public class JerseyApplicationContentProvider<T extends Object> extends Abstract
 			}
 		} else {
 			if (!application.isDefault()) {
-				logger.log(Level.WARNING, "There is no application select filter");
+				logger.log(Level.INFO, "There is no application select filter defined, using default application");
 				return false;
 			}
 		}
 		return true;
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationContentProvider#canHandleDefaultApplication()
+	 */
+	@Override
+	public boolean canHandleDefaultApplication() {
+		if (applicationFilter == null) {
+			return true;
+		} else {
+			Map<String, Object> properties = Collections.singletonMap(JaxRSWhiteboardConstants.JAX_RS_NAME, ".default");
+			return applicationFilter.matches(properties);
+		}
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationContentProvider#canHandleApplications(java.util.Collection)
+	 */
+	@Override
+	public boolean validateApplications(Collection<JaxRsApplicationProvider> applications) {
+		if (applications == null) {
+			return false;
+		}
+		long matched = applications.stream().filter((app)->canHandleApplication(app)).count();
+		boolean canHandle = canHandleDefaultApplication() || matched > 0;
+		if (!canHandle) {
+			updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
+		}
+		return canHandle;
 	}
 
 	/* 
@@ -113,7 +145,7 @@ public class JerseyApplicationContentProvider<T extends Object> extends Abstract
 	protected void doValidateProperties(Map<String, Object> properties) {
 		String resourceProp = (String) properties.get(getJaxRsResourceConstant());
 		if (!Boolean.parseBoolean(resourceProp)) {
-			logger.log(Level.WARNING, "The resource to add is not declared with the resource property: " + JaxRSWhiteboardConstants.JAX_RS_RESOURCE);
+			logger.log(Level.WARNING, "The resource to add is not declared with the resource property: " + getJaxRsResourceConstant());
 			updateStatus(INVALID);
 			return;
 		}
@@ -123,16 +155,6 @@ public class JerseyApplicationContentProvider<T extends Object> extends Abstract
 				applicationFilter = FrameworkUtil.createFilter(filter);
 			} catch (InvalidSyntaxException e) {
 				logger.log(Level.SEVERE, "The given application select filter is invalid: " + filter, e);
-				updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
-				return;
-			}
-		}
-		filter = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_EXTENSION_SELECT);
-		if (filter != null) {
-			try {
-				extensionFilter = FrameworkUtil.createFilter(filter);
-			} catch (InvalidSyntaxException e) {
-				logger.log(Level.SEVERE, "The given extension select filter is invalid: " + filter, e);
 				updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
 				return;
 			}

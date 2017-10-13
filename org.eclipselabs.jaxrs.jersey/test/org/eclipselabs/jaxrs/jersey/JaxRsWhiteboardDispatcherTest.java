@@ -16,8 +16,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,7 +30,6 @@ import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatch
 import org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
 import org.eclipselabs.jaxrs.jersey.resources.TestLegacyApplication;
 import org.eclipselabs.jaxrs.jersey.resources.TestResource;
-import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyApplicationProvider;
 import org.eclipselabs.jaxrs.jersey.runtime.dispatcher.JerseyWhiteboardDispatcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;

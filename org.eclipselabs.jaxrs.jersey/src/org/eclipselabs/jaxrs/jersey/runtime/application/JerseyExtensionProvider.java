@@ -61,7 +61,7 @@ public class JerseyExtensionProvider<T extends Object> extends JerseyApplication
 		if (status == NO_FAILURE) {
 			return DTOConverter.toExtensionDTO(this);
 		} else {
-			return DTOConverter.toFailedExtensionDTO(this, status == INVALID ? DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE : status);
+			return DTOConverter.toFailedExtensionDTO(this, status == INVALID ? DTOConstants.FAILURE_REASON_NOT_AN_EXTENSION_TYPE : status);
 		}
 	}
 
