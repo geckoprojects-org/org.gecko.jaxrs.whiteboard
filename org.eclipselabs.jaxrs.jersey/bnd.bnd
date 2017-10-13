@@ -13,7 +13,6 @@ mockito: org.mockito.mockito-core;version="[1.9,2)",\
 	org.eclipse.jetty.util;version=9.4,\
 	org.eclipse.jetty.servlet;version=9.4,\
 	org.glassfish.jersey.bundles.jaxrs-ri;version=2.26,\
-	org.eclipselabs.osgi.jaxrs;version=latest,\
 	biz.aQute.bnd.annotation;version=3.3
 
 -testpath: \

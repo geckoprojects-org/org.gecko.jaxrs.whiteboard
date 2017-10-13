@@ -266,14 +266,14 @@ public class JaxRsWhiteboardDispatcherTest {
 		// .default is registered and resource was added to default
 		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
-		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
+		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		dispatcher.deactivate();
 		assertFalse(dispatcher.isDispatching());
 		
 		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(1)).unregisterApplication(Mockito.any());
-		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
+		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 	}
 	
 	/**
@@ -705,7 +705,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 */
 		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
-		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
+		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		TestResource resource02 = new TestResource();
 		Map<String, Object> resProperties02 = new HashMap<>();
@@ -722,7 +722,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 */
 		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
-		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
+		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		assertEquals(2, dispatcher.getResources().size());
 		dispatcher.removeResource(resource02, resProperties02);
@@ -734,14 +734,14 @@ public class JaxRsWhiteboardDispatcherTest {
 		 */
 		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
-		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
+		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		dispatcher.deactivate();
 		assertFalse(dispatcher.isDispatching());
 		
 		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(1)).unregisterApplication(Mockito.any());
-		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
+		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 	}
 	
 	/**

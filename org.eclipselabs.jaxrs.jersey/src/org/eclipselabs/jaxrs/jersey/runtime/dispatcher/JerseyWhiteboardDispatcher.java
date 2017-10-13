@@ -219,11 +219,9 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			throw new IllegalStateException("Dispatcher cannot be used without a whiteboard provider");
 		}
 		defaultProvider = new JerseyApplicationProvider(".default", new Application(), "/");
+		whiteboard.registerApplication(defaultProvider);
 		dispatching = true;
 		doDispatch();
-		if (!whiteboard.isRegistered(defaultProvider)) {
-			whiteboard.registerApplication(defaultProvider);
-		}
 	}
 
 	/* 
