@@ -76,7 +76,7 @@ import aQute.bnd.annotation.headers.ProvideCapability;
  */
 @ProvideCapability(ns = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, 
 version="1.0", 
-value = "osgi.implementation=\"osgi.jaxrs\"", 
+value = "osgi.implementation=\"osgi.jaxrs\";provider=jersey", 
 uses= {"javax.ws.rs", "javax.ws.rs.client", "javax.ws.rs.container", "javax.ws.rs.core", "javax.ws.rs.ext", "org.osgi.service.jaxrs.whiteboard"})
 public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboardProvider {
 
