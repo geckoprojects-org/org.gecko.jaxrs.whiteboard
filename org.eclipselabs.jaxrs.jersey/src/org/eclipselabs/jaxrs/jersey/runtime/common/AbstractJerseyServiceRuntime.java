@@ -256,7 +256,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 		Enumeration<String> keys = context.getProperties().keys();
 		while(keys.hasMoreElements()) {
 			String key = keys.nextElement();
-			Object value = context.getProperties().get(keys.nextElement());
+			Object value = context.getProperties().get(key);
 			properties.put(key, value);
 		}
 		return properties;
