@@ -215,11 +215,12 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 				ServletContainer servletContainer = provider.getServletContainer();
 				if (servletContainer != null) {
 					ResourceConfig config = createResourceConfig(provider.getJaxRsApplication());
-//					if (contextHandler != null && contextHandler.isStarted()) {
+					try{
 						servletContainer.reload(config);
-//					} else {
-//						logger.log(Level.WARNING, "Jetty servlet context handler is not started yet");
-//					}
+					} catch(Exception e) {
+						//We cant't check if the surrounding container is started, so we have to do it this way
+						logger.log(Level.WARNING, "Jetty servlet context handler is not started yet");
+					}
 				}
 			}
 		}
