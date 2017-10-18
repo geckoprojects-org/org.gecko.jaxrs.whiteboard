@@ -85,7 +85,7 @@ public class JerseyApplication extends Application {
 		} else {
 			Class<?> resourceClass = contentProvider.getObjectClass();
 			Object result = classesMap.put(name, resourceClass);
-			return resourceClass.equals(result);
+			return !resourceClass.equals(result) || result == null;
 		}
 	}
 
