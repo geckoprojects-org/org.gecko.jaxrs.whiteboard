@@ -9,22 +9,19 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.eclipselabs.jaxrs.jersey.runtime;
+package org.eclipselabs.jaxrs.jersey.runtime.httpwhiteboard;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.Application;
 
-import org.eclipselabs.jaxrs.jersey.helper.JerseyHelper;
-import org.eclipselabs.jaxrs.jersey.provider.JerseyConstants;
-import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher;
 import org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
-import org.eclipselabs.jaxrs.jersey.runtime.dispatcher.JerseyWhiteboardDispatcher;
+import org.eclipselabs.jaxrs.jersey.runtime.JerseyServiceRuntime;
+import org.eclipselabs.jaxrs.jersey.runtime.JerseyWhiteboardComponent;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
@@ -40,41 +37,41 @@ import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime;
 import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntimeConstants;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
 
+
 /**
- * A configurable component, that establishes a whiteboard
+ * This component handles the lifecycle of a {@link JaxRSServiceRuntime}
  * @author Mark Hoffmann
- * @since 11.10.2017
+ * @since 30.07.2017
  */
-@Component(name="JaxRsWhiteboardComponent", immediate=true, configurationPolicy=ConfigurationPolicy.REQUIRE)
-public class JerseyWhiteboardComponent {
+@Component(name="JaxRsHttpWhiteboardRuntimeComponent", immediate=true, configurationPolicy=ConfigurationPolicy.REQUIRE)
+public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardComponent{
 
-	Logger logger = Logger.getLogger("o.e.o.j.runtimeComponent");
-	protected volatile ServiceRegistration<JaxRSServiceRuntime> serviceRuntime = null;
-	protected volatile AtomicLong changeCount = new AtomicLong();
-	private volatile String name;
-	protected final JaxRsWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
-	protected volatile JaxRsWhiteboardProvider whiteboard;
-
+	private static Logger logger = Logger.getLogger("o.e.o.j.JaxRsHttpWhiteboardRuntimeComponent");
 
 	/**
 	 * Called on component activation
 	 * @param context the component context
 	 * @throws ConfigurationException 
 	 */
+	/* (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.runtime.JerseyWhiteboardComponent#activate(org.osgi.service.component.ComponentContext)
+	 */
 	@SuppressWarnings("unchecked")
 	@Activate
-	public void activate(ComponentContext context) throws ConfigurationException {
-		updateProperties(context);
+	@Override
+	public void activate(final ComponentContext context) throws ConfigurationException {
 		if (whiteboard != null) {
 			whiteboard.teardown();;
 		}
-		whiteboard = new JerseyServiceRuntime();
+		whiteboard = new HTTPWhiteboardBasedJerseyServiceRuntime();
 		dispatcher.setWhiteboardProvider(whiteboard);
+		whiteboard.initialize(context);
 		String[] urls = whiteboard.getURLs(context);
 		// activate and start server
-		whiteboard.initialize(context);
 		dispatcher.dispatch();
 		whiteboard.startup();
+		
+		// activate and start server
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put("service.changecount", changeCount.incrementAndGet());
 		properties.put(JaxRSServiceRuntimeConstants.JAX_RS_SERVICE_ENDPOINT, urls);
@@ -106,24 +103,9 @@ public class JerseyWhiteboardComponent {
 	 */
 	@Deactivate
 	public void deactivate(ComponentContext context) {
-		changeCount.set(0);
-		if (dispatcher != null) {
-			dispatcher.deactivate();
-		}
-		if (whiteboard != null) {
-			whiteboard.teardown();
-			whiteboard = null;
-		}
-		if (serviceRuntime != null) {
-			try {
-				serviceRuntime.unregister();
-			} catch (IllegalStateException ise) {
-				logger.log(Level.SEVERE, "JaxRsRuntime was already unregistered", ise);
-			} catch (Exception ise) {
-				logger.log(Level.SEVERE, "Error unregsitering JaxRsRuntime", ise);
-			}
-		}
+		super.deactivate(context);
 	}
+	
 	/**
 	 * Adds a new application
 	 * @param application the application to add
@@ -131,7 +113,7 @@ public class JerseyWhiteboardComponent {
 	 */
 	@Reference(name="application", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeApplication")
 	public void addApplication(Application application, Map<String, Object> properties) {
-		dispatcher.addApplication(application, properties);
+		super.addApplication(application, properties);
 	}
 
 	/**
@@ -140,28 +122,25 @@ public class JerseyWhiteboardComponent {
 	 * @param properties the service properties
 	 */
 	public void removeApplication(Application application, Map<String, Object> properties) {
-		dispatcher.removeApplication(application, properties);
+		super.removeApplication(application, properties);
 	}
-
+	
 	/**
 	 * Adds a new resource
 	 * @param resource the resource to add
 	 * @param properties the service properties
 	 */
+	@Override
 	@Reference(name="resource", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeResource", target="(" + JaxRSWhiteboardConstants.JAX_RS_RESOURCE + "=true)")
 	public void addResource(Object resource, Map<String, Object> properties) {
-		dispatcher.addResource(resource, properties);
+		super.addResource(resource, properties);
 	}
-
-	/**
-	 * Removes a resource 
-	 * @param resource the resource to remove
-	 * @param properties the service properties
-	 */
+	
+	@Override
 	public void removeResource(Object resource, Map<String, Object> properties) {
-		dispatcher.removeResource(resource, properties);
+		super.removeResource(resource, properties);
 	}
-
+	
 	/**
 	 * Adds a new extension
 	 * @param extension the extension to add
@@ -169,7 +148,7 @@ public class JerseyWhiteboardComponent {
 	 */
 	@Reference(name="extension", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeExtension", target="(" + JaxRSWhiteboardConstants.JAX_RS_EXTENSION + "='true')")
 	public void addExtension(Object extension, Map<String, Object> properties) {
-		dispatcher.addExtension(extension, properties);
+		super.addExtension(extension, properties);
 	}
 
 	/**
@@ -178,25 +157,6 @@ public class JerseyWhiteboardComponent {
 	 * @param properties the service properties
 	 */
 	public void removeExtension(Object extension, Map<String, Object> properties) {
-		dispatcher.removeExtension(extension, properties);
+		super.removeExtension(extension, properties);
 	}
-	
-	/**
-	 * Updates the fields that are provided by service properties.
-	 * @param ctx the component context
-	 * @throws ConfigurationException thrown when no context is available or the expected property was not provided 
-	 */
-	protected void updateProperties(ComponentContext ctx) throws ConfigurationException {
-		if (ctx == null) {
-			throw new ConfigurationException(JaxRSServiceRuntimeConstants.JAX_RS_SERVICE_ENDPOINT, "No component context is availble to get properties from");
-		}
-		name = JerseyHelper.getPropertyWithDefault(ctx, JaxRSWhiteboardConstants.JAX_RS_NAME, null);
-		if (name == null) {
-			name = JerseyHelper.getPropertyWithDefault(ctx, JerseyConstants.JERSEY_WHITEBOARD_NAME, null);
-			if (name == null) {
-				throw new ConfigurationException(JaxRSWhiteboardConstants.JAX_RS_NAME, "No name was defined for the whiteboard");
-			}
-		}
-	}
-
 }

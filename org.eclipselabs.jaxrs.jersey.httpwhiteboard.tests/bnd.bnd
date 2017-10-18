@@ -21,6 +21,13 @@ Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 	org.glassfish.jersey.core.jersey-client;version=2.26,\
 	javax.ws.rs-api;version=2.0
 
+-runrequires: \
+	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.shell)',\
+	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.command)',\
+	osgi.identity;filter:='(&(osgi.identity=org.apache.felix.eventadmin)(version>=1.4.8))',\
+	osgi.identity;filter:='(osgi.identity=org.apache.felix.configadmin)',\
+	osgi.identity;filter:='(osgi.identity=org.eclipselabs.jaxrs.jersey.httpwhiteboard.tests)'
+
 javac.source: 1.8
 javac.target: 1.8
 
@@ -41,42 +48,36 @@ javac.target: 1.8
 	org.apache.servicemix.bundles.junit;version='[4.12.0,4.12.1)',\
 	org.eclipse.jetty.http;version='[9.4.6,9.4.7)',\
 	org.eclipse.jetty.io;version='[9.4.6,9.4.7)',\
+	org.eclipse.jetty.jmx;version='[9.4.6,9.4.7)',\
 	org.eclipse.jetty.security;version='[9.4.6,9.4.7)',\
 	org.eclipse.jetty.server;version='[9.4.6,9.4.7)',\
 	org.eclipse.jetty.servlet;version='[9.4.6,9.4.7)',\
 	org.eclipse.jetty.util;version='[9.4.6,9.4.7)',\
 	org.eclipselabs.jaxrs.jersey.api;version=snapshot,\
-	org.eclipselabs.jaxrs.jersey.tests;version=snapshot,\
+	org.eclipselabs.jaxrs.jersey.httpwhiteboard.tests;version=snapshot,\
+	org.eclipselabs.jaxrs.jersey.impl;version=snapshot,\
+	org.eclipselabs.jetty.servlet.contract;version='[9.4.6,9.4.7)',\
 	org.eclipselabs.osgi.hk2.repackaged;version='[2.5.0,2.5.1)',\
+	org.eclipselabs.osgi.jetty;version='[1.0.0,1.0.1)',\
 	org.glassfish.jersey.bundles.jaxrs-ri;version='[2.26.0,2.26.1)',\
 	org.mockito.mockito-core;version='[1.10.19,1.10.20)',\
 	org.objenesis;version='[2.2.0,2.2.1)',\
-	org.osgi.service.jaxrs;version='[0.0.0,0.0.1)',\
-	org.eclipselabs.jaxrs.jersey.impl;version=snapshot,\
-	org.apache.felix.http.jetty;version='[3.1.6,3.1.7)',\
-	org.eclipse.jetty.jmx;version='[9.4.6,9.4.7)',\
-	org.eclipselabs.jetty.servlet.contract;version='[9.4.6,9.4.7)',\
-	org.eclipselabs.osgi.jetty;version='[1.0.0,1.0.1)'
-	
--runrequires: \
-	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.shell)',\
-	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.command)',\
-	osgi.identity;filter:='(&(osgi.identity=org.apache.felix.eventadmin)(version>=1.4.8))',\
-	osgi.identity;filter:='(osgi.identity=org.apache.felix.configadmin)',\
-	osgi.identity;filter:='(osgi.identity=org.eclipselabs.jaxrs.jersey.tests)'
+	org.osgi.service.jaxrs;version='[0.0.0,0.0.1)'
 
 Bundle-Version: 1.0.0.${tstamp}
 Bundle-Copyright: Data In Motion Consulting
 Bundle-License: Eclipse Public License v1.0
-Bundle-Name: Jersey JaxRS Whiteboard integration test
-Bundle-Description: Jersey OSGi JaxRs Whiteboard integration tests
+Bundle-Name: Jersey JaxRS Whiteboard HTTP Whiteboard based integration test
+Bundle-Description: Jersey OSGi JaxRs Whiteboard HTTP Whiteboard based  integration tests
 Bundle-Vendor: Data In Motion Consulting GmbH
 Private-Package: \
-	org.eclipselabs.jaxrs.jersey.tests,\
-	org.eclipselabs.jaxrs.jersey.tests.resources,\
-	org.eclipselabs.jaxrs.jersey.tests.customizer,\
-	org.eclipselabs.jaxrs.jersey.tests.applications
-Require-Capability: osgi.implementation;filter:='(&(osgi.implementation=osgi.jaxrs)(provider=jersey))'
+	org.eclipselabs.jaxrs.jersey.httpwhiteboard.tests,\
+	org.eclipselabs.jaxrs.jersey.httpwhiteboard.tests.applications,\
+	org.eclipselabs.jaxrs.jersey.httpwhiteboard.tests.customizer,\
+	org.eclipselabs.jaxrs.jersey.httpwhiteboard.tests.resources
+Require-Capability: \
+	osgi.implementation;filter:='(&(osgi.implementation=osgi.jaxrs)(provider=jersey)(http.whiteboard=true))',\
+	osgi.implementation;filter:='(&(osgi.implementation=osgi.http)(provider=eclipselabs))'	
 
 # Needed for Mockito's mocking to work
 -runsystempackages.objenesis: sun.misc,sun.reflect

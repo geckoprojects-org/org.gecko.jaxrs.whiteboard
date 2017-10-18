@@ -10,4 +10,5 @@ Export-Package: \
 	org.eclipselabs.jaxrs.jersey.provider.application,\
 	org.eclipselabs.jaxrs.jersey.provider.hk2,\
 	org.eclipselabs.jaxrs.jersey.provider.osgi,\
-	org.eclipselabs.jaxrs.jersey.provider.whiteboard
+	org.eclipselabs.jaxrs.jersey.provider.whiteboard,\
+	org.osgi.service.jaxrs.*

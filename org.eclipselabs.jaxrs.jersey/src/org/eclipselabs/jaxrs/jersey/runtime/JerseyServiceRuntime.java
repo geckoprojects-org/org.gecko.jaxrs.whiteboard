@@ -22,50 +22,29 @@ import static org.eclipselabs.jaxrs.jersey.provider.JerseyConstants.WHITEBOARD_D
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-import javax.ws.rs.core.Application;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlet.ServletMapping;
-import org.eclipselabs.jaxrs.jersey.binder.PrototypeServiceBinder;
-import org.eclipselabs.jaxrs.jersey.dto.DTOConverter;
-import org.eclipselabs.jaxrs.jersey.factories.JerseyResourceInstanceFactory;
 import org.eclipselabs.jaxrs.jersey.helper.JaxRsHelper;
 import org.eclipselabs.jaxrs.jersey.helper.JerseyHelper;
 import org.eclipselabs.jaxrs.jersey.jetty.JettyServerRunnable;
-import org.eclipselabs.jaxrs.jersey.provider.JerseyConstants;
-import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider;
-import org.eclipselabs.jaxrs.jersey.provider.osgi.PrototypeResourceProvider;
-import org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
-import org.glassfish.hk2.api.Factory;
-import org.glassfish.jersey.server.ResourceConfig;
+import org.eclipselabs.jaxrs.jersey.runtime.common.AbstractJerseyServiceRuntime;
 import org.glassfish.jersey.servlet.ServletContainer;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.namespace.implementation.ImplementationNamespace;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime;
-import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntimeConstants;
-import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
-import org.osgi.service.jaxrs.runtime.dto.RuntimeDTO;
-import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
 
 import aQute.bnd.annotation.headers.ProvideCapability;
 
@@ -78,39 +57,23 @@ import aQute.bnd.annotation.headers.ProvideCapability;
 version="1.0", 
 value = "osgi.implementation=\"osgi.jaxrs\";provider=jersey", 
 uses= {"javax.ws.rs", "javax.ws.rs.client", "javax.ws.rs.container", "javax.ws.rs.core", "javax.ws.rs.ext", "org.osgi.service.jaxrs.whiteboard"})
-public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboardProvider {
+public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 
-	private volatile PrototypeServiceBinder binder;
 	private volatile Server jettyServer;
 	private volatile ServletContextHandler contextHandler;
-	private volatile RuntimeDTO runtimeDTO = new RuntimeDTO();
-	private volatile String name;
 	private Integer port = WHITEBOARD_DEFAULT_PORT;
 	private String contextPath = WHITEBOARD_DEFAULT_CONTEXT_PATH;
-	private ComponentContext context;
-	// hold all resource references of the default application 
-	private final Map<String, JaxRsApplicationProvider> applicationContainerMap = new ConcurrentHashMap<>();
 	private Logger logger = Logger.getLogger("o.e.o.j.serviceRuntime");
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime#getRuntimeDTO()
+	/* (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.runtime.common.AbstractJerseyServiceRuntime#doInitialize(org.osgi.service.component.ComponentContext)
 	 */
 	@Override
-	public RuntimeDTO getRuntimeDTO() {
-		return runtimeDTO;
-	}
-
-	/* 
-	 * (non-Javadoc)
-	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#initialize(org.osgi.service.component.ComponentContext)
-	 */
-	@Override
-	public void initialize(ComponentContext context) throws ConfigurationException {
-		this.context = context;
-		updateProperties(context);
+	protected void doInitialize(ComponentContext context){
 		createServerAndContext();
 	}
+	
+	
 
 	/* 
 	 * (non-Javadoc)
@@ -135,7 +98,7 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboar
 			startServer();
 		}
 	}
-
+	
 	/* 
 	 * (non-Javadoc)
 	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#startup()
@@ -145,14 +108,10 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboar
 		startServer();
 	}
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#teardown()
-	 */
-	public void teardown() {
+	@Override
+	protected void doTeardown() {
 		stopContextHandler();
 		stopServer();
-		binder.dispose();
 	}
 
 	/* 
@@ -177,82 +136,17 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboar
 		return new String[] {sb.toString()};
 	}
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#updateRuntimeDTO(org.osgi.framework.ServiceReference)
-	 */
-	public synchronized void updateRuntimeDTO(ServiceReference<?> serviceRef) {
-		List<ApplicationDTO> appDTOList = new LinkedList<>();
-		applicationContainerMap.forEach((name, ap)->{
-			ApplicationDTO appDTO = ap.getApplicationDTO();
-			if (name.equals(".default")) {
-				runtimeDTO.defaultApplication = appDTO;
-			} else {
-				appDTOList.add(appDTO);
-			}
-		});
-		if (serviceRef != null) {
-			ServiceReferenceDTO srDTO = DTOConverter.toServiceReferenceDTO(serviceRef);
-			runtimeDTO.serviceDTO = srDTO;
-			// the defaults application service id is the same, like this, because it comes from here
-			//			runtimeDTO.defaultApplication.serviceId = srDTO.id;
-		}
-		runtimeDTO.applicationDTOs = appDTOList.toArray(new ApplicationDTO[appDTOList.size()]);
-	}
-
-	/* 
-	 * (non-Javadoc)
-	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#updateRuntimeDTO(org.osgi.service.jaxrs.runtime.dto.RuntimeDTO)
+	/* (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.runtime.common.AbstractJerseyServiceRuntime#doRegisterServletContainer(org.glassfish.jersey.servlet.ServletContainer, org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider)
 	 */
 	@Override
-	public void updateRuntimeDTO(RuntimeDTO runtimeDTO) {
-
-	}
-
-	/* 
-	 * (non-Javadoc)
-	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#registerApplication(org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider)
-	 */
-	@Override
-	public void registerApplication(JaxRsApplicationProvider applicationProvider) {
-		if (applicationProvider == null) {
-			logger.log(Level.WARNING, "Cannot register an null application provider");
-			return;
-		}
-		if (applicationContainerMap.containsKey(applicationProvider.getName())) {
-			logger.log(Level.SEVERE, "There is already an application registered with name: " + applicationProvider.getName());
-			throw new IllegalStateException("There is already an application registered with name: " + applicationProvider.getName());
-		}
-		Application application = applicationProvider.getJaxRsApplication();
-		ResourceConfig config = createResourceConfig(application);
-		String path = applicationProvider.getPath();
-		ServletContainer container = new ServletContainer(config);
-		applicationProvider.setServletContainer(container);
+	protected void doRegisterServletContainer(ServletContainer container, String path) {
 		ServletHolder servlet = new ServletHolder(container);
-		String applicationPath = applicationProvider.isDefault() ? JaxRsHelper.getServletPath(application) : JaxRsHelper.toServletPath(path);
-		contextHandler.addServlet(servlet, applicationPath);
-		applicationContainerMap.put(applicationProvider.getName(), applicationProvider);
+		contextHandler.addServlet(servlet, path);
 	}
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#unregisterApplication(org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider)
-	 */
 	@Override
-	public void unregisterApplication(JaxRsApplicationProvider applicationProvider) {
-		if (applicationProvider == null) {
-			logger.log(Level.WARNING, "Cannot unregister an null application provider");
-			return;
-		}
-		JaxRsApplicationProvider provider = null;
-		synchronized (applicationContainerMap) {
-			provider = applicationContainerMap.remove(applicationProvider.getName());
-		}
-		if (provider == null) {
-			logger.log(Level.WARNING, "There is no application registered with the name: " + applicationProvider.getName());
-			return;
-		}
-		ServletContainer container = provider.getServletContainer();
+	protected void doUnregisterApplication(ServletContainer container) {
 		if (container != null && contextHandler != null) {
 			ServletHandler handler = contextHandler.getServletHandler();
 			List<ServletHolder> servlets = new ArrayList<ServletHolder>();
@@ -284,116 +178,10 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboar
 		}
 	}
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#reloadApplication(org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider)
+	/* (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.runtime.common.AbstractJerseyServiceRuntime#doUpdateProperties(org.osgi.service.component.ComponentContext)
 	 */
-	@Override
-	public void reloadApplication(JaxRsApplicationProvider applicationProvider) {
-		if (applicationProvider == null) {
-			logger.log(Level.WARNING, "No application provider was given to be reloaded");
-		}
-		synchronized (applicationContainerMap) {
-			JaxRsApplicationProvider provider = applicationContainerMap.get(applicationProvider.getName());
-			if (provider == null) {
-				logger.log(Level.WARNING, "No application provider was registered nothing to reload, registering instead");
-				registerApplication(applicationProvider);
-			} else {
-				ServletContainer servletContainer = provider.getServletContainer();
-				if (servletContainer != null) {
-					ResourceConfig config = createResourceConfig(provider.getJaxRsApplication());
-					if (contextHandler != null && contextHandler.isStarted()) {
-						servletContainer.reload(config);
-					} else {
-						logger.log(Level.WARNING, "Jetty servlet context handler is not started yet");
-					}
-				}
-			}
-		}
-	}
-
-	/* 
-	 * (non-Javadoc)
-	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#isRegistered(org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider)
-	 */
-	@Override
-	public boolean isRegistered(JaxRsApplicationProvider provider) {
-		if (provider == null) {
-			return false;
-		}
-		return applicationContainerMap.containsKey(provider.getName());
-	}
-
-	/* 
-	 * (non-Javadoc)
-	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#getName()
-	 */
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	/* 
-	 * (non-Javadoc)
-	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#getProperties()
-	 */
-	@Override
-	public Map<String, Object> getProperties() {
-		Map<String, Object> properties = new HashMap<>();
-		Enumeration<String> keys = context.getProperties().keys();
-		while(keys.hasMoreElements()) {
-			String key = keys.nextElement();
-			Object value = context.getProperties().get(keys.nextElement());
-			properties.put(key, value);
-		}
-		return properties;
-	}
-
-	/**
-	 * Creates a new {@link ResourceConfig} for a given application. this method takes care of registering
-	 * Jersey factories for prototype scoped resource services and singletons separately
-	 * @param application the JaxRs application
-	 */
-	private ResourceConfig createResourceConfig(Application application) {
-		if (application == null) {
-			logger.log(Level.WARNING, "Cannot create a resource configuration for null application");
-			return null;
-		}
-		ResourceConfig config = ResourceConfig.forApplication(application);
-		// prepare factory creation to forward prototype functionality to Jersey
-		if (application instanceof PrototypeResourceProvider) {
-			System.out.println("Register a prototype provider like application");
-			if (context == null) {
-				throw new IllegalStateException("Cannot create prototype factories without component context");
-			}
-			PrototypeResourceProvider prp = (PrototypeResourceProvider) application;
-			BundleContext bctx = context.getBundleContext();
-			Set<Class<?>> classes = prp.getPrototypeResourceClasses();
-			classes.forEach((c)->{
-				Factory<?> factory = new JerseyResourceInstanceFactory<>(bctx, c);
-				binder.register(c, factory);
-			});
-			config.register(binder);
-		}
-		return config;
-	}
-
-	/**
-	 * Updates the fields that are provided by service properties.
-	 * @param ctx the component context
-	 * @throws ConfigurationException thrown when no context is available or the expected property was not provided 
-	 */
-	private void updateProperties(ComponentContext ctx) throws ConfigurationException {
-		if (ctx == null) {
-			throw new ConfigurationException(JaxRSServiceRuntimeConstants.JAX_RS_SERVICE_ENDPOINT, "No component context is availble to get properties from");
-		}
-		name = JerseyHelper.getPropertyWithDefault(ctx, JaxRSWhiteboardConstants.JAX_RS_NAME, null);
-		if (name == null) {
-			name = JerseyHelper.getPropertyWithDefault(ctx, JerseyConstants.JERSEY_WHITEBOARD_NAME, null);
-			if (name == null) {
-				throw new ConfigurationException(JaxRSWhiteboardConstants.JAX_RS_NAME, "No name was defined for the whiteboard");
-			}
-		}
+	protected void doUpdateProperties(ComponentContext ctx) {
 		String[] urls = getURLs(ctx);
 		URI[] uris = new URI[urls.length];
 		for (int i = 0; i < urls.length; i++) {
@@ -412,10 +200,6 @@ public class JerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboar
 	 * Creates the Jetty server and initializes the current context handler
 	 */
 	private void createServerAndContext() {
-		if (binder != null) {
-			binder.dispose();
-		}
-		binder = new PrototypeServiceBinder();
 		try {
 			if (jettyServer != null && !jettyServer.isStopped()) {
 				logger.log(Level.WARNING, "Stopping JaxRs white-board server on startup, but it wasn't exepected to run");
