@@ -382,22 +382,24 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	private void assignContent(Collection<JaxRsApplicationProvider> applications, Collection<JaxRsApplicationProvider> candidates, Collection<? extends JaxRsApplicationContentProvider> content) {
 		// determine all content that match an application
 		Set<JaxRsApplicationContentProvider> contentCandidates = content.
-				stream().
+				stream().map((c)->{
+					try {
+						return (JaxRsApplicationContentProvider) c.clone();
+					} catch (CloneNotSupportedException e) {
+						e.printStackTrace();
+					}
+					return null;
+				}).
 				filter((c)->{
 					AtomicBoolean matched = new AtomicBoolean(false);
 					applications.forEach((app)->{
 						if (candidates.contains(app) && 
+								c != null &&
 								c.canHandleApplication(app)) {
 							if (!matched.get()) {
 								matched.set(addContentToApplication(app, c));
 							} else {
-								JaxRsApplicationContentProvider provider;
-								try {
-									provider = (JaxRsApplicationContentProvider) c.clone();
-									addContentToApplication(app, provider);
-								} catch (CloneNotSupportedException e) {
-									e.printStackTrace();
-								}
+								addContentToApplication(app, c);
 							}
 						} else {
 							removeContentFromApplication(app, c);

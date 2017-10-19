@@ -153,6 +153,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 			throw new IllegalStateException("There is already an application registered with name: " + applicationProvider.getName());
 		}
 		Application application = applicationProvider.getJaxRsApplication();
+		logApplicationContent(applicationProvider);
 		ResourceConfig config = createResourceConfig(application);
 		ServletContainer container = new ServletContainer(config);
 		applicationProvider.setServletContainer(container);
@@ -160,6 +161,10 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 		doRegisterServletContainer(container, applicationPath);
 		
 		applicationContainerMap.put(applicationProvider.getName(), applicationProvider);
+	}
+
+	private void logApplicationContent(JaxRsApplicationProvider applicationProvider) {
+		logger.severe(name + " " + applicationProvider.getName() + " " + applicationProvider.getPath() + " " + applicationProvider.getJaxRsApplication().getClasses());
 	}
 
 	/**
