@@ -269,13 +269,13 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	 * we mark lockedChange so, that we know that there, is still work to do.
 	 */
 	private void doDispatch() {
-		Collection<JaxRsApplicationProvider> applications = Collections.unmodifiableCollection(applicationProviderCache.values());
-		Collection<JaxRsResourceProvider> resources = Collections.unmodifiableCollection(resourceProviderCache.values());
-		Collection<JaxRsExtensionProvider> extensions = Collections.unmodifiableCollection(extensionProviderCache.values());
-		Collection<JaxRsApplicationProvider> remApplications = getRemovedList(removedApplications);
-		Collection<JaxRsResourceProvider> remResources = getRemovedList(removedResources);
-		Collection<JaxRsExtensionProvider> remExtensions = getRemovedList(removedExtensions);
 		if (lock.tryLock()) {
+			Collection<JaxRsApplicationProvider> applications = Collections.unmodifiableCollection(applicationProviderCache.values());
+			Collection<JaxRsResourceProvider> resources = Collections.unmodifiableCollection(resourceProviderCache.values());
+			Collection<JaxRsExtensionProvider> extensions = Collections.unmodifiableCollection(extensionProviderCache.values());
+			Collection<JaxRsApplicationProvider> remApplications = getRemovedList(removedApplications);
+			Collection<JaxRsResourceProvider> remResources = getRemovedList(removedResources);
+			Collection<JaxRsExtensionProvider> remExtensions = getRemovedList(removedExtensions);
 			try {
 				/*
 				 * Unregister all applications that are declared as deleted.
