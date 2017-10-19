@@ -409,8 +409,11 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 		Application application = getProviderObject();
 		if (application instanceof JerseyApplication) {
 			JerseyApplication ja = (JerseyApplication) application;
-			changed = ja.removeContent(provider);
-			return changed;
+			boolean removed = ja.removeContent(provider);
+			if (!changed && removed) {
+				changed = removed;
+			}
+			return removed;
 		}
 		return true;
 	}
