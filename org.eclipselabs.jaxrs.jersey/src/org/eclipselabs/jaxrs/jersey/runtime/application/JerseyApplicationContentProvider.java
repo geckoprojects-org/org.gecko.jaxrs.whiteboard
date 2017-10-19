@@ -41,6 +41,16 @@ public class JerseyApplicationContentProvider<T extends Object> extends Abstract
 	public JerseyApplicationContentProvider(T resource, Map<String, Object> properties) {
 		super(resource, properties);
 	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		T object = getProviderObject();
+		Map<String, Object> properties = getProviderProperties();
+		return new JerseyApplicationContentProvider<Object>(object, properties);
+	}
 
 	/**
 	 * Returns <code>true</code>, if this resource is a singleton service

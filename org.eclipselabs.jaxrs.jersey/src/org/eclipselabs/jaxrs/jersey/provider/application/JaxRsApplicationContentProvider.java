@@ -74,4 +74,10 @@ public interface JaxRsApplicationContentProvider extends JaxRsProvider, JaxRsCon
 	 */
 	public boolean validateApplications(Collection<JaxRsApplicationProvider> applications);
 	
+	/**
+	 * @return a clone of the Object
+	 * @throws CloneNotSupportedException
+	 */
+	Object clone() throws CloneNotSupportedException;
+	
 }

@@ -390,6 +390,14 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 								c.canHandleApplication(app)) {
 							if (!matched.get()) {
 								matched.set(addContentToApplication(app, c));
+							} else {
+								JaxRsApplicationContentProvider provider;
+								try {
+									provider = (JaxRsApplicationContentProvider) c.clone();
+									addContentToApplication(app, provider);
+								} catch (CloneNotSupportedException e) {
+									e.printStackTrace();
+								}
 							}
 						} else {
 							removeContentFromApplication(app, c);
