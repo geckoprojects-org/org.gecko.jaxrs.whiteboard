@@ -408,7 +408,14 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 					return matched.get();
 				}).collect(Collectors.toSet());
 		// add all other content to the default application or remove it, if the content fits to an other application now
-		content.stream().forEach((c)->{
+		content.stream().map((c)->{
+			try {
+				return (JaxRsApplicationContentProvider) c.clone();
+			} catch (CloneNotSupportedException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}).forEach((c)->{
 			if (contentCandidates.contains(c)) {
 				if (c.canHandleApplication(defaultProvider)) {
 					addContentToApplication(defaultProvider, c);
