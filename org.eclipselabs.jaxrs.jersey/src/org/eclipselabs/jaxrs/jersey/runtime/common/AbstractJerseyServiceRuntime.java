@@ -30,7 +30,6 @@ import org.eclipselabs.jaxrs.jersey.helper.JaxRsHelper;
 import org.eclipselabs.jaxrs.jersey.helper.JerseyHelper;
 import org.eclipselabs.jaxrs.jersey.provider.JerseyConstants;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider;
-import org.eclipselabs.jaxrs.jersey.provider.osgi.PrototypeResourceProvider;
 import org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -53,7 +52,6 @@ import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
  */
 public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboardProvider {
 
-	private volatile PrototypeServiceBinder binder;
 	private volatile RuntimeDTO runtimeDTO = new RuntimeDTO();
 	private volatile String name;
 	protected ComponentContext context;
@@ -78,10 +76,6 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 	public void initialize(ComponentContext context) throws ConfigurationException {
 		this.context = context;
 		updateProperties(context);
-		if (binder != null) {
-			binder.dispose();
-		}
-		binder = new PrototypeServiceBinder();
 		doInitialize(context);
 	}
 
@@ -97,7 +91,6 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#teardown()
 	 */
 	public void teardown() {
-		binder.dispose();
 		doTeardown();
 	}
 
@@ -152,9 +145,8 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 			logger.log(Level.SEVERE, "There is already an application registered with name: " + applicationProvider.getName());
 			throw new IllegalStateException("There is already an application registered with name: " + applicationProvider.getName());
 		}
-		Application application = applicationProvider.getJaxRsApplication();
 		logApplicationContent(applicationProvider);
-		ResourceConfig config = createResourceConfig(application);
+		ResourceConfig config = createResourceConfig(applicationProvider);
 		ServletContainer container = new ServletContainer(config);
 		applicationProvider.setServletContainer(container);
 		String applicationPath = applicationProvider.isDefault() ? JaxRsHelper.getServletPath(applicationProvider.getJaxRsApplication()) : JaxRsHelper.toServletPath(applicationProvider.getPath());
@@ -219,7 +211,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 			} else {
 				ServletContainer servletContainer = provider.getServletContainer();
 				if (servletContainer != null) {
-					ResourceConfig config = createResourceConfig(provider.getJaxRsApplication());
+					ResourceConfig config = createResourceConfig(provider);
 					try{
 						servletContainer.reload(config);
 					} catch(Exception e) {
@@ -271,23 +263,27 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 	/**
 	 * Creates a new {@link ResourceConfig} for a given application. this method takes care of registering
 	 * Jersey factories for prototype scoped resource services and singletons separately
-	 * @param application the JaxRs application
+	 * @param applicationProvider the JaxRs application application provider
 	 */
-	private ResourceConfig createResourceConfig(Application application) {
-		if (application == null) {
-			logger.log(Level.WARNING, "Cannot create a resource configuration for null application");
+	private ResourceConfig createResourceConfig(JaxRsApplicationProvider applicationProvider) {
+		if (applicationProvider == null) {
+			logger.log(Level.WARNING, "Cannot create a resource configuration for null application provider");
 			return null;
 		}
+		Application application = applicationProvider.getJaxRsApplication();
 		ResourceConfig config = ResourceConfig.forApplication(application);
-		// prepare factory creation to forward prototype functionality to Jersey
-		if (application instanceof PrototypeResourceProvider) {
-			System.out.println("Register a prototype provider like application");
+		/*
+		 * Prepare factory creation to forward prototype functionality to Jersey.
+		 * This is not necessary for legacy applications or applications with am empty classes set
+		 */
+		if (!applicationProvider.isLegacy() && !application.getClasses().isEmpty()) {
+			logger.info("Register prototype provider for classes in the application " + applicationProvider.getName());
 			if (context == null) {
 				throw new IllegalStateException("Cannot create prototype factories without component context");
 			}
-			PrototypeResourceProvider prp = (PrototypeResourceProvider) application;
+			PrototypeServiceBinder binder = new PrototypeServiceBinder();
 			BundleContext bctx = context.getBundleContext();
-			Set<Class<?>> classes = prp.getPrototypeResourceClasses();
+			Set<Class<?>> classes = application.getClasses();
 			classes.forEach((c)->{
 				Factory<?> factory = new JerseyResourceInstanceFactory<>(bctx, c);
 				binder.register(c, factory);

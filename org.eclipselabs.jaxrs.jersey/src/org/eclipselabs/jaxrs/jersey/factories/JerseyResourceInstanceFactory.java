@@ -18,6 +18,7 @@ import java.util.Set;
 import org.eclipselabs.jaxrs.jersey.binder.PrototypeServiceBinder;
 import org.glassfish.hk2.api.Factory;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.framework.ServiceReference;
@@ -151,7 +152,7 @@ public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 		if (reference == null) {
 			throw new IllegalStateException("The resulting service reference is null");
 		}
-		Object scope = reference.getProperty("service.scope");
+		Object scope = reference.getProperty(Constants.SERVICE_SCOPE);
 		if ("prototype".equals(scope)) {
 			if (!reference.equals(resourceReference)) {
 				resourceReference = reference;

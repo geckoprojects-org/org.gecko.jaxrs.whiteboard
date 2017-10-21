@@ -65,6 +65,12 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 		}
 	}
 	
+	/**
+	 * Creates properties for the given parameters. this is used to create the default applicaation
+	 * @param name the application name
+	 * @param basePath the application base path
+	 * @return the properties
+	 */
 	private static Map<String, Object> createProperties(String name, String basePath) {
 		Map<String, Object> properties = new HashMap<String, Object>();
 		properties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, name);
