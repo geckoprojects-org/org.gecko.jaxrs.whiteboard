@@ -11,6 +11,8 @@
  */
 package org.eclipselabs.jaxrs.jersey.helper;
 
+import javax.ws.rs.core.Application;
+
 import org.osgi.service.component.ComponentContext;
 
 /**
@@ -35,6 +37,21 @@ public class JerseyHelper {
 		}
 		Object value = context.getProperties().get(key);
 		return value == null ? defaultValue : (T)value;
+	}
+	
+	/**
+	 * Returns <code>true</code>, if the application does not contain any resources or extensions
+	 * @param application the application to check
+	 * @return s <code>true</code>, if the application does not contain any resources or extensions
+	 */
+	public static boolean isEmpty(Application application) {
+		if (application == null) {
+			return true;
+		}
+		return application.getClasses().isEmpty() && 
+				application.getSingletons().isEmpty() && 
+				application.getProperties().isEmpty();
+		
 	}
 
 }

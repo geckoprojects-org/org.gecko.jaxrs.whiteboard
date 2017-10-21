@@ -162,7 +162,7 @@ public class JaxRsResourceProviderTest {
 		assertEquals("*", provider.getPath());
 		assertEquals(".default", provider.getName());
 		assertTrue(provider.isDefault());
-		assertTrue(provider.isLegacy());
+		assertFalse(provider.isLegacy());
 		
 		JaxRsResourceProvider resourceProvider = new JerseyResourceProvider<TestResource>(new TestResource(), Collections.emptyMap());
 		ResourceDTO resourceDto = resourceProvider.getResourceDTO();
@@ -182,7 +182,7 @@ public class JaxRsResourceProviderTest {
 		assertTrue(resourceProvider.isResource());
 		assertTrue(resourceProvider.isSingleton());
 		assertTrue(resourceProvider.canHandleApplication(provider));
-		assertFalse(provider.addResource(resourceProvider));
+		assertTrue(provider.addResource(resourceProvider));
 		
 		assertNotNull(resourceProvider.getName());
 		assertEquals(TestResource.class, resourceProvider.getObjectClass());

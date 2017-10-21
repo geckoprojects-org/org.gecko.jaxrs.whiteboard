@@ -27,6 +27,7 @@ import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsResourceProvider;
 import org.eclipselabs.jaxrs.jersey.resources.TestApplication;
 import org.eclipselabs.jaxrs.jersey.resources.TestExtension;
+import org.eclipselabs.jaxrs.jersey.resources.TestLegacyApplication;
 import org.eclipselabs.jaxrs.jersey.resources.TestResource;
 import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyApplicationProvider;
 import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyExtensionProvider;
@@ -315,7 +316,7 @@ public class JaxRsApplicationProviderTest {
 		// invalid filter schema
 		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(|(role=bla)(mandant=eTest))");
 		
-		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new TestApplication(), applicationProperties);
+		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new TestLegacyApplication(), applicationProperties);
 		
 		assertTrue(provider.isLegacy());
 		
@@ -343,7 +344,7 @@ public class JaxRsApplicationProviderTest {
 		// invalid filter schema
 		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(|(role=bla)(mandant=eTest))");
 		
-		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new TestApplication(), applicationProperties);
+		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new TestLegacyApplication(), applicationProperties);
 		
 		assertTrue(provider.isLegacy());
 		assertFalse(provider.isChanged());
@@ -375,7 +376,14 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new TestApplication(), applicationProperties);
 		
+		assertFalse(provider.isLegacy());
+		assertTrue(provider.isEmpty());
+		assertFalse(provider.isChanged());
+		
+		provider = new JerseyApplicationProvider(new TestLegacyApplication(), applicationProperties);
+		
 		assertTrue(provider.isLegacy());
+		assertFalse(provider.isEmpty());
 		assertFalse(provider.isChanged());
 		
 		Map<String, Object> contentProperties = new HashMap<>();

@@ -22,6 +22,7 @@ import javax.ws.rs.core.Application;
 
 import org.eclipselabs.jaxrs.jersey.dto.DTOConverter;
 import org.eclipselabs.jaxrs.jersey.helper.JaxRsHelper;
+import org.eclipselabs.jaxrs.jersey.helper.JerseyHelper;
 import org.eclipselabs.jaxrs.jersey.provider.application.AbstractJaxRsProvider;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationContentProvider;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider;
@@ -56,7 +57,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	public JerseyApplicationProvider(Application jaxRsApplication, Map<String, Object> properties) {
 		super(jaxRsApplication, properties);
 		// create name after validation, because some fields are needed eventually
-		if (Application.class == jaxRsApplication.getClass()) {
+		if (JerseyHelper.isEmpty(jaxRsApplication)) {
 			sourceApplication = jaxRsApplication;
 			setProviderObject(new JerseyApplication(getProviderName()));
 		} else {
@@ -162,7 +163,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 */
 	@Override
 	public boolean isEmpty() {
-		return getProviderObject().getClasses().isEmpty() && getProviderObject().getSingletons().isEmpty();
+		return JerseyHelper.isEmpty(getProviderObject());
 	}
 
 	/* 
