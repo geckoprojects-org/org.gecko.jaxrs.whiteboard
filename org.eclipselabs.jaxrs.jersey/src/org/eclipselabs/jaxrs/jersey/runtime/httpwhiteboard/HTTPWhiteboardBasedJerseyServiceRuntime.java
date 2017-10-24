@@ -211,4 +211,5 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 	@Override
 	protected void doTeardown() {
 	}
+
 }

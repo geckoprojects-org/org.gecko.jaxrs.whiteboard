@@ -32,6 +32,7 @@ import org.eclipselabs.jaxrs.jersey.provider.JerseyConstants;
 import org.eclipselabs.jaxrs.jersey.tests.applications.TestLegacyApplication;
 import org.eclipselabs.jaxrs.jersey.tests.customizer.TestServiceCustomizer;
 import org.eclipselabs.jaxrs.jersey.tests.resources.HelloResource;
+import org.eclipselabs.jaxrs.jersey.tests.resources.PrototypeResource;
 import org.glassfish.jersey.client.JerseyClient;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.JerseyInvocation;
@@ -669,6 +670,129 @@ public class JaxRsWhiteboardComponentTest {
 		get = webTarget.request().buildGet();
 		response = get.invoke();
 		assertEquals(404, response.getStatus());
+		
+		tearDownTest(configuration, get);
+	}
+	
+	/**
+	 * Tests 
+	 * @throws IOException 
+	 * @throws InterruptedException 
+	 * @throws InvalidSyntaxException 
+	 */
+	@Test
+	public void testWhiteboardComponentDefaultPrototype() throws IOException, InterruptedException, InvalidSyntaxException {
+		/*
+		 *  The server runs on localhost port 8185 using context path test: http://localhost:8185/test
+		 *  We mount the system with a resource PrototypeResource under http://localhost:8185/test that will return a 
+		 *  HTTP::200 using a GET request
+		 */
+		int port = 8185;
+		String contextPath = "test";
+		String url = "http://localhost:" + port + "/" + contextPath;
+		
+		/*
+		 * Initial setup for the REST runtime 
+		 */
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
+		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
+		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
+		
+		ConfigurationAdmin configAdmin = context.getService(configAdminRef);
+		assertNotNull(configAdmin);
+		Configuration configuration = configAdmin.getConfiguration("JaxRsWhiteboardComponent", "?");
+		assertNotNull(configuration);
+		assertEquals(1, configuration.getChangeCount());
+		Dictionary<String,Object> factoryProperties = configuration.getProperties();
+		assertNull(factoryProperties);
+		configuration.update(properties);
+		
+		/*
+		 * Check that the REST runtime service become available 
+		 */
+		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
+		assertNotNull(runtimeRef);
+		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
+		assertNotNull(runtime);
+		
+		Filter resFilter = FrameworkUtil.createFilter("(osgi.jaxrs.name=ptr)");
+		Object ptrResource = getService(resFilter, 3000l);
+		assertNotNull(ptrResource);
+		
+		
+		CountDownLatch cdl = new CountDownLatch(1);
+		cdl.await(1, TimeUnit.SECONDS);
+		
+		/*
+		 * Check if our RootResource is available under http://localhost:8185/test
+		 */
+		String checkUrl = url + "/test";
+		System.out.println("Checking URL is available: " + checkUrl);
+		JerseyInvocation get = null;
+		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
+		JerseyWebTarget webTarget = jerseyClient.target(checkUrl);
+		get = webTarget.request().buildGet();
+		cdl = new CountDownLatch(1);
+		cdl.await(15, TimeUnit.SECONDS);
+		Response response = get.invoke();
+		assertEquals(200, response.getStatus());
+		assertNotNull(response.getEntity());
+		String result01 = response.readEntity(String.class);
+		assertNotNull(result01);
+		
+		assertTrue(result01.startsWith(PrototypeResource.PROTOTYPE_PREFIX));
+		System.out.println(result01);
+		assertTrue(result01.endsWith(PrototypeResource.PROTOTYPE_POSTFIX));
+		
+//		/*
+//		 * Mount the resource HelloResource that will become available under:
+//		 * http://localhost:8185/test/hello
+//		 */
+//		Dictionary<String, Object> helloProps = new Hashtable<>();
+//		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
+//		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Hello");
+//		System.out.println("Register resource for uri /hello");
+//		ServiceRegistration<Object> helloRegistration = context.registerService(Object.class, new HelloResource(), helloProps);
+//		Filter f = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=Hello)");
+//		Object service = getService(f, 3000l);
+//		assertNotNull(service);
+//		
+//		/*
+//		 * Wait a short time to reload the configuration dynamically
+//		 */
+//		cdl = new CountDownLatch(1);
+//		cdl.await(1, TimeUnit.SECONDS);
+//		
+//		/*
+//		 * Check if http://localhost:8185/test/hello is available now. 
+//		 * Check as well, if http://localhost:8185/test is still available
+//		 */
+//		System.out.println("Checking URL is available " + url + "/hello");
+//		webTarget = jerseyClient.target(url + "/hello");
+//		get = webTarget.request().buildGet();
+//		response = get.invoke();
+//		assertEquals(200, response.getStatus());
+//		
+//		helloRegistration.unregister();
+//		service = getService(f, 3000l);
+//		assertNull(service);
+//		
+//		/*
+//		 * Wait a short time to reload the configuration dynamically
+//		 */
+		cdl = new CountDownLatch(1);
+		cdl.await(5, TimeUnit.SECONDS);
+//		
+//		/*
+//		 * Check if http://localhost:8185/test/hello is not available anymore. 
+//		 * Check as well, if http://localhost:8185/test is still available
+//		 */
+//		System.out.println("Checking URL is not available anymore " + url + "/hello");
+//		webTarget = jerseyClient.target(url + "/hello");
+//		get = webTarget.request().buildGet();
+//		response = get.invoke();
+//		assertEquals(404, response.getStatus());
 		
 		tearDownTest(configuration, get);
 	}

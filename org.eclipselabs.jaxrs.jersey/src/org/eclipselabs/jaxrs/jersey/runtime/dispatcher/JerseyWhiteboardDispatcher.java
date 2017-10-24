@@ -19,6 +19,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Application;
@@ -61,6 +63,7 @@ import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyResourceProvider;
  */
 public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 
+	private static final Logger logger = Logger.getLogger("jersey.dispatcher");
 	private JaxRsWhiteboardProvider whiteboard;
 	private volatile Map<String, JaxRsApplicationProvider> applicationProviderCache = new ConcurrentHashMap<>();
 	private volatile Map<String, JaxRsResourceProvider> resourceProviderCache = new ConcurrentHashMap<>();
@@ -263,7 +266,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			doDispatch();
 		}
 	}
-
+	
 	/**
 	 * Does the dispatching work. We lock the dispatch work. If we dont get a lock, because there is currently work in progress,
 	 * we mark lockedChange so, that we know that there, is still work to do.
@@ -382,14 +385,8 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	private void assignContent(Collection<JaxRsApplicationProvider> applications, Collection<JaxRsApplicationProvider> candidates, Collection<? extends JaxRsApplicationContentProvider> content) {
 		// determine all content that match an application
 		Set<JaxRsApplicationContentProvider> contentCandidates = content.
-				stream().map((c)->{
-					try {
-						return (JaxRsApplicationContentProvider) c.clone();
-					} catch (CloneNotSupportedException e) {
-						e.printStackTrace();
-					}
-					return null;
-				}).
+				stream().
+				map(this::cloneContent).
 				filter((c)->{
 					AtomicBoolean matched = new AtomicBoolean(false);
 					applications.forEach((app)->{
@@ -408,14 +405,8 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 					return matched.get();
 				}).collect(Collectors.toSet());
 		// add all other content to the default application or remove it, if the content fits to an other application now
-		content.stream().map((c)->{
-			try {
-				return (JaxRsApplicationContentProvider) c.clone();
-			} catch (CloneNotSupportedException e) {
-				e.printStackTrace();
-			}
-			return null;
-		}).forEach((c)->{
+		content.stream().
+			map(this::cloneContent).forEach((c)->{
 			if (contentCandidates.contains(c)) {
 				if (c.canHandleApplication(defaultProvider)) {
 					addContentToApplication(defaultProvider, c);
@@ -438,6 +429,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		if (application.isLegacy()) {
 			return false;
 		}
+		logger.info("Add content " + content.getName() + " to application " + application.getName());
 		if (content instanceof JaxRsResourceProvider) {
 			return application.addResource((JaxRsResourceProvider) content);
 		}
@@ -457,6 +449,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		if (application.isLegacy()) {
 			return false;
 		}
+		logger.info("Remove content " + content.getName() + " from application " + application.getName());
 		if (content instanceof JaxRsResourceProvider) {
 			return application.removeResource((JaxRsResourceProvider) content);
 		}
@@ -464,6 +457,23 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			return application.removeExtension((JaxRsExtensionProvider) content);
 		}
 		return false;
+	}
+
+	/**
+	 * Clones the given source and returns the new cloned instance
+	 * @param source the object to be cloned
+	 * @return the cloned instance
+	 */
+	private JaxRsApplicationContentProvider cloneContent(JaxRsApplicationContentProvider source) {
+		if (source == null) {
+			return null;
+		}
+		try {
+			return (JaxRsApplicationContentProvider) source.clone();
+		} catch (CloneNotSupportedException e) {
+			logger.log(Level.SEVERE, "Cannot clone object " + source.getName() + " because it is not clonable", e);
+		}
+		return null;
 	}
 
 	/**

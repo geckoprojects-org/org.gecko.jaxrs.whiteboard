@@ -11,8 +11,8 @@ mockito: org.mockito.mockito-core;version="[1.9,2)",\
 	org.eclipse.jetty.server;version=9.4,\
 	org.eclipse.jetty.util;version=9.4,\
 	org.eclipse.jetty.servlet;version=9.4,\
-	org.glassfish.jersey.bundles.jaxrs-ri;version=2.26,\
 	biz.aQute.bnd.annotation;version=3.3,\
+	org.glassfish.jersey.bundles.jaxrs-ri,\
 	org.eclipselabs.osgi.hk2.repackaged
 
 -testpath: \
