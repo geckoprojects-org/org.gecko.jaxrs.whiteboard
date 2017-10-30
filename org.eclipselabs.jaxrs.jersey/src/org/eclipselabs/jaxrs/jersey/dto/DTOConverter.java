@@ -222,7 +222,7 @@ public class DTOConverter {
 		ResourceMethodInfoDTO dto = new ResourceMethodInfoDTO();
 		Path path = method.getAnnotation(Path.class);
 		if (path != null) {
-			dto.path = path.value();
+			dto.uri = path.value();
 			empty = false;
 		}
 		Consumes consumes = method.getAnnotation(Consumes.class);
