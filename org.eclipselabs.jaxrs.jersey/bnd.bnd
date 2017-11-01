@@ -8,12 +8,10 @@ mockito: org.mockito.mockito-core;version="[1.9,2)",\
 	osgi.cmpn;version=6.0,\
 	javax.servlet-api;version=3.1,\
 	org.osgi.service.jaxrs;version=1.0,\
-	org.eclipse.jetty.server;version=9.4,\
-	org.eclipse.jetty.util;version=9.4,\
-	org.eclipse.jetty.servlet;version=9.4,\
 	org.glassfish.jersey.bundles.jaxrs-ri;version=2.26,\
 	biz.aQute.bnd.annotation;version=3.3,\
-	org.eclipselabs.osgi.hk2.repackaged
+	org.eclipselabs.osgi.hk2.repackaged,\
+	org.apache.felix.http.jetty
 
 -testpath: \
 	${junit},\

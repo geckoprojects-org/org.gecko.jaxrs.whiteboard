@@ -31,6 +31,7 @@ import org.eclipselabs.jaxrs.jersey.helper.JerseyHelper;
 import org.eclipselabs.jaxrs.jersey.provider.JerseyConstants;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider;
 import org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
+import org.eclipselabs.jaxrs.jersey.runtime.servlet.WhiteboardServletContainer;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
@@ -147,7 +148,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 		}
 		logApplicationContent(applicationProvider);
 		ResourceConfig config = createResourceConfig(applicationProvider);
-		ServletContainer container = new ServletContainer(config);
+		ServletContainer container = new WhiteboardServletContainer(config);
 		applicationProvider.setServletContainer(container);
 		String applicationPath = applicationProvider.isDefault() ? JaxRsHelper.getServletPath(applicationProvider.getJaxRsApplication()) : JaxRsHelper.toServletPath(applicationProvider.getPath());
 		doRegisterServletContainer(container, applicationPath);

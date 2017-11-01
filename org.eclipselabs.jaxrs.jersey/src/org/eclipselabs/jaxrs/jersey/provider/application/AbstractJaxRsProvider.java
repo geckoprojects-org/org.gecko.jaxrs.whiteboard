@@ -125,13 +125,7 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 		}
 		runtimeProperties = runtimeProperties == null ? Collections.emptyMap() : runtimeProperties;
 		boolean match = whiteboardFilter.matches(runtimeProperties);
-		/*
-		 * TODO Clearance
-		 * https://osgi.org/members/bugzilla/show_bug.cgi?id=3014
-		 */
-		if (!match) {
-			updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
-		}
+
 		return match;
 	}
 	

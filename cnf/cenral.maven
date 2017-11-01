@@ -14,3 +14,4 @@ org.glassfish.jersey.core:jersey-client:2.26-b09
 org.glassfish.jersey.core:jersey-common:2.26-b09
 org.json:json:20170516
 org.simpleframework:simple-xml:2.7.1
+org.apache.felix:org.apache.felix.http.jetty:3.4.4

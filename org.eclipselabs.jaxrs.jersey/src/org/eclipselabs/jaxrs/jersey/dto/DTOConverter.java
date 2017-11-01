@@ -100,10 +100,6 @@ public class DTOConverter {
 		}
 		ResourceDTO dto = new JerseyResourceDTO();
 		Class<?> clazz = resourceProvider.getObjectClass();
-		Path path = clazz.getAnnotation(Path.class);
-		if (path != null) {
-			dto.base = path.value();
-		}
 		dto.name = resourceProvider.getName();
 		Long serviceId = resourceProvider.getServiceId();
 		dto.serviceId = -1;
@@ -132,11 +128,11 @@ public class DTOConverter {
 		Long serviceId = resourceProvider.getServiceId();
 		dto.serviceId = serviceId != null ? serviceId.longValue() : -1;
 		dto.failureReason = reason;
-		Class<?> clazz = resourceProvider.getObjectClass();
-		Path path = clazz.getAnnotation(Path.class);
-		if (path != null) {
-			dto.base = path.value();
-		}
+//		Class<?> clazz = resourceProvider.getObjectClass();
+//		Path path = clazz.getAnnotation(Path.class);
+//		if (path != null) {
+//			dto.base = path.value();
+//		}
 		return dto;
 	}
 	
@@ -230,11 +226,6 @@ public class DTOConverter {
 		}
 		boolean empty = true;
 		ResourceMethodInfoDTO dto = new ResourceMethodInfoDTO();
-		Path path = method.getAnnotation(Path.class);
-		if (path != null) {
-			dto.uri = path.value();
-			empty = false;
-		}
 		Consumes consumes = method.getAnnotation(Consumes.class);
 		if (consumes != null) {
 			dto.consumingMimeType = consumes.value();

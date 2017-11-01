@@ -45,27 +45,27 @@
 #       index=${.}/cenral.maven.jetty; \
 #       name="Jetty Maven Central"
        
--plugin.8.Nexus = \
-	aQute.bnd.repository.maven.provider.MavenBndRepository; \
-       releaseUrl=http://devel.data-in-motion.biz/nexus/repository/maven-releases/; \
-       snapshotUrl=http://devel.data-in-motion.biz/nexus/repository/maven-snapshots/; \
-       index=${.}/dim.release.maven; \
-	   name = "Release Nexus"
+#-plugin.8.Nexus = \
+#	aQute.bnd.repository.maven.provider.MavenBndRepository; \
+ #      releaseUrl=http://devel.data-in-motion.biz/nexus/repository/maven-releases/; \
+  #     snapshotUrl=http://devel.data-in-motion.biz/nexus/repository/maven-snapshots/; \
+   #    index=${.}/dim.release.maven; \
+	#   name = "Release Nexus"
 
 -plugin.9.Jersey = \
 	aQute.bnd.repository.osgi.OSGiRepository; \
 	locations = http://devel.data-in-motion.biz/public/update/repository/p2/obr/jersey-dependencies/index.xml;\
 	name = "Jersey Dependencies"
 
--plugin.10.jetty_obr: \
-	aQute.bnd.repository.osgi.OSGiRepository; \
-	locations = http://devel.data-in-motion.biz/public/update/repository/p2/obr/jetty-9.4.6/index.xml;\
-	name = "Jetty OBR" 
+#-plugin.10.jetty_obr: \
+#	aQute.bnd.repository.osgi.OSGiRepository; \
+#	locations = http://devel.data-in-motion.biz/public/update/repository/p2/obr/jetty-9.4.6/index.xml;\
+#	name = "Jetty OBR" 
 
--plugin.11.http_whiteboard: \
-	aQute.bnd.repository.osgi.OSGiRepository; \
-	locations = http://devel.data-in-motion.biz/public/update/repository/p2/obr/http-whiteboard/index.xml;\
-	name = "Jetty HTTP Whiteboard" 
+#-plugin.11.http_whiteboard: \
+#	aQute.bnd.repository.osgi.OSGiRepository; \
+#	locations = http://devel.data-in-motion.biz/public/update/repository/p2/obr/http-whiteboard/index.xml;\
+#	name = "Jetty HTTP Whiteboard" 
 
 -releaserepo: Release
 -baselinerepo: Release
