@@ -139,7 +139,7 @@ public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 		if (resourceReference == null) {
 			Collection<ServiceReference<Object>> serviceReferences;
 			try {
-				serviceReferences = bctx.getServiceReferences(Object.class, "(osgi.jaxrs.resource=" + clazz.getName() + ")");
+				serviceReferences = bctx.getServiceReferences(Object.class, "(osgi.jaxrs.resource=true)");
 				if (serviceReferences.isEmpty()) {
 					throw new IllegalStateException("There was no service found for class: " + clazz.getSimpleName());
 				} else {

@@ -53,6 +53,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
  */
 public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboardProvider {
 
+	private volatile PrototypeServiceBinder binder;
 	private volatile RuntimeDTO runtimeDTO = new RuntimeDTO();
 	private volatile String name;
 	protected ComponentContext context;
@@ -77,6 +78,10 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 	public void initialize(ComponentContext context) throws ConfigurationException {
 		this.context = context;
 		updateProperties(context);
+		if (binder != null) {
+			binder.dispose();
+		}
+		binder = new PrototypeServiceBinder();
 		doInitialize(context);
 	}
 
@@ -86,20 +91,23 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 	 */
 	protected abstract void doInitialize(ComponentContext context) ;
 
-		
+
 	/* 
 	 * (non-Javadoc)
 	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#teardown()
 	 */
 	public void teardown() {
 		doTeardown();
+		if (binder != null) {
+			binder.dispose();
+		}
 	}
 
 	/**
 	 * Handles the distinct teardown event
 	 */
 	protected abstract void doTeardown();
-	
+
 	/* 
 	 * (non-Javadoc)
 	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#updateRuntimeDTO(org.osgi.framework.ServiceReference)
@@ -146,18 +154,12 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 			logger.log(Level.SEVERE, "There is already an application registered with name: " + applicationProvider.getName());
 			throw new IllegalStateException("There is already an application registered with name: " + applicationProvider.getName());
 		}
-		logApplicationContent(applicationProvider);
 		ResourceConfig config = createResourceConfig(applicationProvider);
 		ServletContainer container = new WhiteboardServletContainer(config);
 		applicationProvider.setServletContainer(container);
 		String applicationPath = applicationProvider.isDefault() ? JaxRsHelper.getServletPath(applicationProvider.getJaxRsApplication()) : JaxRsHelper.toServletPath(applicationProvider.getPath());
 		doRegisterServletContainer(container, applicationPath);
-		
 		applicationContainerMap.put(applicationProvider.getName(), applicationProvider);
-	}
-
-	private void logApplicationContent(JaxRsApplicationProvider applicationProvider) {
-		logger.severe(name + " " + applicationProvider.getName() + " " + applicationProvider.getPath() + " " + applicationProvider.getJaxRsApplication().getClasses());
 	}
 
 	/**
@@ -204,26 +206,28 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 		if (applicationProvider == null) {
 			logger.log(Level.WARNING, "No application provider was given to be reloaded");
 		}
-		synchronized (applicationContainerMap) {
-			JaxRsApplicationProvider provider = applicationContainerMap.get(applicationProvider.getName());
-			if (provider == null) {
-				logger.log(Level.WARNING, "No application provider was registered nothing to reload, registering instead");
-				registerApplication(applicationProvider);
-			} else {
-				ServletContainer servletContainer = provider.getServletContainer();
-				if (servletContainer != null) {
-					ResourceConfig config = createResourceConfig(provider);
-					try{
-						servletContainer.reload(config);
-					} catch(Exception e) {
-						//We cant't check if the surrounding container is started, so we have to do it this way
-						logger.log(Level.WARNING, "Jetty servlet context handler is not started yet");
-					}
+		logger.log(Level.INFO, "Reload an application provider " + applicationProvider.getName());
+		JaxRsApplicationProvider provider = applicationContainerMap.get(applicationProvider.getName());
+		if (provider == null) {
+			logger.log(Level.WARNING, "No application provider was registered nothing to reload, registering instead");
+			registerApplication(applicationProvider);
+		} else {
+			ServletContainer servletContainer = provider.getServletContainer();
+			if (servletContainer != null) {
+				ResourceConfig config = createResourceConfig(provider);
+				try{
+					logger.log(Level.INFO, "Reload servlet container " + applicationProvider.getName());
+					servletContainer.reload(config);
+				} catch(Exception e) {
+					//We cant't check if the surrounding container is started, so we have to do it this way
+					logger.log(Level.WARNING, "Jetty servlet context handler is not started yet", e);
 				}
+			} else {
+				logger.log(Level.INFO, "No servlet container is available to reload " + applicationProvider.getName());
 			}
 		}
 	}
-
+	
 	/* 
 	 * (non-Javadoc)
 	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#isRegistered(org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider)

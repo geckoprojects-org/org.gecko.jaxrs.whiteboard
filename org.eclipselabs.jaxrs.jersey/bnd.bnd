@@ -11,7 +11,8 @@ mockito: org.mockito.mockito-core;version="[1.9,2)",\
 	org.glassfish.jersey.bundles.jaxrs-ri;version=2.26,\
 	biz.aQute.bnd.annotation;version=3.3,\
 	org.eclipselabs.osgi.hk2.repackaged,\
-	org.apache.felix.http.jetty
+	org.apache.felix.http.jetty;version=3.4
+
 
 -testpath: \
 	${junit},\

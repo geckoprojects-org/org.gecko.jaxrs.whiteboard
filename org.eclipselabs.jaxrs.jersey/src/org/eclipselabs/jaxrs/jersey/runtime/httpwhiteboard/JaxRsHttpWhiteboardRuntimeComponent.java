@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.Application;
 
 import org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
-import org.eclipselabs.jaxrs.jersey.runtime.JerseyServiceRuntime;
 import org.eclipselabs.jaxrs.jersey.runtime.JerseyWhiteboardComponent;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
@@ -36,7 +35,6 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime;
 import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntimeConstants;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
-
 
 /**
  * This component handles the lifecycle of a {@link JaxRSServiceRuntime}

@@ -19,15 +19,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.Servlet;
 
 import org.eclipselabs.jaxrs.jersey.helper.JerseyHelper;
-import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider;
 import org.eclipselabs.jaxrs.jersey.runtime.common.AbstractJerseyServiceRuntime;
-import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -214,4 +211,5 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 	@Override
 	protected void doTeardown() {
 	}
+
 }
