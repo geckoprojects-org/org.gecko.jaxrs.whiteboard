@@ -30,6 +30,7 @@ import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 
+import org.apache.felix.http.jetty.JettyConfigConstants;
 import org.eclipselabs.jaxrs.jersey.httpwhiteboard.tests.applications.TestLegacyApplication;
 import org.eclipselabs.jaxrs.jersey.httpwhiteboard.tests.customizer.TestServiceCustomizer;
 import org.eclipselabs.jaxrs.jersey.httpwhiteboard.tests.resources.HelloResource;
@@ -108,13 +109,14 @@ public class JaxRsWhiteboardComponentTest {
 		 * Initial Setup of the HTTP Runtime
 		 * 
 		 */
-		Configuration runtimeConfig = configAdmin.createFactoryConfiguration("http.server.jetty", "?");
+		Configuration runtimeConfig = configAdmin.createFactoryConfiguration("org.apache.felix.http", "?");
 		
 		Dictionary<String, Object> props = new Hashtable<>();
-		List<String> endpoints = new ArrayList<>();
-		endpoints.add("http://localhost:" + port);
-		props.put(HttpServiceRuntimeConstants.HTTP_SERVICE_ENDPOINT, endpoints);
-		props.put("test.id", "endpoints");
+		props.put("org.osgi.service.http.port", port);
+		props.put("org.apache.felix.http.context_path", "/");
+		props.put("org.apache.felix.http.name", "Test");
+		props.put(JettyConfigConstants.FELIX_CUSTOM_HTTP_RUNTIME_PROPERTY_PREFIX + "test.id", "endpoints");
+		
 		runtimeConfig.update(props);
 		
 		//Register our Context
@@ -473,13 +475,14 @@ public class JaxRsWhiteboardComponentTest {
 		 * Initial Setup of the HTTP Runtime
 		 * 
 		 */
-		Configuration runtimeConfig = configAdmin.createFactoryConfiguration("http.server.jetty", "?");
+		Configuration runtimeConfig = configAdmin.createFactoryConfiguration("org.apache.felix.http", "?");
 		
 		Dictionary<String, Object> props = new Hashtable<>();
-		List<String> endpoints = new ArrayList<>();
-		endpoints.add("http://localhost:" + port);
-		props.put(HttpServiceRuntimeConstants.HTTP_SERVICE_ENDPOINT, endpoints);
-		props.put("test.id", "endpoints");
+		props.put("org.osgi.service.http.port", port);
+		props.put("org.apache.felix.http.context_path", "/");
+		props.put("org.apache.felix.http.name", "Test");
+		props.put(JettyConfigConstants.FELIX_CUSTOM_HTTP_RUNTIME_PROPERTY_PREFIX + "test.id", "endpoints");
+		
 		runtimeConfig.update(props);
 		
 		//Register our Context
@@ -651,14 +654,16 @@ public class JaxRsWhiteboardComponentTest {
 		 * Initial Setup of the HTTP Runtime
 		 * 
 		 */
-		Configuration runtimeConfig = configAdmin.createFactoryConfiguration("http.server.jetty", "?");
+		Configuration runtimeConfig = configAdmin.createFactoryConfiguration("org.apache.felix.http", "?");
 		
 		Dictionary<String, Object> props = new Hashtable<>();
-		List<String> endpoints = new ArrayList<>();
-		endpoints.add("http://localhost:" + port);
-		props.put(HttpServiceRuntimeConstants.HTTP_SERVICE_ENDPOINT, endpoints);
-		props.put("test.id", "endpoints");
+		props.put("org.osgi.service.http.port", port);
+		props.put("org.apache.felix.http.context_path", "/");
+		props.put("org.apache.felix.http.name", "Test");
+		props.put(JettyConfigConstants.FELIX_CUSTOM_HTTP_RUNTIME_PROPERTY_PREFIX + "test.id", "endpoints");
+
 		runtimeConfig.update(props);
+		
 		
 		//Register our Context
 		ServletContextHelper newContext = new ServletContextHelper() {
@@ -771,7 +776,6 @@ public class JaxRsWhiteboardComponentTest {
 	 * @throws InterruptedException 
 	 * @throws InvalidSyntaxException 
 	 */
-	@Test
 	public void testWhiteboardComponentMultipleEndpointsLegacyApplication() throws IOException, InterruptedException, InvalidSyntaxException {
 		/*
 		 *  The server runs on localhost port 8185 using context path test: http://localhost:8185/test
@@ -927,13 +931,14 @@ public class JaxRsWhiteboardComponentTest {
 		 * Initial Setup of the HTTP Runtime
 		 * 
 		 */
-		Configuration runtimeConfig = configAdmin.createFactoryConfiguration("http.server.jetty", "?");
+		Configuration runtimeConfig = configAdmin.createFactoryConfiguration("org.apache.felix.http", "?");
 		
 		Dictionary<String, Object> props = new Hashtable<>();
-		List<String> endpoints = new ArrayList<>();
-		endpoints.add("http://localhost:" + port);
-		props.put(HttpServiceRuntimeConstants.HTTP_SERVICE_ENDPOINT, endpoints);
-		props.put("test.id", "endpoints");
+		props.put("org.osgi.service.http.port", port);
+		props.put("org.apache.felix.http.context_path", "/");
+		props.put("org.apache.felix.http.name", "Test");
+		props.put(JettyConfigConstants.FELIX_CUSTOM_HTTP_RUNTIME_PROPERTY_PREFIX + "test.id", "endpoints");
+		
 		runtimeConfig.update(props);
 		
 		//Register our Context
@@ -1064,15 +1069,14 @@ public class JaxRsWhiteboardComponentTest {
 		 * Initial Setup of the HTTP Runtime
 		 * 
 		 */
-		Configuration runtimeConfig = configAdmin.createFactoryConfiguration("http.server.jetty", "?");
+		Configuration runtimeConfig = configAdmin.createFactoryConfiguration("org.apache.felix.http", "?");
 		
 		Dictionary<String, Object> props = new Hashtable<>();
-		List<String> endpoints = new ArrayList<>();
-		endpoints.add("http://localhost:" + port);
-		props.put(HttpServiceRuntimeConstants.HTTP_SERVICE_ENDPOINT, endpoints);
-		props.put("test.id", "endpoints");
-		runtimeConfig.update(props);
-		
+		props.put("org.osgi.service.http.port", port);
+		props.put("org.apache.felix.http.context_path", "/");
+		props.put("org.apache.felix.http.name", "Test");
+		props.put(JettyConfigConstants.FELIX_CUSTOM_HTTP_RUNTIME_PROPERTY_PREFIX + "test.id", "endpoints");
+
 		//Register our Context
 		ServletContextHelper newContext = new ServletContextHelper() {
 		};
