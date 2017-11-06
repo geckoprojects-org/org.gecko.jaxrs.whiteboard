@@ -304,9 +304,7 @@ public class JaxRsApplicationProviderTest {
 		assertFalse(provider.canHandleWhiteboard(null));
 		
 		dto = provider.getApplicationDTO();
-		assertTrue(dto instanceof FailedApplicationDTO);
-		failedDto = (FailedApplicationDTO) dto;
-		assertEquals(DTOConstants.FAILURE_REASON_VALIDATION_FAILED, failedDto.failureReason);
+		assertFalse(dto instanceof FailedApplicationDTO);
 	}
 	
 	@Test
@@ -332,9 +330,9 @@ public class JaxRsApplicationProviderTest {
 		assertFalse(provider.canHandleWhiteboard(null));
 		
 		dto = provider.getApplicationDTO();
-		assertTrue(dto instanceof FailedApplicationDTO);
-		failedDto = (FailedApplicationDTO) dto;
-		assertEquals(DTOConstants.FAILURE_REASON_VALIDATION_FAILED, failedDto.failureReason);
+		
+		// according to the current spec an application that does not match a whiteboard will not produce a failure dto 
+		assertFalse(dto instanceof FailedApplicationDTO);
 	}
 	
 	@Test
