@@ -20,7 +20,7 @@ Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 	org.osgi.service.jaxrs;version=1.0,\
 	org.glassfish.jersey.core.jersey-client;version=2.26,\
 	javax.ws.rs-api;version=2.0,\
-	org.apache.felix.http.jetty;version=3.4
+	org.apache.felix.http.jetty;version=3.4.5
 
 -runrequires: \
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.shell)',\
