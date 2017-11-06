@@ -144,7 +144,7 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 	 * @param extension the extension to add
 	 * @param properties the service properties
 	 */
-	@Reference(name="extension", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeExtension", target="(" + JaxRSWhiteboardConstants.JAX_RS_EXTENSION + "='true')")
+	@Reference(name="extension", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeExtension", target="(" + JaxRSWhiteboardConstants.JAX_RS_EXTENSION + "=true)")
 	public void addExtension(Object extension, Map<String, Object> properties) {
 		super.addExtension(extension, properties);
 	}
