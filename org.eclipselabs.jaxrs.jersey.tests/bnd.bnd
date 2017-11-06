@@ -19,7 +19,8 @@ Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 	org.eclipselabs.jaxrs.jersey.impl;version=latest,\
 	org.osgi.service.jaxrs;version=1.0,\
 	org.glassfish.jersey.core.jersey-client,\
-	org.glassfish.jersey.bundles.jaxrs-ri
+	org.glassfish.jersey.bundles.jaxrs-ri,\
+	javax.annotation-api;version=1.3
 	
 
 javac.source: 1.8
