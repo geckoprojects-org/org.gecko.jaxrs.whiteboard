@@ -55,7 +55,7 @@
 -plugin.9.Jersey = \
 	aQute.bnd.repository.osgi.OSGiRepository; \
 	locations = http://devel.data-in-motion.biz/public/update/repository/p2/obr/jersey-dependencies/index.xml;\
-	name = "Jersey Dependencies"
+	name = "Jersey_Dependencies"
 
 #-plugin.10.jetty_obr: \
 #	aQute.bnd.repository.osgi.OSGiRepository; \
