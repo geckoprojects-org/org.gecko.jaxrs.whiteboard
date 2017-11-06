@@ -18,8 +18,8 @@ Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 	org.eclipselabs.jaxrs.jersey.api;version=latest,\
 	org.eclipselabs.jaxrs.jersey.impl;version=latest,\
 	org.osgi.service.jaxrs;version=1.0,\
-	javax.ws.rs-api;version=2.0,\
-	org.glassfish.jersey.core.jersey-client
+	org.glassfish.jersey.core.jersey-client,\
+	org.glassfish.jersey.bundles.jaxrs-ri
 	
 
 javac.source: 1.8
