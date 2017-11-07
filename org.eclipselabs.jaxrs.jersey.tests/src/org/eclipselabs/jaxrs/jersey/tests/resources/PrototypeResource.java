@@ -28,7 +28,6 @@ import org.osgi.service.component.annotations.ServiceScope;
  */
 @Path("/")
 @Component(service=Object.class, scope=ServiceScope.PROTOTYPE, property= {"osgi.jaxrs.name=ptr", "osgi.jaxrs.resource=true"})
-//@Component(service=Object.class, scope=ServiceScope.PROTOTYPE, property= {"osgi.jaxrs.name=ptr", "osgi.jaxrs.resource=true", "osgi.jaxrs.application.select=(app=prototype)"})
 public class PrototypeResource {
 	
 	public static final String PROTOTYPE_PREFIX = "test_";

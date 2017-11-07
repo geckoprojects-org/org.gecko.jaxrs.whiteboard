@@ -32,6 +32,7 @@ import org.eclipselabs.jaxrs.jersey.provider.JerseyConstants;
 import org.eclipselabs.jaxrs.jersey.tests.applications.TestLegacyApplication;
 import org.eclipselabs.jaxrs.jersey.tests.customizer.TestServiceCustomizer;
 import org.eclipselabs.jaxrs.jersey.tests.resources.HelloResource;
+import org.eclipselabs.jaxrs.jersey.tests.resources.PrototypeExtension;
 import org.eclipselabs.jaxrs.jersey.tests.resources.PrototypeResource;
 import org.glassfish.jersey.client.JerseyClient;
 import org.glassfish.jersey.client.JerseyClientBuilder;
@@ -743,56 +744,8 @@ public class JaxRsWhiteboardComponentTest {
 		
 		assertTrue(result01.startsWith(PrototypeResource.PROTOTYPE_PREFIX));
 		System.out.println(result01);
-		assertTrue(result01.endsWith(PrototypeResource.PROTOTYPE_POSTFIX));
-		
-//		/*
-//		 * Mount the resource HelloResource that will become available under:
-//		 * http://localhost:8185/test/hello
-//		 */
-//		Dictionary<String, Object> helloProps = new Hashtable<>();
-//		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
-//		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Hello");
-//		System.out.println("Register resource for uri /hello");
-//		ServiceRegistration<Object> helloRegistration = context.registerService(Object.class, new HelloResource(), helloProps);
-//		Filter f = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=Hello)");
-//		Object service = getService(f, 3000l);
-//		assertNotNull(service);
-//		
-//		/*
-//		 * Wait a short time to reload the configuration dynamically
-//		 */
-//		cdl = new CountDownLatch(1);
-//		cdl.await(1, TimeUnit.SECONDS);
-//		
-//		/*
-//		 * Check if http://localhost:8185/test/hello is available now. 
-//		 * Check as well, if http://localhost:8185/test is still available
-//		 */
-//		System.out.println("Checking URL is available " + url + "/hello");
-//		webTarget = jerseyClient.target(url + "/hello");
-//		get = webTarget.request().buildGet();
-//		response = get.invoke();
-//		assertEquals(200, response.getStatus());
-//		
-//		helloRegistration.unregister();
-//		service = getService(f, 3000l);
-//		assertNull(service);
-//		
-//		/*
-//		 * Wait a short time to reload the configuration dynamically
-//		 */
-		cdl = new CountDownLatch(1);
-		cdl.await(5, TimeUnit.SECONDS);
-//		
-//		/*
-//		 * Check if http://localhost:8185/test/hello is not available anymore. 
-//		 * Check as well, if http://localhost:8185/test is still available
-//		 */
-//		System.out.println("Checking URL is not available anymore " + url + "/hello");
-//		webTarget = jerseyClient.target(url + "/hello");
-//		get = webTarget.request().buildGet();
-//		response = get.invoke();
-//		assertEquals(404, response.getStatus());
+		assertTrue(result01.contains(PrototypeResource.PROTOTYPE_POSTFIX));
+		assertTrue(result01.endsWith(PrototypeExtension.PROTOTYPE_POSTFIX));
 		
 		tearDownTest(configuration, get);
 	}

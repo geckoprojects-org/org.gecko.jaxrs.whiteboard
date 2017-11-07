@@ -14,6 +14,11 @@ package org.eclipselabs.jaxrs.jersey.binder;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Singleton;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Provider;
+
 import org.eclipselabs.jaxrs.jersey.factories.JerseyResourceInstanceFactory;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.api.PerLookup;
@@ -64,7 +69,7 @@ public class PrototypeServiceBinder extends AbstractBinder {
 		}
 		factoryMap.remove(clazz);
 	}
-	
+
 	/**
 	 * Releases all resources
 	 */

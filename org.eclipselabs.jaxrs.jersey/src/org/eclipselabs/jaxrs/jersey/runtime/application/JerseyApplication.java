@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.Application;
 
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationContentProvider;
+import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider;
 
 /**
  * Special JaxRs application implementation that holds and updates all resource and extension given by the application provider
@@ -78,7 +79,7 @@ public class JerseyApplication extends Application {
 			return false;
 		}
 		String name = contentProvider.getName();
-		if (contentProvider.isSingleton()) {
+		if (contentProvider.isSingleton() || contentProvider instanceof JaxRsExtensionProvider) {
 			Object resource = contentProvider.getObject();
 			Object result = singletonMap.put(name, resource);
 			return !resource.equals(result) || result == null;
