@@ -11,7 +11,9 @@
  */
 package org.eclipselabs.jaxrs.jersey.provider.application;
 
+import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
@@ -75,13 +77,6 @@ public interface JaxRsApplicationProvider extends JaxRsProvider, JaxRsConstants 
 	public ServletContainer getServletContainer();
 	
 	/**
-	 * Returns <code>true</code>, if the application provider contains a legacy application.
-	 * This applications are not further extensible.
-	 * @return <code>true</code>, if the container contains a legacy application, otherwise <code>false</code>
-	 */
-	public boolean isLegacy();
-	
-	/**
 	 * Returns <code>true</code>, if the application provider is the default application.
 	 * @return <code>true</code>, if the application provider is the default application., otherwise <code>false</code>
 	 */
@@ -107,22 +102,6 @@ public interface JaxRsApplicationProvider extends JaxRsProvider, JaxRsConstants 
 	/**
 	 * Adds a new resource to the application provider. The call returns <code>true</code>,
 	 * if adding was successful, otherwise <code>false</code>
-	 * @param resource resource to add
-	 * @param properties the resource service properties
-	 */
-	public boolean addResource(Object resource, Map<String, Object> properties);
-	
-	/**
-	 * Removes a resource from the application provider. The call returns <code>true</code>,
-	 * if removing was successful, otherwise <code>false</code>
-	 * @param resource resource to be removed
-	 * @param properties the resource service properties
-	 */
-	public boolean removeResource(Object resource, Map<String, Object> properties);
-	
-	/**
-	 * Adds a new resource to the application provider. The call returns <code>true</code>,
-	 * if adding was successful, otherwise <code>false</code>
 	 * @param provider resource provider to add
 	 */
 	public boolean addResource(JaxRsResourceProvider provider);
@@ -137,22 +116,6 @@ public interface JaxRsApplicationProvider extends JaxRsProvider, JaxRsConstants 
 	/**
 	 * Adds a new extension to the application provider. The call returns <code>true</code>,
 	 * if adding was successful, otherwise <code>false</code>
-	 * @param extension extension to add
-	 * @param properties the resource service properties
-	 */
-	public boolean addExtension(Object extension, Map<String, Object> properties);
-	
-	/**
-	 * Removes a extension from the application provider. The call returns <code>true</code>,
-	 * if removing was successful, otherwise <code>false</code>
-	 * @param extension resource to be removed
-	 * @param properties the resource service properties
-	 */
-	public boolean removeExtension(Object extension, Map<String, Object> properties);
-	
-	/**
-	 * Adds a new extension to the application provider. The call returns <code>true</code>,
-	 * if adding was successful, otherwise <code>false</code>
 	 * @param provider extension provider to add
 	 */
 	public boolean addExtension(JaxRsExtensionProvider provider);
@@ -163,5 +126,11 @@ public interface JaxRsApplicationProvider extends JaxRsProvider, JaxRsConstants 
 	 * @param provider extension provider to be removed
 	 */
 	public boolean removeExtension(JaxRsExtensionProvider provider);
+	
+	/**
+	 * All registered {@link JaxRsApplicationContentProvider}
+	 * @return a {@link Collection} of {@link JaxRsApplicationContentProvider}
+	 */
+	public Collection<JaxRsApplicationContentProvider> getContentProviers();
 
 }

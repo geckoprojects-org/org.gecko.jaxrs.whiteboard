@@ -24,6 +24,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceObjects;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
@@ -42,13 +43,13 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 	private Long serviceId;
 	private Integer serviceRank;
 	private int status = NO_FAILURE;
-	private T object;
 	private Filter whiteboardFilter;
 	private List<Filter> extensionFilters = new LinkedList<>();
+	private ServiceObjects<T> serviceObjects;
 
-	public AbstractJaxRsProvider(T object, Map<String, Object> properties) {
-		this.object = object;
+	public AbstractJaxRsProvider(ServiceObjects<T> serviceObjects, Map<String, Object> properties) {
 		this.properties = properties == null ? Collections.emptyMap() : properties;
+		this.serviceObjects = serviceObjects;
 		validateProperties();
 	}
 
@@ -139,21 +140,13 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 	}
 
 	/**
-	 * Sets a new provider object instance
-	 * @param object the new instance to set
+	 * Returns the {@link ServiceObjects} representing this resource
+	 * @return the {@link ServiceObjects} representing this resource
 	 */
-	protected void setProviderObject(T object) {
-		this.object = object;
+	public ServiceObjects<T> getServiceObjects() {
+		return serviceObjects;
 	}
-
-	/**
-	 * Returns the provider content
-	 * @return the provider content
-	 */
-	protected T getProviderObject() {
-		return object;
-	}
-
+	
 	/**
 	 * Returns the internal status of the provider
 	 * @return the internal status of the provider
@@ -184,8 +177,6 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 				if (jaxRsName.startsWith("osgi") || jaxRsName.startsWith(".")) {
 					updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
 				}
-			} else {
-				providerName = properties.toString();
 			}
 		}
 		return providerName;

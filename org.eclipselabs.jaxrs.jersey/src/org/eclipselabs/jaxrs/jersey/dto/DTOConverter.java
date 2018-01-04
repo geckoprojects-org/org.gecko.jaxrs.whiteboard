@@ -27,7 +27,6 @@ import javax.ws.rs.HEAD;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider;
@@ -105,7 +104,7 @@ public class DTOConverter {
 		if (serviceId != null) {
 			dto.serviceId = serviceId.longValue();
 		} 
-		ResourceMethodInfoDTO[] rmiDTOs = getResourceMethodInfoDTOs(resourceProvider.getObject());
+		ResourceMethodInfoDTO[] rmiDTOs = getResourceMethodInfoDTOs(resourceProvider.getObjectClass());
 		if (rmiDTOs != null) {
 			dto.resourceMethods = rmiDTOs;
 		}
@@ -191,11 +190,7 @@ public class DTOConverter {
 	 * @param resource the object class to parse
 	 * @return an array of method objects or <code>null</code>
 	 */
-	public static <T> ResourceMethodInfoDTO[] getResourceMethodInfoDTOs(T resource) {
-		if (resource == null) {
-			throw new IllegalArgumentException("Expected an resource isntance to introspect resource methods an create a ResourceMethodInfoDTO");
-		}
-		Class<?> clazz = resource.getClass();
+	public static <T> ResourceMethodInfoDTO[] getResourceMethodInfoDTOs(Class<T> clazz) {
 		Method[] methods = clazz.getDeclaredMethods();
 		List<ResourceMethodInfoDTO> dtos = new ArrayList<>(methods.length);
 

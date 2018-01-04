@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.osgi.framework.Filter;
+import org.osgi.framework.ServiceObjects;
 
 /**
  * Base interface that provides basic provider information
@@ -75,5 +76,10 @@ public interface JaxRsProvider extends Cloneable {
 	 * @return <code>true</code>, if this provider is failed provider, which will result in a failed DTO
 	 */
 	public boolean isFailed();
+
+	/**
+	 * @return
+	 */
+	ServiceObjects getServiceObjects();
 
 }

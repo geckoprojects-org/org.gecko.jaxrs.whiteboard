@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @since 21.10.2017
  */
 @Provider
-@Component(service=Object.class, scope=ServiceScope.PROTOTYPE, property= {"osgi.jaxrs.name=pte", "osgi.jaxrs.extension=true"})
+@Component(service=PrototypeExtension.class, scope=ServiceScope.PROTOTYPE, property= {"osgi.jaxrs.name=pte", "osgi.jaxrs.extension=true"})
 public class PrototypeExtension implements MessageBodyWriter<String>{
 
 	public static final String PROTOTYPE_POSTFIX = "_protoExtension";

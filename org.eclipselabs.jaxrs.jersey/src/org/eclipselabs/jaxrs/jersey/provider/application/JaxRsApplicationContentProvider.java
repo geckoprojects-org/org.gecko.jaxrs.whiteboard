@@ -43,12 +43,6 @@ public interface JaxRsApplicationContentProvider extends JaxRsProvider, JaxRsCon
 	public Class<?> getObjectClass();
 	
 	/**
-	 * Returns the resource instance
-	 * @return the resource instance
-	 */
-	public Object getObject();
-	
-	/**
 	 * Returns <code>true</code>, if this resource can handle the given properties.
 	 * If the resource contains a application select, than the properties are checked against
 	 * the select filter and returns the result.

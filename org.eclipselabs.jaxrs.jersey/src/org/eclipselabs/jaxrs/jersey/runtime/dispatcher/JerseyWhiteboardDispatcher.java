@@ -11,6 +11,7 @@
  */
 package org.eclipselabs.jaxrs.jersey.runtime.dispatcher;
 
+import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -25,6 +26,8 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Application;
 
+import org.eclipselabs.jaxrs.jersey.helper.ReferenceCollector;
+import org.eclipselabs.jaxrs.jersey.helper.ServiceReferenceEvent;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationContentProvider;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider;
@@ -34,6 +37,10 @@ import org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
 import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyApplicationProvider;
 import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyExtensionProvider;
 import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyResourceProvider;
+import org.osgi.framework.ServiceObjects;
+import org.osgi.framework.ServiceReference;
+import org.osgi.util.pushstream.PushStream;
+import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * Implementation of the dispatcher.
@@ -76,6 +83,9 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	private ReentrantLock lock = new ReentrantLock();
 	private AtomicBoolean lockedChange = new AtomicBoolean();
 
+	public JerseyWhiteboardDispatcher() {
+	}
+	
 	/* 
 	 * (non-Javadoc)
 	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher#setWhiteboardProvider(org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider)
@@ -86,6 +96,9 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			throw new IllegalStateException("Error setting whiteboard provider, when dispatching is active");
 		}
 		this.whiteboard = whiteboard;
+		if(defaultProvider != null) {
+			whiteboard.registerApplication(defaultProvider);
+		}
 	}
 
 	/* 
@@ -124,13 +137,19 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		return Collections.unmodifiableSet(new HashSet<>(extensionProviderCache.values()));
 	}
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher#addApplication(javax.ws.rs.core.Application, java.util.Map)
+	/* (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher#addApplication(org.osgi.framework.ServiceReference)
 	 */
 	@Override
-	public void addApplication(Application application, Map<String, Object> properties) {
-		JaxRsApplicationProvider provider = new JerseyApplicationProvider(application, properties);
+	public void addApplication(ServiceObjects<Application> appServiceObject, Map<String, Object> properties) {
+		JaxRsApplicationProvider provider = new JerseyApplicationProvider(appServiceObject, properties);
+		if(provider.isDefault()) {
+			defaultProvider = provider;
+			if(whiteboard != null) {
+				whiteboard.registerApplication(defaultProvider);
+			}
+			return;
+		}
 		String name = provider.getName();
 		if (!applicationProviderCache.containsKey(name)) {
 			applicationProviderCache.put(name, provider);
@@ -138,13 +157,12 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		}
 	}
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher#removeApplication(javax.ws.rs.core.Application, java.util.Map)
+	/* (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher#removeApplication(org.osgi.framework.ServiceReference)
 	 */
 	@Override
-	public void removeApplication(Application application, Map<String, Object> properties) {
-		JaxRsApplicationProvider provider = new JerseyApplicationProvider(application, properties);
+	public void removeApplication(Map<String, Object> properties) {
+		JaxRsApplicationProvider provider = new JerseyApplicationProvider(null, properties);
 		String name = provider.getName();
 		JaxRsApplicationProvider removed = applicationProviderCache.remove(name);
 		if (removed != null) {
@@ -153,13 +171,12 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		} 
 	}
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher#addResource(java.lang.Object, java.util.Map)
+	/* (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher#addResource(org.osgi.framework.ServiceReference)
 	 */
 	@Override
-	public void addResource(Object resource, Map<String, Object> properties) {
-		JaxRsResourceProvider provider = new JerseyResourceProvider<Object>(resource, properties);
+	public void addResource(ServiceObjects<?> serviceObject, Map<String, Object> properties) {
+		JaxRsResourceProvider provider = new JerseyResourceProvider<>(serviceObject, properties);
 		String name = provider.getName();
 		if (!resourceProviderCache.containsKey(name)) {
 			resourceProviderCache.put(name, provider);
@@ -172,8 +189,8 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher#removeResource(java.lang.Object, java.util.Map)
 	 */
 	@Override
-	public void removeResource(Object resource, Map<String, Object> properties) {
-		JaxRsResourceProvider provider = new JerseyResourceProvider<Object>(resource, properties);
+	public void removeResource(Map<String, Object> properties) {
+		JaxRsResourceProvider provider = new JerseyResourceProvider<Object>(null, properties);
 		String name = provider.getName();
 		JaxRsResourceProvider removed = resourceProviderCache.remove(name);
 		if (removed != null) {
@@ -187,8 +204,8 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher#addExtension(java.lang.Object, java.util.Map)
 	 */
 	@Override
-	public void addExtension(Object extension, Map<String, Object> properties) {
-		JaxRsExtensionProvider provider = new JerseyExtensionProvider<Object>(extension, properties);
+	public void addExtension(ServiceObjects<?> serviceObject, Map<String, Object> properties) {
+		JaxRsExtensionProvider provider = new JerseyExtensionProvider<>(serviceObject, properties);
 		String name = provider.getName();
 		if (!extensionProviderCache.containsKey(name)) {
 			extensionProviderCache.put(name, provider);
@@ -201,8 +218,8 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher#removeExtension(java.lang.Object, java.util.Map)
 	 */
 	@Override
-	public void removeExtension(Object extension, Map<String, Object> properties) {
-		JaxRsExtensionProvider provider = new JerseyExtensionProvider<Object>(extension, properties);
+	public void removeExtension(Map<String, Object> properties) {
+		JaxRsExtensionProvider provider = new JerseyExtensionProvider<Object>(null, properties);
 		String name = provider.getName();
 		JaxRsExtensionProvider removed = extensionProviderCache.remove(name);
 		if (removed != null) {
@@ -221,8 +238,6 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		if (whiteboard == null) {
 			throw new IllegalStateException("Dispatcher cannot be used without a whiteboard provider");
 		}
-		defaultProvider = new JerseyApplicationProvider(".default", new Application(), "/");
-		whiteboard.registerApplication(defaultProvider);
 		dispatching = true;
 		doDispatch();
 	}
@@ -324,13 +339,12 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 							if (app.isEmpty()) {
 								whiteboard.unregisterApplication(app);
 								// legacy application don't need a reload at all, all others are only reloaded, if they have changed
-							} else if (!app.isLegacy() && app.isChanged()) {
+							} else if (app.isChanged()) {
 								whiteboard.reloadApplication(app);
 							}
 						} else {
 							// we don't register empty applications and legacy application in general or changed applications 
-							if (!app.isEmpty() && 
-									(app.isLegacy() || app.isChanged())) {
+							if (!app.isEmpty() && app.isChanged()) {
 								whiteboard.registerApplication(app);
 							}
 						}
@@ -426,9 +440,6 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	 * @return <code>true</code>, if adding was successful
 	 */
 	private boolean addContentToApplication(JaxRsApplicationProvider application, JaxRsApplicationContentProvider content) {
-		if (application.isLegacy()) {
-			return false;
-		}
 		logger.info("Add content " + content.getName() + " to application " + application.getName());
 		if (content instanceof JaxRsResourceProvider) {
 			return application.addResource((JaxRsResourceProvider) content);
@@ -446,9 +457,6 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	 * @return <code>true</code>, if removal was successful
 	 */
 	private boolean removeContentFromApplication(JaxRsApplicationProvider application, JaxRsApplicationContentProvider content) {
-		if (application.isLegacy()) {
-			return false;
-		}
 		logger.info("Remove content " + content.getName() + " from application " + application.getName());
 		if (content instanceof JaxRsResourceProvider) {
 			return application.removeResource((JaxRsResourceProvider) content);
@@ -492,5 +500,4 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		}
 		return removed;
 	}
-
 }

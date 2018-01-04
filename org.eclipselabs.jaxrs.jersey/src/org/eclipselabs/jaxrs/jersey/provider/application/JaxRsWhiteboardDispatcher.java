@@ -17,6 +17,8 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 
 import org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
+import org.osgi.framework.ServiceObjects;
+import org.osgi.framework.ServiceReference;
 
 /**
  * Dispatcher that handles the dynamic adding and removing of resources, extension and applications, that are
@@ -59,45 +61,39 @@ public interface JaxRsWhiteboardDispatcher {
 	
 	/**
 	 * Adds an application
-	 * @param application the application to add
-	 * @param properties the service properties
+	 * @param ref the {@link ServiceReference} of the {@link Application}
 	 */
-	public void addApplication(Application application, Map<String, Object> properties);
+	public void addApplication(ServiceObjects<Application> appServiceObject, Map<String, Object> properties);
 	
 	/**
 	 * Removes an application
-	 * @param application the application to remove
-	 * @param properties the service properties
+	 * @param ref the {@link ServiceReference} of the {@link Application}
 	 */
-	public void removeApplication(Application application, Map<String, Object> properties);
+	public void removeApplication(Map<String, Object> properties);
 	
 	/**
 	 * Adds a resource
-	 * @param resource the resource to add
-	 * @param properties the service properties
+	 * @param ref the {@link ServiceReference} of the Resource
 	 */
-	public void addResource(Object resource, Map<String, Object> properties);
+	public void addResource(ServiceObjects<?> appServiceObject, Map<String, Object> properties);
 	
 	/**
 	 * Removes a resource
-	 * @param resource the resource to remove
-	 * @param properties the service properties
+	 * @param ref the {@link ServiceReference} of the Resource
 	 */
-	public void removeResource(Object resource, Map<String, Object> properties);
+	public void removeResource(Map<String, Object> properties);
 	
 	/**
 	 * Adds an extension
-	 * @param extension the extension to add
-	 * @param properties the service properties
+	 * @param ref the {@link ServiceReference} of the Extension
 	 */
-	public void addExtension(Object extension, Map<String, Object> properties);
+	public void addExtension(ServiceObjects<?> appServiceObject, Map<String, Object> properties);
 
 	/**
 	 * Removes an extension
-	 * @param extension the extension to remove
-	 * @param properties the service properties
+	 * @param ref the {@link ServiceReference} of the Resource
 	 */
-	public void removeExtension(Object extension, Map<String, Object> properties);
+	public void removeExtension(Map<String, Object> properties);
 	
 	/**
 	 * Activates dispatching

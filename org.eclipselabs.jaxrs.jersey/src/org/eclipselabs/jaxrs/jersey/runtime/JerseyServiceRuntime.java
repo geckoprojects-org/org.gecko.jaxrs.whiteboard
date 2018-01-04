@@ -80,7 +80,6 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#modified(org.osgi.service.component.ComponentContext)
 	 */
 	public void modified(ComponentContext ctx) throws ConfigurationException {
-		System.out.println("modify " + this.toString());
 		Integer oldPort = port;
 		String oldContextPath = contextPath;
 		updateProperties(ctx);

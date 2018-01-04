@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,6 +29,7 @@ import org.eclipselabs.jaxrs.jersey.helper.JaxRsHelper;
 import org.eclipselabs.jaxrs.jersey.helper.JerseyHelper;
 import org.eclipselabs.jaxrs.jersey.provider.JerseyConstants;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider;
+import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsResourceProvider;
 import org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
 import org.eclipselabs.jaxrs.jersey.runtime.servlet.WhiteboardServletContainer;
 import org.glassfish.hk2.api.Factory;
@@ -248,7 +248,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 	public String getName() {
 		return name;
 	}
-
+	
 	/* 
 	 * (non-Javadoc)
 	 * @see org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider#getProperties()
@@ -277,24 +277,21 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 		}
 		Application application = applicationProvider.getJaxRsApplication();
 		ResourceConfig config = ResourceConfig.forApplication(application);
-		/*
-		 * Prepare factory creation to forward prototype functionality to Jersey.
-		 * This is not necessary for legacy applications or applications with am empty classes set
-		 */
-		if (!applicationProvider.isLegacy() && !application.getClasses().isEmpty()) {
-			logger.info("Register prototype provider for classes in the application " + applicationProvider.getName());
+		
+		final BundleContext ctx = context.getBundleContext();
+		PrototypeServiceBinder binder = new PrototypeServiceBinder();
+		applicationProvider.getContentProviers().forEach(provider -> {
+			logger.info("Register prototype provider for classes " + provider.getObjectClass() + " in the application " + applicationProvider.getName());
 			if (context == null) {
 				throw new IllegalStateException("Cannot create prototype factories without component context");
 			}
-			PrototypeServiceBinder binder = new PrototypeServiceBinder();
-			BundleContext bctx = context.getBundleContext();
-			Set<Class<?>> classes = application.getClasses();
-			classes.forEach((c)->{
-				Factory<?> factory = new JerseyResourceInstanceFactory<>(bctx, c);
-				binder.register(c, factory);
-			});
-			config.register(binder);
-		}
+			if(provider instanceof JaxRsResourceProvider) {
+				Factory<?> factory = new JerseyResourceInstanceFactory<>(ctx, provider);
+				logger.info("registering for real " + provider.getObjectClass());
+				binder.register(provider.getObjectClass(), factory);
+			}
+		});
+		config.register(binder);
 		return config;
 	}
 

@@ -11,11 +11,11 @@
  */
 package org.eclipselabs.jaxrs.jersey.runtime.application;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipselabs.jaxrs.jersey.dto.DTOConverter;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider;
+import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
 import org.osgi.service.jaxrs.runtime.dto.ExtensionDTO;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
@@ -28,8 +28,11 @@ import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
  */
 public class JerseyExtensionProvider<T extends Object> extends JerseyApplicationContentProvider<T> implements JaxRsExtensionProvider {
 
-	public JerseyExtensionProvider(T resource, Map<String, Object> properties) {
-		super(resource, properties);
+	private static Class[] contracts = null;
+	
+	public JerseyExtensionProvider(ServiceObjects<T> serviceObjects, Map<String, Object> properties) {
+		super(serviceObjects, properties);
+		// TODO: find the provided Contracts 
 	}
 	
 	/* 
@@ -47,9 +50,6 @@ public class JerseyExtensionProvider<T extends Object> extends JerseyApplication
 	 */
 	@Override
 	public ExtensionDTO getExtensionDTO() {
-		if (getProviderObject() == null) {
-			throw new IllegalStateException("This extension provider does not contain an extension, but should have one to get a DTO");
-		}
 		int status = getProviderStatus();
 		if (status == NO_FAILURE) {
 			return DTOConverter.toExtensionDTO(this);
@@ -58,17 +58,22 @@ public class JerseyExtensionProvider<T extends Object> extends JerseyApplication
 		}
 	}
 	
-	/* 
-	 * (non-Javadoc)
+	/* (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider#getContracts()
+	 */
+	@Override
+	public Class[] getContracts() {
+		return contracts;
+	}
+	
+	/* (non-Javadoc)
 	 * @see java.lang.Object#clone()
 	 */
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		Object extension = getProviderObject();
-		Map<String, Object> properties = new HashMap<>(getProviderProperties());
-		return new JerseyExtensionProvider<Object>(extension, properties);
+		return new JerseyExtensionProvider<T>(getServiceObjects(), getProviderProperties());
 	}
-
+	
 	/**
 	 * Returns the {@link JaxRSWhiteboardConstants} for this resource type 
 	 * @return the {@link JaxRSWhiteboardConstants} for this resource type

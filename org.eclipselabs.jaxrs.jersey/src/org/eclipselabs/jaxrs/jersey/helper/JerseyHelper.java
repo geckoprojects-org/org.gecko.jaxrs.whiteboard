@@ -11,8 +11,12 @@
  */
 package org.eclipselabs.jaxrs.jersey.helper;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.ws.rs.core.Application;
 
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 
 /**
@@ -21,7 +25,7 @@ import org.osgi.service.component.ComponentContext;
  * @since 16.07.2017
  */
 public class JerseyHelper {
-	
+
 	/**
 	 * Returns the property. If it not available but a default value is set, the
 	 * default value will be returned.
@@ -38,7 +42,7 @@ public class JerseyHelper {
 		Object value = context.getProperties().get(key);
 		return value == null ? defaultValue : (T)value;
 	}
-	
+
 	/**
 	 * Returns <code>true</code>, if the application does not contain any resources or extensions
 	 * @param application the application to check
@@ -51,7 +55,22 @@ public class JerseyHelper {
 		return application.getClasses().isEmpty() && 
 				application.getSingletons().isEmpty() && 
 				application.getProperties().isEmpty();
-		
+
+	}
+
+	/**
+	 * Creates a properties map from the service reference properties
+	 * @param reference the service reference
+	 * @return a properties map
+	 */
+	public static Map<String, Object> getServiceProperties(ServiceReference<?> reference) {
+		Map<String, Object> props = new HashMap<>();
+		if (reference != null) {
+			for (String key : reference.getPropertyKeys()) {
+				props.put(key,  reference.getProperty(key));
+			}
+		}
+		return props;
 	}
 
 }

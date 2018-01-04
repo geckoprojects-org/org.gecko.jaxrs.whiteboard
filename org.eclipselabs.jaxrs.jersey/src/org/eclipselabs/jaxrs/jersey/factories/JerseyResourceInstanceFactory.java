@@ -11,18 +11,14 @@
  */
 package org.eclipselabs.jaxrs.jersey.factories;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipselabs.jaxrs.jersey.binder.PrototypeServiceBinder;
+import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationContentProvider;
 import org.glassfish.hk2.api.Factory;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceObjects;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * HK2 creation factory for JaxRs resource instance. These factory instances will be bound using the {@link PrototypeServiceBinder}.
@@ -34,33 +30,17 @@ import org.osgi.service.component.annotations.Reference;
 public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 
 	private final BundleContext bctx;
-	private final Class<T> clazz;
-	private ServiceReference<Object> resourceReference;
-	private volatile Set<Object> instanceCache = new HashSet<>();
+	private volatile Set<T> instanceCache = new HashSet<>();
+	private JaxRsApplicationContentProvider provider;
 
 	/**
 	 * Creates a new instance. A service reference will be cached lazily, on the first request
 	 * @param bctx the bundle context
 	 * @param clazz the resource class
 	 */
-	public JerseyResourceInstanceFactory(BundleContext bctx, Class<T> clazz) {
+	public JerseyResourceInstanceFactory(BundleContext bctx, JaxRsApplicationContentProvider provider) {
 		this.bctx = bctx;
-		this.clazz = clazz;
-		this.resourceReference = null;
-	}
-
-	/**
-	 * Creates a new instance. The given service reference will be taken, to determine the {@link ServiceObjects}.
-	 * If the given service reference is not of scope prototype, the provide method will return <code>null</code>,
-	 * in the same manner like, if it does not find service with the scope 
-	 * @param bctx the bundle context
-	 * @param clazz the resource class
-	 * @param resourceReference the service reference to the resource service
-	 */
-	public JerseyResourceInstanceFactory(BundleContext bctx, Class<T> clazz, ServiceReference<Object> resourceReference) {
-		this.bctx = bctx;
-		this.clazz = clazz;
-		this.resourceReference = resourceReference;
+		this.provider = provider;
 	}
 
 	/* (non-Javadoc)
@@ -74,22 +54,18 @@ public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 	/* (non-Javadoc)
 	 * @see org.glassfish.hk2.api.Factory#provide()
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public T provide() {
 		if (bctx == null) {
 			throw new IllegalStateException("Cannot create instances because bundle context is not available");
 		}
-		if (clazz == null) {
-			throw new IllegalStateException("Cannot create instances because not class was given");
-		}
 		try {
-			ServiceObjects<Object> soInstance = getServiceObjects();
+			ServiceObjects<T> soInstance = getServiceObjects();
 			// If the service objects is null, the service is obviously gone and we return null to avoid exception in jersey
 			if (soInstance == null) {
 				return null;
 			}
-			Object instance = soInstance.getService();
+			T instance = soInstance.getService();
 			synchronized (instanceCache) {
 				instanceCache.add(instance);
 			}
@@ -98,7 +74,7 @@ public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 			if (e instanceof IllegalStateException) {
 				throw e;
 			}
-			throw new IllegalStateException("Cannot create prototype instance for class " + clazz.getName(), e);
+			throw new IllegalStateException("Cannot create prototype instance for class " + provider.getName(), e);
 		}
 	}
 
@@ -108,12 +84,11 @@ public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 	 */
 	public void dispose() {
 		// release all cached service instances
-		ServiceObjects<Object> soInstance = getServiceObjects();
+		ServiceObjects<T> soInstance = getServiceObjects();
 		if (soInstance != null) {
 			instanceCache.forEach((i) -> soInstance.ungetService(i));
 		}
 		instanceCache.clear();
-		resourceReference = null;
 	}
 	
 	/**
@@ -125,60 +100,12 @@ public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 	}
 
 	/**
-	 * Returns a service reference for the given class. If already an {@link ServiceReference} was set
-	 * @return the service {@link Reference} or otherwise an {@link IllegalStateException} will be thrown
-	 */
-	private ServiceReference<Object> getServiceReference() {
-		if (bctx == null) {
-			throw new IllegalStateException("Cannot create instances because bundle context is not available");
-		}
-		if (clazz == null) {
-			throw new IllegalStateException("Cannot create instances because not class was given");
-		}
-		ServiceReference<Object> reference = resourceReference;
-		if (resourceReference == null) {
-			Collection<ServiceReference<Object>> serviceReferences;
-			try {
-				serviceReferences = bctx.getServiceReferences(Object.class, "(osgi.jaxrs.resource=true)");
-				if (serviceReferences.isEmpty()) {
-					throw new IllegalStateException("There was no service found for class: " + clazz.getSimpleName());
-				} else {
-					reference = serviceReferences.iterator().next();
-				}
-			} catch (InvalidSyntaxException e) {
-				throw new IllegalStateException("Cannot execute a service lookup because of invalid syntax: ", e);
-			}
-		}
-		if (reference == null) {
-			throw new IllegalStateException("The resulting service reference is null");
-		}
-		Object scope = reference.getProperty(Constants.SERVICE_SCOPE);
-		if ("prototype".equals(scope)) {
-			if (!reference.equals(resourceReference)) {
-				resourceReference = reference;
-			}
-		} else {
-			throw new IllegalStateException("The resulting service reference is not of service scope prototype");
-		}
-		return resourceReference;
-	}
-
-	/**
 	 * Returns the {@link ServiceObjects} instance or <code>null</code>, in case the service is already gone
 	 * @return the {@link ServiceObjects} instance or <code>null</code>
 	 */
-	private ServiceObjects<Object> getServiceObjects() {
-		try {
-			ServiceReference<Object> reference = getServiceReference();
-			ServiceObjects<Object> soInstance = bctx.getServiceObjects(reference);
-			if (soInstance == null) {
-				return null;
-			} else {
-				return soInstance;
-			}
-		} catch (Exception e) {
-			return null;
-		}
+	@SuppressWarnings("unchecked")
+	private ServiceObjects<T> getServiceObjects() {
+		return provider.getServiceObjects();
 	}
 
 	/**
@@ -191,7 +118,7 @@ public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 		}
 		if (instanceCache.remove(instance)) {
 			try {
-				ServiceObjects<Object> soInstance = getServiceObjects();
+				ServiceObjects<T> soInstance = getServiceObjects();
 				soInstance.ungetService(instance);
 			} catch (Exception e) {
 				if (e instanceof IllegalStateException) {

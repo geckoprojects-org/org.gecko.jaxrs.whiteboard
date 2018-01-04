@@ -11,7 +11,9 @@
  */
 package org.eclipselabs.jaxrs.jersey.runtime.application;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -31,22 +33,39 @@ import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider;
  */
 public class JerseyApplication extends Application {
 
-	private volatile Map<String, Class<?>> classesMap = new ConcurrentHashMap<>();
-	private volatile Map<String, Object> singletonMap = new ConcurrentHashMap<>();
+	private volatile Map<String, Class<?>> classes = new ConcurrentHashMap<>();
+	private volatile Map<String, Object> singletons = new ConcurrentHashMap<>();
+	private volatile Map<String, JaxRsApplicationContentProvider> contentProviders = new ConcurrentHashMap<>();
 	private final String applicationName;
 	private final Logger log = Logger.getLogger("jersey.application");
+	private Map<String, Object> properties;
+	private Application sourceApplication;
 
 	public JerseyApplication(String applicationName) {
 		this.applicationName = applicationName;
 	}
 
+	public JerseyApplication(String applicationName, Application sourceApplication) {
+		this.applicationName = applicationName;
+		this.sourceApplication = sourceApplication;
+		properties = Collections.unmodifiableMap(sourceApplication.getProperties());
+	}
+
+	@Override
+	public Map<String, Object> getProperties() {
+		return properties;
+	}
+	
 	/* 
 	 * (non-Javadoc)
 	 * @see javax.ws.rs.core.Application#getClasses()
 	 */
 	@Override
 	public Set<Class<?>> getClasses() {
-		return Collections.unmodifiableSet(new HashSet<>(classesMap.values()));
+		Set<Class<?>> resutlClasses = new HashSet<>();
+		resutlClasses.addAll(classes.values());
+		resutlClasses.addAll(sourceApplication.getClasses());
+		return Collections.unmodifiableSet(resutlClasses);
 	}
 
 	/* 
@@ -55,7 +74,10 @@ public class JerseyApplication extends Application {
 	 */
 	@Override
 	public Set<Object> getSingletons() {
-		return Collections.unmodifiableSet(new HashSet<>(singletonMap.values()));
+		Set<Object> resutlSingletons = new HashSet<>();
+		resutlSingletons.addAll(singletons.values());
+		resutlSingletons.addAll(sourceApplication.getSingletons());
+		return Collections.unmodifiableSet(resutlSingletons);
 	}
 
 	/**
@@ -78,16 +100,19 @@ public class JerseyApplication extends Application {
 			}
 			return false;
 		}
+		
 		String name = contentProvider.getName();
+		contentProviders.put(name, contentProvider);
 		if (contentProvider.isSingleton() || contentProvider instanceof JaxRsExtensionProvider) {
-			Object resource = contentProvider.getObject();
-			Object result = singletonMap.put(name, resource);
+			Object resource = contentProvider.getServiceObjects().getService();
+			Object result = singletons.put(name, resource);
 			return !resource.equals(result) || result == null;
 		} else {
 			Class<?> resourceClass = contentProvider.getObjectClass();
-			Object result = classesMap.put(name, resourceClass);
+			Object result = classes.put(name, resourceClass);
 			return !resourceClass.equals(result) || result == null;
 		}
+		
 	}
 
 	/**
@@ -104,13 +129,16 @@ public class JerseyApplication extends Application {
 		}
 		String name = contentProvider.getName();
 		if (contentProvider.isSingleton()) {
-			synchronized (singletonMap) {
-				return singletonMap.remove(name) != null;
+			synchronized (singletons) {
+				singletons.remove(name);
 			}
 		} else {
-			synchronized (classesMap) {
-				return classesMap.remove(name) != null;
+			synchronized (classes) {
+				classes.remove(name);
 			}
+		}
+		synchronized (contentProviders) {
+			return contentProviders.remove(name) != null;
 		}
 	}
 
@@ -118,8 +146,14 @@ public class JerseyApplication extends Application {
 	 * Cleans up all resources
 	 */
 	public void dispose() {
-		classesMap.clear();
-		singletonMap.clear();
+		contentProviders.clear();
 	}
 
+	/**
+	 * @return a Collection of contentProviders
+	 */
+	public Collection<JaxRsApplicationContentProvider> getContentProviders(){
+		return contentProviders.values();
+	}
+	
 }

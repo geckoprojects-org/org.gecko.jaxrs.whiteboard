@@ -11,11 +11,11 @@
  */
 package org.eclipselabs.jaxrs.jersey.runtime.application;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipselabs.jaxrs.jersey.dto.DTOConverter;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsResourceProvider;
+import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
 import org.osgi.service.jaxrs.runtime.dto.ResourceDTO;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
@@ -28,8 +28,8 @@ import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
  */
 public class JerseyResourceProvider<T extends Object> extends JerseyApplicationContentProvider<T> implements JaxRsResourceProvider {
 
-	public JerseyResourceProvider(T resource, Map<String, Object> properties) {
-		super(resource, properties);
+	public JerseyResourceProvider(ServiceObjects<T> serviceObjects, Map<String, Object> properties) {
+		super(serviceObjects, properties);
 	}
 
 	/* 
@@ -47,9 +47,6 @@ public class JerseyResourceProvider<T extends Object> extends JerseyApplicationC
 	 */
 	@Override
 	public ResourceDTO getResourceDTO() {
-		if (getProviderObject() == null) {
-			throw new IllegalStateException("This resource provider does not contain an resource, but should have one to get a DTO");
-		}
 		int status = getProviderStatus();
 		if (status == NO_FAILURE) {
 			return DTOConverter.toResourceDTO(this);
@@ -58,17 +55,15 @@ public class JerseyResourceProvider<T extends Object> extends JerseyApplicationC
 		}
 	}
 	
-	/* 
-	 * (non-Javadoc)
+	
+	/* (non-Javadoc)
 	 * @see java.lang.Object#clone()
 	 */
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		Object resource = getProviderObject();
-		Map<String, Object> properties = new HashMap<>(getProviderProperties());
-		return new JerseyResourceProvider<Object>(resource, properties);
+		return new JerseyResourceProvider<T>(getServiceObjects(), getProviderProperties());
 	}
-
+	
 	/**
 	 * Returns the {@link JaxRSWhiteboardConstants} for this resource type 
 	 * @return the {@link JaxRSWhiteboardConstants} for this resource type

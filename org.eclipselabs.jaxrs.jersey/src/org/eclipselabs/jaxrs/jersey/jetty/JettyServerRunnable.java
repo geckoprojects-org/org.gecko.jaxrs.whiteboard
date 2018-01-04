@@ -40,8 +40,8 @@ public class JettyServerRunnable implements Runnable {
 		}
 		try {
 			server.start();
-			server.join();
 			System.out.println("Started Jersey server at port " + port + " successfully try http://localhost:" + port);
+			server.join();
 		} catch (Exception e) {
 			System.out.println("Error starting Jersey server on port " + port);
 		} finally {

@@ -24,6 +24,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
 
@@ -37,19 +38,15 @@ public class JerseyApplicationContentProvider<T extends Object> extends Abstract
 
 	private static final Logger logger = Logger.getLogger("jersey.contentProvider");
 	private Filter applicationFilter;
+	private Class<? extends Object> clazz;
 
-	public JerseyApplicationContentProvider(T resource, Map<String, Object> properties) {
-		super(resource, properties);
-	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#clone()
-	 */
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		T object = getProviderObject();
-		Map<String, Object> properties = getProviderProperties();
-		return new JerseyApplicationContentProvider<Object>(object, properties);
+	public JerseyApplicationContentProvider(ServiceObjects<T> serviceObjects, Map<String, Object> properties) {
+		super(serviceObjects, properties);
+		if(getServiceObjects() != null) {
+			T service = getServiceObjects().getService();
+			clazz = service.getClass();
+			getServiceObjects().ungetService(service);
+		}
 	}
 
 	/**
@@ -64,22 +61,21 @@ public class JerseyApplicationContentProvider<T extends Object> extends Abstract
 		return false;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
+	
 	/* 
 	 * (non-Javadoc)
 	 * @see org.eclipselabs.jaxrs.jersey.provider.JaxRsRandEProvider#getObjectClass()
 	 */
 	@Override
 	public Class<?> getObjectClass() {
-		return getProviderObject() == null ? null : getProviderObject().getClass();
-	}
-	
-	/* 
-	 * (non-Javadoc)
-	 * @see org.eclipselabs.jaxrs.jersey.provider.JaxRsRandEProvider#getObject()
-	 */
-	@Override
-	public Object getObject() {
-		return getProviderObject();
+		return clazz;
 	}
 	
 	/* 

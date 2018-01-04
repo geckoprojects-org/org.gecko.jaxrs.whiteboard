@@ -21,10 +21,14 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.Application;
 
 import org.eclipselabs.jaxrs.jersey.helper.JerseyHelper;
+import org.eclipselabs.jaxrs.jersey.helper.ReferenceCollector;
 import org.eclipselabs.jaxrs.jersey.provider.JerseyConstants;
-import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher;
 import org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
 import org.eclipselabs.jaxrs.jersey.runtime.dispatcher.JerseyWhiteboardDispatcher;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceObjects;
+import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
@@ -52,10 +56,14 @@ public class JerseyWhiteboardComponent {
 	protected volatile ServiceRegistration<JaxRSServiceRuntime> serviceRuntime = null;
 	protected volatile AtomicLong changeCount = new AtomicLong();
 	private volatile String name;
-	protected final JaxRsWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
+	protected JerseyWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
 	protected volatile JaxRsWhiteboardProvider whiteboard;
 
-
+	private BundleContext bctx;
+	
+	@Reference(cardinality = ReferenceCardinality.MANDATORY)
+	ReferenceCollector collector;
+	
 	/**
 	 * Called on component activation
 	 * @param context the component context
@@ -64,15 +72,18 @@ public class JerseyWhiteboardComponent {
 	@SuppressWarnings("unchecked")
 	@Activate
 	public void activate(ComponentContext context) throws ConfigurationException {
+		this.bctx = context.getBundleContext();
 		updateProperties(context);
+		
 		if (whiteboard != null) {
 			whiteboard.teardown();;
 		}
 		whiteboard = new JerseyServiceRuntime();
-		dispatcher.setWhiteboardProvider(whiteboard);
 		String[] urls = whiteboard.getURLs(context);
 		// activate and start server
 		whiteboard.initialize(context);
+		dispatcher.setWhiteboardProvider(whiteboard);
+		collector.connect(dispatcher);
 		dispatcher.dispatch();
 		whiteboard.startup();
 		Dictionary<String, Object> properties = new Hashtable<>();
@@ -108,6 +119,7 @@ public class JerseyWhiteboardComponent {
 	public void deactivate(ComponentContext context) {
 		changeCount.set(0);
 		if (dispatcher != null) {
+			collector.disconnect(dispatcher);
 			dispatcher.deactivate();
 		}
 		if (whiteboard != null) {
@@ -130,8 +142,14 @@ public class JerseyWhiteboardComponent {
 	 * @param properties the service properties
 	 */
 	@Reference(name="application", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeApplication")
-	public void addApplication(Application application, Map<String, Object> properties) {
-		dispatcher.addApplication(application, properties);
+	public void addApplication(ServiceReference<Application> ref) {
+		Map<String, Object> properties = JerseyHelper.getServiceProperties(ref);
+		BundleContext bundleContext = bctx; 
+		if(bundleContext == null) {
+			bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
+		}
+		ServiceObjects<Application> appServiceObject = bundleContext.getServiceObjects(ref);
+		dispatcher.addApplication(appServiceObject, properties);
 	}
 
 	/**
@@ -139,48 +157,11 @@ public class JerseyWhiteboardComponent {
 	 * @param application the application to remove
 	 * @param properties the service properties
 	 */
-	public void removeApplication(Application application, Map<String, Object> properties) {
-		dispatcher.removeApplication(application, properties);
+	public void removeApplication(ServiceReference<Application> ref) {
+		Map<String, Object> properties = JerseyHelper.getServiceProperties(ref);
+		dispatcher.removeApplication(properties);
 	}
 
-	/**
-	 * Adds a new resource
-	 * @param resource the resource to add
-	 * @param properties the service properties
-	 */
-	@Reference(name="resource", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeResource", target="(" + JaxRSWhiteboardConstants.JAX_RS_RESOURCE + "=true)")
-	public void addResource(Object resource, Map<String, Object> properties) {
-		dispatcher.addResource(resource, properties);
-	}
-
-	/**
-	 * Removes a resource 
-	 * @param resource the resource to remove
-	 * @param properties the service properties
-	 */
-	public void removeResource(Object resource, Map<String, Object> properties) {
-		dispatcher.removeResource(resource, properties);
-	}
-
-	/**
-	 * Adds a new extension
-	 * @param extension the extension to add
-	 * @param properties the service properties
-	 */
-	@Reference(name="extension", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeExtension", target="(" + JaxRSWhiteboardConstants.JAX_RS_EXTENSION + "=true)")
-	public void addExtension(Object extension, Map<String, Object> properties) {
-		dispatcher.addExtension(extension, properties);
-	}
-
-	/**
-	 * Removes an extension 
-	 * @param extension the extension to remove
-	 * @param properties the service properties
-	 */
-	public void removeExtension(Object extension, Map<String, Object> properties) {
-		dispatcher.removeExtension(extension, properties);
-	}
-	
 	/**
 	 * Updates the fields that are provided by service properties.
 	 * @param ctx the component context

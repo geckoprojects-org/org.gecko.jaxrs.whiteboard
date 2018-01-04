@@ -88,7 +88,7 @@ public class JaxRsWhiteboardComponentTest {
 	 * @throws InvalidSyntaxException 
 	 */
 	@Test
-	public void testWhiteboardComponentApplicationAndResource() throws IOException, InterruptedException, InvalidSyntaxException {
+	public void testWhiteboardComponentApplicationAndResourceTest() throws IOException, InterruptedException, InvalidSyntaxException {
 		/*
 		 *  The server runs on localhost port 8185 using context path test: http://localhost:8185/test
 		 *  We mount the system with a resource RootResource under http://localhost:8185/test that will return a 
@@ -135,8 +135,11 @@ public class JaxRsWhiteboardComponentTest {
 		JerseyWebTarget webTarget = jerseyClient.target(url);
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
-		assertEquals(404, response.getStatus());
+//		assertEquals(404, response.getStatus());
+		cdl.await(1, TimeUnit.SECONDS);
 		
+		response = get.invoke();
+		assertEquals(404, response.getStatus());
 		/*
 		 * Mount the application customer that will become available under: test/customer
 		 * http://localhost:8185/test/customer
@@ -261,7 +264,7 @@ public class JaxRsWhiteboardComponentTest {
 		assertNotNull(runtime);
 		
 		CountDownLatch cdl = new CountDownLatch(1);
-		cdl.await(1, TimeUnit.SECONDS);
+		cdl.await(2, TimeUnit.SECONDS);
 		
 		/*
 		 * Check if our RootResource is available under http://localhost:8185/test
@@ -404,13 +407,13 @@ public class JaxRsWhiteboardComponentTest {
 		/*
 		 * Check that the REST runtime service become available 
 		 */
-		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
+		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 400000l);
 		assertNotNull(runtimeRef);
 		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
 		assertNotNull(runtime);
 		
 		CountDownLatch cdl = new CountDownLatch(1);
-		cdl.await(1, TimeUnit.SECONDS);
+		cdl.await(2, TimeUnit.SECONDS);
 		
 		/*
 		 * Check if our RootResource is not available under http://localhost:8185/test
@@ -481,7 +484,7 @@ public class JaxRsWhiteboardComponentTest {
 	 * @throws InvalidSyntaxException 
 	 */
 	@Test
-	public void testWhiteboardComponentDefaultResource() throws IOException, InterruptedException, InvalidSyntaxException {
+	public void testWhiteboardComponentDefaultResourceTest() throws IOException, InterruptedException, InvalidSyntaxException {
 		/*
 		 *  The server runs on localhost port 8185 using context path test: http://localhost:8185/test
 		 *  We mount the system with a resource RootResource under http://localhost:8185/test that will return a 
@@ -517,7 +520,7 @@ public class JaxRsWhiteboardComponentTest {
 		assertNotNull(runtime);
 		
 		CountDownLatch cdl = new CountDownLatch(1);
-		cdl.await(1, TimeUnit.SECONDS);
+		cdl.await(2, TimeUnit.SECONDS);
 		
 		/*
 		 * Check if our RootResource is available under http://localhost:8185/test
@@ -547,7 +550,7 @@ public class JaxRsWhiteboardComponentTest {
 		 * Wait a short time to reload the configuration dynamically
 		 */
 		cdl = new CountDownLatch(1);
-		cdl.await(1, TimeUnit.SECONDS);
+		cdl.await(2, TimeUnit.SECONDS);
 		
 		/*
 		 * Check if http://localhost:8185/test/hello is available now. 
@@ -638,7 +641,7 @@ public class JaxRsWhiteboardComponentTest {
 		assertNotNull(runtime);
 		
 		CountDownLatch cdl = new CountDownLatch(1);
-		cdl.await(1, TimeUnit.SECONDS);
+		cdl.await(2, TimeUnit.SECONDS);
 		
 		/*
 		 * Check if http://localhost:8185/test/hello is available now. 
@@ -660,7 +663,7 @@ public class JaxRsWhiteboardComponentTest {
 		 * Wait a short time to reload the configuration dynamically
 		 */
 		cdl = new CountDownLatch(1);
-		cdl.await(1, TimeUnit.SECONDS);
+		cdl.await(2, TimeUnit.SECONDS);
 		
 		/*
 		 * Check if http://localhost:8185/test/hello is not available anymore. 
@@ -673,6 +676,7 @@ public class JaxRsWhiteboardComponentTest {
 		assertEquals(404, response.getStatus());
 		
 		tearDownTest(configuration, get);
+		System.out.println("==================================================");
 	}
 	
 	/**
@@ -735,7 +739,7 @@ public class JaxRsWhiteboardComponentTest {
 		JerseyWebTarget webTarget = jerseyClient.target(checkUrl);
 		get = webTarget.request().buildGet();
 		cdl = new CountDownLatch(1);
-		cdl.await(15, TimeUnit.SECONDS);
+		cdl.await(1, TimeUnit.SECONDS);
 		Response response = get.invoke();
 		assertEquals(200, response.getStatus());
 		assertNotNull(response.getEntity());

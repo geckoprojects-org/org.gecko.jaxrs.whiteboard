@@ -31,4 +31,12 @@ public interface JaxRsExtensionProvider extends JaxRsApplicationContentProvider 
 	 * @return the extension DTO or failed extension DTO
 	 */
 	public ExtensionDTO getExtensionDTO();
+	
+	/**
+	 * Returns the contracts under which the Extensions have to be registered. Can be <code>null</code> if
+	 * no specific contracts are provided. In this case the JAX-RS implementation has to scan the class for 
+	 * Annotations and Interfaces
+	 * @return the Array of Classes or null
+	 */
+	public Class[] getContracts();
 }

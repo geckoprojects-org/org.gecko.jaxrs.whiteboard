@@ -17,6 +17,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -35,7 +37,13 @@ import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyApplicationProvide
 import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyExtensionProvider;
 import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyResourceProvider;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
@@ -52,7 +60,11 @@ import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
  * @author Mark Hoffmann
  * @since 14.07.2017
  */
+@RunWith(MockitoJUnitRunner.class)
 public class DTOConverterTest {
+	
+	@Mock
+	private ServiceReference<Application> appRef;
 	
 	/**
 	 * Tests conversion of a failed application DTO
@@ -60,8 +72,16 @@ public class DTOConverterTest {
 	@Test
 	public void testToFailedApplicationDTO() {
 		Map<String, Object> properties = new Hashtable<>();
+		when(appRef.getPropertyKeys()).thenReturn(properties.keySet().toArray(new String[0]));
+		when(appRef.getProperty(any())).then(new Answer<String>() {
+
+			@Override
+			public String answer(InvocationOnMock invocation) throws Throwable {
+				return (String) properties.get(invocation.getArgumentAt(0, String.class));
+			}
+		});
 		
-		JaxRsApplicationProvider resourceProvider = new JerseyApplicationProvider(new Application(), properties);
+		JaxRsApplicationProvider resourceProvider = new JerseyApplicationProvider(appRef);
 		
 		FailedApplicationDTO dto = DTOConverter.toFailedApplicationDTO(resourceProvider, DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE);
 		assertNotNull(dto);
@@ -70,11 +90,13 @@ public class DTOConverterTest {
 		assertEquals(-1, dto.serviceId);
 		assertEquals(DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE, dto.failureReason);
 		
+		verify(appRef, times(1)).getPropertyKeys();
+		
 		properties.put(Constants.SERVICE_ID, Long.valueOf(12));
 		properties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "MyApp");
 		properties.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
 		
-		resourceProvider = new JerseyApplicationProvider(new Application(), properties);
+		resourceProvider = new JerseyApplicationProvider(appRef);
 		dto = DTOConverter.toFailedApplicationDTO(resourceProvider, DTOConstants.FAILURE_REASON_SHADOWED_BY_OTHER_SERVICE);
 		
 		assertNotNull(dto);
@@ -90,7 +112,7 @@ public class DTOConverterTest {
 	 */
 	@Test
 	public void testToApplicationDTO() {
-Map<String, Object> properties = new Hashtable<>();
+		Map<String, Object> properties = new Hashtable<>();
 		
 		JaxRsApplicationProvider resourceProvider = new JerseyApplicationProvider(new Application(), properties);
 		
