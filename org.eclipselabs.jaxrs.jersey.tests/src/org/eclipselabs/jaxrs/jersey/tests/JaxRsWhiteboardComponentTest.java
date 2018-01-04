@@ -641,7 +641,7 @@ public class JaxRsWhiteboardComponentTest {
 		assertNotNull(runtime);
 		
 		CountDownLatch cdl = new CountDownLatch(1);
-		cdl.await(2, TimeUnit.SECONDS);
+		cdl.await(3, TimeUnit.SECONDS);
 		
 		/*
 		 * Check if http://localhost:8185/test/hello is available now. 

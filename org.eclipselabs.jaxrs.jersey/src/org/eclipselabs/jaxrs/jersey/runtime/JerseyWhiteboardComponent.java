@@ -82,6 +82,7 @@ public class JerseyWhiteboardComponent {
 		String[] urls = whiteboard.getURLs(context);
 		// activate and start server
 		whiteboard.initialize(context);
+//		dispatcher.setBatchMode(true);
 		dispatcher.setWhiteboardProvider(whiteboard);
 		collector.connect(dispatcher);
 		dispatcher.dispatch();

@@ -30,6 +30,22 @@ import org.osgi.framework.ServiceReference;
 public interface JaxRsWhiteboardDispatcher {
 	
 	/**
+	 * #returns the batch mode
+	 * @return the batch mode
+	 */
+	public boolean getBatchMode();
+	
+	/**
+	 * Sets the batchMode
+	 * @param batchMode <code>true</code> to handle dispatch manually
+	 */
+	public void setBatchMode(boolean batchMode);
+	/**
+	 * executes an manual dispatch, usually used if batchMode == true
+	 */
+	public void batchDispatch();
+	
+	/**
 	 * Sets a whiteboard instance
 	 * @param whiteboard the whiteboard to set
 	 */

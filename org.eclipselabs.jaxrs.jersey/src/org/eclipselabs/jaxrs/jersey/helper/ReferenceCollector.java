@@ -37,7 +37,7 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 
 	private PushStreamProvider provider = new PushStreamProvider();
 	
-	private Map<ServiceReference, ServiceReferenceEvent> contentReferences = new HashMap<>(); 
+	private Map<ServiceReference, ServiceReferenceEvent> contentReferences = new ConcurrentHashMap<>(); 
 	
 	private SimplePushEventSource<ServiceReferenceEvent> source; 
 
@@ -61,43 +61,29 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 		PushStream<ServiceReferenceEvent> pushStream = dispatcherMap.get(dispatcher);
 		
 		if(pushStream == null) {
+
+			contentReferences.forEach((sr, sre) -> {
+				if(sre.isExtension()) {
+					handleExtensionReferences(dispatcher, sre);
+				} else {
+					handleResourceReferences(dispatcher, sre);
+				}
+			});
 			
 			pushStream = provider.buildStream(source).withScheduler(Executors.newScheduledThreadPool(1)).build();
-			pushStream = pushStream.merge(provider.streamOf(contentReferences.values().stream()));
 			
 			dispatcherMap.put(dispatcher, pushStream);
 			
 			pushStream = pushStream.buffer().distinct();
 			
-			pushStream.window(Duration.ofSeconds(1), sec -> sec).forEach(sec -> {
+			pushStream.window(Duration.ofMillis(500), sec -> sec).forEach(sec -> {
 				sec.stream().filter(sre -> sre.isResource()).forEach(sre -> {
-					Map<String, Object> properties = JerseyHelper.getServiceProperties(sre.getReference());
-					switch (sre.getType()) {
-					case ADD:
-						ServiceObjects so = context.getServiceObjects(sre.getReference());
-						dispatcher.addResource(so, properties);
-						break;
-					case MODIFY:
-						break;
-					default:
-						dispatcher.removeResource(properties);
-						break;
-					};
+					handleResourceReferences(dispatcher, sre);
 				});
 				sec.stream().filter(sre -> sre.isExtension()).forEach(sre -> {
-					Map<String, Object> properties = JerseyHelper.getServiceProperties(sre.getReference());
-					switch (sre.getType()) {
-					case ADD:
-						ServiceObjects so = context.getServiceObjects(sre.getReference());
-						dispatcher.addExtension(so, properties);
-						break;
-					case MODIFY:
-						break;
-					default:
-						dispatcher.removeExtension(properties);
-						break;
-					};
+					handleExtensionReferences(dispatcher, sre);
 				});
+//				dispatcher.batchDispatch();
 			});
 		}
 		
@@ -105,6 +91,36 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 //			dis
 //		});
 		
+	}
+
+	private void handleExtensionReferences(final JaxRsWhiteboardDispatcher dispatcher, ServiceReferenceEvent sre) {
+		Map<String, Object> properties = JerseyHelper.getServiceProperties(sre.getReference());
+		switch (sre.getType()) {
+		case ADD:
+			ServiceObjects so = context.getServiceObjects(sre.getReference());
+			dispatcher.addExtension(so, properties);
+			break;
+		case MODIFY:
+			break;
+		default:
+			dispatcher.removeExtension(properties);
+			break;
+		};
+	}
+
+	private void handleResourceReferences(final JaxRsWhiteboardDispatcher dispatcher, ServiceReferenceEvent sre) {
+		Map<String, Object> properties = JerseyHelper.getServiceProperties(sre.getReference());
+		switch (sre.getType()) {
+		case ADD:
+			ServiceObjects so = context.getServiceObjects(sre.getReference());
+			dispatcher.addResource(so, properties);
+			break;
+		case MODIFY:
+			break;
+		default:
+			dispatcher.removeResource(properties);
+			break;
+		};
 	}
 
 	public void disconnect(JaxRsWhiteboardDispatcher dispatcher) {

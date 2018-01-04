@@ -82,8 +82,25 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	private volatile JaxRsApplicationProvider defaultProvider;
 	private ReentrantLock lock = new ReentrantLock();
 	private AtomicBoolean lockedChange = new AtomicBoolean();
+	private boolean batchMode = false;
 
 	public JerseyWhiteboardDispatcher() {
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher#setBatchMode(boolean)
+	 */
+	public void setBatchMode(boolean batchMode) {
+		this.batchMode = batchMode;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher#batchDispatch()
+	 */
+	public void batchDispatch() {
+		if (isDispatching() && batchMode) {
+			doDispatch();
+		}
 	}
 	
 	/* 
@@ -277,7 +294,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	 * Checks the execution of doDispatch, in case it is active
 	 */
 	private void checkDispatch() {
-		if (isDispatching()) {
+		if (isDispatching() && !batchMode) {
 			doDispatch();
 		}
 	}
@@ -499,5 +516,13 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			originalCollection.removeAll(removed);
 		}
 		return removed;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher#getBatchMode()
+	 */
+	@Override
+	public boolean getBatchMode() {
+		return batchMode;
 	}
 }
