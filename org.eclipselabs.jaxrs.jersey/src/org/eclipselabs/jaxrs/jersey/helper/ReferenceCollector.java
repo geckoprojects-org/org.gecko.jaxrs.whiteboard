@@ -1,10 +1,17 @@
 /**
+ * Copyright (c) 2012 - 2017 Data In Motion and others.
+ * All rights reserved. 
  * 
+ * This program and the accompanying materials are made available under the terms of the 
+ * Eclipse Public License v1.0 which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Data In Motion - initial API and implementation
  */
 package org.eclipselabs.jaxrs.jersey.helper;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
@@ -26,25 +33,28 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
- * @author jalbert
- *
+ * {@link PushStream} based service tracker customizer
+ * @author Juergen Albert
+ * @since 03.01.2018
  */
 @Component(service=ReferenceCollector.class, immediate = true, enabled=true)
 @SuppressWarnings("rawtypes")
 public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Object> {
 
 	private ServiceTracker<Object, Object> serviceTracker;
-
 	private PushStreamProvider provider = new PushStreamProvider();
-	
-	private Map<ServiceReference, ServiceReferenceEvent> contentReferences = new ConcurrentHashMap<>(); 
-	
+	private final Map<ServiceReference, ServiceReferenceEvent> contentReferences = new ConcurrentHashMap<>(); 
 	private SimplePushEventSource<ServiceReferenceEvent> source; 
 
 	private BundleContext context; 
 	
 	private Map<JaxRsWhiteboardDispatcher, PushStream<ServiceReferenceEvent>> dispatcherMap = new ConcurrentHashMap<>();
 	
+	/**
+	 * Activated at component activation
+	 * @param context the component context
+	 * @throws InvalidSyntaxException
+	 */
 	@Activate
 	public void activate(BundleContext context) throws InvalidSyntaxException {
 		this.context = context;
@@ -52,16 +62,19 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 		serviceTracker.open();
 
 		source = provider.buildSimpleEventSource(ServiceReferenceEvent.class).build();
-	
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * Connects the {@link PushStream} with the JaxRs dispatcher to forward
+	 * the services it
+	 * @param dispatcher the dispatcher instance
+	 */
 	public void connect(final JaxRsWhiteboardDispatcher dispatcher){
-
+		if (dispatcher == null) {
+			throw new IllegalArgumentException("Dispatcher instance must not be null");
+		}
 		PushStream<ServiceReferenceEvent> pushStream = dispatcherMap.get(dispatcher);
-		
 		if(pushStream == null) {
-
 			contentReferences.forEach((sr, sre) -> {
 				if(sre.isExtension()) {
 					handleExtensionReferences(dispatcher, sre);
@@ -92,7 +105,7 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 //		});
 		
 	}
-
+	
 	private void handleExtensionReferences(final JaxRsWhiteboardDispatcher dispatcher, ServiceReferenceEvent sre) {
 		Map<String, Object> properties = JerseyHelper.getServiceProperties(sre.getReference());
 		switch (sre.getType()) {

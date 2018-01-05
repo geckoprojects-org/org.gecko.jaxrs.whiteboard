@@ -14,9 +14,6 @@ package org.eclipselabs.jaxrs.jersey.binder;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Singleton;
-import javax.ws.rs.ext.Provider;
-
 import org.eclipselabs.jaxrs.jersey.factories.JerseyResourceInstanceFactory;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.api.PerLookup;
@@ -40,11 +37,8 @@ public class PrototypeServiceBinder extends AbstractBinder {
 	protected void configure() {
 		// bind factories in two different scopes
 		factoryMap.forEach((K,V)->{
-			bindFactory(V).to(K);
-//			bindFactory(V).to(K).in(Singleton.class);
-//			bindFactory(V).to(K).in(Provider.class);
-//			bindFactory(V).to(K).in(RequestScoped.class);
-//			bindFactory(V).to(K).in(PerLookup.class);
+			bindFactory(V).to(K).in(RequestScoped.class);
+			bindFactory(V).to(K).in(PerLookup.class);
 		});
 	}
 
