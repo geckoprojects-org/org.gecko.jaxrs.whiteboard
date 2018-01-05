@@ -38,6 +38,7 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
 
 /**
@@ -50,6 +51,9 @@ public class JaxRsWhiteboardDispatcherTest {
 
 	@Mock
 	private JaxRsWhiteboardProvider whiteboard;
+
+	@Mock
+	private ServiceObjects<Object> serviceObject;
 	
 	/**
 	 * Tests the dispatcher in not ready state
@@ -82,7 +86,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		assertFalse(dispatcher.isDispatching());
 		
 		// default application should be registered
-		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, never()).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(1)).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 	}
@@ -117,7 +121,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		assertTrue(dispatcher.isDispatching());
 		
 		// register default application
-		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, never()).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
@@ -129,7 +133,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		assertEquals(1, dispatcher.getApplications().size());
 		
 		// no further application registered because of missing properties
-		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, never()).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
@@ -139,15 +143,15 @@ public class JaxRsWhiteboardDispatcherTest {
 		assertEquals(2, dispatcher.getApplications().size());
 		
 		// no further application registered because it is legacy
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		dispatcher.deactivate();
 		assertFalse(dispatcher.isDispatching());
 		
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
-		Mockito.verify(whiteboard, times(2)).unregisterApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(1)).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 	}
 	
@@ -257,10 +261,11 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		TestResource resource = new TestResource();
+		when(serviceObject.getService()).thenReturn(resource);
 		Map<String, Object> resProperties = new HashMap<>();
 		resProperties.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		assertEquals(0, dispatcher.getResources().size());
-		dispatcher.addResource(resource, resProperties);
+		dispatcher.addResource(serviceObject, resProperties);
 		assertEquals(1, dispatcher.getResources().size());
 		
 		// .default is registered and resource was added to default
@@ -321,10 +326,11 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		TestResource resource = new TestResource();
+		when(serviceObject.getService()).thenReturn(resource);
 		Map<String, Object> resProperties = new HashMap<>();
 		resProperties.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		assertEquals(0, dispatcher.getResources().size());
-		dispatcher.addResource(resource, resProperties);
+		dispatcher.addResource(serviceObject, resProperties);
 		assertEquals(1, dispatcher.getResources().size());
 		
 		// .default is registered and resource was added to default
@@ -332,7 +338,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 		
-		dispatcher.removeResource(resource, resProperties);
+		dispatcher.removeResource(resProperties);
 		
 		// .default is registered and resource was added to default
 		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
@@ -395,12 +401,13 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		TestResource resource01 = new TestResource();
+		when(serviceObject.getService()).thenReturn(resource01);
 		Map<String, Object> resProperties01 = new HashMap<>();
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=testApp)");
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "res01");
 		assertEquals(0, dispatcher.getResources().size());
-		dispatcher.addResource(resource01, resProperties01);
+		dispatcher.addResource(serviceObject, resProperties01);
 		assertEquals(1, dispatcher.getResources().size());
 		
 		// .default is registered and resource was added to testApp, which is not empty and will be registered
@@ -409,12 +416,13 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		TestResource resource02 = new TestResource();
+		when(serviceObject.getService()).thenReturn(resource02);
 		Map<String, Object> resProperties02 = new HashMap<>();
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=testApp)");
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "res02");
 		assertEquals(1, dispatcher.getResources().size());
-		dispatcher.addResource(resource02, resProperties02);
+		dispatcher.addResource(serviceObject, resProperties02);
 		assertEquals(2, dispatcher.getResources().size());
 		
 		// .default is registered and resource was added to testApp, which is not empty and will be registered
@@ -423,7 +431,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 		
 		assertEquals(2, dispatcher.getResources().size());
-		dispatcher.removeResource(resource01, resProperties01);
+		dispatcher.removeResource(resProperties01);
 		assertEquals(1, dispatcher.getResources().size());
 		
 		// .default is registered and resource was added to default
@@ -487,12 +495,13 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		TestResource resource01 = new TestResource();
+		when(serviceObject.getService()).thenReturn(resource01);
 		Map<String, Object> resProperties01 = new HashMap<>();
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=*)");
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "res01");
 		assertEquals(0, dispatcher.getResources().size());
-		dispatcher.addResource(resource01, resProperties01);
+		dispatcher.addResource(serviceObject, resProperties01);
 		assertEquals(1, dispatcher.getResources().size());
 		
 		/* 
@@ -506,12 +515,13 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 		
 		TestResource resource02 = new TestResource();
+		when(serviceObject.getService()).thenReturn(resource02);
 		Map<String, Object> resProperties02 = new HashMap<>();
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=testApp)");
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "res02");
 		assertEquals(1, dispatcher.getResources().size());
-		dispatcher.addResource(resource02, resProperties02);
+		dispatcher.addResource(serviceObject, resProperties02);
 		assertEquals(2, dispatcher.getResources().size());
 		
 		/* 
@@ -523,7 +533,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, times(2)).reloadApplication(Mockito.any());
 		
 		assertEquals(2, dispatcher.getResources().size());
-		dispatcher.removeResource(resource01, resProperties01);
+		dispatcher.removeResource(resProperties01);
 		assertEquals(1, dispatcher.getResources().size());
 		
 		/* 
@@ -590,12 +600,13 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		TestResource resource01 = new TestResource();
+		when(serviceObject.getService()).thenReturn(resource01);
 		Map<String, Object> resProperties01 = new HashMap<>();
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=*)");
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "res01");
 		assertEquals(0, dispatcher.getResources().size());
-		dispatcher.addResource(resource01, resProperties01);
+		dispatcher.addResource(serviceObject, resProperties01);
 		assertEquals(1, dispatcher.getResources().size());
 		
 		/* 
@@ -609,12 +620,13 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 		
 		TestResource resource02 = new TestResource();
+		when(serviceObject.getService()).thenReturn(resource02);
 		Map<String, Object> resProperties02 = new HashMap<>();
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=testApp)");
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "res02");
 		assertEquals(1, dispatcher.getResources().size());
-		dispatcher.addResource(resource02, resProperties02);
+		dispatcher.addResource(serviceObject, resProperties02);
 		assertEquals(2, dispatcher.getResources().size());
 		
 		/* 
@@ -626,7 +638,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, times(2)).reloadApplication(Mockito.any());
 		
 		assertEquals(2, dispatcher.getResources().size());
-		dispatcher.removeResource(resource02, resProperties02);
+		dispatcher.removeResource(resProperties02);
 		assertEquals(1, dispatcher.getResources().size());
 		
 		/* 
@@ -669,7 +681,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		assertTrue(dispatcher.isDispatching());
 		
 		// register default application
-		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
+//		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
@@ -689,12 +701,13 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		TestResource resource01 = new TestResource();
+		when(serviceObject.getService()).thenReturn(resource01);
 		Map<String, Object> resProperties01 = new HashMap<>();
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=*)");
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "res01");
 		assertEquals(0, dispatcher.getResources().size());
-		dispatcher.addResource(resource01, resProperties01);
+		dispatcher.addResource(serviceObject, resProperties01);
 		assertEquals(1, dispatcher.getResources().size());
 		
 		/* 
@@ -708,12 +721,13 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		TestResource resource02 = new TestResource();
+		when(serviceObject.getService()).thenReturn(resource02);
 		Map<String, Object> resProperties02 = new HashMap<>();
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=testApp)");
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "res02");
 		assertEquals(1, dispatcher.getResources().size());
-		dispatcher.addResource(resource02, resProperties02);
+		dispatcher.addResource(serviceObject, resProperties02);
 		assertEquals(2, dispatcher.getResources().size());
 		
 		/* 
@@ -725,7 +739,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		assertEquals(2, dispatcher.getResources().size());
-		dispatcher.removeResource(resource02, resProperties02);
+		dispatcher.removeResource(resProperties02);
 		assertEquals(1, dispatcher.getResources().size());
 		
 		/* 
@@ -788,12 +802,13 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		TestResource resource01 = new TestResource();
+		when(serviceObject.getService()).thenReturn(resource01);
 		Map<String, Object> resProperties01 = new HashMap<>();
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=*)");
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "res01");
 		assertEquals(0, dispatcher.getResources().size());
-		dispatcher.addResource(resource01, resProperties01);
+		dispatcher.addResource(serviceObject, resProperties01);
 		assertEquals(1, dispatcher.getResources().size());
 		
 		/* 
@@ -807,12 +822,13 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 		
 		TestResource resource02 = new TestResource();
+		when(serviceObject.getService()).thenReturn(resource02);
 		Map<String, Object> resProperties02 = new HashMap<>();
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=testApp)");
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "res02");
 		assertEquals(1, dispatcher.getResources().size());
-		dispatcher.addResource(resource02, resProperties02);
+		dispatcher.addResource(serviceObject, resProperties02);
 		assertEquals(2, dispatcher.getResources().size());
 		
 		/* 
@@ -824,7 +840,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, times(2)).reloadApplication(Mockito.any());
 		
 		assertEquals(2, dispatcher.getResources().size());
-		dispatcher.removeResource(resource02, resProperties02);
+		dispatcher.removeResource(resProperties02);
 		assertEquals(1, dispatcher.getResources().size());
 		
 		/* 
@@ -887,13 +903,14 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		TestResource resource01 = new TestResource();
+		when(serviceObject.getService()).thenReturn(resource01);
 		Map<String, Object> resProperties01 = new HashMap<>();
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(test=my)");
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=*)");
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "res01");
 		assertEquals(0, dispatcher.getResources().size());
-		dispatcher.addResource(resource01, resProperties01);
+		dispatcher.addResource(serviceObject, resProperties01);
 		assertEquals(1, dispatcher.getResources().size());
 		
 		/* 
@@ -905,12 +922,13 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		TestResource resource02 = new TestResource();
+		when(serviceObject.getService()).thenReturn(resource02);
 		Map<String, Object> resProperties02 = new HashMap<>();
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=testApp)");
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "res02");
 		assertEquals(1, dispatcher.getResources().size());
-		dispatcher.addResource(resource02, resProperties02);
+		dispatcher.addResource(serviceObject, resProperties02);
 		assertEquals(2, dispatcher.getResources().size());
 		
 		/* 
@@ -922,7 +940,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		assertEquals(2, dispatcher.getResources().size());
-		dispatcher.removeResource(resource02, resProperties02);
+		dispatcher.removeResource(resProperties02);
 		assertEquals(1, dispatcher.getResources().size());
 		
 		/* 
@@ -986,13 +1004,14 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		TestResource resource01 = new TestResource();
+		when(serviceObject.getService()).thenReturn(resource01);
 		Map<String, Object> resProperties01 = new HashMap<>();
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(customer=my)");
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=*)");
 		resProperties01.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "res01");
 		assertEquals(0, dispatcher.getResources().size());
-		dispatcher.addResource(resource01, resProperties01);
+		dispatcher.addResource(serviceObject, resProperties01);
 		assertEquals(1, dispatcher.getResources().size());
 		
 		/* 
@@ -1004,12 +1023,13 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 		
 		TestResource resource02 = new TestResource();
+		when(serviceObject.getService()).thenReturn(resource02);
 		Map<String, Object> resProperties02 = new HashMap<>();
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=testApp)");
 		resProperties02.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "res02");
 		assertEquals(1, dispatcher.getResources().size());
-		dispatcher.addResource(resource02, resProperties02);
+		dispatcher.addResource(serviceObject, resProperties02);
 		assertEquals(2, dispatcher.getResources().size());
 		
 		/* 
@@ -1021,7 +1041,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, times(2)).reloadApplication(Mockito.any());
 		
 		assertEquals(2, dispatcher.getResources().size());
-		dispatcher.removeResource(resource02, resProperties02);
+		dispatcher.removeResource(resProperties02);
 		assertEquals(1, dispatcher.getResources().size());
 		
 		/* 

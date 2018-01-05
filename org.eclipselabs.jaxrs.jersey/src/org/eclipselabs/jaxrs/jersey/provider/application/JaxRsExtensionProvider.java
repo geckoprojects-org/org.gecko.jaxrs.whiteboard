@@ -38,5 +38,5 @@ public interface JaxRsExtensionProvider extends JaxRsApplicationContentProvider 
 	 * Annotations and Interfaces
 	 * @return the Array of Classes or null
 	 */
-	public Class[] getContracts();
+	public Class<?>[] getContracts();
 }

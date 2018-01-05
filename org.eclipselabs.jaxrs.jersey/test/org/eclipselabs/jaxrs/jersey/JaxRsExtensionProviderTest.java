@@ -14,6 +14,7 @@ package org.eclipselabs.jaxrs.jersey;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,10 +22,14 @@ import java.util.Map;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider;
 import org.eclipselabs.jaxrs.jersey.resources.TestApplication;
-import org.eclipselabs.jaxrs.jersey.resources.TestResource;
+import org.eclipselabs.jaxrs.jersey.resources.TestExtension;
 import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyApplicationProvider;
 import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyExtensionProvider;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.ExtensionDTO;
 import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
@@ -37,8 +42,12 @@ import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
  * @author Mark Hoffmann
  * @since 21.09.2017
  */
+@RunWith(MockitoJUnitRunner.class)
 public class JaxRsExtensionProviderTest {
 
+	@Mock
+	private ServiceObjects<Object> serviceObject;
+	
 	/**
 	 * Test extension specific behavior 
 	 */
@@ -60,8 +69,8 @@ public class JaxRsExtensionProviderTest {
 		
 		Map<String, Object> resourceProperties = new HashMap<>();
 		resourceProperties.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		
-		JaxRsExtensionProvider resourceProvider = new JerseyExtensionProvider<TestResource>(new TestResource(), resourceProperties);
+		when(serviceObject.getService()).thenReturn(new TestExtension());
+		JaxRsExtensionProvider resourceProvider = new JerseyExtensionProvider<Object>(serviceObject, resourceProperties);
 		
 		ExtensionDTO resourceDto = resourceProvider.getExtensionDTO();
 		assertTrue(resourceDto instanceof FailedExtensionDTO);
@@ -70,7 +79,7 @@ public class JaxRsExtensionProviderTest {
 		
 		resourceProperties.clear();
 		resourceProperties.put(JaxRSWhiteboardConstants.JAX_RS_EXTENSION, "true");
-		resourceProvider = new JerseyExtensionProvider<TestResource>(new TestResource(), resourceProperties);
+		resourceProvider = new JerseyExtensionProvider<Object>(serviceObject, resourceProperties);
 		
 		resourceDto = resourceProvider.getExtensionDTO();
 		assertFalse(resourceDto instanceof FailedExtensionDTO);

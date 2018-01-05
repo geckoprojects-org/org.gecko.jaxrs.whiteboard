@@ -24,11 +24,12 @@ import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
  * A wrapper class for a JaxRs extensions 
  * @author Mark Hoffmann
  * @param <T>
+ * @param <T>
  * @since 09.10.2017
  */
-public class JerseyExtensionProvider<T extends Object> extends JerseyApplicationContentProvider<T> implements JaxRsExtensionProvider {
+public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider<T> implements JaxRsExtensionProvider {
 
-	private static Class[] contracts = null;
+	private static Class<?>[] contracts = null;
 	
 	public JerseyExtensionProvider(ServiceObjects<T> serviceObjects, Map<String, Object> properties) {
 		super(serviceObjects, properties);
@@ -62,7 +63,7 @@ public class JerseyExtensionProvider<T extends Object> extends JerseyApplication
 	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider#getContracts()
 	 */
 	@Override
-	public Class[] getContracts() {
+	public Class<?>[] getContracts() {
 		return contracts;
 	}
 	
@@ -71,7 +72,7 @@ public class JerseyExtensionProvider<T extends Object> extends JerseyApplication
 	 */
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		return new JerseyExtensionProvider<T>(getServiceObjects(), getProviderProperties());
+		return new JerseyExtensionProvider<T>(getProviderObject(), getProviderProperties());
 	}
 	
 	/**

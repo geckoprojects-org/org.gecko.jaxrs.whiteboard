@@ -25,10 +25,6 @@ import org.eclipselabs.jaxrs.jersey.helper.ReferenceCollector;
 import org.eclipselabs.jaxrs.jersey.provider.JerseyConstants;
 import org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
 import org.eclipselabs.jaxrs.jersey.runtime.dispatcher.JerseyWhiteboardDispatcher;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceObjects;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
@@ -59,8 +55,6 @@ public class JerseyWhiteboardComponent {
 	protected JerseyWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
 	protected volatile JaxRsWhiteboardProvider whiteboard;
 
-	private BundleContext bctx;
-	
 	@Reference(cardinality = ReferenceCardinality.MANDATORY)
 	ReferenceCollector collector;
 	
@@ -72,7 +66,6 @@ public class JerseyWhiteboardComponent {
 	@SuppressWarnings("unchecked")
 	@Activate
 	public void activate(ComponentContext context) throws ConfigurationException {
-		this.bctx = context.getBundleContext();
 		updateProperties(context);
 		
 		if (whiteboard != null) {
@@ -143,14 +136,8 @@ public class JerseyWhiteboardComponent {
 	 * @param properties the service properties
 	 */
 	@Reference(name="application", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeApplication")
-	public void addApplication(ServiceReference<Application> ref) {
-		Map<String, Object> properties = JerseyHelper.getServiceProperties(ref);
-		BundleContext bundleContext = bctx; 
-		if(bundleContext == null) {
-			bundleContext = FrameworkUtil.getBundle(getClass()).getBundleContext();
-		}
-		ServiceObjects<Application> appServiceObject = bundleContext.getServiceObjects(ref);
-		dispatcher.addApplication(appServiceObject, properties);
+	public void addApplication(Application application, Map<String, Object> properties) {
+		dispatcher.addApplication(application, properties);
 	}
 
 	/**
@@ -158,9 +145,8 @@ public class JerseyWhiteboardComponent {
 	 * @param application the application to remove
 	 * @param properties the service properties
 	 */
-	public void removeApplication(ServiceReference<Application> ref) {
-		Map<String, Object> properties = JerseyHelper.getServiceProperties(ref);
-		dispatcher.removeApplication(properties);
+	public void removeApplication(Application application, Map<String, Object> properties) {
+		dispatcher.removeApplication(application, properties);
 	}
 
 	/**

@@ -13,7 +13,6 @@ package org.eclipselabs.jaxrs.jersey.runtime.application;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +24,7 @@ import javax.ws.rs.core.Application;
 
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationContentProvider;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider;
+import org.osgi.framework.ServiceObjects;
 
 /**
  * Special JaxRs application implementation that holds and updates all resource and extension given by the application provider
@@ -104,7 +104,8 @@ public class JerseyApplication extends Application {
 		String name = contentProvider.getName();
 		contentProviders.put(name, contentProvider);
 		if (contentProvider.isSingleton() || contentProvider instanceof JaxRsExtensionProvider) {
-			Object resource = contentProvider.getServiceObjects().getService();
+			ServiceObjects<?> serviceObject = (ServiceObjects<?>) contentProvider.getProviderObject();
+			Object resource = serviceObject.getService();
 			Object result = singletons.put(name, resource);
 			return !resource.equals(result) || result == null;
 		} else {
@@ -150,6 +151,7 @@ public class JerseyApplication extends Application {
 	}
 
 	/**
+	 * Returns all content providers
 	 * @return a Collection of contentProviders
 	 */
 	public Collection<JaxRsApplicationContentProvider> getContentProviders(){

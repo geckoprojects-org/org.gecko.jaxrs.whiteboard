@@ -77,15 +77,17 @@ public interface JaxRsWhiteboardDispatcher {
 	
 	/**
 	 * Adds an application
-	 * @param ref the {@link ServiceReference} of the {@link Application}
+	 * @param application the {@link Application}
+	 * @param properties the service properties
 	 */
-	public void addApplication(ServiceObjects<Application> appServiceObject, Map<String, Object> properties);
+	public void addApplication(Application application, Map<String, Object> properties);
 	
 	/**
 	 * Removes an application
-	 * @param ref the {@link ServiceReference} of the {@link Application}
+	 * @param application the {@link Application}
+	 * @param properties the service properties
 	 */
-	public void removeApplication(Map<String, Object> properties);
+	public void removeApplication(Application application, Map<String, Object> properties);
 	
 	/**
 	 * Adds a resource
