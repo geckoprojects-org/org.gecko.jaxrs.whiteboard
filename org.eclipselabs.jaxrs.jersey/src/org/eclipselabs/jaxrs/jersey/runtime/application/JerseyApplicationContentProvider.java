@@ -32,9 +32,10 @@ import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
  * A wrapper class for a JaxRs resources 
  * @author Mark Hoffmann
  * @param <T>
+ * @param <T>
  * @since 09.10.2017
  */
-public class JerseyApplicationContentProvider<T extends Object> extends AbstractJaxRsProvider<T> implements JaxRsApplicationContentProvider {
+public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<ServiceObjects<T>> implements JaxRsApplicationContentProvider {
 
 	private static final Logger logger = Logger.getLogger("jersey.contentProvider");
 	private Filter applicationFilter;
@@ -42,10 +43,10 @@ public class JerseyApplicationContentProvider<T extends Object> extends Abstract
 
 	public JerseyApplicationContentProvider(ServiceObjects<T> serviceObjects, Map<String, Object> properties) {
 		super(serviceObjects, properties);
-		if(getServiceObjects() != null) {
-			T service = getServiceObjects().getService();
+		if(getProviderObject() != null) {
+			T service = getProviderObject().getService();
 			clazz = service.getClass();
-			getServiceObjects().ungetService(service);
+			getProviderObject().ungetService(service);
 		}
 	}
 

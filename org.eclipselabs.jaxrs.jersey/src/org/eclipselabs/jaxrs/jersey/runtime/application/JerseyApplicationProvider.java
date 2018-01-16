@@ -32,7 +32,6 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
@@ -48,15 +47,13 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	private ServletContainer applicationContainer;
 	private String applicationBase;
 	private boolean changed = true;
-	private Application sourceApplication;
 	private JerseyApplication wrappedApplication;
 
-	public JerseyApplicationProvider(ServiceObjects<Application> serviceObjects, Map<String, Object> properties) {
-		super(serviceObjects, properties);
+	public JerseyApplicationProvider(Application application, Map<String, Object> properties) {
+		super(application, properties);
 		// create name after validation, because some fields are needed eventually
-		if(getServiceObjects() != null) {
-			sourceApplication = getServiceObjects().getService();
-			wrappedApplication = new JerseyApplication(getProviderName(), sourceApplication);
+		if(application != null) {
+			wrappedApplication = new JerseyApplication(getProviderName(), application);
 		}
 	}
 	
@@ -133,7 +130,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 * @see org.eclipselabs.osgi.jersey.JaxRsApplicationProvider#isDefault()
 	 */
 	public boolean isDefault() {
-		return sourceApplication instanceof DefaultApplication;
+		return getProviderObject() instanceof DefaultApplication;
 	}
 
 	/* 
@@ -229,7 +226,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 */
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		return new JerseyApplicationProvider(getServiceObjects(), getProviderProperties());
+		return new JerseyApplicationProvider(getProviderObject(), getProviderProperties());
 	}
 
 	/* 
@@ -336,5 +333,6 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 		}
 		return true;
 	}
+
 
 }

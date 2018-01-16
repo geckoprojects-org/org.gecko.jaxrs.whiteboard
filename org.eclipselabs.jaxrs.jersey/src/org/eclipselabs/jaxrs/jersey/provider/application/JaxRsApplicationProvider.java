@@ -13,7 +13,6 @@ package org.eclipselabs.jaxrs.jersey.provider.application;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 import javax.ws.rs.core.Application;
 

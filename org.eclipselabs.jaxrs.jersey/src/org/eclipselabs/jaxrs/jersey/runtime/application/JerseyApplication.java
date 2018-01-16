@@ -25,6 +25,7 @@ import javax.ws.rs.core.Application;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationContentProvider;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider;
 import org.eclipselabs.jaxrs.jersey.runtime.application.feature.WhiteboardFeature;
+import org.osgi.framework.ServiceObjects;
 
 /**
  * Special JaxRs application implementation that holds and updates all resource and extension given by the application provider
@@ -116,9 +117,9 @@ public class JerseyApplication extends Application {
 			Class<?> resourceClass = contentProvider.getObjectClass();
 			Object result = singletons.get(name);
 			if(result == null || !result.getClass().equals(resourceClass)){
-				result = singletons.put(name, contentProvider.getServiceObjects().getService());
+				result = singletons.put(name, ((ServiceObjects<?>) contentProvider.getProviderObject()).getService());
 				if(result != null) {
-					contentProvider.getServiceObjects().ungetService(result);
+					((ServiceObjects) contentProvider.getProviderObject()).ungetService(result);
 				}
 				return true;
 			}
@@ -173,6 +174,7 @@ public class JerseyApplication extends Application {
 	}
 
 	/**
+	 * Returns all content providers
 	 * @return a Collection of contentProviders
 	 */
 	public Collection<JaxRsApplicationContentProvider> getContentProviders(){

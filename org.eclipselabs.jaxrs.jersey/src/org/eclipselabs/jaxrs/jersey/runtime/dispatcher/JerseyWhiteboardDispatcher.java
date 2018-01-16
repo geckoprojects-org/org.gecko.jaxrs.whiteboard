@@ -11,7 +11,6 @@
  */
 package org.eclipselabs.jaxrs.jersey.runtime.dispatcher;
 
-import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -26,8 +25,6 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Application;
 
-import org.eclipselabs.jaxrs.jersey.helper.ReferenceCollector;
-import org.eclipselabs.jaxrs.jersey.helper.ServiceReferenceEvent;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationContentProvider;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider;
@@ -38,9 +35,6 @@ import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyApplicationProvide
 import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyExtensionProvider;
 import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyResourceProvider;
 import org.osgi.framework.ServiceObjects;
-import org.osgi.framework.ServiceReference;
-import org.osgi.util.pushstream.PushStream;
-import org.osgi.util.tracker.ServiceTracker;
 
 /**
  * Implementation of the dispatcher.
@@ -154,12 +148,13 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		return Collections.unmodifiableSet(new HashSet<>(extensionProviderCache.values()));
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher#addApplication(org.osgi.framework.ServiceReference)
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher#addApplication(javax.ws.rs.core.Application, java.util.Map)
 	 */
 	@Override
-	public void addApplication(ServiceObjects<Application> appServiceObject, Map<String, Object> properties) {
-		JaxRsApplicationProvider provider = new JerseyApplicationProvider(appServiceObject, properties);
+	public void addApplication(Application application, Map<String, Object> properties) {
+		JaxRsApplicationProvider provider = new JerseyApplicationProvider(application, properties);
 		if(provider.isDefault()) {
 			defaultProvider = provider;
 			if(whiteboard != null) {
@@ -174,11 +169,12 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher#removeApplication(org.osgi.framework.ServiceReference)
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatcher#removeApplication(javax.ws.rs.core.Application, java.util.Map)
 	 */
 	@Override
-	public void removeApplication(Map<String, Object> properties) {
+	public void removeApplication(Application application, Map<String, Object> properties) {
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(null, properties);
 		String name = provider.getName();
 		JaxRsApplicationProvider removed = applicationProviderCache.remove(name);

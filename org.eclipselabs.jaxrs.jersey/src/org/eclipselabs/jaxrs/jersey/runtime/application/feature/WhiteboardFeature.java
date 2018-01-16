@@ -1,3 +1,14 @@
+/**
+ * Copyright (c) 2012 - 2017 Data In Motion and others.
+ * All rights reserved. 
+ * 
+ * This program and the accompanying materials are made available under the terms of the 
+ * Eclipse Public License v1.0 which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     Data In Motion - initial API and implementation
+ */
 package org.eclipselabs.jaxrs.jersey.runtime.application.feature;
 
 import java.util.HashMap;
@@ -7,7 +18,13 @@ import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider;
+import org.osgi.framework.ServiceObjects;
 
+/**
+ * A {@link Feature} implementation registering all extensions as singleton and according to there provided contracts. 
+ * @author Juergen Albert
+ * @since 16.01.2018
+ */
 public class WhiteboardFeature implements Feature{
 
 	Map<String, JaxRsExtensionProvider> extensions;
@@ -23,8 +40,7 @@ public class WhiteboardFeature implements Feature{
 	@Override
 	public boolean configure(FeatureContext context) {
 		extensions.forEach((k, extension) -> {
-			Object serviceObject = extension.getServiceObjects().getService();
-			System.out.println("Configuring feature for " + extension.getName());
+			Object serviceObject = ((ServiceObjects<?>) extension.getProviderObject()).getService();
 			if(extension.getContracts() != null) {
 				context.register(serviceObject, extension.getContracts());
 			}

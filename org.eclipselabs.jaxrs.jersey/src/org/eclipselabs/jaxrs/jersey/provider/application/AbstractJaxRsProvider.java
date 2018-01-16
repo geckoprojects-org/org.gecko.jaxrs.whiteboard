@@ -24,7 +24,6 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceObjects;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
@@ -45,11 +44,18 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 	private int status = NO_FAILURE;
 	private Filter whiteboardFilter;
 	private List<Filter> extensionFilters = new LinkedList<>();
-	private ServiceObjects<T> serviceObjects;
+	private T providerObject;
+//	private ServiceObjects<T> serviceObjects;
 
-	public AbstractJaxRsProvider(ServiceObjects<T> serviceObjects, Map<String, Object> properties) {
+//	public AbstractJaxRsProvider(ServiceObjects<T> serviceObjects, Map<String, Object> properties) {
+//		this.properties = properties == null ? Collections.emptyMap() : properties;
+//		this.serviceObjects = serviceObjects;
+//		validateProperties();
+//	}
+	
+	public AbstractJaxRsProvider(T providerObject, Map<String, Object> properties) {
 		this.properties = properties == null ? Collections.emptyMap() : properties;
-		this.serviceObjects = serviceObjects;
+		this.providerObject = providerObject;
 		validateProperties();
 	}
 
@@ -138,15 +144,24 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 	public List<Filter> getExtensionFilters() {
 		return extensionFilters;
 	}
-
-	/**
-	 * Returns the {@link ServiceObjects} representing this resource
-	 * @return the {@link ServiceObjects} representing this resource
-	 */
-	public ServiceObjects<T> getServiceObjects() {
-		return serviceObjects;
-	}
+//
+//	/**
+//	 * Returns the {@link ServiceObjects} representing this resource
+//	 * @return the {@link ServiceObjects} representing this resource
+//	 */
+//	public ServiceObjects<T> getServiceObjects() {
+//		return serviceObjects;
+//	}
 	
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsProvider#getProviderObject()
+	 */
+	@SuppressWarnings("unchecked")
+	public T getProviderObject() {
+		return providerObject;
+	}
+
 	/**
 	 * Returns the internal status of the provider
 	 * @return the internal status of the provider

@@ -61,7 +61,7 @@ public class JerseyResourceProvider<T extends Object> extends JerseyApplicationC
 	 */
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		return new JerseyResourceProvider<T>(getServiceObjects(), getProviderProperties());
+		return new JerseyResourceProvider<T>(getProviderObject(), getProviderProperties());
 	}
 	
 	/**

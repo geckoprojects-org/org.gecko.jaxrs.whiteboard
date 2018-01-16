@@ -42,7 +42,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
  * @param <T>
  * @since 09.10.2017
  */
-public class JerseyExtensionProvider<T extends Object> extends JerseyApplicationContentProvider<T> implements JaxRsExtensionProvider {
+public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider<T> implements JaxRsExtensionProvider {
 
 	private static final List<String> POSSIBLE_INTERFACES = Arrays.asList(new String[] {
 		ContainerRequestFilter.class.getName(),
@@ -120,7 +120,7 @@ public class JerseyExtensionProvider<T extends Object> extends JerseyApplication
 	 */
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		return new JerseyExtensionProvider<T>(getServiceObjects(), getProviderProperties());
+		return new JerseyExtensionProvider<T>(getProviderObject(), getProviderProperties());
 	}
 	
 	/**

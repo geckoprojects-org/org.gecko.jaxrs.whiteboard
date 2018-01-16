@@ -13,6 +13,7 @@ package org.eclipselabs.jaxrs.jersey.runtime.httpwhiteboard;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,7 +22,6 @@ import javax.ws.rs.core.Application;
 import org.eclipselabs.jaxrs.jersey.helper.ReferenceCollector;
 import org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
 import org.eclipselabs.jaxrs.jersey.runtime.JerseyWhiteboardComponent;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
@@ -131,8 +131,8 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 	 * @param properties the service properties
 	 */
 	@Reference(name="application", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeApplication")
-	public void addApplication(ServiceReference<Application> ref) {
-		super.addApplication(ref);
+	public void addApplication(Application application, Map<String, Object> properties) {
+		super.addApplication(application, properties);
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 	 * @param application the application to remove
 	 * @param properties the service properties
 	 */
-	public void removeApplication(ServiceReference<Application> ref) {
-		super.removeApplication(ref);
+	public void removeApplication(Application application, Map<String, Object> properties) {
+		super.removeApplication(application, properties);
 	}
 }

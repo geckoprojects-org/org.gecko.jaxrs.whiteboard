@@ -96,9 +96,8 @@ public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 	 * Returns the {@link ServiceObjects} instance or <code>null</code>, in case the service is already gone
 	 * @return the {@link ServiceObjects} instance or <code>null</code>
 	 */
-	@SuppressWarnings("unchecked")
 	private ServiceObjects<T> getServiceObjects() {
-		return provider.getServiceObjects();
+		return provider.getProviderObject();
 	}
 
 	/**

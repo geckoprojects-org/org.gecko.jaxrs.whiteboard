@@ -16,6 +16,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +34,10 @@ import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyApplicationProvide
 import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyExtensionProvider;
 import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyResourceProvider;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
 import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
@@ -43,8 +48,12 @@ import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
  * @author Mark Hoffmann
  * @since 21.09.2017
  */
+@RunWith(MockitoJUnitRunner.class)
 public class JaxRsApplicationProviderTest {
 
+	@Mock
+	private ServiceObjects<Object> serviceObject;
+	
 	@Test
 	public void testApplicationProviderNoRequiredProperties() {
 		Map<String, Object> applicationProperties = new HashMap<>();
@@ -53,8 +62,6 @@ public class JaxRsApplicationProviderTest {
 		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(hallo=bla");
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
-		
-		assertFalse(provider.isLegacy());
 		
 		ApplicationDTO dto = provider.getApplicationDTO();
 		assertTrue(dto instanceof FailedApplicationDTO);
@@ -75,8 +82,6 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
-		assertFalse(provider.isLegacy());
-		
 		ApplicationDTO dto = provider.getApplicationDTO();
 		assertTrue(dto instanceof FailedApplicationDTO);
 		FailedApplicationDTO failedDto = (FailedApplicationDTO) dto;
@@ -96,8 +101,6 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
-		assertFalse(provider.isLegacy());
-		
 		ApplicationDTO dto = provider.getApplicationDTO();
 		assertTrue(dto instanceof FailedApplicationDTO);
 		FailedApplicationDTO failedDto = (FailedApplicationDTO) dto;
@@ -115,8 +118,6 @@ public class JaxRsApplicationProviderTest {
 		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
-		
-		assertFalse(provider.isLegacy());
 		
 		ApplicationDTO dto = provider.getApplicationDTO();
 		assertFalse(dto instanceof FailedApplicationDTO);
@@ -140,7 +141,6 @@ public class JaxRsApplicationProviderTest {
 		
 		assertEquals("test/*", provider.getPath());
 		assertEquals("myTest", provider.getName());
-		assertFalse(provider.isLegacy());
 	}
 	
 	@Test
@@ -151,8 +151,6 @@ public class JaxRsApplicationProviderTest {
 		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(hallo=bla");
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
-		
-		assertFalse(provider.isLegacy());
 		
 		Map<String, Object> runtimeProperties = new HashMap<>();
 		assertFalse(provider.canHandleWhiteboard(runtimeProperties));
@@ -182,8 +180,6 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
-		assertFalse(provider.isLegacy());
-		
 		Map<String, Object> runtimeProperties = new HashMap<>();
 		assertFalse(provider.canHandleWhiteboard(runtimeProperties));
 		
@@ -210,8 +206,6 @@ public class JaxRsApplicationProviderTest {
 		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(|(role=bla)(mandant=eTest))");
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
-		
-		assertFalse(provider.isLegacy());
 		
 		Map<String, Object> runtimeProperties = new HashMap<>();
 		assertFalse(provider.canHandleWhiteboard(runtimeProperties));
@@ -251,8 +245,6 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
-		assertFalse(provider.isLegacy());
-		
 		Map<String, Object> runtimeProperties = new HashMap<>();
 		assertFalse(provider.canHandleWhiteboard(runtimeProperties));
 		
@@ -290,8 +282,6 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
-		assertFalse(provider.isLegacy());
-		
 		assertFalse(provider.canHandleWhiteboard(null));
 		
 		ApplicationDTO dto = provider.getApplicationDTO();
@@ -315,8 +305,6 @@ public class JaxRsApplicationProviderTest {
 		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(|(role=bla)(mandant=eTest))");
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new TestLegacyApplication(), applicationProperties);
-		
-		assertTrue(provider.isLegacy());
 		
 		assertFalse(provider.canHandleWhiteboard(null));
 		
@@ -344,25 +332,26 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new TestLegacyApplication(), applicationProperties);
 		
-		assertTrue(provider.isLegacy());
-		assertFalse(provider.isChanged());
+		assertTrue(provider.isChanged());
 		
+		when(serviceObject.getService()).thenReturn(new TestResource());
 		Map<String, Object> contentProperties = new HashMap<>();
 		contentProperties.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		JaxRsResourceProvider resource = new JerseyResourceProvider<Object>(new TestResource(), contentProperties);
+		JaxRsResourceProvider resource = new JerseyResourceProvider<Object>(serviceObject, contentProperties);
 		
 		assertFalse(provider.addResource(resource));
-		assertFalse(provider.isChanged());
+		assertTrue(provider.isChanged());
 		assertFalse(provider.removeResource(resource));
-		assertFalse(provider.isChanged());
+		assertTrue(provider.isChanged());
 		
+		when(serviceObject.getService()).thenReturn(new TestExtension());
 		contentProperties.put(JaxRSWhiteboardConstants.JAX_RS_EXTENSION, "true");
-		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(new TestExtension(), contentProperties);
+		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(serviceObject, contentProperties);
 		
 		assertFalse(provider.addExtension(extension));
-		assertFalse(provider.isChanged());
+		assertTrue(provider.isChanged());
 		assertFalse(provider.removeExtension(extension));
-		assertFalse(provider.isChanged());
+		assertTrue(provider.isChanged());
 	}
 	
 	@Test
@@ -374,27 +363,27 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new TestApplication(), applicationProperties);
 		
-		assertFalse(provider.isLegacy());
 		assertTrue(provider.isEmpty());
 		assertFalse(provider.isChanged());
 		
 		provider = new JerseyApplicationProvider(new TestLegacyApplication(), applicationProperties);
 		
-		assertTrue(provider.isLegacy());
 		assertFalse(provider.isEmpty());
 		assertFalse(provider.isChanged());
 		
+		when(serviceObject.getService()).thenReturn(new TestResource());
 		Map<String, Object> contentProperties = new HashMap<>();
 		contentProperties.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		JaxRsResourceProvider resource = new JerseyResourceProvider<Object>(new TestResource(), contentProperties);
+		JaxRsResourceProvider resource = new JerseyResourceProvider<Object>(serviceObject, contentProperties);
 		
 		assertFalse(provider.addResource(resource));
 		assertFalse(provider.isChanged());
 		assertFalse(provider.removeResource(resource));
 		assertFalse(provider.isChanged());
 		
+		when(serviceObject.getService()).thenReturn(new TestExtension());
 		contentProperties.put(JaxRSWhiteboardConstants.JAX_RS_EXTENSION, "true");
-		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(new TestExtension(), contentProperties);
+		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(serviceObject, contentProperties);
 		
 		assertFalse(provider.addExtension(extension));
 		assertFalse(provider.isChanged());
@@ -411,20 +400,21 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
-		assertFalse(provider.isLegacy());
 		assertFalse(provider.isChanged());
 		
+		when(serviceObject.getService()).thenReturn(new TestResource());
 		Map<String, Object> contentProperties = new HashMap<>();
 		contentProperties.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		JaxRsResourceProvider resource = new JerseyResourceProvider<Object>(new TestResource(), contentProperties);
+		JaxRsResourceProvider resource = new JerseyResourceProvider<Object>(serviceObject, contentProperties);
 		
 		assertFalse(provider.addResource(resource));
 		assertFalse(provider.isChanged());
 		assertFalse(provider.removeResource(resource));
 		assertFalse(provider.isChanged());
 		
+		when(serviceObject.getService()).thenReturn(new TestExtension());
 		contentProperties.put(JaxRSWhiteboardConstants.JAX_RS_EXTENSION, "true");
-		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(new TestExtension(), contentProperties);
+		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(serviceObject, contentProperties);
 		
 		assertFalse(provider.addExtension(extension));
 		assertFalse(provider.isChanged());
@@ -441,20 +431,21 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
-		assertFalse(provider.isLegacy());
 		assertFalse(provider.isChanged());
 		
+		when(serviceObject.getService()).thenReturn(new TestResource());
 		Map<String, Object> contentProperties = new HashMap<>();
 		contentProperties.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		JaxRsResourceProvider resource = new JerseyResourceProvider<Object>(new TestResource(), contentProperties);
+		JaxRsResourceProvider resource = new JerseyResourceProvider<Object>(serviceObject, contentProperties);
 		
 		assertFalse(provider.addResource(resource));
 		assertFalse(provider.isChanged());
 		assertFalse(provider.removeResource(resource));
 		assertFalse(provider.isChanged());
 		
+		when(serviceObject.getService()).thenReturn(new TestExtension());
 		contentProperties.put(JaxRSWhiteboardConstants.JAX_RS_EXTENSION, "true");
-		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(new TestExtension(), contentProperties);
+		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(serviceObject, contentProperties);
 		
 		assertFalse(provider.addExtension(extension));
 		assertFalse(provider.isChanged());
@@ -471,18 +462,18 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
-		assertFalse(provider.isLegacy());
 		assertFalse(provider.isChanged());
 		
+		when(serviceObject.getService()).thenReturn(new TestResource());
 		Map<String, Object> contentProperties = new HashMap<>();
 		contentProperties.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		contentProperties.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(name=me)");
 		contentProperties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "res_one");
-		JaxRsResourceProvider resource = new JerseyResourceProvider<Object>(new TestResource(), contentProperties);
+		JaxRsResourceProvider resource = new JerseyResourceProvider<Object>(serviceObject, contentProperties);
 		
 		Map<String, Object> contentProperties2 = new HashMap<>(contentProperties);
 		contentProperties2.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "two");
-		JaxRsResourceProvider resource2 = new JerseyResourceProvider<Object>(new TestResource(), contentProperties2);
+		JaxRsResourceProvider resource2 = new JerseyResourceProvider<Object>(serviceObject, contentProperties2);
 		
 		assertTrue(provider.addResource(resource));
 		assertTrue(provider.isChanged());
@@ -496,9 +487,10 @@ public class JaxRsApplicationProviderTest {
 		assertTrue(provider.removeResource(resource));
 		assertTrue(provider.isChanged());
 		
+		when(serviceObject.getService()).thenReturn(new TestExtension());
 		contentProperties.put(JaxRSWhiteboardConstants.JAX_RS_EXTENSION, "true");
 		contentProperties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "ext_one");
-		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(new TestExtension(), contentProperties);
+		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(serviceObject, contentProperties);
 		
 		assertTrue(provider.addExtension(extension));
 		assertTrue(provider.isChanged());
