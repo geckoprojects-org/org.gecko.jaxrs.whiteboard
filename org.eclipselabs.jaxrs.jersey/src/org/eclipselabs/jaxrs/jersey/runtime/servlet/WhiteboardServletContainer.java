@@ -3,10 +3,13 @@
  */
 package org.eclipselabs.jaxrs.jersey.runtime.servlet;
 
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
@@ -43,6 +46,7 @@ public class WhiteboardServletContainer extends ServletContainer {
 	
 	@Override
 	public void reload(ResourceConfig configuration) {
+		long start = System.currentTimeMillis();
 		lock.lock();
 		try {
 			if(initialized.get()) {
@@ -53,6 +57,6 @@ public class WhiteboardServletContainer extends ServletContainer {
 		} finally {
 			lock.unlock();
 		}
+		System.out.println("Reload took " + (System.currentTimeMillis() -start) + " ms");
 	}
-
 }

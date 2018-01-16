@@ -11,10 +11,26 @@
  */
 package org.eclipselabs.jaxrs.jersey.runtime.application;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.DynamicFeature;
+import javax.ws.rs.core.Feature;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.ParamConverterProvider;
+import javax.ws.rs.ext.ReaderInterceptor;
+import javax.ws.rs.ext.WriterInterceptor;
 
 import org.eclipselabs.jaxrs.jersey.dto.DTOConverter;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
 import org.osgi.service.jaxrs.runtime.dto.ExtensionDTO;
@@ -28,13 +44,46 @@ import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
  */
 public class JerseyExtensionProvider<T extends Object> extends JerseyApplicationContentProvider<T> implements JaxRsExtensionProvider {
 
-	private static Class[] contracts = null;
+	private static final List<String> POSSIBLE_INTERFACES = Arrays.asList(new String[] {
+		ContainerRequestFilter.class.getName(),
+		ContainerResponseFilter.class.getName(),
+		ReaderInterceptor.class.getName(),
+		WriterInterceptor.class.getName(),
+		MessageBodyReader.class.getName(),
+		MessageBodyWriter.class.getName(),
+		ContextResolver.class.getName(),
+		ExceptionMapper.class.getName(),
+		ParamConverterProvider.class.getName(),
+		Feature.class.getName(),
+		DynamicFeature.class.getName()
+	});
+	
+	private Class<?>[] contracts = null;
 	
 	public JerseyExtensionProvider(ServiceObjects<T> serviceObjects, Map<String, Object> properties) {
 		super(serviceObjects, properties);
-		// TODO: find the provided Contracts 
+		extractContracts(properties);
+		
 	}
 	
+	private void extractContracts(Map<String, Object> properties) {
+		String[] objectClasses = (String[]) properties.get(Constants.OBJECTCLASS);
+		List<Class<?>> possibleContracts = new ArrayList<>(objectClasses.length);
+		for (String objectClass : objectClasses) {
+			if(POSSIBLE_INTERFACES.contains(objectClass)) {
+				try {
+					possibleContracts.add(Class.forName(objectClass));
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} 
+		}
+		if(!possibleContracts.isEmpty()) {
+			contracts = possibleContracts.toArray(new Class[0]);
+		}
+	}
+
 	/* 
 	 * (non-Javadoc)
 	 * @see org.eclipselabs.jaxrs.jersey.provider.JaxRsExtensionProvider#isExtension()
@@ -62,7 +111,7 @@ public class JerseyExtensionProvider<T extends Object> extends JerseyApplication
 	 * @see org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider#getContracts()
 	 */
 	@Override
-	public Class[] getContracts() {
+	public Class<?>[] getContracts() {
 		return contracts;
 	}
 	

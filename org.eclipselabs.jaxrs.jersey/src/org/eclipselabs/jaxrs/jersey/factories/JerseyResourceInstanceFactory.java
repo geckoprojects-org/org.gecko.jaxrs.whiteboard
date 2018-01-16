@@ -17,7 +17,6 @@ import java.util.Set;
 import org.eclipselabs.jaxrs.jersey.binder.PrototypeServiceBinder;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationContentProvider;
 import org.glassfish.hk2.api.Factory;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceObjects;
 
 /**
@@ -29,17 +28,14 @@ import org.osgi.framework.ServiceObjects;
  */
 public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 
-	private final BundleContext bctx;
 	private volatile Set<T> instanceCache = new HashSet<>();
 	private JaxRsApplicationContentProvider provider;
 
 	/**
 	 * Creates a new instance. A service reference will be cached lazily, on the first request
-	 * @param bctx the bundle context
 	 * @param clazz the resource class
 	 */
-	public JerseyResourceInstanceFactory(BundleContext bctx, JaxRsApplicationContentProvider provider) {
-		this.bctx = bctx;
+	public JerseyResourceInstanceFactory(JaxRsApplicationContentProvider provider) {
 		this.provider = provider;
 	}
 
@@ -56,9 +52,6 @@ public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 	 */
 	@Override
 	public T provide() {
-		if (bctx == null) {
-			throw new IllegalStateException("Cannot create instances because bundle context is not available");
-		}
 		try {
 			ServiceObjects<T> soInstance = getServiceObjects();
 			// If the service objects is null, the service is obviously gone and we return null to avoid exception in jersey

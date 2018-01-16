@@ -11,11 +11,7 @@
  */
 package org.eclipselabs.jaxrs.jersey.tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -25,12 +21,16 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.MessageBodyReader;
 
 import org.eclipselabs.jaxrs.jersey.provider.JerseyConstants;
 import org.eclipselabs.jaxrs.jersey.tests.applications.TestLegacyApplication;
 import org.eclipselabs.jaxrs.jersey.tests.customizer.TestServiceCustomizer;
+import org.eclipselabs.jaxrs.jersey.tests.resources.ContractedExtension;
 import org.eclipselabs.jaxrs.jersey.tests.resources.HelloResource;
 import org.eclipselabs.jaxrs.jersey.tests.resources.PrototypeExtension;
 import org.eclipselabs.jaxrs.jersey.tests.resources.PrototypeResource;
@@ -38,6 +38,7 @@ import org.glassfish.jersey.client.JerseyClient;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.JerseyInvocation;
 import org.glassfish.jersey.client.JerseyWebTarget;
+import org.glassfish.jersey.message.internal.EntityInputStream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -161,7 +162,7 @@ public class JaxRsWhiteboardComponentTest {
 		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Hello");
 		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
 		System.out.println("Register resource for uri /hello under application customer");
-		ServiceRegistration<Object> helloRegistration = context.registerService(Object.class, new HelloResource(), helloProps);
+		ServiceRegistration<HelloResource> helloRegistration = context.registerService(HelloResource.class, new HelloResource(), helloProps);
 		f = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=Hello)");
 		Object service = getService(f, 3000l);
 		assertNotNull(service);
@@ -727,7 +728,7 @@ public class JaxRsWhiteboardComponentTest {
 		
 		
 		CountDownLatch cdl = new CountDownLatch(1);
-		cdl.await(1, TimeUnit.SECONDS);
+		cdl.await(2, TimeUnit.SECONDS);
 		
 		/*
 		 * Check if our RootResource is available under http://localhost:8185/test
@@ -752,6 +753,139 @@ public class JaxRsWhiteboardComponentTest {
 		assertTrue(result01.endsWith(PrototypeExtension.PROTOTYPE_POSTFIX));
 		
 		tearDownTest(configuration, get);
+	}
+
+	/**
+	 * Tests 
+	 * @throws IOException 
+	 * @throws InterruptedException 
+	 * @throws InvalidSyntaxException 
+	 */
+	@Test
+	public void testWhiteboardComponentExtensionContracts() throws IOException, InterruptedException, InvalidSyntaxException {
+		/*
+		 *  The server runs on localhost port 8185 using context path test: http://localhost:8185/test
+		 *  We mount the system with a resource PrototypeResource under http://localhost:8185/test that will return a 
+		 *  HTTP::200 using a GET request
+		 */
+		int port = 8185;
+		String contextPath = "test";
+		String url = "http://localhost:" + port + "/" + contextPath;
+		
+		/*
+		 * Initial setup for the REST runtime 
+		 */
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
+		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
+		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
+		
+		ConfigurationAdmin configAdmin = context.getService(configAdminRef);
+		assertNotNull(configAdmin);
+		Configuration configuration = configAdmin.getConfiguration("JaxRsWhiteboardComponent", "?");
+		assertNotNull(configuration);
+		assertEquals(1, configuration.getChangeCount());
+		Dictionary<String,Object> factoryProperties = configuration.getProperties();
+		assertNull(factoryProperties);
+		configuration.update(properties);
+		
+		/*
+		 * Check that the REST runtime service become available 
+		 */
+		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
+		assertNotNull(runtimeRef);
+		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
+		assertNotNull(runtime);
+
+		/*
+		 * Mount the application customer that will become available under: test/customer
+		 * http://localhost:8185/test/customer
+		 */
+		Dictionary<String, Object> appProps = new Hashtable<>();
+		appProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
+		appProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "customerApp");
+		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new Application(), appProps);
+		Filter f = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
+		Application application = getService(f, 3000l);
+		assertNotNull(application);
+		
+		/*
+		 * Mount the extension ContractedExtension that will become available under:
+		 * http://localhost:8185/test/hello
+		 */
+		Dictionary<String, Object> extensionProps = new Hashtable<>();
+		extensionProps.put(JaxRSWhiteboardConstants.JAX_RS_EXTENSION, "true");
+		extensionProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Contracted");
+		extensionProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
+		
+		System.out.println("Register resource for uri /hello");
+		ServiceRegistration<?> contractedRegistration = context.registerService(ContractedExtension.class, new ContractedExtension(), extensionProps);
+		
+		/*
+		 * Mount the resource HelloResource that will become available under:
+		 * http://localhost:8185/test/hello
+		 */
+		Dictionary<String, Object> helloProps = new Hashtable<>();
+		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Hello");
+		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
+		
+		System.out.println("Register resource for uri /hello");
+		ServiceRegistration<HelloResource> helloRegistration = context.registerService(HelloResource.class, new HelloResource(), helloProps);
+
+		f = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=Hello)");
+		Object service = getService(f, 3000l);
+		assertNotNull(service);
+
+//		f = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=Contracted)");
+//		service = getService(f, 3000l);
+//		assertNotNull(service);
+		
+		
+		CountDownLatch cdl = new CountDownLatch(1);
+		cdl.await(1, TimeUnit.SECONDS);
+		
+		/*
+		 * Check if our RootResource is available under http://localhost:8185/test
+		 */
+		String checkUrl = url + "/customer/hello";
+		System.out.println("Checking URL is available: " + checkUrl);
+		JerseyInvocation post = null;
+		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
+		JerseyWebTarget webTarget = jerseyClient.target(checkUrl);
+		post = webTarget.request().buildPost(Entity.entity("test", "application/testThing"));
+		Response response = post.invoke();
+		assertEquals(200, response.getStatus());
+		assertNotNull(response.getEntity());
+		String result01 = response.readEntity(String.class);
+		System.out.println(result01);
+		assertNotNull(result01);
+		
+		assertTrue(result01.contains(ContractedExtension.READER_POSTFIX));
+		assertTrue(result01.contains(ContractedExtension.WRITER_POSTFIX));
+
+		contractedRegistration.unregister();
+		contractedRegistration = context.registerService(MessageBodyReader.class, new ContractedExtension(), extensionProps);
+		
+		cdl.await(2, TimeUnit.SECONDS);
+		
+		response = post.invoke();
+		assertEquals(200, response.getStatus());
+		assertNotNull(response.getEntity());
+		result01 = response.readEntity(String.class);
+		System.out.println(result01);
+		assertNotNull(result01);
+		
+		assertTrue(result01.contains(ContractedExtension.READER_POSTFIX));
+		assertFalse(result01.contains(ContractedExtension.WRITER_POSTFIX));
+		
+		
+		
+		helloRegistration.unregister();
+		contractedRegistration.unregister();
+		appRegistration.unregister();
+		
+		tearDownTest(configuration, post);
 	}
 	
 	private void tearDownTest(Configuration configuration, JerseyInvocation get) throws IOException, InterruptedException {

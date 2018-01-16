@@ -13,7 +13,6 @@ package org.eclipselabs.jaxrs.jersey.runtime.application;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +24,7 @@ import javax.ws.rs.core.Application;
 
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationContentProvider;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider;
+import org.eclipselabs.jaxrs.jersey.runtime.application.feature.WhiteboardFeature;
 
 /**
  * Special JaxRs application implementation that holds and updates all resource and extension given by the application provider
@@ -35,6 +35,7 @@ public class JerseyApplication extends Application {
 
 	private volatile Map<String, Class<?>> classes = new ConcurrentHashMap<>();
 	private volatile Map<String, Object> singletons = new ConcurrentHashMap<>();
+	private volatile Map<String, JaxRsExtensionProvider> extensions = new ConcurrentHashMap<>();
 	private volatile Map<String, JaxRsApplicationContentProvider> contentProviders = new ConcurrentHashMap<>();
 	private final String applicationName;
 	private final Logger log = Logger.getLogger("jersey.application");
@@ -77,6 +78,9 @@ public class JerseyApplication extends Application {
 		Set<Object> resutlSingletons = new HashSet<>();
 		resutlSingletons.addAll(singletons.values());
 		resutlSingletons.addAll(sourceApplication.getSingletons());
+		if(!extensions.isEmpty()) {
+			resutlSingletons.add(new WhiteboardFeature(extensions));
+		}
 		return Collections.unmodifiableSet(resutlSingletons);
 	}
 
@@ -93,6 +97,7 @@ public class JerseyApplication extends Application {
 	 * @param contentProvider the provider to register
 	 * @return <code>true</code>, if content was added
 	 */
+	@SuppressWarnings("unchecked")
 	public boolean addContent(JaxRsApplicationContentProvider contentProvider) {
 		if (contentProvider == null) {
 			if (log != null) {
@@ -103,10 +108,21 @@ public class JerseyApplication extends Application {
 		
 		String name = contentProvider.getName();
 		contentProviders.put(name, contentProvider);
-		if (contentProvider.isSingleton() || contentProvider instanceof JaxRsExtensionProvider) {
-			Object resource = contentProvider.getServiceObjects().getService();
-			Object result = singletons.put(name, resource);
-			return !resource.equals(result) || result == null;
+		if(contentProvider instanceof JaxRsExtensionProvider) {
+			Class<?> resourceClass = contentProvider.getObjectClass();
+			JaxRsExtensionProvider result = extensions.put(name, (JaxRsExtensionProvider) contentProvider);
+			return  result == null || !resourceClass.equals(result.getObjectClass());
+		} else if (contentProvider.isSingleton()) {
+			Class<?> resourceClass = contentProvider.getObjectClass();
+			Object result = singletons.get(name);
+			if(result == null || !result.getClass().equals(resourceClass)){
+				result = singletons.put(name, contentProvider.getServiceObjects().getService());
+				if(result != null) {
+					contentProvider.getServiceObjects().ungetService(result);
+				}
+				return true;
+			}
+			return false;
 		} else {
 			Class<?> resourceClass = contentProvider.getObjectClass();
 			Object result = classes.put(name, resourceClass);
@@ -128,7 +144,11 @@ public class JerseyApplication extends Application {
 			return false;
 		}
 		String name = contentProvider.getName();
-		if (contentProvider.isSingleton()) {
+		if(contentProvider instanceof JaxRsExtensionProvider) {
+			synchronized (extensions) {
+				extensions.remove(name);
+			}
+		} else if (contentProvider.isSingleton()) {
 			synchronized (singletons) {
 				singletons.remove(name);
 			}
@@ -147,6 +167,9 @@ public class JerseyApplication extends Application {
 	 */
 	public void dispose() {
 		contentProviders.clear();
+		extensions.clear();
+		classes.clear();
+		singletons.clear();
 	}
 
 	/**

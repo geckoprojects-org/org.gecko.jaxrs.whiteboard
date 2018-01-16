@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.ServiceScope;
 public class PrototypeResource {
 	
 	public static final String PROTOTYPE_PREFIX = "test_";
-	public static final String PROTOTYPE_POSTFIX = "_proto";
+	public static final String PROTOTYPE_POSTFIX = "_protoResource";
 	private static AtomicInteger counter = new AtomicInteger();
 	private String postFix = "";
 	

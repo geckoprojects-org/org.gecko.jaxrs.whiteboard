@@ -14,5 +14,6 @@ Private-Package: \
 	org.eclipselabs.jaxrs.jersey.runtime.dispatcher,\
 	org.eclipselabs.jaxrs.jersey.runtime.common,\
 	org.eclipselabs.jaxrs.jersey.runtime.httpwhiteboard,\
-	org.eclipselabs.jaxrs.jersey.runtime.servlet
+	org.eclipselabs.jaxrs.jersey.runtime.servlet,\
+	org.eclipselabs.jaxrs.jersey.runtime.application.feature
 Require-Capability: osgi.implementation;filter:='(osgi.implementation=osgi.http)' 

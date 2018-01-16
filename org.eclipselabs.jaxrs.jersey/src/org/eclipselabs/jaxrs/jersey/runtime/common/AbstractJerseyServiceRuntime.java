@@ -35,7 +35,6 @@ import org.eclipselabs.jaxrs.jersey.runtime.servlet.WhiteboardServletContainer;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.service.cm.ConfigurationException;
@@ -278,7 +277,6 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 		Application application = applicationProvider.getJaxRsApplication();
 		ResourceConfig config = ResourceConfig.forApplication(application);
 		
-		final BundleContext ctx = context.getBundleContext();
 		PrototypeServiceBinder binder = new PrototypeServiceBinder();
 		applicationProvider.getContentProviers().forEach(provider -> {
 			logger.info("Register prototype provider for classes " + provider.getObjectClass() + " in the application " + applicationProvider.getName());
@@ -286,7 +284,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 				throw new IllegalStateException("Cannot create prototype factories without component context");
 			}
 			if(provider instanceof JaxRsResourceProvider) {
-				Factory<?> factory = new JerseyResourceInstanceFactory<>(ctx, provider);
+				Factory<?> factory = new JerseyResourceInstanceFactory<>(provider);
 				logger.info("registering for real " + provider.getObjectClass());
 				binder.register(provider.getObjectClass(), factory);
 			}
