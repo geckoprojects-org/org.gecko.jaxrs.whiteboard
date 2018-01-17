@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyReader;
 
 import org.eclipselabs.jaxrs.jersey.provider.JerseyConstants;
+import org.eclipselabs.jaxrs.jersey.tests.applications.AnnotatedTestLegacyApplication;
 import org.eclipselabs.jaxrs.jersey.tests.applications.TestLegacyApplication;
 import org.eclipselabs.jaxrs.jersey.tests.customizer.TestServiceCustomizer;
 import org.eclipselabs.jaxrs.jersey.tests.resources.ContractedExtension;
@@ -471,6 +472,113 @@ public class JaxRsWhiteboardComponentTest {
 		 */
 		System.out.println("Checking URL is not available anymore " + url + "/legacy/hello/mark");
 		webTarget = jerseyClient.target(url + "/legacy/hello/mark");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(404, response.getStatus());
+		
+		tearDownTest(configuration, get);
+	}
+
+	/**
+	 * Tests 
+	 * @throws IOException 
+	 * @throws InterruptedException 
+	 * @throws InvalidSyntaxException 
+	 */
+	@Test
+	public void testWhiteboardComponentAnnotatedLegacyApplication() throws IOException, InterruptedException, InvalidSyntaxException {
+		/*
+		 *  The server runs on localhost port 8185 using context path test: http://localhost:8185/test
+		 *  We mount the system with a resource RootResource under http://localhost:8185/test that will return a 
+		 *  HTTP::200 using a GET request
+		 */
+		int port = 8185;
+		String contextPath = "test";
+		String url = "http://localhost:" + port + "/" + contextPath;
+		
+		/*
+		 * Initial setup for the REST runtime 
+		 */
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
+		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
+		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
+		
+		ConfigurationAdmin configAdmin = context.getService(configAdminRef);
+		assertNotNull(configAdmin);
+		Configuration configuration = configAdmin.getConfiguration("JaxRsWhiteboardComponent", "?");
+		assertNotNull(configuration);
+		assertEquals(1, configuration.getChangeCount());
+		Dictionary<String,Object> factoryProperties = configuration.getProperties();
+		assertNull(factoryProperties);
+		configuration.update(properties);
+		
+		/*
+		 * Check that the REST runtime service become available 
+		 */
+		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 400000l);
+		assertNotNull(runtimeRef);
+		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
+		assertNotNull(runtime);
+		
+		CountDownLatch cdl = new CountDownLatch(1);
+		cdl.await(2, TimeUnit.SECONDS);
+		
+		/*
+		 * Check if our RootResource is not available under http://localhost:8185/test
+		 */
+		System.out.println("Checking URL is not available: " + url);
+		JerseyInvocation get = null;
+		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
+		JerseyWebTarget webTarget = jerseyClient.target(url);
+		get = webTarget.request().buildGet();
+		Response response = get.invoke();
+		assertEquals(404, response.getStatus());
+		
+		/*
+		 * Mount the application customer that will become available under: test/customer
+		 * http://localhost:8185/test/customer
+		 */
+		Dictionary<String, Object> appProps = new Hashtable<>();
+		appProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "legacy");
+		appProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "legacyApp");
+		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new AnnotatedTestLegacyApplication(), appProps);
+		Filter appFilter = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=legacyApp)");
+		Application application = getService(appFilter, 3000l);
+		assertNotNull(application);
+		
+		/*
+		 * Wait a short time to reload the configuration dynamically
+		 */
+		cdl = new CountDownLatch(1);
+		cdl.await(2, TimeUnit.SECONDS);
+		
+		/*
+		 * Check if http://localhost:8185/test/customer/hello is available now. 
+		 * Check as well, if http://localhost:8185/test is /hello is not available
+		 */
+		System.out.println("Checking URL is available " + url + "/legacy/annotated/hello/mark");
+		webTarget = jerseyClient.target(url + "/legacy/annotated/hello/mark");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(200, response.getStatus());
+		
+		appRegistration.unregister();
+		application = getService(appFilter, 3000l);
+		assertNull(application);
+		
+		/*
+		 * Wait a short time to reload the configuration dynamically
+		 */
+		cdl = new CountDownLatch(1);
+		cdl.await(1, TimeUnit.SECONDS);
+		
+		/*
+		 * Check if http://localhost:8185/test/customer/hello is not available anymore. 
+		 * Check as well, if http://localhost:8185/test/hello is still not available
+		 */
+		System.out.println("Checking URL is not available anymore " + url + "/legacy/annotated/hello/mark");
+		webTarget = jerseyClient.target(url + "/legacy/annotated/hello/mark");
 		get = webTarget.request().buildGet();
 		response = get.invoke();
 		assertEquals(404, response.getStatus());

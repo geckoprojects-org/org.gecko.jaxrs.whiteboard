@@ -29,15 +29,28 @@ public class JaxRsHelper {
 	 * @param application the JaxRs application instance
 	 * @return the application path
 	 */
-	public static String getServletPath(Application application) {
+	public static String getServletPath(Application application, String applicationBase) {
 		if (application != null) {
 			ApplicationPath applicationPathAnnotation = application.getClass().getAnnotation(ApplicationPath.class);
 			if (applicationPathAnnotation != null) {
 				String applicationPath = applicationPathAnnotation.value();
-				return toServletPath(applicationPath);
+				String stripedApplicationBase = stripApplicationPath(applicationBase);
+				return stripedApplicationBase + toServletPath(applicationPath);
 			}
 		}
-		return toServletPath(null);
+		return toServletPath(applicationBase);
+	}
+
+	private static String stripApplicationPath(String applicationPath) {
+		String resultPath =  applicationPath.startsWith("/") ? "" : "/";
+		if(applicationPath.endsWith("/*")) {
+			resultPath += applicationPath.substring(0, applicationPath.length() - 2);
+		} else if(applicationPath.endsWith("/")) {
+			resultPath += applicationPath.substring(0, applicationPath.length() - 1);
+		} else {
+			resultPath += applicationPath;
+		}
+		return resultPath;
 	}
 
 	/**

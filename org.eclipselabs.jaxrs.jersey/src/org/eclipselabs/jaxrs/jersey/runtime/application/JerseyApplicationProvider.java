@@ -84,7 +84,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 		if (wrappedApplication == null) {
 			throw new IllegalStateException("This application provider does not contain an application, but should have one to create a context path");
 		}
-		return applicationBase == null ? null : JaxRsHelper.toApplicationPath(applicationBase);
+		return applicationBase == null ? null : JaxRsHelper.getServletPath(wrappedApplication.getSourceApplication() , applicationBase);
 	}
 
 	/* 

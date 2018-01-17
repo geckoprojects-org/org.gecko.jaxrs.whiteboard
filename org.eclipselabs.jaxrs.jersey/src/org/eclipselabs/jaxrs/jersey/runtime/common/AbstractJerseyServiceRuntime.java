@@ -25,7 +25,6 @@ import javax.ws.rs.core.Application;
 import org.eclipselabs.jaxrs.jersey.binder.PrototypeServiceBinder;
 import org.eclipselabs.jaxrs.jersey.dto.DTOConverter;
 import org.eclipselabs.jaxrs.jersey.factories.JerseyResourceInstanceFactory;
-import org.eclipselabs.jaxrs.jersey.helper.JaxRsHelper;
 import org.eclipselabs.jaxrs.jersey.helper.JerseyHelper;
 import org.eclipselabs.jaxrs.jersey.provider.JerseyConstants;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider;
@@ -156,7 +155,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 		ResourceConfig config = createResourceConfig(applicationProvider);
 		ServletContainer container = new WhiteboardServletContainer(config);
 		applicationProvider.setServletContainer(container);
-		String applicationPath = applicationProvider.isDefault() ? JaxRsHelper.getServletPath(applicationProvider.getJaxRsApplication()) : JaxRsHelper.toServletPath(applicationProvider.getPath());
+		String applicationPath = applicationProvider.getPath();
 		doRegisterServletContainer(container, applicationPath);
 		applicationContainerMap.put(applicationProvider.getName(), applicationProvider);
 	}

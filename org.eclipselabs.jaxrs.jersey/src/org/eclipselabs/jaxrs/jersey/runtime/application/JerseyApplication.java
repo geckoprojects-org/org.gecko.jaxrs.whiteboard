@@ -180,5 +180,14 @@ public class JerseyApplication extends Application {
 	public Collection<JaxRsApplicationContentProvider> getContentProviders(){
 		return contentProviders.values();
 	}
+
+	/**
+	 * @return the sourceApplication
+	 */
+	public Application getSourceApplication() {
+		return sourceApplication;
+	}
+	
+	
 	
 }
