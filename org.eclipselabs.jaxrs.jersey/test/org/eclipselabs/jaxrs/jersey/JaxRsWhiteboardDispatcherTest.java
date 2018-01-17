@@ -30,6 +30,8 @@ import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsWhiteboardDispatch
 import org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
 import org.eclipselabs.jaxrs.jersey.resources.TestLegacyApplication;
 import org.eclipselabs.jaxrs.jersey.resources.TestResource;
+import org.eclipselabs.jaxrs.jersey.runtime.application.JerseyApplicationProvider;
+import org.eclipselabs.jaxrs.jersey.runtime.common.DefaultApplication;
 import org.eclipselabs.jaxrs.jersey.runtime.dispatcher.JerseyWhiteboardDispatcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -80,13 +82,18 @@ public class JaxRsWhiteboardDispatcherTest {
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
 		
+		Map<String, Object> defaultProperties = new HashMap<>();
+		defaultProperties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, ".default");
+		defaultProperties.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "/");
+		dispatcher.addApplication(new DefaultApplication(), defaultProperties);
+		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
 		dispatcher.deactivate();
 		assertFalse(dispatcher.isDispatching());
 		
 		// default application should be registered
-		Mockito.verify(whiteboard, never()).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(1)).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 	}
@@ -151,7 +158,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		assertFalse(dispatcher.isDispatching());
 		
 		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
-		Mockito.verify(whiteboard, times(1)).unregisterApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(2)).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 	}
 	
@@ -160,7 +167,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	@Test
 	public void testDispatcherLegacyApplicationRemove() {
-		JaxRsWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
+		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -194,34 +201,46 @@ public class JaxRsWhiteboardDispatcherTest {
 		dispatcher.addApplication(application, appProperties);
 		assertEquals(1, dispatcher.getApplications().size());
 		
-		// no further application registered because it is legacy
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		// no further application registered
+		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
-		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 		
 		assertEquals(1, dispatcher.getApplications().size());
 		dispatcher.removeApplication(application, appProperties);
 		assertEquals(0, dispatcher.getApplications().size());
 		
-		// no further application registered because it is legacy
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		// no further application registered
+		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(1)).unregisterApplication(Mockito.any());
-		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 		
 		dispatcher.deactivate();
 		assertFalse(dispatcher.isDispatching());
 		
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(2)).unregisterApplication(Mockito.any());
-		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 	}
 	
+	private JaxRsWhiteboardDispatcher createDispatcherWithDefaultApplication() {
+		JerseyWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
+		
+		//actually register default Application
+		Map<String, Object> defaultProperties = new HashMap<>();
+		defaultProperties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, ".default");
+		defaultProperties.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "/");
+		dispatcher.addApplication(new DefaultApplication(), defaultProperties);
+		
+		return dispatcher;
+	}
+
 	/**
 	 * Tests the dispatcher with a legacy application
 	 */
 	@Test
 	public void testDispatcherReloadDefaultApplication() {
-		JaxRsWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
+		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -286,7 +305,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	@Test
 	public void testDispatcherLegacyApplicationAddRemoveResourceDefault() {
-		JaxRsWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
+		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -302,7 +321,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * 2. addResource: Application test: true,
 		 * 3. Deactivate test - application: true
 		 */
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, true, true);
+		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, false, true, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -343,14 +362,14 @@ public class JaxRsWhiteboardDispatcherTest {
 		// .default is registered and resource was added to default
 		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
-		Mockito.verify(whiteboard, times(2)).reloadApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 		
 		dispatcher.deactivate();
 		assertFalse(dispatcher.isDispatching());
 		
 		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(2)).unregisterApplication(Mockito.any());
-		Mockito.verify(whiteboard, times(2)).reloadApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 	}
 	
 	/**
@@ -358,7 +377,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	@Test
 	public void testDispatcherApplicationAddRemoveResource01() {
-		JaxRsWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
+		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -376,7 +395,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * 4. removeResource Application test: true,
 		 * 5. Deactivate test - application: true
 		 */
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, false, true, true, true);
+		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, false, false, true, true, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -452,7 +471,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	@Test
 	public void testDispatcherApplicationAddRemoveResource02() {
-		JaxRsWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
+		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -470,7 +489,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * 4. removeResource Application test: true,
 		 * 5. Deactivate test - application: true
 		 */
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, false, true, true, true);
+		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, false, false, true, true, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -557,7 +576,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	@Test
 	public void testDispatcherApplicationAddRemoveResource03() {
-		JaxRsWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
+		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -575,7 +594,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * 4. removeResource Application test: true,
 		 * 5. Deactivate test - application: true
 		 */
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, false, true, true, true);
+		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, false, false, true, true, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -662,7 +681,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	@Test
 	public void testDispatcherApplicationAddRemoveResourceWhiteboardTarget01() {
-		JaxRsWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
+		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -675,7 +694,7 @@ public class JaxRsWhiteboardDispatcherTest {
 				return wbProperties;
 			}
 		});
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false);
+		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, false);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -763,7 +782,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	@Test
 	public void testDispatcherApplicationAddRemoveResourceWhiteboardTarget02() {
-		JaxRsWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
+		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -776,7 +795,7 @@ public class JaxRsWhiteboardDispatcherTest {
 				return wbProperties;
 			}
 		});
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, false, true, true, true);
+		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, false, false, true, true, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -864,7 +883,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	@Test
 	public void testDispatcherApplicationAddRemoveResourceWhiteboardTarget03() {
-		JaxRsWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
+		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -877,7 +896,7 @@ public class JaxRsWhiteboardDispatcherTest {
 				return wbProperties;
 			}
 		});
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, false, false, true, false);
+		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, false, false, false, true, false);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -965,7 +984,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	@Test
 	public void testDispatcherApplicationAddRemoveResourceWhiteboardTarget04() {
-		JaxRsWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
+		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -978,7 +997,7 @@ public class JaxRsWhiteboardDispatcherTest {
 				return wbProperties;
 			}
 		});
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, false, true, true, true);
+		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, false, false, true, true, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());

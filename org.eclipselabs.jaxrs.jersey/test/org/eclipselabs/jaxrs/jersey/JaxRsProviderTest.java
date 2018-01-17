@@ -34,6 +34,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
@@ -114,6 +115,7 @@ public class JaxRsProviderTest {
 	@Test
 	public void testNameExtension() {
 		Map<String, Object> properties = new HashMap<>();
+		properties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
 		when(serviceObject.getService()).thenReturn(new TestExtension());
 		JaxRsExtensionProvider extProvider = new JerseyExtensionProvider<Object>(serviceObject, properties);
 		// generated name

@@ -351,7 +351,6 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 							// unregister applications that are now empty
 							if (app.isEmpty()) {
 								whiteboard.unregisterApplication(app);
-								// legacy application don't need a reload at all, all others are only reloaded, if they have changed
 							} else if (app.isChanged()) {
 								whiteboard.reloadApplication(app);
 							}
@@ -370,7 +369,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 					// reset change marker
 					app.markUnchanged();
 				});
-				if (defaultProvider.isChanged()) {
+				if (defaultProvider != null && defaultProvider.isChanged()) {
 					if (whiteboard.isRegistered(defaultProvider)) {
 						whiteboard.reloadApplication(defaultProvider);
 					}

@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.ExtensionDTO;
@@ -69,6 +70,7 @@ public class JaxRsExtensionProviderTest {
 		
 		Map<String, Object> resourceProperties = new HashMap<>();
 		resourceProperties.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		resourceProperties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
 		when(serviceObject.getService()).thenReturn(new TestExtension());
 		JaxRsExtensionProvider resourceProvider = new JerseyExtensionProvider<Object>(serviceObject, resourceProperties);
 		
@@ -79,6 +81,7 @@ public class JaxRsExtensionProviderTest {
 		
 		resourceProperties.clear();
 		resourceProperties.put(JaxRSWhiteboardConstants.JAX_RS_EXTENSION, "true");
+		resourceProperties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
 		resourceProvider = new JerseyExtensionProvider<Object>(serviceObject, resourceProperties);
 		
 		resourceDto = resourceProvider.getExtensionDTO();

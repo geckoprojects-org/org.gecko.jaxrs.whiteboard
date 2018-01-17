@@ -204,6 +204,7 @@ public class DTOConverterTest {
 	public void testToFailedExtensionDTO() {
 		TestExtension extension = new TestExtension();
 		Map<String, Object> properties = new Hashtable<>();
+		properties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
 		when(serviceObject.getService()).thenReturn(extension);
 		JaxRsExtensionProvider extensionProvider = new JerseyExtensionProvider<Object>(serviceObject, properties);
 		
@@ -233,6 +234,7 @@ public class DTOConverterTest {
 	public void testToExtensionDTO() {
 		TestExtension extension = new TestExtension();
 		Map<String, Object> properties = new Hashtable<>();
+		properties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
 		when(serviceObject.getService()).thenReturn(extension);
 		JaxRsExtensionProvider extensionProvider = new JerseyExtensionProvider<Object>(serviceObject, properties);
 		
@@ -256,7 +258,7 @@ public class DTOConverterTest {
 		properties = new Hashtable<>();
 		properties.put(ComponentConstants.COMPONENT_ID, Long.valueOf(13));
 		properties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Myresource2");
-		
+		properties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
 		extensionProvider = new JerseyExtensionProvider<Object>(serviceObject, properties);
 		dto = DTOConverter.toExtensionDTO(extensionProvider);
 		

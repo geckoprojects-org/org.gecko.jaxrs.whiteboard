@@ -37,6 +37,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
@@ -346,6 +347,7 @@ public class JaxRsApplicationProviderTest {
 		
 		when(serviceObject.getService()).thenReturn(new TestExtension());
 		contentProperties.put(JaxRSWhiteboardConstants.JAX_RS_EXTENSION, "true");
+		contentProperties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
 		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(serviceObject, contentProperties);
 		
 		assertFalse(provider.addExtension(extension));
@@ -364,12 +366,14 @@ public class JaxRsApplicationProviderTest {
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new TestApplication(), applicationProperties);
 		
 		assertTrue(provider.isEmpty());
-		assertFalse(provider.isChanged());
+		assertTrue(provider.isChanged());
+		provider.markUnchanged();
 		
 		provider = new JerseyApplicationProvider(new TestLegacyApplication(), applicationProperties);
 		
 		assertFalse(provider.isEmpty());
-		assertFalse(provider.isChanged());
+		assertTrue(provider.isChanged());
+		provider.markUnchanged();
 		
 		when(serviceObject.getService()).thenReturn(new TestResource());
 		Map<String, Object> contentProperties = new HashMap<>();
@@ -383,6 +387,7 @@ public class JaxRsApplicationProviderTest {
 		
 		when(serviceObject.getService()).thenReturn(new TestExtension());
 		contentProperties.put(JaxRSWhiteboardConstants.JAX_RS_EXTENSION, "true");
+		contentProperties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
 		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(serviceObject, contentProperties);
 		
 		assertFalse(provider.addExtension(extension));
@@ -400,7 +405,8 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
-		assertFalse(provider.isChanged());
+		assertTrue(provider.isChanged());
+		provider.markUnchanged();
 		
 		when(serviceObject.getService()).thenReturn(new TestResource());
 		Map<String, Object> contentProperties = new HashMap<>();
@@ -414,6 +420,7 @@ public class JaxRsApplicationProviderTest {
 		
 		when(serviceObject.getService()).thenReturn(new TestExtension());
 		contentProperties.put(JaxRSWhiteboardConstants.JAX_RS_EXTENSION, "true");
+		contentProperties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
 		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(serviceObject, contentProperties);
 		
 		assertFalse(provider.addExtension(extension));
@@ -431,7 +438,8 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
-		assertFalse(provider.isChanged());
+		assertTrue(provider.isChanged());
+		provider.markUnchanged();
 		
 		when(serviceObject.getService()).thenReturn(new TestResource());
 		Map<String, Object> contentProperties = new HashMap<>();
@@ -445,6 +453,7 @@ public class JaxRsApplicationProviderTest {
 		
 		when(serviceObject.getService()).thenReturn(new TestExtension());
 		contentProperties.put(JaxRSWhiteboardConstants.JAX_RS_EXTENSION, "true");
+		contentProperties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
 		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(serviceObject, contentProperties);
 		
 		assertFalse(provider.addExtension(extension));
@@ -462,7 +471,8 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
-		assertFalse(provider.isChanged());
+		assertTrue(provider.isChanged());
+		provider.markUnchanged();
 		
 		when(serviceObject.getService()).thenReturn(new TestResource());
 		Map<String, Object> contentProperties = new HashMap<>();
@@ -490,7 +500,7 @@ public class JaxRsApplicationProviderTest {
 		when(serviceObject.getService()).thenReturn(new TestExtension());
 		contentProperties.put(JaxRSWhiteboardConstants.JAX_RS_EXTENSION, "true");
 		contentProperties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "ext_one");
-		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(serviceObject, contentProperties);
+		contentProperties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(serviceObject, contentProperties);
 		
 		assertTrue(provider.addExtension(extension));
 		assertTrue(provider.isChanged());
