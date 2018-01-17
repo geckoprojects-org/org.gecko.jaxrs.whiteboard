@@ -100,12 +100,9 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 			});
 		}
 		
-//		contentReferences.forEach((sr, sre) -> {
-//			dis
-//		});
-		
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void handleExtensionReferences(final JaxRsWhiteboardDispatcher dispatcher, ServiceReferenceEvent sre) {
 		Map<String, Object> properties = JerseyHelper.getServiceProperties(sre.getReference());
 		switch (sre.getType()) {
@@ -121,6 +118,7 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 		};
 	}
 
+	@SuppressWarnings("unchecked")
 	private void handleResourceReferences(final JaxRsWhiteboardDispatcher dispatcher, ServiceReferenceEvent sre) {
 		Map<String, Object> properties = JerseyHelper.getServiceProperties(sre.getReference());
 		switch (sre.getType()) {
@@ -136,6 +134,10 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 		};
 	}
 
+	/**
+	 * Disconnects and closes the given {@link JaxRsWhiteboardDispatcher}s {@link PushStream}
+	 * @param dispatcher the {@link JaxRsWhiteboardDispatcher} to disconnect
+	 */
 	public void disconnect(JaxRsWhiteboardDispatcher dispatcher) {
 		PushStream<ServiceReferenceEvent> removed = dispatcherMap.remove(dispatcher);
 		if(removed != null) {
@@ -146,25 +148,33 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 	@Deactivate
 	public void deactivate() {
 		serviceTracker.close();
-
 		source.close();
+		dispatcherMap.clear();
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.osgi.util.tracker.ServiceTrackerCustomizer#addingService(org.osgi.framework.ServiceReference)
+	 */
 	@Override
 	public Object addingService(ServiceReference<Object> reference) {
 		ServiceReferenceEvent event = new ServiceReferenceEvent(reference, Type.ADD);
 		source.publish(event);
 		contentReferences.put(reference, event);
-		System.out.println(System.currentTimeMillis() + " adding " + reference.getProperty(JaxRSWhiteboardConstants.JAX_RS_NAME));
 		return context.getService(reference);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.osgi.util.tracker.ServiceTrackerCustomizer#modifiedService(org.osgi.framework.ServiceReference, java.lang.Object)
+	 */
 	@Override
 	public void modifiedService(ServiceReference<Object> reference, Object service) {
 		ServiceReferenceEvent event = new ServiceReferenceEvent(reference, Type.MODIFY);
 		source.publish(event);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.osgi.util.tracker.ServiceTrackerCustomizer#removedService(org.osgi.framework.ServiceReference, java.lang.Object)
+	 */
 	@Override
 	public void removedService(ServiceReference<Object> reference, Object service) {
 		ServiceReferenceEvent event = new ServiceReferenceEvent(reference, Type.REMOVE);

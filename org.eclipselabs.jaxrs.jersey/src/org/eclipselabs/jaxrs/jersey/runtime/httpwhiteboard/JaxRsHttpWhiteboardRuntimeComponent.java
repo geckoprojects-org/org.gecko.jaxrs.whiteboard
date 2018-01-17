@@ -61,12 +61,13 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 	@Activate
 	@Override
 	public void activate(final ComponentContext context) throws ConfigurationException {
+		updateProperties(context);
 		if (whiteboard != null) {
 			whiteboard.teardown();;
 		}
 		whiteboard = new HTTPWhiteboardBasedJerseyServiceRuntime();
-		dispatcher.setWhiteboardProvider(whiteboard);
 		whiteboard.initialize(context);
+		dispatcher.setWhiteboardProvider(whiteboard);
 		String[] urls = whiteboard.getURLs(context);
 		// activate and start server
 		collector.connect(dispatcher);
