@@ -39,12 +39,12 @@
        index=${.}/osgi.maven; \
        name="OSGi Maven"
        
-#-plugin.7.Jetty = \
-#   aQute.bnd.repository.maven.provider.MavenBndRepository; \
-#       releaseUrl=https://repo.maven.apache.org/maven2/; \
-#       index=${.}/cenral.maven.jetty; \
-#       name="Jetty Maven Central"
-       
+-plugin.7.apache = \
+         aQute.bnd.repository.maven.provider.MavenBndRepository;\
+            snapshotUrl="https://repository.apache.org/content/repositories/snapshots/";\
+            index=${.}/apache-snapshots.maven;\
+            name='Apache Snapshots';\
+            readOnly=true       
 #-plugin.8.Nexus = \
 #	aQute.bnd.repository.maven.provider.MavenBndRepository; \
  #      releaseUrl=http://devel.data-in-motion.biz/nexus/repository/maven-releases/; \

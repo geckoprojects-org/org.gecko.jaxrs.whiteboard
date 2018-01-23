@@ -1,3 +1,4 @@
+org.osgi:org.osgi.service.cm:1.6.0-SNAPSHOT
 org.osgi:org.osgi.service.jaxrs:0.0.0-SNAPSHOT
 org.osgi:org.osgi.service.jaxrs:1.0.0-SNAPSHOT
 org.osgi:org.osgi.service.jaxrs.whiteboard:1.0.0-SNAPSHOT

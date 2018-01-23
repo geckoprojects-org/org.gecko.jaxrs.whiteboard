@@ -127,10 +127,10 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 		sb.append("://");
 		String host = JerseyHelper.getPropertyWithDefault(context, JERSEY_HOST, WHITEBOARD_DEFAULT_HOST);
 		sb.append(host);
-		Integer port = JerseyHelper.getPropertyWithDefault(context, JERSEY_PORT, null);
+		Object port = JerseyHelper.getPropertyWithDefault(context, JERSEY_PORT, null);
 		if (port != null) {
 			sb.append(":");
-			sb.append(port.intValue());
+			sb.append(port.toString());
 		}
 		String path = JerseyHelper.getPropertyWithDefault(context, JERSEY_CONTEXT_PATH, WHITEBOARD_DEFAULT_CONTEXT_PATH);
 		path = JaxRsHelper.toServletPath(path);
