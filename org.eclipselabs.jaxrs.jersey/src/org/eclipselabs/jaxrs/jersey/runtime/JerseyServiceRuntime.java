@@ -39,7 +39,10 @@ import org.eclipse.jetty.servlet.ServletMapping;
 import org.eclipselabs.jaxrs.jersey.helper.JaxRsHelper;
 import org.eclipselabs.jaxrs.jersey.helper.JerseyHelper;
 import org.eclipselabs.jaxrs.jersey.jetty.JettyServerRunnable;
+import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider;
 import org.eclipselabs.jaxrs.jersey.runtime.common.AbstractJerseyServiceRuntime;
+import org.eclipselabs.jaxrs.jersey.runtime.servlet.WhiteboardServletContainer;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.osgi.namespace.implementation.ImplementationNamespace;
 import org.osgi.service.cm.ConfigurationException;
@@ -139,41 +142,50 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	 * @see org.eclipselabs.jaxrs.jersey.runtime.common.AbstractJerseyServiceRuntime#doRegisterServletContainer(org.glassfish.jersey.servlet.ServletContainer, org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider)
 	 */
 	@Override
-	protected void doRegisterServletContainer(ServletContainer container, String path) {
+	protected void doRegisterServletContainer(JaxRsApplicationProvider applicationProvider, String path, ResourceConfig config) {
+		ServletContainer container = new WhiteboardServletContainer(config);
+		if(!applicationProvider.getServletContainers().isEmpty()) {
+			throw new IllegalStateException("There is alread a ServletContainer registered for this application " + applicationProvider.getName());
+		}
+		applicationProvider.getServletContainers().add(container);
 		ServletHolder servlet = new ServletHolder(container);
 		contextHandler.addServlet(servlet, path);
 	}
 
 	@Override
-	protected void doUnregisterApplication(ServletContainer container) {
-		if (container != null && contextHandler != null) {
-			ServletHandler handler = contextHandler.getServletHandler();
-			List<ServletHolder> servlets = new ArrayList<ServletHolder>();
-			Set<String> names = new HashSet<String>();
-			for( ServletHolder holder : handler.getServlets()) {
-				/* If it is the class we want to remove, then just keep track of its name */
-				try {
-					if (container.equals(holder.getServlet())) {
-						names.add(holder.getName());
-					} else /* We keep it */ {
-						servlets.add(holder);
+	protected void doUnregisterApplication(JaxRsApplicationProvider applicationProvider) {
+		List<ServletContainer> servletContainers = applicationProvider.getServletContainers();
+		if(!servletContainers.isEmpty()) {
+			ServletContainer container = servletContainers.remove(0);
+			if (container != null && contextHandler != null) {
+				ServletHandler handler = contextHandler.getServletHandler();
+				List<ServletHolder> servlets = new ArrayList<ServletHolder>();
+				Set<String> names = new HashSet<String>();
+				for( ServletHolder holder : handler.getServlets()) {
+					/* If it is the class we want to remove, then just keep track of its name */
+					try {
+						if (container.equals(holder.getServlet())) {
+							names.add(holder.getName());
+						} else /* We keep it */ {
+							servlets.add(holder);
+						}
+					} catch (ServletException e) {
+						logger.log(Level.SEVERE, "Error unregistering servlets from holder with name: " + holder.getName());
 					}
-				} catch (ServletException e) {
-					logger.log(Level.SEVERE, "Error unregistering servlets from holder with name: " + holder.getName());
 				}
-			}
-
-			List<ServletMapping> mappings = new ArrayList<ServletMapping>();
-			for( ServletMapping mapping : handler.getServletMappings() )  {
-				/* Only keep the mappings that didn't point to one of the servlets we removed */
-				if(!names.contains(mapping.getServletName())) {
-					mappings.add(mapping);
+				
+				List<ServletMapping> mappings = new ArrayList<ServletMapping>();
+				for( ServletMapping mapping : handler.getServletMappings() )  {
+					/* Only keep the mappings that didn't point to one of the servlets we removed */
+					if(!names.contains(mapping.getServletName())) {
+						mappings.add(mapping);
+					}
 				}
+				
+				/* Set the new configuration for the mappings and the servlets */
+				handler.setServletMappings( mappings.toArray(new ServletMapping[0]) );
+				handler.setServlets( servlets.toArray(new ServletHolder[0]) );
 			}
-
-			/* Set the new configuration for the mappings and the servlets */
-			handler.setServletMappings( mappings.toArray(new ServletMapping[0]) );
-			handler.setServlets( servlets.toArray(new ServletHolder[0]) );
 		}
 	}
 

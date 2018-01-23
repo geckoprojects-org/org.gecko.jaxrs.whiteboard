@@ -45,8 +45,11 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 		super(serviceObjects, properties);
 		if(getProviderObject() != null) {
 			T service = getProviderObject().getService();
-			clazz = service.getClass();
-			getProviderObject().ungetService(service);
+			// this is called while a service gets unregistered, the ServiceObjects return null as a Service 
+			if(service != null) {
+				clazz = service.getClass();
+				getProviderObject().ungetService(service);
+			}
 		}
 	}
 

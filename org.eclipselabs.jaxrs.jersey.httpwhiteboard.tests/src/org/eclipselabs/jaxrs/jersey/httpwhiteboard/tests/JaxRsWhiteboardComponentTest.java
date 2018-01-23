@@ -626,9 +626,262 @@ public class JaxRsWhiteboardComponentTest {
 		cdl = new CountDownLatch(1);
 		cdl.await(1, TimeUnit.SECONDS);
 		
+		runtimeConfig.delete();
 		servletContextRegistration.unregister();
 		tearDownTest(jasxRsWhiteBoardConfig);
 		tearDownTest(HttpServiceRuntime.class, runtimeConfig, get);
+	}
+
+	/**
+	 * Tests 
+	 * @throws IOException 
+	 * @throws InterruptedException 
+	 * @throws InvalidSyntaxException 
+	 */
+	@Test
+	public void testWhiteboardComponentApplicationAndResourceWildcardWithMultipleHttpWhiteboards() throws IOException, InterruptedException, InvalidSyntaxException {
+		/*
+		 *  The server runs on localhost port 8185 using context path test: http://localhost:8185/test
+		 *  We mount the system with a resource RootResource under http://localhost:8185/test that will return a 
+		 *  HTTP::200 using a GET request
+		 */
+		int port = 8185;
+		String contextPath = "test";
+		String urlWhiteboard1 = "http://localhost:" + port + "/" + contextPath;
+		String urlWhiteboard2 = "http://localhost:" + (port + 1) + "/" + contextPath;
+		
+		ConfigurationAdmin configAdmin = context.getService(configAdminRef);
+		
+		/*
+		 * Initial Setup of the HTTP Runtime
+		 * 
+		 */
+		Configuration runtimeConfig1 = configAdmin.createFactoryConfiguration("org.apache.felix.http", "?");
+		
+		Dictionary<String, Object> props = new Hashtable<>();
+		props.put("org.osgi.service.http.port", port);
+		props.put("org.apache.felix.http.context_path", "/");
+		props.put("org.apache.felix.http.name", "Test");
+		props.put(JettyConfigConstants.FELIX_CUSTOM_HTTP_RUNTIME_PROPERTY_PREFIX + "test.id", "endpoints");
+		
+		runtimeConfig1.update(props);
+
+		/*
+		 * Initial Setup of the HTTP Runtime
+		 * 
+		 */
+		Configuration runtimeConfig2 = configAdmin.createFactoryConfiguration("org.apache.felix.http", "?");
+		
+		Dictionary<String, Object> props2 = new Hashtable<>();
+		props2.put("org.osgi.service.http.port", port + 1);
+		props2.put("org.apache.felix.http.context_path", "/");
+		props2.put("org.apache.felix.http.name", "Test");
+		props2.put(JettyConfigConstants.FELIX_CUSTOM_HTTP_RUNTIME_PROPERTY_PREFIX + "test.id", "endpoints");
+		
+		runtimeConfig2.update(props2);
+		
+		//Register our Context
+		ServletContextHelper newContext = new ServletContextHelper() {
+		};
+		
+		Dictionary<String, String> ctxProps = new Hashtable<>();
+		ctxProps.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_PATH, "/" + contextPath);
+		ctxProps.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME, contextPath);
+		
+		ServiceRegistration<ServletContextHelper> servletContextRegistration = context.registerService(ServletContextHelper.class, newContext, ctxProps);
+		
+		/*
+		 * Initial setup for the REST runtime by targeteing the http whiteboard and the context
+		 */
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
+		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_TARGET, "(test.id=endpoints)");
+		properties.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT, "(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=" + contextPath + ")");
+		
+		ServiceReference<HttpServiceRuntime> httpRuntimeRef = getServiceReference(HttpServiceRuntime.class, 40000l);
+		assertNotNull(httpRuntimeRef);
+		
+		assertNotNull(configAdmin);
+		Configuration jasxRsWhiteBoardConfig = configAdmin.getConfiguration("JaxRsHttpWhiteboardRuntimeComponent", "?");
+		assertNotNull(jasxRsWhiteBoardConfig);
+		assertEquals(1, jasxRsWhiteBoardConfig.getChangeCount());
+		Dictionary<String,Object> factoryProperties = jasxRsWhiteBoardConfig.getProperties();
+		assertNull(factoryProperties);
+		jasxRsWhiteBoardConfig.update(properties);
+		
+		/*
+		 * Check that the REST runtime service become available 
+		 */
+		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
+		assertNotNull(runtimeRef);
+		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
+		assertNotNull(runtime);
+		
+		CountDownLatch cdl = new CountDownLatch(1);
+		cdl.await(1, TimeUnit.SECONDS);
+		
+		/*
+		 * Check if our RootResource is available under http://localhost:8185/test
+		 */
+		System.out.println("Checking URL is available: " + urlWhiteboard1);
+		JerseyInvocation get = null;
+		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
+		JerseyWebTarget webTarget = jerseyClient.target(urlWhiteboard1);
+		get = webTarget.request().buildGet();
+		Response response = get.invoke();
+		assertEquals(404, response.getStatus());
+		
+		/*
+		 * Mount the application customer that will become available under: test/customer
+		 * http://localhost:8185/test/customer
+		 */
+		Dictionary<String, Object> appProps = new Hashtable<>();
+		appProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
+		appProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "customerApp");
+		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new Application(), appProps);
+		Filter appFilter = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
+		Application application = getService(appFilter, 3000l);
+		assertNotNull(application);
+		
+		/*
+		 * Mount the resource HelloResource that will become available under:
+		 * http://localhost:8185/test/hello
+		 */
+		Dictionary<String, Object> helloProps = new Hashtable<>();
+		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Hello");
+		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=*)");
+		System.out.println("Register resource for uri /hello under application customer");
+		ServiceRegistration<Object> helloRegistration = context.registerService(Object.class, new HelloResource(), helloProps);
+		Filter resourceFilter = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=Hello)");
+		Object service = getService(resourceFilter, 3000l);
+		assertNotNull(service);
+		
+		/*
+		 * Wait a short time to reload the configuration dynamically
+		 */
+		cdl = new CountDownLatch(1);
+		cdl.await(3, TimeUnit.SECONDS);
+		
+		/*
+		 * Check if http://localhost:8185/test/customer/hello is available now. 
+		 * Check as well, if http://localhost:8185/test is /hello is not available
+		 */
+		System.out.println("Checking URL is available " + urlWhiteboard1 + "/customer/hello");
+		webTarget = jerseyClient.target(urlWhiteboard1 + "/customer/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(200, response.getStatus());
+		
+		System.out.println("Checking URL is available " + urlWhiteboard1 + "/hello");
+		webTarget = jerseyClient.target(urlWhiteboard1 + "/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(200, response.getStatus());
+
+		/*
+		 * Check if http://localhost:8186/test/customer/hello is available now. 
+		 * Check as well, if http://localhost:8186/test is /hello is not available
+		 */
+		System.out.println("Checking URL is available " + urlWhiteboard2 + "/customer/hello");
+		webTarget = jerseyClient.target(urlWhiteboard2 + "/customer/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(200, response.getStatus());
+		
+		System.out.println("Checking URL is available " + urlWhiteboard2 + "/hello");
+		webTarget = jerseyClient.target(urlWhiteboard2 + "/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(200, response.getStatus());
+		
+		//change the properties of the second http runtime, so the jaxRS runtime should removed
+		props2.put(JettyConfigConstants.FELIX_CUSTOM_HTTP_RUNTIME_PROPERTY_PREFIX + "test.id", "endpoints2");
+		runtimeConfig2.update(props2);
+
+		cdl.await(3, TimeUnit.SECONDS);
+		
+		/*
+		 * Check if http://localhost:8185/test/customer/hello is available now. 
+		 * Check as well, if http://localhost:8185/test is /hello is available
+		 */
+		System.out.println("Checking URL is available " + urlWhiteboard1 + "/customer/hello");
+		webTarget = jerseyClient.target(urlWhiteboard1 + "/customer/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(200, response.getStatus());
+		
+		System.out.println("Checking URL is available " + urlWhiteboard1 + "/hello");
+		webTarget = jerseyClient.target(urlWhiteboard1 + "/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(200, response.getStatus());
+
+		/*
+		 * Check if http://localhost:8186/test/customer/hello is not available annymore. 
+		 * Check as well, if http://localhost:8186/test is /hello is not available anymore
+		 */
+		System.out.println("Checking URL is available " + urlWhiteboard2 + "/customer/hello");
+		webTarget = jerseyClient.target(urlWhiteboard2 + "/customer/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(404, response.getStatus());
+		
+		System.out.println("Checking URL is available " + urlWhiteboard2 + "/hello");
+		webTarget = jerseyClient.target(urlWhiteboard2 + "/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(404, response.getStatus());
+		
+		
+		appRegistration.unregister();
+		application = getService(appFilter, 3000l);
+		assertNull(application);
+		
+		/*
+		 * Wait a short time to reload the configuration dynamically
+		 */
+		cdl = new CountDownLatch(1);
+		cdl.await(1, TimeUnit.SECONDS);
+		
+		/*
+		 * Check if http://localhost:8185/test/customer/hello is not available anymore. 
+		 * Check as well, if http://localhost:8185/test/hello is still not available
+		 */
+		System.out.println("Checking URL is not available anymore " + urlWhiteboard1 + "/customer/hello");
+		webTarget = jerseyClient.target(urlWhiteboard1 + "/customer/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(404, response.getStatus());
+		
+		System.out.println("Checking URL is still available " + urlWhiteboard1 + "/hello");
+		webTarget = jerseyClient.target(urlWhiteboard1 + "/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(200, response.getStatus());
+		
+		helloRegistration.unregister();
+		service = getService(resourceFilter, 3000l);
+		assertNull(service);
+		
+		System.out.println("Checking URL is not available anymore " + urlWhiteboard1 + "/hello");
+		webTarget = jerseyClient.target(urlWhiteboard1 + "/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(404, response.getStatus());
+		
+		/*
+		 * Wait a short time to reload the configuration dynamically
+		 */
+		cdl = new CountDownLatch(1);
+		cdl.await(1, TimeUnit.SECONDS);
+		
+		runtimeConfig1.delete();
+		runtimeConfig2.delete();
+		
+		servletContextRegistration.unregister();
+		tearDownTest(jasxRsWhiteBoardConfig);
+		tearDownTest(HttpServiceRuntime.class, runtimeConfig2, get);
 	}
 	
 	/**

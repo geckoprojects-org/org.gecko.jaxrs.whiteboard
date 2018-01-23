@@ -16,8 +16,8 @@ import java.util.Map;
 import org.eclipselabs.jaxrs.jersey.dto.DTOConverter;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsResourceProvider;
 import org.osgi.framework.ServiceObjects;
+import org.osgi.service.jaxrs.runtime.dto.BaseDTO;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
-import org.osgi.service.jaxrs.runtime.dto.ResourceDTO;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
 
 /**
@@ -46,7 +46,7 @@ public class JerseyResourceProvider<T extends Object> extends JerseyApplicationC
 	 * @see org.eclipselabs.jaxrs.jersey.provider.JaxRsResourceProvider#getResourceDTO()
 	 */
 	@Override
-	public ResourceDTO getResourceDTO() {
+	public BaseDTO getResourceDTO() {
 		int status = getProviderStatus();
 		if (status == NO_FAILURE) {
 			return DTOConverter.toResourceDTO(this);

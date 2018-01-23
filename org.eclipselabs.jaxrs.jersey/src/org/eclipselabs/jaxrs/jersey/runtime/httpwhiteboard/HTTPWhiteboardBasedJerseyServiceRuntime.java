@@ -24,12 +24,17 @@ import java.util.logging.Logger;
 import javax.servlet.Servlet;
 
 import org.eclipselabs.jaxrs.jersey.helper.JerseyHelper;
+import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider;
 import org.eclipselabs.jaxrs.jersey.runtime.common.AbstractJerseyServiceRuntime;
+import org.eclipselabs.jaxrs.jersey.runtime.servlet.WhiteboardServletContainer;
+import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.PrototypeServiceFactory;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.namespace.implementation.ImplementationNamespace;
@@ -56,7 +61,7 @@ uses= {"javax.ws.rs", "javax.ws.rs.client", "javax.ws.rs.container", "javax.ws.r
 @RequireCapability(ns = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, filter = "(osgi.implementation=osgi.http)")
 public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 
-	private final Map<ServletContainer, ServiceRegistration<Servlet>> applicationServletContainerMap = new ConcurrentHashMap<>();
+	private final Map<String, ServiceRegistration<Servlet>> applicationServletRegistrationMap = new ConcurrentHashMap<>();
 	private Logger logger = Logger.getLogger("o.e.o.j.HTTPWhiteboardBasedJerseyServiceRuntime");
 	private Filter httpContextSelect;
 	private Filter httpWhiteboardTarget;
@@ -148,12 +153,12 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 		}
 		return endpoint + path;
 	}
-
+	
 	/* (non-Javadoc)
-	 * @see org.eclipselabs.jaxrs.jersey.runtime.common.AbstractJerseyServiceRuntime#doRegisterServletContainer(org.glassfish.jersey.servlet.ServletContainer, java.lang.String)
+	 * @see org.eclipselabs.jaxrs.jersey.runtime.common.AbstractJerseyServiceRuntime#doRegisterServletContainer(org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider, java.lang.String, org.glassfish.jersey.server.ResourceConfig)
 	 */
 	@Override
-	protected void doRegisterServletContainer(ServletContainer container, String path) {
+	protected void doRegisterServletContainer(JaxRsApplicationProvider provider, String path, ResourceConfig config) {
 		Dictionary<String, Object> props = new Hashtable<>();
 		props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, path);
 		String target = (String) context.getProperties().get(HttpWhiteboardConstants.HTTP_WHITEBOARD_TARGET);
@@ -167,25 +172,34 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 		
 		//TODO: We have to register this as a prototype service, but how?O
 		
-		ServiceRegistration<Servlet> serviceRegistration = context.getBundleContext().registerService(Servlet.class, container, props);
-		
-		applicationServletContainerMap.put(container, serviceRegistration);
-	}
+		ServiceRegistration<Servlet> serviceRegistration = context.getBundleContext().registerService(Servlet.class, new PrototypeServiceFactory<Servlet>() {
 
-	
-	/* (non-Javadoc)
-	 * @see org.eclipselabs.jaxrs.jersey.runtime.common.AbstractJerseyServiceRuntime#doUnregisterApplication(org.glassfish.jersey.servlet.ServletContainer)
-	 */
-	@Override
-	protected void doUnregisterApplication(ServletContainer container) {
-		ServiceRegistration<Servlet> registration = null;
-		synchronized (applicationServletContainerMap) {
-			registration = applicationServletContainerMap.remove(container);
+			@Override
+			public Servlet getService(Bundle bundle, ServiceRegistration<Servlet> registration) {
+				ResourceConfig config = createResourceConfig(provider);
+				ServletContainer container = new WhiteboardServletContainer(config);
+				provider.addServletContainer(container);
+				return container;
+			}
+
+			@Override
+			public void ungetService(Bundle bundle, ServiceRegistration<Servlet> registration, Servlet service) {
+				provider.removeServletContainer((ServletContainer) service);
+			}
 			
-		}
-		registration.unregister();
+		}, props);
+		
+		applicationServletRegistrationMap.put(provider.getName(), serviceRegistration);
 	}
-
+	
+	@Override
+	protected void doUnregisterApplication(JaxRsApplicationProvider applicationProvider) {
+		ServiceRegistration<Servlet> serviceRegistration = applicationServletRegistrationMap.remove(applicationProvider.getName());
+		if(serviceRegistration != null) {
+			serviceRegistration.unregister();
+		}
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipselabs.jaxrs.jersey.runtime.common.AbstractJerseyServiceRuntime#doUpdateProperties(org.osgi.service.component.ComponentContext)
 	 */

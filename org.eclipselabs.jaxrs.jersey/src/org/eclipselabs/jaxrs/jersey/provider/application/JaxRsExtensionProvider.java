@@ -11,7 +11,7 @@
  */
 package org.eclipselabs.jaxrs.jersey.provider.application;
 
-import org.osgi.service.jaxrs.runtime.dto.ExtensionDTO;
+import org.osgi.service.jaxrs.runtime.dto.BaseExtensionDTO;
 
 /**
  * Provider interface for JaxRs extensions
@@ -30,7 +30,7 @@ public interface JaxRsExtensionProvider extends JaxRsApplicationContentProvider 
 	 * Returns the extension DTO or failed extension DTO
 	 * @return the extension DTO or failed extension DTO
 	 */
-	public ExtensionDTO getExtensionDTO();
+	public BaseExtensionDTO getExtensionDTO();
 	
 	/**
 	 * Returns the contracts under which the Extensions have to be registered. Can be <code>null</code> if

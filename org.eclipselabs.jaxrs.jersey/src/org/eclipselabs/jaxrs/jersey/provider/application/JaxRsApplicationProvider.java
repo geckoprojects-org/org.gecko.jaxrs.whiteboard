@@ -12,6 +12,7 @@
 package org.eclipselabs.jaxrs.jersey.provider.application;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Application;
@@ -19,6 +20,7 @@ import javax.ws.rs.core.Application;
 import org.eclipselabs.jaxrs.jersey.provider.JaxRsConstants;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
+import org.osgi.service.jaxrs.runtime.dto.BaseApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
 
 /**
@@ -61,19 +63,20 @@ public interface JaxRsApplicationProvider extends JaxRsProvider, JaxRsConstants 
 	 * In case of an error a {@link FailedApplicationDTO} instance will be returned
 	 * @return the {@link ApplicationDTO} or {@link FailedApplicationDTO} for this JaxRsApplication
 	 */
-	public ApplicationDTO getApplicationDTO();
+	public BaseApplicationDTO getApplicationDTO();
 	
 	/**
 	 * Sets the {@link ServletContainer} instance, that represents an application in Jersey
 	 * @param applicationContainer the application to set
 	 */
-	public void setServletContainer(ServletContainer applicationContainer);
+	public void addServletContainer(ServletContainer applicationContainer);
 	
 	/**
-	 * Returns the servlet container of the application
-	 * @return the servlet container of the application
+	 * Returns the {@link List} of {@link ServletContainer}s of the application
+	 * The List will never be null.
+	 * @return the {@link List} of {@link ServletContainer}s of the application
 	 */
-	public ServletContainer getServletContainer();
+	public List<ServletContainer> getServletContainers();
 	
 	/**
 	 * Returns <code>true</code>, if the application provider is the default application.
@@ -131,5 +134,11 @@ public interface JaxRsApplicationProvider extends JaxRsProvider, JaxRsConstants 
 	 * @return a {@link Collection} of {@link JaxRsApplicationContentProvider}
 	 */
 	public Collection<JaxRsApplicationContentProvider> getContentProviers();
+
+	/**
+	 * Removes the given {@link ServletContainer}
+	 * @param applicationContainer the {@link ServletContainer} to remove
+	 */
+	public void removeServletContainer(ServletContainer applicationContainer);
 
 }

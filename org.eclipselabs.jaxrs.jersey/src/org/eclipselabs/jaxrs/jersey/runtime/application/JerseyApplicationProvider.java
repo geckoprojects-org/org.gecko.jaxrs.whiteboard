@@ -12,6 +12,8 @@
 package org.eclipselabs.jaxrs.jersey.runtime.application;
 
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -32,7 +34,7 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
+import org.osgi.service.jaxrs.runtime.dto.BaseApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
 
@@ -44,7 +46,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
 public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application> implements JaxRsApplicationProvider {
 
 	private static final Logger logger = Logger.getLogger("jersey.applicationProvider");
-	private ServletContainer applicationContainer;
+	private List<ServletContainer> applicationContainers = new LinkedList<>();
 	private String applicationBase;
 	private boolean changed = true;
 	private JerseyApplication wrappedApplication;
@@ -62,17 +64,26 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsApplicationProvider#setServletContainer(org.glassfish.jersey.servlet.ServletContainer)
 	 */
 	@Override
-	public void setServletContainer(ServletContainer applicationContainer) {
-		this.applicationContainer = applicationContainer;
+	public void addServletContainer(ServletContainer applicationContainer) {
+		applicationContainers.add(applicationContainer);
 	}
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsApplicationProvider#getServletContainer()
+	 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsApplicationProvider#setServletContainer(org.glassfish.jersey.servlet.ServletContainer)
 	 */
 	@Override
-	public ServletContainer getServletContainer() {
-		return applicationContainer;
+	public void removeServletContainer(ServletContainer applicationContainer) {
+		applicationContainers.remove(applicationContainer);
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsApplicationPrsovider#getServletContainers()
+	 */
+	@Override
+	public List<ServletContainer> getServletContainers() {
+		return applicationContainers;
 	}
 
 	/* 
@@ -113,7 +124,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsApplicationProvider#getApplicationDTO()
 	 */
 	@Override
-	public ApplicationDTO getApplicationDTO() {
+	public BaseApplicationDTO getApplicationDTO() {
 		int status = getProviderStatus();
 		if (wrappedApplication == null) {
 			throw new IllegalStateException("This application provider does not contain an application, but should have one to get a DTO");

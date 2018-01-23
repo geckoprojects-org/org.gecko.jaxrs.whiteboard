@@ -40,6 +40,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
+import org.osgi.service.jaxrs.runtime.dto.BaseApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
 import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
@@ -64,7 +65,7 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
-		ApplicationDTO dto = provider.getApplicationDTO();
+		BaseApplicationDTO dto = provider.getApplicationDTO();
 		assertTrue(dto instanceof FailedApplicationDTO);
 		FailedApplicationDTO failedDto = (FailedApplicationDTO) dto;
 		assertEquals(DTOConstants.FAILURE_REASON_VALIDATION_FAILED, failedDto.failureReason);
@@ -83,7 +84,7 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
-		ApplicationDTO dto = provider.getApplicationDTO();
+		BaseApplicationDTO  dto = provider.getApplicationDTO();
 		assertTrue(dto instanceof FailedApplicationDTO);
 		FailedApplicationDTO failedDto = (FailedApplicationDTO) dto;
 		assertEquals(DTOConstants.FAILURE_REASON_VALIDATION_FAILED, failedDto.failureReason);
@@ -102,7 +103,7 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
-		ApplicationDTO dto = provider.getApplicationDTO();
+		BaseApplicationDTO  dto = provider.getApplicationDTO();
 		assertTrue(dto instanceof FailedApplicationDTO);
 		FailedApplicationDTO failedDto = (FailedApplicationDTO) dto;
 		assertEquals(DTOConstants.FAILURE_REASON_VALIDATION_FAILED, failedDto.failureReason);
@@ -120,7 +121,7 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
-		ApplicationDTO dto = provider.getApplicationDTO();
+		BaseApplicationDTO dto = provider.getApplicationDTO();
 		assertFalse(dto instanceof FailedApplicationDTO);
 		
 		assertEquals("test/*", provider.getPath());
@@ -137,7 +138,7 @@ public class JaxRsApplicationProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
-		ApplicationDTO dto = provider.getApplicationDTO();
+		BaseApplicationDTO dto = provider.getApplicationDTO();
 		assertFalse(dto instanceof FailedApplicationDTO);
 		
 		assertEquals("test/*", provider.getPath());
@@ -156,7 +157,7 @@ public class JaxRsApplicationProviderTest {
 		Map<String, Object> runtimeProperties = new HashMap<>();
 		assertFalse(provider.canHandleWhiteboard(runtimeProperties));
 		
-		ApplicationDTO dto = provider.getApplicationDTO();
+		BaseApplicationDTO dto = provider.getApplicationDTO();
 		assertTrue(dto instanceof FailedApplicationDTO);
 		FailedApplicationDTO failedDto = (FailedApplicationDTO) dto;
 		assertEquals(DTOConstants.FAILURE_REASON_VALIDATION_FAILED, failedDto.failureReason);
@@ -184,7 +185,7 @@ public class JaxRsApplicationProviderTest {
 		Map<String, Object> runtimeProperties = new HashMap<>();
 		assertFalse(provider.canHandleWhiteboard(runtimeProperties));
 		
-		ApplicationDTO dto = provider.getApplicationDTO();
+		BaseApplicationDTO dto = provider.getApplicationDTO();
 		assertTrue(dto instanceof FailedApplicationDTO);
 		FailedApplicationDTO failedDto = (FailedApplicationDTO) dto;
 		assertEquals(DTOConstants.FAILURE_REASON_VALIDATION_FAILED, failedDto.failureReason);
@@ -211,7 +212,7 @@ public class JaxRsApplicationProviderTest {
 		Map<String, Object> runtimeProperties = new HashMap<>();
 		assertFalse(provider.canHandleWhiteboard(runtimeProperties));
 		
-		ApplicationDTO dto = provider.getApplicationDTO();
+		BaseApplicationDTO dto = provider.getApplicationDTO();
 		assertTrue(dto instanceof FailedApplicationDTO);
 		FailedApplicationDTO failedDto = (FailedApplicationDTO) dto;
 		assertEquals(DTOConstants.FAILURE_REASON_VALIDATION_FAILED, failedDto.failureReason);
@@ -249,7 +250,7 @@ public class JaxRsApplicationProviderTest {
 		Map<String, Object> runtimeProperties = new HashMap<>();
 		assertFalse(provider.canHandleWhiteboard(runtimeProperties));
 		
-		ApplicationDTO dto = provider.getApplicationDTO();
+		BaseApplicationDTO dto = provider.getApplicationDTO();
 		assertTrue(dto instanceof FailedApplicationDTO);
 		FailedApplicationDTO failedDto = (FailedApplicationDTO) dto;
 		assertEquals(DTOConstants.FAILURE_REASON_VALIDATION_FAILED, failedDto.failureReason);
@@ -285,7 +286,7 @@ public class JaxRsApplicationProviderTest {
 		
 		assertFalse(provider.canHandleWhiteboard(null));
 		
-		ApplicationDTO dto = provider.getApplicationDTO();
+		BaseApplicationDTO dto = provider.getApplicationDTO();
 		assertTrue(dto instanceof FailedApplicationDTO);
 		FailedApplicationDTO failedDto = (FailedApplicationDTO) dto;
 		assertEquals(DTOConstants.FAILURE_REASON_VALIDATION_FAILED, failedDto.failureReason);
@@ -309,7 +310,7 @@ public class JaxRsApplicationProviderTest {
 		
 		assertFalse(provider.canHandleWhiteboard(null));
 		
-		ApplicationDTO dto = provider.getApplicationDTO();
+		BaseApplicationDTO dto = provider.getApplicationDTO();
 		assertTrue(dto instanceof FailedApplicationDTO);
 		FailedApplicationDTO failedDto = (FailedApplicationDTO) dto;
 		assertEquals(DTOConstants.FAILURE_REASON_VALIDATION_FAILED, failedDto.failureReason);

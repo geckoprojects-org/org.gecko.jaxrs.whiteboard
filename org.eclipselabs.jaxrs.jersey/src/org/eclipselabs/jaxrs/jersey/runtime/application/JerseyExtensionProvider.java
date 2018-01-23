@@ -32,8 +32,8 @@ import org.eclipselabs.jaxrs.jersey.dto.DTOConverter;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsExtensionProvider;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceObjects;
+import org.osgi.service.jaxrs.runtime.dto.BaseExtensionDTO;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
-import org.osgi.service.jaxrs.runtime.dto.ExtensionDTO;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
 
 /**
@@ -98,7 +98,7 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 	 * @see org.eclipselabs.jaxrs.jersey.provider.JaxRsExtensionProvider#getExtensionDTO()
 	 */
 	@Override
-	public ExtensionDTO getExtensionDTO() {
+	public BaseExtensionDTO getExtensionDTO() {
 		int status = getProviderStatus();
 		if (status == NO_FAILURE) {
 			return DTOConverter.toExtensionDTO(this);

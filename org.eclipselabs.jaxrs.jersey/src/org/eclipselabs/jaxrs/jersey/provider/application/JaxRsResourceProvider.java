@@ -11,6 +11,7 @@
  */
 package org.eclipselabs.jaxrs.jersey.provider.application;
 
+import org.osgi.service.jaxrs.runtime.dto.BaseDTO;
 import org.osgi.service.jaxrs.runtime.dto.FailedResourceDTO;
 import org.osgi.service.jaxrs.runtime.dto.ResourceDTO;
 
@@ -28,10 +29,10 @@ public interface JaxRsResourceProvider extends JaxRsApplicationContentProvider {
 	public boolean isResource();
 	
 	/**
-	 * Returns the {@link ResourceDTO} for this JaxRsResource.
+	 * Returns the {@link ResourceDTO} or {@link FailedResourceDTO} as {@link BaseDTO} for this JaxRsResource.
 	 * In case of an error a {@link FailedResourceDTO} instance will be returned
 	 * @return the {@link ResourceDTO} or {@link FailedResourceDTO} for this JaxRsResource
 	 */
-	public ResourceDTO getResourceDTO();
+	public BaseDTO getResourceDTO();
 	
 }

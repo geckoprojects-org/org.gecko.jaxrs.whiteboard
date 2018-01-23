@@ -30,7 +30,6 @@ import org.eclipselabs.jaxrs.jersey.provider.JerseyConstants;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsApplicationProvider;
 import org.eclipselabs.jaxrs.jersey.provider.application.JaxRsResourceProvider;
 import org.eclipselabs.jaxrs.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
-import org.eclipselabs.jaxrs.jersey.runtime.servlet.WhiteboardServletContainer;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
@@ -41,6 +40,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime;
 import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntimeConstants;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
+import org.osgi.service.jaxrs.runtime.dto.BaseApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.RuntimeDTO;
 import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
 
@@ -56,7 +56,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 	private volatile String name;
 	protected ComponentContext context;
 	// hold all resource references of the default application 
-	private final Map<String, JaxRsApplicationProvider> applicationContainerMap = new ConcurrentHashMap<>();
+	protected final Map<String, JaxRsApplicationProvider> applicationContainerMap = new ConcurrentHashMap<>();
 	private Logger logger = Logger.getLogger("o.e.o.j.serviceRuntime");
 
 	/* 
@@ -113,11 +113,16 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 	public synchronized void updateRuntimeDTO(ServiceReference<?> serviceRef) {
 		List<ApplicationDTO> appDTOList = new LinkedList<>();
 		applicationContainerMap.forEach((name, ap)->{
-			ApplicationDTO appDTO = ap.getApplicationDTO();
-			if (name.equals(".default")) {
-				runtimeDTO.defaultApplication = appDTO;
+			BaseApplicationDTO appDTO = ap.getApplicationDTO();
+			if(appDTO instanceof ApplicationDTO) {
+				ApplicationDTO curDTO = (ApplicationDTO) appDTO;
+				if (name.equals(".default")) {
+					runtimeDTO.defaultApplication = curDTO;
+				} else {
+					appDTOList.add(curDTO);
+				}
 			} else {
-				appDTOList.add(appDTO);
+				//TODO: What about the failed DTOs
 			}
 		});
 		if (serviceRef != null) {
@@ -153,10 +158,8 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 			throw new IllegalStateException("There is already an application registered with name: " + applicationProvider.getName());
 		}
 		ResourceConfig config = createResourceConfig(applicationProvider);
-		ServletContainer container = new WhiteboardServletContainer(config);
-		applicationProvider.setServletContainer(container);
 		String applicationPath = applicationProvider.getPath();
-		doRegisterServletContainer(container, applicationPath);
+		doRegisterServletContainer(applicationProvider, applicationPath, config);
 		applicationContainerMap.put(applicationProvider.getName(), applicationProvider);
 	}
 
@@ -165,7 +168,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 	 * @param container the container servlet to add
 	 * @param path to path to add it for
 	 */
-	protected abstract void doRegisterServletContainer(ServletContainer container, String path);
+	protected abstract void doRegisterServletContainer(JaxRsApplicationProvider provider, String path, ResourceConfig config);
 
 	/* 
 	 * (non-Javadoc)
@@ -185,15 +188,14 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 			logger.log(Level.WARNING, "There is no application registered with the name: " + applicationProvider.getName());
 			return;
 		}
-		ServletContainer container = provider.getServletContainer();
-		doUnregisterApplication(container);
+		doUnregisterApplication(provider);
 	}
 
 	/**
-	 * Handles the destinct unregistration of the servlet
-	 * @param container the Jersey Servlet to unregister
+	 * Handles the destinct unregistration of the servlets
+	 * @param applicationProvider {@link JaxRsApplicationProvider} to unregister
 	 */
-	protected abstract void doUnregisterApplication(ServletContainer container);
+	protected abstract void doUnregisterApplication(JaxRsApplicationProvider applicationProvider);
 
 	/* 
 	 * (non-Javadoc)
@@ -210,16 +212,18 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 			logger.log(Level.WARNING, "No application provider was registered nothing to reload, registering instead");
 			registerApplication(applicationProvider);
 		} else {
-			ServletContainer servletContainer = provider.getServletContainer();
-			if (servletContainer != null) {
-				ResourceConfig config = createResourceConfig(provider);
-				try{
-					logger.log(Level.INFO, "Reload servlet container " + applicationProvider.getName());
-					servletContainer.reload(config);
-				} catch(Exception e) {
-					//We cant't check if the surrounding container is started, so we have to do it this way
-					logger.log(Level.WARNING, "Jetty servlet context handler is not started yet", e);
-				}
+			List<ServletContainer> servletContainers = provider.getServletContainers();
+			if(!servletContainers.isEmpty()) {
+				logger.log(Level.INFO, "Reload servlet container " + applicationProvider.getName());
+				servletContainers.forEach(servletContainer -> {
+					try{
+						ResourceConfig config = createResourceConfig(provider);
+						servletContainer.reload(config);
+					} catch(Exception e) {
+						//We cant't check if the surrounding container is started, so we have to do it this way
+						logger.log(Level.WARNING, "Jetty servlet context handler is not started yet", e);
+					}
+				});
 			} else {
 				logger.log(Level.INFO, "No servlet container is available to reload " + applicationProvider.getName());
 			}
@@ -268,7 +272,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 	 * Jersey factories for prototype scoped resource services and singletons separately
 	 * @param applicationProvider the JaxRs application application provider
 	 */
-	private ResourceConfig createResourceConfig(JaxRsApplicationProvider applicationProvider) {
+	protected ResourceConfig createResourceConfig(JaxRsApplicationProvider applicationProvider) {
 		if (applicationProvider == null) {
 			logger.log(Level.WARNING, "Cannot create a resource configuration for null application provider");
 			return null;

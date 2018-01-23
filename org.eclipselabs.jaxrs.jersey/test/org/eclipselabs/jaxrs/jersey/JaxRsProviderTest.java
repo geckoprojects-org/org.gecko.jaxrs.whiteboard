@@ -37,6 +37,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
+import org.osgi.service.jaxrs.runtime.dto.BaseApplicationDTO;
+import org.osgi.service.jaxrs.runtime.dto.BaseDTO;
+import org.osgi.service.jaxrs.runtime.dto.BaseExtensionDTO;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
 import org.osgi.service.jaxrs.runtime.dto.ExtensionDTO;
 import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
@@ -65,7 +68,7 @@ public class JaxRsProviderTest {
 		JaxRsApplicationProvider appProvider = new JerseyApplicationProvider(new Application(), properties);
 		// generated name
 		assertTrue(appProvider.getName().startsWith("."));
-		ApplicationDTO appDTO = appProvider.getApplicationDTO();
+		BaseApplicationDTO appDTO = appProvider.getApplicationDTO();
 		assertNotNull(appDTO);
 		assertTrue(appDTO instanceof FailedApplicationDTO);
 		assertEquals(DTOConstants.FAILURE_REASON_VALIDATION_FAILED, ((FailedApplicationDTO)appDTO).failureReason);
@@ -120,7 +123,7 @@ public class JaxRsProviderTest {
 		JaxRsExtensionProvider extProvider = new JerseyExtensionProvider<Object>(serviceObject, properties);
 		// generated name
 		assertTrue(extProvider.getName().startsWith("."));
-		ExtensionDTO extDTO = extProvider.getExtensionDTO();
+		BaseExtensionDTO extDTO = extProvider.getExtensionDTO();
 		assertNotNull(extDTO);
 		assertTrue(extDTO instanceof FailedExtensionDTO);
 		assertEquals(DTOConstants.FAILURE_REASON_NOT_AN_EXTENSION_TYPE, ((FailedExtensionDTO)extDTO).failureReason);
@@ -195,7 +198,7 @@ public class JaxRsProviderTest {
 		JaxRsResourceProvider resProvider = new JerseyResourceProvider<Object>(serviceObject, properties);
 		// generated name
 		assertTrue(resProvider.getName().startsWith("."));
-		ResourceDTO resDTO = resProvider.getResourceDTO();
+		BaseDTO resDTO = resProvider.getResourceDTO();
 		assertNotNull(resDTO);
 		assertTrue(resDTO instanceof FailedResourceDTO);
 		assertEquals(DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE, ((FailedResourceDTO)resDTO).failureReason);

@@ -32,6 +32,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
+import org.osgi.service.jaxrs.runtime.dto.BaseApplicationDTO;
+import org.osgi.service.jaxrs.runtime.dto.BaseExtensionDTO;
 import org.osgi.service.jaxrs.runtime.dto.ExtensionDTO;
 import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.FailedExtensionDTO;
@@ -62,7 +64,7 @@ public class JaxRsExtensionProviderTest {
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new TestApplication(), applicationProperties);
 		
-		ApplicationDTO dto = provider.getApplicationDTO();
+		BaseApplicationDTO dto = provider.getApplicationDTO();
 		assertFalse(dto instanceof FailedApplicationDTO);
 		
 		assertEquals("test/*", provider.getPath());
@@ -74,7 +76,7 @@ public class JaxRsExtensionProviderTest {
 		when(serviceObject.getService()).thenReturn(new TestExtension());
 		JaxRsExtensionProvider resourceProvider = new JerseyExtensionProvider<Object>(serviceObject, resourceProperties);
 		
-		ExtensionDTO resourceDto = resourceProvider.getExtensionDTO();
+		BaseExtensionDTO resourceDto = resourceProvider.getExtensionDTO();
 		assertTrue(resourceDto instanceof FailedExtensionDTO);
 		assertFalse(resourceProvider.isExtension());
 		assertTrue(resourceProvider.isSingleton());

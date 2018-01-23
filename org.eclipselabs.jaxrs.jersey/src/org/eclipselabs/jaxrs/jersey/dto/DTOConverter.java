@@ -172,15 +172,6 @@ public class DTOConverter {
 		Long serviceId = provider.getServiceId();
 		dto.serviceId = serviceId != null ? serviceId.longValue() : -1;
 		dto.failureReason = reason;
-		Class<?> clazz = provider.getObjectClass();
-		Produces produces = clazz.getAnnotation(Produces.class);
-		if (produces != null) {
-			dto.produces = produces.value();
-		}
-		Consumes consumes = clazz.getAnnotation(Consumes.class);
-		if (consumes != null) {
-			dto.consumes = consumes.value();
-		}
 		return dto;
 	}
 
