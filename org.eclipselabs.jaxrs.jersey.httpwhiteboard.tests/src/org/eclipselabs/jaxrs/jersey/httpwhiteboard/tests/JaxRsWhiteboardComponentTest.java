@@ -626,7 +626,6 @@ public class JaxRsWhiteboardComponentTest {
 		cdl = new CountDownLatch(1);
 		cdl.await(1, TimeUnit.SECONDS);
 		
-		runtimeConfig.delete();
 		servletContextRegistration.unregister();
 		tearDownTest(jasxRsWhiteBoardConfig);
 		tearDownTest(HttpServiceRuntime.class, runtimeConfig, get);
@@ -876,11 +875,9 @@ public class JaxRsWhiteboardComponentTest {
 		cdl = new CountDownLatch(1);
 		cdl.await(1, TimeUnit.SECONDS);
 		
-		runtimeConfig1.delete();
-		runtimeConfig2.delete();
-		
 		servletContextRegistration.unregister();
 		tearDownTest(jasxRsWhiteBoardConfig);
+		tearDownTest(HttpServiceRuntime.class, runtimeConfig1, get);
 		tearDownTest(HttpServiceRuntime.class, runtimeConfig2, get);
 	}
 	
