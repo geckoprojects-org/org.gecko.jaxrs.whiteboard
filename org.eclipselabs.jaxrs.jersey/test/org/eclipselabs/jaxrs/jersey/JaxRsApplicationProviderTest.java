@@ -89,7 +89,7 @@ public class JaxRsApplicationProviderTest {
 		FailedApplicationDTO failedDto = (FailedApplicationDTO) dto;
 		assertEquals(DTOConstants.FAILURE_REASON_VALIDATION_FAILED, failedDto.failureReason);
 		
-		assertEquals("test/*", provider.getPath());
+		assertEquals("/test/*", provider.getPath());
 		assertEquals(".test", provider.getName());
 	}
 	
@@ -108,7 +108,7 @@ public class JaxRsApplicationProviderTest {
 		FailedApplicationDTO failedDto = (FailedApplicationDTO) dto;
 		assertEquals(DTOConstants.FAILURE_REASON_VALIDATION_FAILED, failedDto.failureReason);
 		
-		assertEquals("test/*", provider.getPath());
+		assertEquals("/test/*", provider.getPath());
 		assertEquals("myTest", provider.getName());
 	}
 	
@@ -124,7 +124,7 @@ public class JaxRsApplicationProviderTest {
 		BaseApplicationDTO dto = provider.getApplicationDTO();
 		assertFalse(dto instanceof FailedApplicationDTO);
 		
-		assertEquals("test/*", provider.getPath());
+		assertEquals("/test/*", provider.getPath());
 		assertEquals(".test", provider.getName());
 	}
 	
@@ -141,7 +141,7 @@ public class JaxRsApplicationProviderTest {
 		BaseApplicationDTO dto = provider.getApplicationDTO();
 		assertFalse(dto instanceof FailedApplicationDTO);
 		
-		assertEquals("test/*", provider.getPath());
+		assertEquals("/test/*", provider.getPath());
 		assertEquals("myTest", provider.getName());
 	}
 	

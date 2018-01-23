@@ -86,7 +86,7 @@ public class DTOConverterTest {
 		dto = DTOConverter.toFailedApplicationDTO(resourceProvider, DTOConstants.FAILURE_REASON_SHADOWED_BY_OTHER_SERVICE);
 		
 		assertNotNull(dto);
-		assertEquals("test/*", dto.base);
+		assertEquals("/test/*", dto.base);
 		assertEquals("MyApp", dto.name);
 		assertEquals(12, dto.serviceId);
 		assertEquals(DTOConstants.FAILURE_REASON_SHADOWED_BY_OTHER_SERVICE, dto.failureReason);
@@ -116,7 +116,7 @@ public class DTOConverterTest {
 		dto = DTOConverter.toApplicationDTO(resourceProvider);
 		
 		assertNotNull(dto);
-		assertEquals("test/*", dto.base);
+		assertEquals("/test/*", dto.base);
 		assertEquals("MyApp", dto.name);
 		assertEquals(12, dto.serviceId);
 	}
