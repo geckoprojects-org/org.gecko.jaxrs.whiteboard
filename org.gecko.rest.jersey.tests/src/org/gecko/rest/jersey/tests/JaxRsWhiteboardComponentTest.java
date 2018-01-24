@@ -123,6 +123,13 @@ public class JaxRsWhiteboardComponentTest {
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		runtimeChecker.waitModify();
+		
 		/*
 		 * Check if our RootResource is available under http://localhost:8185/test
 		 */
@@ -253,6 +260,13 @@ public class JaxRsWhiteboardComponentTest {
 		configuration.update(properties);
 		
 		assertTrue(runtimeChecker.waitCreate());
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		runtimeChecker.waitModify();
 		
 		/*
 		 * Check if our RootResource is available under http://localhost:8185/test
@@ -398,6 +412,13 @@ public class JaxRsWhiteboardComponentTest {
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		runtimeChecker.waitModify();
+		
 		/*
 		 * Check if our RootResource is not available under http://localhost:8185/test
 		 */
@@ -503,6 +524,13 @@ public class JaxRsWhiteboardComponentTest {
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		runtimeChecker.waitModify();
+		
 		/*
 		 * Check if our RootResource is not available under http://localhost:8185/test
 		 */
@@ -605,6 +633,13 @@ public class JaxRsWhiteboardComponentTest {
 		configuration.update(properties);
 		
 		assertTrue(runtimeChecker.waitCreate());
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		runtimeChecker.waitModify();
 		
 		/*
 		 * Check if our RootResource is available under http://localhost:8185/test
@@ -719,6 +754,13 @@ public class JaxRsWhiteboardComponentTest {
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		runtimeChecker.waitModify();
+		
 		/*
 		 * Check if http://localhost:8185/test/hello is available now. 
 		 * Check as well, if http://localhost:8185/test is still available
@@ -794,6 +836,13 @@ public class JaxRsWhiteboardComponentTest {
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		runtimeChecker.waitModify();
+		
 		Filter resFilter = FrameworkUtil.createFilter("(osgi.jaxrs.name=ptr)");
 		Object ptrResource = getService(resFilter, 3000l);
 		assertNotNull(ptrResource);
@@ -865,6 +914,13 @@ public class JaxRsWhiteboardComponentTest {
 		configuration.update(properties);
 		
 		assertTrue(runtimeChecker.waitCreate());
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		runtimeChecker.waitModify();
 
 		/*
 		 * Mount the application customer that will become available under: test/customer
