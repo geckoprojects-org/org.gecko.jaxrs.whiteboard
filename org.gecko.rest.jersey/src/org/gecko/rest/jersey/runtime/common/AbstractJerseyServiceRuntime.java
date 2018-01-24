@@ -11,12 +11,15 @@
  */
 package org.gecko.rest.jersey.runtime.common;
 
+import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,6 +37,7 @@ import org.glassfish.hk2.api.Factory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
@@ -58,6 +62,8 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 	// hold all resource references of the default application 
 	protected final Map<String, JaxRsApplicationProvider> applicationContainerMap = new ConcurrentHashMap<>();
 	private Logger logger = Logger.getLogger("o.e.o.j.serviceRuntime");
+	private ServiceRegistration<JaxRSServiceRuntime> serviceRuntime;
+	private AtomicLong changeCount = new AtomicLong();
 
 	/* 
 	 * (non-Javadoc)
@@ -81,20 +87,88 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 		}
 		binder = new PrototypeServiceBinder();
 		doInitialize(context);
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#startup()
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public void startup() {
+		doStartup();
+		Dictionary<String, Object> properties = getRuntimeProperties();
+		String[] service = new String[] {JaxRSServiceRuntime.class.getName(), JaxRsWhiteboardProvider.class.getName()};
+		try {
+			serviceRuntime = (ServiceRegistration<JaxRSServiceRuntime>) context.getBundleContext().registerService(service, this, properties);
+			updateRuntimeDTO(serviceRuntime.getReference());
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Error starting JaxRsRuntimeService ", e);
+			if (serviceRuntime != null) {
+				serviceRuntime.unregister();
+			}
+		} 
 	}
 
+	/**
+	 * Merges all availabe properties and adds an fitting changecount
+	 * @return the properties that can be assigend to the changecount
+	 */
+	private Dictionary<String, Object> getRuntimeProperties() {
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put("service.changecount", changeCount .incrementAndGet());
+		getProperties().entrySet().forEach(e -> properties.put(e.getKey(), e.getValue()));
+		properties.put(JaxRSServiceRuntimeConstants.JAX_RS_SERVICE_ENDPOINT, getURLs(context));
+		properties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, name);
+		return properties;
+	}
+	
+	/**
+	 * Updates the properties and the changecount of the registered Runtime
+	 */
+	protected void updateRuntimeProperties() {
+		if(serviceRuntime != null) {
+			Dictionary<String, Object> properties = getRuntimeProperties();
+			serviceRuntime.setProperties(properties);
+		}
+	}
+
+	/**
+	 * Handles the actual implementation specific Startup
+	 */
+	protected abstract void doStartup();
+	
 	/**
 	 * Handles the distinct intilization 
 	 * @param context the {@link ComponentContext} to use
 	 */
 	protected abstract void doInitialize(ComponentContext context) ;
 
+	/* (non-Javadoc)
+	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#modified(org.osgi.service.component.ComponentContext)
+	 */
+	@Override
+	public void modified(ComponentContext context) throws ConfigurationException {
+		updateProperties(context);
+		doModified(context);
+	}
+	
+	protected abstract void doModified(ComponentContext context) throws ConfigurationException ;
 
 	/* 
 	 * (non-Javadoc)
 	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#teardown()
 	 */
 	public void teardown() {
+		if (serviceRuntime != null) {
+			try {
+				serviceRuntime.unregister();
+			} catch (IllegalStateException ise) {
+				logger.log(Level.SEVERE, "JaxRsRuntime was already unregistered", ise);
+			} catch (Exception ise) {
+				logger.log(Level.SEVERE, "Error unregsitering JaxRsRuntime", ise);
+			}
+		}
 		doTeardown();
 		if (binder != null) {
 			binder.dispose();
@@ -161,6 +235,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 		String applicationPath = applicationProvider.getPath();
 		doRegisterServletContainer(applicationProvider, applicationPath, config);
 		applicationContainerMap.put(applicationProvider.getName(), applicationProvider);
+		updateRuntimeProperties();
 	}
 
 	/**
@@ -189,6 +264,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 			return;
 		}
 		doUnregisterApplication(provider);
+		updateRuntimeProperties();
 	}
 
 	/**
@@ -227,6 +303,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 			} else {
 				logger.log(Level.INFO, "No servlet container is available to reload " + applicationProvider.getName());
 			}
+			updateRuntimeProperties();
 		}
 	}
 	

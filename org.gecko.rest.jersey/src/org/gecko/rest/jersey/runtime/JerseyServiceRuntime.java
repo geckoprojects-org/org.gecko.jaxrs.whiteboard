@@ -82,7 +82,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	 * (non-Javadoc)
 	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#modified(org.osgi.service.component.ComponentContext)
 	 */
-	public void modified(ComponentContext ctx) throws ConfigurationException {
+	public void doModified(ComponentContext ctx) throws ConfigurationException {
 		Integer oldPort = port;
 		String oldContextPath = contextPath;
 		updateProperties(ctx);
@@ -101,15 +101,17 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 		}
 	}
 	
-	/* 
-	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#startup()
+	/* (non-Javadoc)
+	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#doStartup()
 	 */
 	@Override
-	public void startup() {
+	public void doStartup() {
 		startServer();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#doTeardown()
+	 */
 	@Override
 	protected void doTeardown() {
 		stopContextHandler();

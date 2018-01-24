@@ -11,18 +11,12 @@
  */
 package org.gecko.rest.jersey.runtime.httpwhiteboard;
 
-import java.util.Dictionary;
-import java.util.Hashtable;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.ws.rs.core.Application;
 
 import org.gecko.rest.jersey.helper.ReferenceCollector;
-import org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
 import org.gecko.rest.jersey.runtime.JerseyWhiteboardComponent;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -34,7 +28,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime;
-import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntimeConstants;
 
 /**
  * This component handles the lifecycle of a {@link JaxRSServiceRuntime}
@@ -44,7 +37,7 @@ import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntimeConstants;
 @Component(name="JaxRsHttpWhiteboardRuntimeComponent", immediate=true, configurationPolicy=ConfigurationPolicy.REQUIRE)
 public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardComponent{
 
-	private static Logger logger = Logger.getLogger("o.e.o.j.JaxRsHttpWhiteboardRuntimeComponent");
+//	private static Logger logger = Logger.getLogger("o.e.o.j.JaxRsHttpWhiteboardRuntimeComponent");
 
 	@Reference(cardinality = ReferenceCardinality.MANDATORY)
 	private ReferenceCollector collector;
@@ -57,7 +50,6 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 	/* (non-Javadoc)
 	 * @see org.gecko.rest.jersey.runtime.JerseyWhiteboardComponent#activate(org.osgi.service.component.ComponentContext)
 	 */
-	@SuppressWarnings("unchecked")
 	@Activate
 	@Override
 	public void activate(final ComponentContext context) throws ConfigurationException {
@@ -68,26 +60,9 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 		whiteboard = new HTTPWhiteboardBasedJerseyServiceRuntime();
 		whiteboard.initialize(context);
 		dispatcher.setWhiteboardProvider(whiteboard);
-		String[] urls = whiteboard.getURLs(context);
-		// activate and start server
 		collector.connect(dispatcher);
 		dispatcher.dispatch();
 		whiteboard.startup();
-		
-		// activate and start server
-		Dictionary<String, Object> properties = new Hashtable<>();
-		properties.put("service.changecount", changeCount.incrementAndGet());
-		properties.put(JaxRSServiceRuntimeConstants.JAX_RS_SERVICE_ENDPOINT, urls);
-		String[] service = new String[] {JaxRSServiceRuntime.class.getName(), JaxRsWhiteboardProvider.class.getName()};
-		try {
-			serviceRuntime = (ServiceRegistration<JaxRSServiceRuntime>) context.getBundleContext().registerService(service, whiteboard, properties);
-			whiteboard.updateRuntimeDTO(serviceRuntime.getReference());
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Error starting JaxRsRuntimeService ", e);
-			if (serviceRuntime != null) {
-				serviceRuntime.unregister();
-			}
-		} 
 	}
 
 	/**
@@ -98,6 +73,8 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 	@Modified
 	public void modified(ComponentContext context) throws ConfigurationException {
 		updateProperties(context);
+		whiteboard.modified(context);
+		dispatcher.dispatch();
 	}
 
 	/**
@@ -106,7 +83,6 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 	 */
 	@Deactivate
 	public void deactivate(ComponentContext context) {
-		changeCount.set(0);
 		if (dispatcher != null) {
 			collector.disconnect(dispatcher);
 			dispatcher.deactivate();
@@ -114,15 +90,6 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 		if (whiteboard != null) {
 			whiteboard.teardown();
 			whiteboard = null;
-		}
-		if (serviceRuntime != null) {
-			try {
-				serviceRuntime.unregister();
-			} catch (IllegalStateException ise) {
-				logger.log(Level.SEVERE, "JaxRsRuntime was already unregistered", ise);
-			} catch (Exception ise) {
-				logger.log(Level.SEVERE, "Error unregsitering JaxRsRuntime", ise);
-			}
 		}
 	}
 	

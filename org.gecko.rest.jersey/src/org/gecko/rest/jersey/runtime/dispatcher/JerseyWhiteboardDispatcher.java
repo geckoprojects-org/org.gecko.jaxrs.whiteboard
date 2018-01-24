@@ -349,16 +349,18 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 					if (applicationCandidates.contains(app)) {
 						if (whiteboard.isRegistered(app)) {
 							// unregister applications that are now empty
-							if (app.isEmpty()) {
-								whiteboard.unregisterApplication(app);
-							} else if (app.isChanged()) {
+//							if (app.isEmpty()) {
+//								whiteboard.unregisterApplication(app);
+//							} else 
+							if (app.isChanged()) {
 								whiteboard.reloadApplication(app);
 							}
 						} else {
+							
 							// we don't register empty applications and legacy application in general or changed applications 
-							if (!app.isEmpty() && app.isChanged()) {
+//							if (!app.isEmpty() && app.isChanged()) {
 								whiteboard.registerApplication(app);
-							}
+//							}
 						}
 						// the application doesn't fit to the whiteboard anymore
 					} else {

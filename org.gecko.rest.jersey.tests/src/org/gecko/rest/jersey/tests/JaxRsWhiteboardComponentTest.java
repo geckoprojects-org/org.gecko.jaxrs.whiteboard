@@ -30,6 +30,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.gecko.rest.jersey.tests.applications.AnnotatedTestLegacyApplication;
 import org.gecko.rest.jersey.tests.applications.TestLegacyApplication;
+import org.gecko.rest.jersey.tests.customizer.ServiceChecker;
 import org.gecko.rest.jersey.tests.customizer.TestServiceCustomizer;
 import org.gecko.rest.jersey.tests.resources.ContractedExtension;
 import org.gecko.rest.jersey.tests.resources.HelloResource;
@@ -100,6 +101,9 @@ public class JaxRsWhiteboardComponentTest {
 		String contextPath = "test";
 		String url = "http://localhost:" + port + "/" + contextPath;
 		
+		ServiceChecker<JaxRSServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxRSServiceRuntime.class, context);
+		runtimeChecker.start();
+		
 		/*
 		 * Initial setup for the REST runtime 
 		 */
@@ -117,16 +121,7 @@ public class JaxRsWhiteboardComponentTest {
 		assertNull(factoryProperties);
 		configuration.update(properties);
 		
-		/*
-		 * Check that the REST runtime service become available 
-		 */
-		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
-		assertNotNull(runtimeRef);
-		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
-		assertNotNull(runtime);
-		
-		CountDownLatch cdl = new CountDownLatch(1);
-		cdl.await(1, TimeUnit.SECONDS);
+		assertTrue(runtimeChecker.waitCreate());
 		
 		/*
 		 * Check if our RootResource is available under http://localhost:8185/test
@@ -137,11 +132,13 @@ public class JaxRsWhiteboardComponentTest {
 		JerseyWebTarget webTarget = jerseyClient.target(url);
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
-//		assertEquals(404, response.getStatus());
-		cdl.await(1, TimeUnit.SECONDS);
-		
-		response = get.invoke();
 		assertEquals(404, response.getStatus());
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(2);
+		runtimeChecker.start();
+		
 		/*
 		 * Mount the application customer that will become available under: test/customer
 		 * http://localhost:8185/test/customer
@@ -168,12 +165,7 @@ public class JaxRsWhiteboardComponentTest {
 		Object service = getService(f, 3000l);
 		assertNotNull(service);
 		
-		/*
-		 * Wait a short time to reload the configuration dynamically
-		 */
-		cdl = new CountDownLatch(1);
-		cdl.await(3, TimeUnit.SECONDS);
-		
+		assertTrue(runtimeChecker.waitModify());
 		/*
 		 * Check if http://localhost:8185/test/customer/hello is available now. 
 		 * Check as well, if http://localhost:8185/test is /hello is not available
@@ -190,6 +182,11 @@ public class JaxRsWhiteboardComponentTest {
 		response = get.invoke();
 		assertEquals(404, response.getStatus());
 		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(2);
+		runtimeChecker.start();
+		
 		helloRegistration.unregister();
 		service = getService(f, 3000l);
 		assertNull(service);
@@ -198,12 +195,7 @@ public class JaxRsWhiteboardComponentTest {
 		service = getService(f, 3000l);
 		assertNull(service);
 		
-		/*
-		 * Wait a short time to reload the configuration dynamically
-		 */
-		cdl = new CountDownLatch(1);
-		cdl.await(1, TimeUnit.SECONDS);
-		
+		assertTrue(runtimeChecker.waitModify());
 		/*
 		 * Check if http://localhost:8185/test/customer/hello is not available anymore. 
 		 * Check as well, if http://localhost:8185/test/hello is still not available
@@ -240,6 +232,9 @@ public class JaxRsWhiteboardComponentTest {
 		String contextPath = "test";
 		String url = "http://localhost:" + port + "/" + contextPath;
 		
+		ServiceChecker<JaxRSServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxRSServiceRuntime.class, context);
+		runtimeChecker.start();
+		
 		/*
 		 * Initial setup for the REST runtime 
 		 */
@@ -257,16 +252,7 @@ public class JaxRsWhiteboardComponentTest {
 		assertNull(factoryProperties);
 		configuration.update(properties);
 		
-		/*
-		 * Check that the REST runtime service become available 
-		 */
-		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
-		assertNotNull(runtimeRef);
-		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
-		assertNotNull(runtime);
-		
-		CountDownLatch cdl = new CountDownLatch(1);
-		cdl.await(2, TimeUnit.SECONDS);
+		assertTrue(runtimeChecker.waitCreate());
 		
 		/*
 		 * Check if our RootResource is available under http://localhost:8185/test
@@ -278,6 +264,12 @@ public class JaxRsWhiteboardComponentTest {
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(2);
+		runtimeChecker.start();
+		
 		
 		/*
 		 * Mount the application customer that will become available under: test/customer
@@ -305,11 +297,7 @@ public class JaxRsWhiteboardComponentTest {
 		Object service = getService(resourceFilter, 3000l);
 		assertNotNull(service);
 		
-		/*
-		 * Wait a short time to reload the configuration dynamically
-		 */
-		cdl = new CountDownLatch(1);
-		cdl.await(3, TimeUnit.SECONDS);
+		assertTrue(runtimeChecker.waitModify());
 		
 		/*
 		 * Check if http://localhost:8185/test/customer/hello is available now. 
@@ -327,15 +315,14 @@ public class JaxRsWhiteboardComponentTest {
 		response = get.invoke();
 		assertEquals(200, response.getStatus());
 		
-		appRegistration.unregister();
-		application = getService(appFilter, 3000l);
-		assertNull(application);
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
 		
-		/*
-		 * Wait a short time to reload the configuration dynamically
-		 */
-		cdl = new CountDownLatch(1);
-		cdl.await(1, TimeUnit.SECONDS);
+		appRegistration.unregister();
+		
+		assertTrue(runtimeChecker.waitModify());
 		
 		/*
 		 * Check if http://localhost:8185/test/customer/hello is not available anymore. 
@@ -353,21 +340,21 @@ public class JaxRsWhiteboardComponentTest {
 		response = get.invoke();
 		assertEquals(200, response.getStatus());
 		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		
 		helloRegistration.unregister();
-		service = getService(resourceFilter, 3000l);
-		assertNull(service);
+		
+		assertTrue(runtimeChecker.waitModify());
 		
 		System.out.println("Checking URL is not available anymore " + url + "/hello");
 		webTarget = jerseyClient.target(url + "/hello");
 		get = webTarget.request().buildGet();
 		response = get.invoke();
 		assertEquals(404, response.getStatus());
-		
-		/*
-		 * Wait a short time to reload the configuration dynamically
-		 */
-		cdl = new CountDownLatch(1);
-		cdl.await(1, TimeUnit.SECONDS);
 		
 		tearDownTest(configuration, get);
 	}
@@ -389,6 +376,9 @@ public class JaxRsWhiteboardComponentTest {
 		String contextPath = "test";
 		String url = "http://localhost:" + port + "/" + contextPath;
 		
+		ServiceChecker<JaxRSServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxRSServiceRuntime.class, context);
+		runtimeChecker.start();
+		
 		/*
 		 * Initial setup for the REST runtime 
 		 */
@@ -406,16 +396,7 @@ public class JaxRsWhiteboardComponentTest {
 		assertNull(factoryProperties);
 		configuration.update(properties);
 		
-		/*
-		 * Check that the REST runtime service become available 
-		 */
-		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 400000l);
-		assertNotNull(runtimeRef);
-		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
-		assertNotNull(runtime);
-		
-		CountDownLatch cdl = new CountDownLatch(1);
-		cdl.await(2, TimeUnit.SECONDS);
+		assertTrue(runtimeChecker.waitCreate());
 		
 		/*
 		 * Check if our RootResource is not available under http://localhost:8185/test
@@ -427,6 +408,12 @@ public class JaxRsWhiteboardComponentTest {
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
 		
 		/*
 		 * Mount the application customer that will become available under: test/customer
@@ -440,11 +427,7 @@ public class JaxRsWhiteboardComponentTest {
 		Application application = getService(appFilter, 3000l);
 		assertNotNull(application);
 		
-		/*
-		 * Wait a short time to reload the configuration dynamically
-		 */
-		cdl = new CountDownLatch(1);
-		cdl.await(2, TimeUnit.SECONDS);
+		assertTrue(runtimeChecker.waitModify());
 		
 		/*
 		 * Check if http://localhost:8185/test/customer/hello is available now. 
@@ -456,15 +439,15 @@ public class JaxRsWhiteboardComponentTest {
 		response = get.invoke();
 		assertEquals(200, response.getStatus());
 		
-		appRegistration.unregister();
-		application = getService(appFilter, 3000l);
-		assertNull(application);
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
 		
-		/*
-		 * Wait a short time to reload the configuration dynamically
-		 */
-		cdl = new CountDownLatch(1);
-		cdl.await(1, TimeUnit.SECONDS);
+		appRegistration.unregister();
+		
+		assertTrue(runtimeChecker.waitModify());
+		
 		
 		/*
 		 * Check if http://localhost:8185/test/customer/hello is not available anymore. 
@@ -479,8 +462,10 @@ public class JaxRsWhiteboardComponentTest {
 		tearDownTest(configuration, get);
 	}
 
+	
+	
 	/**
-	 * Tests 
+	 * Tests ---- before 88s 
 	 * @throws IOException 
 	 * @throws InterruptedException 
 	 * @throws InvalidSyntaxException 
@@ -504,6 +489,9 @@ public class JaxRsWhiteboardComponentTest {
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
 		
+		ServiceChecker<JaxRSServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxRSServiceRuntime.class, context);
+		runtimeChecker.start();
+		
 		ConfigurationAdmin configAdmin = context.getService(configAdminRef);
 		assertNotNull(configAdmin);
 		Configuration configuration = configAdmin.getConfiguration("JaxRsWhiteboardComponent", "?");
@@ -513,16 +501,7 @@ public class JaxRsWhiteboardComponentTest {
 		assertNull(factoryProperties);
 		configuration.update(properties);
 		
-		/*
-		 * Check that the REST runtime service become available 
-		 */
-		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 400000l);
-		assertNotNull(runtimeRef);
-		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
-		assertNotNull(runtime);
-		
-		CountDownLatch cdl = new CountDownLatch(1);
-		cdl.await(2, TimeUnit.SECONDS);
+		assertTrue(runtimeChecker.waitCreate());
 		
 		/*
 		 * Check if our RootResource is not available under http://localhost:8185/test
@@ -534,6 +513,11 @@ public class JaxRsWhiteboardComponentTest {
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
 		
 		/*
 		 * Mount the application customer that will become available under: test/customer
@@ -547,11 +531,7 @@ public class JaxRsWhiteboardComponentTest {
 		Application application = getService(appFilter, 3000l);
 		assertNotNull(application);
 		
-		/*
-		 * Wait a short time to reload the configuration dynamically
-		 */
-		cdl = new CountDownLatch(1);
-		cdl.await(2, TimeUnit.SECONDS);
+		assertTrue(runtimeChecker.waitModify());
 		
 		/*
 		 * Check if http://localhost:8185/test/customer/hello is available now. 
@@ -563,15 +543,16 @@ public class JaxRsWhiteboardComponentTest {
 		response = get.invoke();
 		assertEquals(200, response.getStatus());
 		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(60);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
 		appRegistration.unregister();
 		application = getService(appFilter, 3000l);
 		assertNull(application);
 		
-		/*
-		 * Wait a short time to reload the configuration dynamically
-		 */
-		cdl = new CountDownLatch(1);
-		cdl.await(1, TimeUnit.SECONDS);
+		assertTrue(runtimeChecker.waitModify());
 		
 		/*
 		 * Check if http://localhost:8185/test/customer/hello is not available anymore. 
@@ -603,6 +584,9 @@ public class JaxRsWhiteboardComponentTest {
 		String contextPath = "test";
 		String url = "http://localhost:" + port + "/" + contextPath;
 		
+		ServiceChecker<JaxRSServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxRSServiceRuntime.class, context);
+		runtimeChecker.start();
+		
 		/*
 		 * Initial setup for the REST runtime 
 		 */
@@ -620,16 +604,7 @@ public class JaxRsWhiteboardComponentTest {
 		assertNull(factoryProperties);
 		configuration.update(properties);
 		
-		/*
-		 * Check that the REST runtime service become available 
-		 */
-		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
-		assertNotNull(runtimeRef);
-		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
-		assertNotNull(runtime);
-		
-		CountDownLatch cdl = new CountDownLatch(1);
-		cdl.await(2, TimeUnit.SECONDS);
+		assertTrue(runtimeChecker.waitCreate());
 		
 		/*
 		 * Check if our RootResource is available under http://localhost:8185/test
@@ -642,6 +617,11 @@ public class JaxRsWhiteboardComponentTest {
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());
 		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
 		/*
 		 * Mount the resource HelloResource that will become available under:
 		 * http://localhost:8185/test/hello
@@ -651,15 +631,8 @@ public class JaxRsWhiteboardComponentTest {
 		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Hello");
 		System.out.println("Register resource for uri /hello");
 		ServiceRegistration<Object> helloRegistration = context.registerService(Object.class, new HelloResource(), helloProps);
-		Filter f = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=Hello)");
-		Object service = getService(f, 3000l);
-		assertNotNull(service);
 		
-		/*
-		 * Wait a short time to reload the configuration dynamically
-		 */
-		cdl = new CountDownLatch(1);
-		cdl.await(2, TimeUnit.SECONDS);
+		assertTrue(runtimeChecker.waitModify());
 		
 		/*
 		 * Check if http://localhost:8185/test/hello is available now. 
@@ -671,16 +644,15 @@ public class JaxRsWhiteboardComponentTest {
 		response = get.invoke();
 		assertEquals(200, response.getStatus());
 		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
 		helloRegistration.unregister();
-		service = getService(f, 3000l);
-		assertNull(service);
-		
-		/*
-		 * Wait a short time to reload the configuration dynamically
-		 */
-		cdl = new CountDownLatch(1);
-		cdl.await(1, TimeUnit.SECONDS);
-		
+
+		assertTrue(runtimeChecker.waitModify());
+				
 		/*
 		 * Check if http://localhost:8185/test/hello is not available anymore. 
 		 * Check as well, if http://localhost:8185/test is still available
@@ -719,10 +691,14 @@ public class JaxRsWhiteboardComponentTest {
 		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Hello");
 		System.out.println("Register resource for uri /hello");
+		
 		ServiceRegistration<Object> helloRegistration = context.registerService(Object.class, new HelloResource(), helloProps);
 		Filter f = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=Hello)");
 		Object service = getService(f, 3000l);
 		assertNotNull(service);
+		
+		ServiceChecker<JaxRSServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxRSServiceRuntime.class, context);
+		runtimeChecker.start();
 		
 		/*
 		 * Initial setup for the REST runtime 
@@ -741,16 +717,7 @@ public class JaxRsWhiteboardComponentTest {
 		assertNull(factoryProperties);
 		configuration.update(properties);
 		
-		/*
-		 * Check that the REST runtime service become available 
-		 */
-		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
-		assertNotNull(runtimeRef);
-		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
-		assertNotNull(runtime);
-		
-		CountDownLatch cdl = new CountDownLatch(1);
-		cdl.await(3, TimeUnit.SECONDS);
+		assertTrue(runtimeChecker.waitCreate());
 		
 		/*
 		 * Check if http://localhost:8185/test/hello is available now. 
@@ -764,15 +731,15 @@ public class JaxRsWhiteboardComponentTest {
 		Response response = get.invoke();
 		assertEquals(200, response.getStatus());
 		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
 		helloRegistration.unregister();
 		service = getService(f, 3000l);
-		assertNull(service);
 		
-		/*
-		 * Wait a short time to reload the configuration dynamically
-		 */
-		cdl = new CountDownLatch(1);
-		cdl.await(2, TimeUnit.SECONDS);
+		assertTrue(runtimeChecker.waitModify());
 		
 		/*
 		 * Check if http://localhost:8185/test/hello is not available anymore. 
@@ -805,6 +772,9 @@ public class JaxRsWhiteboardComponentTest {
 		String contextPath = "test";
 		String url = "http://localhost:" + port + "/" + contextPath;
 		
+		ServiceChecker<JaxRSServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxRSServiceRuntime.class, context);
+		runtimeChecker.start();
+		
 		/*
 		 * Initial setup for the REST runtime 
 		 */
@@ -822,13 +792,7 @@ public class JaxRsWhiteboardComponentTest {
 		assertNull(factoryProperties);
 		configuration.update(properties);
 		
-		/*
-		 * Check that the REST runtime service become available 
-		 */
-		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
-		assertNotNull(runtimeRef);
-		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
-		assertNotNull(runtime);
+		assertTrue(runtimeChecker.waitCreate());
 		
 		Filter resFilter = FrameworkUtil.createFilter("(osgi.jaxrs.name=ptr)");
 		Object ptrResource = getService(resFilter, 3000l);
@@ -880,6 +844,9 @@ public class JaxRsWhiteboardComponentTest {
 		String contextPath = "test";
 		String url = "http://localhost:" + port + "/" + contextPath;
 		
+		ServiceChecker<JaxRSServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxRSServiceRuntime.class, context);
+		runtimeChecker.start();
+		
 		/*
 		 * Initial setup for the REST runtime 
 		 */
@@ -897,13 +864,7 @@ public class JaxRsWhiteboardComponentTest {
 		assertNull(factoryProperties);
 		configuration.update(properties);
 		
-		/*
-		 * Check that the REST runtime service become available 
-		 */
-		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
-		assertNotNull(runtimeRef);
-		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
-		assertNotNull(runtime);
+		assertTrue(runtimeChecker.waitCreate());
 
 		/*
 		 * Mount the application customer that will become available under: test/customer
@@ -1041,5 +1002,26 @@ public class JaxRsWhiteboardComponentTest {
 		tracker.open();
 		return tracker.waitForService(timeout);
 	}
+	
+	private <T extends Object> ServiceChecker<T> createdCheckerTrackedForCleanUp(Class<T> serviceClass, BundleContext context) {
+		ServiceChecker<T> checker = new ServiceChecker<>(serviceClass, context);
+
+		checker.setCreateCount(1);
+		checker.setDeleteCount(1);
+		checker.setCreateTimeout(5000);
+		checker.setDeleteTimeout(5000);
+		return (ServiceChecker<T>) checker;
+	}
+
+	private <T extends Object> ServiceChecker<T>  createdCheckerTrackedForCleanUp(String filter, BundleContext context) throws InvalidSyntaxException {
+		ServiceChecker<? extends Object> checker = new ServiceChecker<>(filter, context);
+		
+		checker.setCreateCount(1);
+		checker.setDeleteCount(1);
+		checker.setCreateTimeout(5);
+		checker.setDeleteTimeout(5);
+		return (ServiceChecker<T>) checker;
+	}
+
 
 }

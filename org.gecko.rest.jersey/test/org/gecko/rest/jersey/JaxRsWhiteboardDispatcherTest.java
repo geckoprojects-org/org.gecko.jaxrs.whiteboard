@@ -256,7 +256,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * 2. addResource: Application test: true,
 		 * 3. Deactivate test - application: true
 		 */
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false);
+		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, false, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -275,7 +275,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		assertEquals(1, dispatcher.getApplications().size());
 		
 		// .default is registered, .test is empty
-		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
@@ -288,16 +288,16 @@ public class JaxRsWhiteboardDispatcherTest {
 		assertEquals(1, dispatcher.getResources().size());
 		
 		// .default is registered and resource was added to default
-		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
-		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 		
 		dispatcher.deactivate();
 		assertFalse(dispatcher.isDispatching());
 		
-		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
-		Mockito.verify(whiteboard, times(1)).unregisterApplication(Mockito.any());
-		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(2)).unregisterApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 	}
 	
 	/**
@@ -415,7 +415,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		assertEquals(1, dispatcher.getApplications().size());
 		
 		// .default is registered, test is empty
-		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
@@ -430,7 +430,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		assertEquals(1, dispatcher.getResources().size());
 		
 		// .default is registered and resource was added to testApp, which is not empty and will be registered
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
@@ -445,7 +445,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		assertEquals(2, dispatcher.getResources().size());
 		
 		// .default is registered and resource was added to testApp, which is not empty and will be registered
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 		
@@ -454,14 +454,14 @@ public class JaxRsWhiteboardDispatcherTest {
 		assertEquals(1, dispatcher.getResources().size());
 		
 		// .default is registered and resource was added to default
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(2)).reloadApplication(Mockito.any());
 		
 		dispatcher.deactivate();
 		assertFalse(dispatcher.isDispatching());
 		
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(2)).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(2)).reloadApplication(Mockito.any());
 	}
@@ -489,7 +489,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * 4. removeResource Application test: true,
 		 * 5. Deactivate test - application: true
 		 */
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, false, false, true, true, true);
+		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, false, true, true, true, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -509,7 +509,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		assertEquals(1, dispatcher.getApplications().size());
 		
 		// .default is registered, test is empty
-		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
@@ -531,7 +531,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 */
 		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
-		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(2)).reloadApplication(Mockito.any());
 		
 		TestResource resource02 = new TestResource();
 		when(serviceObject.getService()).thenReturn(resource02);
@@ -549,7 +549,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 */
 		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
-		Mockito.verify(whiteboard, times(2)).reloadApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).reloadApplication(Mockito.any());
 		
 		assertEquals(2, dispatcher.getResources().size());
 		dispatcher.removeResource(resProperties01);
@@ -561,14 +561,14 @@ public class JaxRsWhiteboardDispatcherTest {
 		 */
 		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
-		Mockito.verify(whiteboard, times(4)).reloadApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(5)).reloadApplication(Mockito.any());
 		
 		dispatcher.deactivate();
 		assertFalse(dispatcher.isDispatching());
 		
 		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(2)).unregisterApplication(Mockito.any());
-		Mockito.verify(whiteboard, times(4)).reloadApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(5)).reloadApplication(Mockito.any());
 	}
 	
 	/**
@@ -614,7 +614,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		assertEquals(1, dispatcher.getApplications().size());
 		
 		// .default is registered, test is empty
-		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
@@ -634,7 +634,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * So default will be reloaded.
 		 * testApp wis not empty anymore and will be registered
 		 */
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 		
@@ -652,7 +652,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * .default and testApp are registered. Resource2 was added to testApp.
 		 * testApp should be reloaded
 		 */
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(2)).reloadApplication(Mockito.any());
 		
@@ -664,14 +664,14 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * .default and testApp are registered. Resource2 was removed from testApp.
 		 * testApp should be reloaded
 		 */
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(3)).reloadApplication(Mockito.any());
 		
 		dispatcher.deactivate();
 		assertFalse(dispatcher.isDispatching());
 		
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(2)).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(3)).reloadApplication(Mockito.any());
 	}
@@ -816,7 +816,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		assertEquals(1, dispatcher.getApplications().size());
 		
 		// .default is registered, test is empty
-		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
@@ -836,7 +836,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * So default will be reloaded.
 		 * testApp wis not empty anymore and will be registered
 		 */
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 		
@@ -854,7 +854,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * .default and testApp are registered. Resource2 was added to testApp.
 		 * testApp should be reloaded
 		 */
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(2)).reloadApplication(Mockito.any());
 		
@@ -866,14 +866,14 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * .default and testApp are registered. Resource2 was removed from testApp.
 		 * testApp should be reloaded
 		 */
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(3)).reloadApplication(Mockito.any());
 		
 		dispatcher.deactivate();
 		assertFalse(dispatcher.isDispatching());
 		
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(2)).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(3)).reloadApplication(Mockito.any());
 	}
@@ -896,7 +896,7 @@ public class JaxRsWhiteboardDispatcherTest {
 				return wbProperties;
 			}
 		});
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, false, false, false, true, false);
+		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(false, false, true, false, true, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -917,7 +917,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		assertEquals(1, dispatcher.getApplications().size());
 		
 		// .default is registered, test is empty
-		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
@@ -933,10 +933,10 @@ public class JaxRsWhiteboardDispatcherTest {
 		assertEquals(1, dispatcher.getResources().size());
 		
 		/* 
-		 * .default is registered. testApp is not registered but empty.
+		 * .default is registered. testApp is registered but empty.
 		 * Resource was not added to testApp and .default because the filter does not match
 		 */
-		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
@@ -954,7 +954,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * .default and testApp are registered. Resource2 was added to testApp that will be registered now.
 		 * testApp should be registered
 		 */
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
@@ -966,16 +966,16 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * .default and testApp are registered. Resource2 was removed from testApp.
 		 * testApp should be unregistered because it is empty
 		 */
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
-		Mockito.verify(whiteboard, times(1)).unregisterApplication(Mockito.any());
-		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 		
 		dispatcher.deactivate();
 		assertFalse(dispatcher.isDispatching());
 		
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(2)).unregisterApplication(Mockito.any());
-		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 	}
 	
 	/**
@@ -1018,7 +1018,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		assertEquals(1, dispatcher.getApplications().size());
 		
 		// .default is registered, test is empty
-		Mockito.verify(whiteboard, times(1)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
@@ -1037,7 +1037,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * .default is registered. testApp is not registered but empty.
 		 * Resource was not added to testApp and .default because the filter does not match
 		 */
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 		
@@ -1055,7 +1055,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * .default and testApp are registered. Resource2 was added to testApp that will be registered now.
 		 * testApp should be registered
 		 */
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(2)).reloadApplication(Mockito.any());
 		
@@ -1067,14 +1067,14 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * .default and testApp are registered. Resource2 was removed from testApp.
 		 * testApp should be unregistered because it is empty
 		 */
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(3)).reloadApplication(Mockito.any());
 		
 		dispatcher.deactivate();
 		assertFalse(dispatcher.isDispatching());
 		
-		Mockito.verify(whiteboard, times(2)).registerApplication(Mockito.any());
+		Mockito.verify(whiteboard, times(3)).registerApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(2)).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, times(3)).reloadApplication(Mockito.any());
 	}

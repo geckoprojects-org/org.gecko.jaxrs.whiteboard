@@ -74,18 +74,18 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#startup()
+	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#doStartup()
 	 */
 	@Override
-	public void startup() {
+	protected void doStartup() {
+		//Nothing todo here
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#modified(org.osgi.service.component.ComponentContext)
+	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#doModified(org.osgi.service.component.ComponentContext)
 	 */
 	@Override
-	public void modified(ComponentContext context) throws ConfigurationException {
-		// TODO Auto-generated method stub
+	public void doModified(ComponentContext context) throws ConfigurationException {
 	}
 
 	/* 
