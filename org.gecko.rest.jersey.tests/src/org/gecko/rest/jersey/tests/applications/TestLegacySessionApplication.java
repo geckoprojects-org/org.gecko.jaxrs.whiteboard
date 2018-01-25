@@ -16,24 +16,17 @@ import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
-import org.gecko.rest.jersey.tests.resources.LegacyResource;
-import org.gecko.rest.jersey.tests.resources.SingletonLegacyResource;
+import org.gecko.rest.jersey.tests.resources.SessionManipulator;
 
 /**
  * 
  * @author Mark Hoffmann
  * @since 13.10.2017
  */
-public class TestLegacyApplication extends Application {
+public class TestLegacySessionApplication extends Application {
 	
 	@Override
 	public Set<Object> getSingletons() {
-		return Collections.singleton(new SingletonLegacyResource());
+		return Collections.singleton(new SessionManipulator());
 	}
-	
-	@Override
-	public Set<Class<?>> getClasses() {
-		return Collections.singleton(LegacyResource.class);
-	}
-
 }

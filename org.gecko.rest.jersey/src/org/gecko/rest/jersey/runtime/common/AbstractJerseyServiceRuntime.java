@@ -235,7 +235,11 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 		String applicationPath = applicationProvider.getPath();
 		doRegisterServletContainer(applicationProvider, applicationPath, config);
 		applicationContainerMap.put(applicationProvider.getName(), applicationProvider);
-		updateRuntimeProperties();
+
+		if(!applicationProvider.isDefault()) {
+			//registration of the default container does not warrant a servicechangecount 
+			updateRuntimeProperties();
+		}
 	}
 
 	/**

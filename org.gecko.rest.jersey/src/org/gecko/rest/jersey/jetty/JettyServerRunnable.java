@@ -11,7 +11,11 @@
  */
 package org.gecko.rest.jersey.jetty;
 
+import java.util.concurrent.CountDownLatch;
+
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.component.LifeCycle;
+import org.eclipse.jetty.util.component.LifeCycle.Listener;
 
 /**
  * Runnable to start a Jetty server in a different thread
@@ -22,10 +26,12 @@ public class JettyServerRunnable implements Runnable {
 	
 	private final Server server;
 	private final int port;
+	private CountDownLatch awaitStart;
 	
-	public JettyServerRunnable(Server server, int port) {
+	public JettyServerRunnable(Server server, int port, CountDownLatch awaitStart) {
 		this.server = server;
 		this.port = port;
+		this.awaitStart = awaitStart;
 	}
 
 	/* 
@@ -41,6 +47,38 @@ public class JettyServerRunnable implements Runnable {
 		try {
 			server.start();
 			System.out.println("Started Jersey server at port " + port + " successfully try http://localhost:" + port);
+			awaitStart.countDown();
+			server.addLifeCycleListener(new Listener() {
+				
+				@Override
+				public void lifeCycleStopping(LifeCycle arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void lifeCycleStopped(LifeCycle arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void lifeCycleStarting(LifeCycle arg0) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void lifeCycleStarted(LifeCycle arg0) {
+					awaitStart.countDown();
+				}
+				
+				@Override
+				public void lifeCycleFailure(LifeCycle arg0, Throwable arg1) {
+					// TODO Auto-generated method stub
+					
+				}
+			});
 			server.join();
 		} catch (Exception e) {
 			System.out.println("Error starting Jersey server on port " + port);

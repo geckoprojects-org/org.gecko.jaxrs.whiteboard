@@ -99,16 +99,28 @@ public class JerseyWhiteboardComponent {
 			whiteboard = null;
 		}
 	}
+	
 	/**
 	 * Adds a new application
 	 * @param application the application to add
 	 * @param properties the service properties
 	 */
-	@Reference(name="application", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeApplication")
+	@Reference(name="application", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeApplication", updated = "modifedApplication")
 	public void addApplication(Application application, Map<String, Object> properties) {
 		dispatcher.addApplication(application, properties);
 	}
 
+	/**
+	 * Adds a new application
+	 * @param application the application to add
+	 * @param properties the service properties
+	 */
+	public void modifedApplication(Application application, Map<String, Object> properties) {
+		dispatcher.removeApplication(application, properties);
+		dispatcher.addApplication(application, properties);
+	}
+
+	
 	/**
 	 * Removes a application 
 	 * @param application the application to remove

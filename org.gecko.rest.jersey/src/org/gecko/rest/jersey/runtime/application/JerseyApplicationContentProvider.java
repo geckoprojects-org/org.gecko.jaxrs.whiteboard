@@ -155,8 +155,8 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 	 * @see org.gecko.rest.jersey.provider.AbstractJaxRsProvider#doValidateProperties(java.util.Map)
 	 */
 	protected void doValidateProperties(Map<String, Object> properties) {
-		String resourceProp = (String) properties.get(getJaxRsResourceConstant());
-		if (!Boolean.parseBoolean(resourceProp)) {
+		Object resourceProp = properties.get(getJaxRsResourceConstant());
+		if (resourceProp == null || (resourceProp instanceof Boolean && !((Boolean) resourceProp)) || !Boolean.parseBoolean(resourceProp.toString())) {
 			logger.log(Level.WARNING, "The resource to add is not declared with the resource property: " + getJaxRsResourceConstant());
 			updateStatus(INVALID);
 			return;

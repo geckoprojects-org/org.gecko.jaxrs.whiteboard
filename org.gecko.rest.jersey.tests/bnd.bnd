@@ -21,7 +21,8 @@ Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 	org.glassfish.jersey.core.jersey-client,\
 	org.glassfish.jersey.bundles.jaxrs-ri,\
 	javax.annotation-api;version=1.3,\
-	org.osgi.util.pushstream
+	org.osgi.util.pushstream,\
+	javax.servlet-api
 	
 
 javac.source: 1.8

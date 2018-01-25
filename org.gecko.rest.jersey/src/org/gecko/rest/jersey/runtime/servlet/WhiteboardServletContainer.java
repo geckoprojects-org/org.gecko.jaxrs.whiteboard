@@ -5,19 +5,20 @@ package org.gecko.rest.jersey.runtime.servlet;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
 /**
- * @author jalbert
- *
+ * As Wrapper for the {@link ServletContainer} that locks the Servlet while its configuration is reloaded.
+ * Ruthermore it takes care that a reload is done, if a new configuration comes available while it is initialized
+ * @author Juergen Albert
+ * @since 1.0
  */
 public class WhiteboardServletContainer extends ServletContainer {
 
@@ -35,6 +36,9 @@ public class WhiteboardServletContainer extends ServletContainer {
 		super(config);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.glassfish.jersey.servlet.ServletContainer#init()
+	 */
 	@Override
 	public void init() throws ServletException {
 		lock.writeLock().lock();
@@ -50,6 +54,9 @@ public class WhiteboardServletContainer extends ServletContainer {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see org.glassfish.jersey.servlet.ServletContainer#reload(org.glassfish.jersey.server.ResourceConfig)
+	 */
 	@Override
 	public void reload(ResourceConfig configuration) {
 		lock.writeLock().lock();
@@ -64,15 +71,17 @@ public class WhiteboardServletContainer extends ServletContainer {
 		}
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.glassfish.jersey.servlet.ServletContainer#service(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+	 */
 	@Override
-	public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		lock.readLock().lock();
 		try {
-			super.service(req, res);
+			super.service(request, response);
 		} finally {
 			lock.readLock().unlock();
 		}
-		
 	}
-	
 }

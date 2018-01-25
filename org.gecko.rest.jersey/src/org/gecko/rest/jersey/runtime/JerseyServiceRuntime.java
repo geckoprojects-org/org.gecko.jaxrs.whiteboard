@@ -25,7 +25,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -137,7 +139,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 		String path = JerseyHelper.getPropertyWithDefault(context, JERSEY_CONTEXT_PATH, WHITEBOARD_DEFAULT_CONTEXT_PATH);
 		path = JaxRsHelper.toServletPath(path);
 		sb.append(path);
-		return new String[] {sb.toString()};
+		return new String[] {sb.substring(0,  sb.length() - 1)};
 	}
 
 	/* (non-Javadoc)
@@ -145,7 +147,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	 */
 	@Override
 	protected void doRegisterServletContainer(JaxRsApplicationProvider applicationProvider, String path, ResourceConfig config) {
-		ServletContainer container = new WhiteboardServletContainer(config);
+		WhiteboardServletContainer container = new WhiteboardServletContainer(config);
 		if(!applicationProvider.getServletContainers().isEmpty()) {
 			throw new IllegalStateException("There is alread a ServletContainer registered for this application " + applicationProvider.getName());
 		}
@@ -233,10 +235,18 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	private void startServer() {
 		if (jettyServer != null && contextHandler != null && !jettyServer.isRunning()) {
 			try {
-				Executors.newSingleThreadExecutor().submit(new JettyServerRunnable(jettyServer, port));
-				logger.info("Started JaxRs white-board server for port: " + port + " and context: " + contextPath);
+				CountDownLatch awaitStart = new CountDownLatch(1);
+				Executors.newSingleThreadExecutor().submit(new JettyServerRunnable(jettyServer, port, awaitStart));
+				if(!awaitStart.await(1, TimeUnit.SECONDS)) {
+					// TODO: We have todo something I guess
+					logger.info("Started JaxRs white-board server for port: " + port + " and context: " + contextPath + " took to long");
+					throw new IllegalStateException("Server Startup took too long");
+				} else {
+					logger.info("Started JaxRs white-board server for port: " + port + " and context: " + contextPath);
+				}
 			} catch (Exception e) {
 				logger.log(Level.SEVERE, "Error starting JaxRs white-board because of an exception", e);
+				// TODO: We have todo something I guess like throw an Exception
 			}
 		}
 	}

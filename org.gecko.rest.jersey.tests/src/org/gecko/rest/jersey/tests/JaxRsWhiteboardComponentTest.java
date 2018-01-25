@@ -143,7 +143,7 @@ public class JaxRsWhiteboardComponentTest {
 		
 		runtimeChecker.stop();
 		runtimeChecker.setModifyTimeout(5);
-		runtimeChecker.setModifyCount(2);
+		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
 		
 		/*
@@ -157,13 +157,20 @@ public class JaxRsWhiteboardComponentTest {
 		Filter f = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
 		Application application = getService(f, 3000l);
 		assertNotNull(application);
+
+		assertTrue(runtimeChecker.waitModify());
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(500);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
 		
 		/*
 		 * Mount the resource HelloResource that will become available under:
 		 * http://localhost:8185/test/hello
 		 */
 		Dictionary<String, Object> helloProps = new Hashtable<>();
-		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, true);
 		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Hello");
 		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
 		System.out.println("Register resource for uri /hello under application customer");
@@ -191,7 +198,7 @@ public class JaxRsWhiteboardComponentTest {
 		
 		runtimeChecker.stop();
 		runtimeChecker.setModifyTimeout(5);
-		runtimeChecker.setModifyCount(2);
+		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
 		
 		helloRegistration.unregister();
@@ -459,6 +466,16 @@ public class JaxRsWhiteboardComponentTest {
 		get = webTarget.request().buildGet();
 		response = get.invoke();
 		assertEquals(200, response.getStatus());
+
+		/*
+		 * Check if http://localhost:8185/test/customer/hello is available now. 
+		 * Check as well, if http://localhost:8185/test is /hello is not available
+		 */
+		System.out.println("Checking URL is available " + url + "/legacy/singleton/hello/mark");
+		webTarget = jerseyClient.target(url + "/legacy/singleton/hello/mark");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(200, response.getStatus());
 		
 		runtimeChecker.stop();
 		runtimeChecker.setModifyTimeout(5);
@@ -594,7 +611,7 @@ public class JaxRsWhiteboardComponentTest {
 		
 		tearDownTest(configuration, get);
 	}
-	
+
 	/**
 	 * Tests 
 	 * @throws IOException 

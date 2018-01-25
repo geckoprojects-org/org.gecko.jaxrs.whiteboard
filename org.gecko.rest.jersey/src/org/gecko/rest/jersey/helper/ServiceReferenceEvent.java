@@ -29,10 +29,18 @@ public class ServiceReferenceEvent {
 	}
 	
 	public boolean isExtension() {
-		return Boolean.parseBoolean((String) reference.getProperty(JaxRSWhiteboardConstants.JAX_RS_EXTENSION));
+		Object isExtension = reference.getProperty(JaxRSWhiteboardConstants.JAX_RS_EXTENSION);
+		if(isExtension == null) {
+			return false;
+		}
+		return isExtension instanceof Boolean ? (boolean) isExtension : Boolean.parseBoolean(isExtension.toString());
 	}
 
 	public boolean isResource() {
-		return Boolean.parseBoolean((String) reference.getProperty(JaxRSWhiteboardConstants.JAX_RS_RESOURCE));
+		Object isResource = reference.getProperty(JaxRSWhiteboardConstants.JAX_RS_RESOURCE);
+		if(isResource == null) {
+			return false;
+		}
+		return isResource instanceof Boolean ? (boolean) isResource : Boolean.parseBoolean(isResource.toString());
 	}
 }
