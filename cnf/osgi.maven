@@ -1,8 +1,11 @@
-org.osgi:org.osgi.service.cm:1.6.0-SNAPSHOT
-org.osgi:org.osgi.service.jaxrs:0.0.0-SNAPSHOT
 org.osgi:org.osgi.service.jaxrs:1.0.0-SNAPSHOT
-org.osgi:org.osgi.service.jaxrs.whiteboard:1.0.0-SNAPSHOT
 org.osgi:org.osgi.util.function:1.1.0-SNAPSHOT
 org.osgi:org.osgi.util.promise:1.1.0-SNAPSHOT
 org.osgi:org.osgi.util.pushstream:1.0.0-SNAPSHOT
+org.osgi:osgi.annotation:7.0.0-SNAPSHOT
+org.osgi:osgi.cmpn:7.0.0-SNAPSHOT
+org.osgi:osgi.core:7.0.0-SNAPSHOT
 
+org.osgi:osgi.annotation:6.0.1
+org.osgi:osgi.cmpn:6.0.0
+org.osgi:osgi.core:6.0.0

@@ -1,7 +1,7 @@
 package org.gecko.rest.jersey.helper;
 
 import org.osgi.framework.ServiceReference;
-import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 @SuppressWarnings("rawtypes")
 public class ServiceReferenceEvent {
@@ -29,7 +29,7 @@ public class ServiceReferenceEvent {
 	}
 	
 	public boolean isExtension() {
-		Object isExtension = reference.getProperty(JaxRSWhiteboardConstants.JAX_RS_EXTENSION);
+		Object isExtension = reference.getProperty(JaxrsWhiteboardConstants.JAX_RS_EXTENSION);
 		if(isExtension == null) {
 			return false;
 		}
@@ -37,7 +37,7 @@ public class ServiceReferenceEvent {
 	}
 
 	public boolean isResource() {
-		Object isResource = reference.getProperty(JaxRSWhiteboardConstants.JAX_RS_RESOURCE);
+		Object isResource = reference.getProperty(JaxrsWhiteboardConstants.JAX_RS_RESOURCE);
 		if(isResource == null) {
 			return false;
 		}

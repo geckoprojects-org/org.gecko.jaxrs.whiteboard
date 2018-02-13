@@ -39,7 +39,7 @@ import org.osgi.service.jaxrs.runtime.dto.BaseDTO;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
 import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.FailedResourceDTO;
-import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * 
@@ -56,9 +56,9 @@ public class JaxRsResourceProviderTest {
 	public void testApplicationSelect() {
 		Map<String, Object> applicationProperties = new HashMap<>();
 		applicationProperties.put("something", "else");
-		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(hallo=bla)");
-		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
-		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "test");
+		applicationProperties.put(JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(hallo=bla)");
+		applicationProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
+		applicationProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "test");
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), applicationProperties);
 		
@@ -69,7 +69,7 @@ public class JaxRsResourceProviderTest {
 		assertEquals("test", provider.getName());
 		
 		Map<String, Object> resourceProperties = new HashMap<>();
-		resourceProperties.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		resourceProperties.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		when(serviceObject.getService()).thenReturn(new TestResource());
 		JaxRsResourceProvider resourceProvider = new JerseyResourceProvider<Object>(serviceObject, resourceProperties);
 		
@@ -85,7 +85,7 @@ public class JaxRsResourceProviderTest {
 		assertFalse(provider.addResource(resourceProvider));
 		
 		// invalid application filter
-		resourceProperties.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "test");
+		resourceProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "test");
 		resourceProvider = new JerseyResourceProvider<Object>(serviceObject, resourceProperties);
 		
 		assertFalse(resourceProvider.canHandleApplication(provider));
@@ -99,7 +99,7 @@ public class JaxRsResourceProviderTest {
 		assertTrue(resourceProvider.isSingleton());
 		
 		// application filter does not match
-		resourceProperties.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(name=xy)");
+		resourceProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(name=xy)");
 		resourceProvider = new JerseyResourceProvider<Object>(serviceObject, resourceProperties);
 		
 		assertFalse(resourceProvider.canHandleApplication(provider));
@@ -111,7 +111,7 @@ public class JaxRsResourceProviderTest {
 		assertTrue(resourceProvider.isSingleton());
 		
 		// application filter matches
-		resourceProperties.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=test)");
+		resourceProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=test)");
 		resourceProvider = new JerseyResourceProvider<Object>(serviceObject, resourceProperties);
 		
 		assertTrue(resourceProvider.canHandleApplication(provider));
@@ -146,7 +146,7 @@ public class JaxRsResourceProviderTest {
 		assertTrue(resourceProvider.isSingleton());
 		
 		Map<String, Object> resourceProperties = new HashMap<>();
-		resourceProperties.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		resourceProperties.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		
 		resourceProvider = new JerseyResourceProvider<Object>(serviceObject, resourceProperties);
 		
@@ -185,7 +185,7 @@ public class JaxRsResourceProviderTest {
 		assertTrue(resourceProvider.isSingleton());
 		
 		Map<String, Object> resourceProperties = new HashMap<>();
-		resourceProperties.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		resourceProperties.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		
 		resourceProvider = new JerseyResourceProvider<Object>(serviceObject, resourceProperties);
 		
@@ -213,7 +213,7 @@ public class JaxRsResourceProviderTest {
 		assertTrue(resourceProvider.isSingleton());
 		
 		Map<String, Object> resourceProperties = new HashMap<>();
-		resourceProperties.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		resourceProperties.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		
 		resourceProvider = new JerseyResourceProvider<Object>(serviceObject, resourceProperties);
 		
@@ -252,7 +252,7 @@ public class JaxRsResourceProviderTest {
 		assertTrue(resourceProvider.isSingleton());
 		
 		Map<String, Object> resourceProperties = new HashMap<>();
-		resourceProperties.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		resourceProperties.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		
 		resourceProvider = new JerseyResourceProvider<Object>(serviceObject, resourceProperties);
 		
@@ -265,7 +265,7 @@ public class JaxRsResourceProviderTest {
 		assertNotEquals("test", resourceProvider.getName());
 		assertEquals(TestResource.class, resourceProvider.getObjectClass());
 		
-		resourceProperties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "test");
+		resourceProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "test");
 		
 		resourceProvider = new JerseyResourceProvider<Object>(serviceObject, resourceProperties);
 		

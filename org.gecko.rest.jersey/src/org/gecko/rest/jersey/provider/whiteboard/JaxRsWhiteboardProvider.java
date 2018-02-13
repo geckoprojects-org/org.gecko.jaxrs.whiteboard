@@ -17,7 +17,6 @@ import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime;
 import org.osgi.service.jaxrs.runtime.dto.RuntimeDTO;
 
 /**

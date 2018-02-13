@@ -41,19 +41,19 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime;
-import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntimeConstants;
+import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntimeConstants;
+import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.BaseApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.RuntimeDTO;
-import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * Implementation of the {@link JaxRSServiceRuntime} for a Jersey implementation
  * @author Mark Hoffmann
  * @since 12.07.2017
  */
-public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntime, JaxRsWhiteboardProvider {
+public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntime, JaxRsWhiteboardProvider {
 
 	private volatile PrototypeServiceBinder binder;
 	private volatile RuntimeDTO runtimeDTO = new RuntimeDTO();
@@ -62,7 +62,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 	// hold all resource references of the default application 
 	protected final Map<String, JaxRsApplicationProvider> applicationContainerMap = new ConcurrentHashMap<>();
 	private Logger logger = Logger.getLogger("o.e.o.j.serviceRuntime");
-	private ServiceRegistration<JaxRSServiceRuntime> serviceRuntime;
+	private ServiceRegistration<JaxrsServiceRuntime> serviceRuntime;
 	private AtomicLong changeCount = new AtomicLong();
 
 	/* 
@@ -98,9 +98,9 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 	public void startup() {
 		doStartup();
 		Dictionary<String, Object> properties = getRuntimeProperties();
-		String[] service = new String[] {JaxRSServiceRuntime.class.getName(), JaxRsWhiteboardProvider.class.getName()};
+		String[] service = new String[] {JaxrsServiceRuntime.class.getName(), JaxRsWhiteboardProvider.class.getName()};
 		try {
-			serviceRuntime = (ServiceRegistration<JaxRSServiceRuntime>) context.getBundleContext().registerService(service, this, properties);
+			serviceRuntime = (ServiceRegistration<JaxrsServiceRuntime>) context.getBundleContext().registerService(service, this, properties);
 			updateRuntimeDTO(serviceRuntime.getReference());
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Error starting JaxRsRuntimeService ", e);
@@ -118,8 +118,8 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put("service.changecount", changeCount .incrementAndGet());
 		getProperties().entrySet().forEach(e -> properties.put(e.getKey(), e.getValue()));
-		properties.put(JaxRSServiceRuntimeConstants.JAX_RS_SERVICE_ENDPOINT, getURLs(context));
-		properties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, name);
+		properties.put(JaxrsServiceRuntimeConstants.JAX_RS_SERVICE_ENDPOINT, getURLs(context));
+		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, name);
 		return properties;
 	}
 	
@@ -384,13 +384,13 @@ public abstract class AbstractJerseyServiceRuntime implements JaxRSServiceRuntim
 	 */
 	protected void updateProperties(ComponentContext ctx) throws ConfigurationException {
 		if (ctx == null) {
-			throw new ConfigurationException(JaxRSServiceRuntimeConstants.JAX_RS_SERVICE_ENDPOINT, "No component context is availble to get properties from");
+			throw new ConfigurationException(JaxrsServiceRuntimeConstants.JAX_RS_SERVICE_ENDPOINT, "No component context is availble to get properties from");
 		}
-		name = JerseyHelper.getPropertyWithDefault(ctx, JaxRSWhiteboardConstants.JAX_RS_NAME, null);
+		name = JerseyHelper.getPropertyWithDefault(ctx, JaxrsWhiteboardConstants.JAX_RS_NAME, null);
 		if (name == null) {
 			name = JerseyHelper.getPropertyWithDefault(ctx, JerseyConstants.JERSEY_WHITEBOARD_NAME, null);
 			if (name == null) {
-				throw new ConfigurationException(JaxRSWhiteboardConstants.JAX_RS_NAME, "No name was defined for the whiteboard");
+				throw new ConfigurationException(JaxrsWhiteboardConstants.JAX_RS_NAME, "No name was defined for the whiteboard");
 			}
 		}
 		doUpdateProperties(ctx);

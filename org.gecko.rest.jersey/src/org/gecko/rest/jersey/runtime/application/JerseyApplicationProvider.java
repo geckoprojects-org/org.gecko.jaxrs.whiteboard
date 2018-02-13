@@ -36,7 +36,7 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.jaxrs.runtime.dto.BaseApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
-import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * Implementation of the Application Provider
@@ -178,7 +178,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	@Override
 	public boolean addResource(JaxRsResourceProvider provider) {
 		if (!provider.isResource()) {
-			logger.log(Level.WARNING, "The resource to add is not declared with the resource property: " + JaxRSWhiteboardConstants.JAX_RS_RESOURCE);
+			logger.log(Level.WARNING, "The resource to add is not declared with the resource property: " + JaxrsWhiteboardConstants.JAX_RS_RESOURCE);
 			return false;
 		}
 		return doAddContent(provider);
@@ -195,7 +195,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 			return false;
 		}
 		if (!provider.isResource()) {
-			logger.log(Level.WARNING, "The resource to be removed is not declared with the resource property: " + JaxRSWhiteboardConstants.JAX_RS_RESOURCE);
+			logger.log(Level.WARNING, "The resource to be removed is not declared with the resource property: " + JaxrsWhiteboardConstants.JAX_RS_RESOURCE);
 			return false;
 		}
 		return doRemoveContent(provider);
@@ -208,7 +208,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	@Override
 	public boolean addExtension(JaxRsExtensionProvider provider) {
 		if (!provider.isExtension()) {
-			logger.log(Level.WARNING, "The extension to add is not declared with the extension property: " + JaxRSWhiteboardConstants.JAX_RS_EXTENSION);
+			logger.log(Level.WARNING, "The extension to add is not declared with the extension property: " + JaxrsWhiteboardConstants.JAX_RS_EXTENSION);
 			return false;
 		}
 		return doAddContent(provider);
@@ -225,7 +225,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 			return false;
 		}
 		if (!provider.isExtension()) {
-			logger.log(Level.WARNING, "The extension to be removed is not declared with the extension property: " + JaxRSWhiteboardConstants.JAX_RS_EXTENSION);
+			logger.log(Level.WARNING, "The extension to be removed is not declared with the extension property: " + JaxrsWhiteboardConstants.JAX_RS_EXTENSION);
 			return false;
 		}
 		return doRemoveContent(provider);
@@ -249,8 +249,8 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 		String name = null;
 		Map<String, Object> providerProperties = getProviderProperties();
 		if (providerProperties != null) {
-			String baseProperty = (String) providerProperties.get(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE);
-			name = (String) providerProperties.get(JaxRSWhiteboardConstants.JAX_RS_NAME);
+			String baseProperty = (String) providerProperties.get(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE);
+			name = (String) providerProperties.get(JaxrsWhiteboardConstants.JAX_RS_NAME);
 			if (name == null && baseProperty != null) {
 				name = "." + baseProperty;
 			} else if (name != null && !name.equals(".default") && (name.startsWith(".") || name.startsWith("osgi"))) {
@@ -266,7 +266,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 */
 	@Override
 	protected void doValidateProperties(Map<String, Object> properties) {
-		String baseProperty = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE);
+		String baseProperty = (String) properties.get(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE);
 		if (applicationBase == null && (baseProperty == null || baseProperty.isEmpty())) {
 			updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
 			return;
@@ -325,7 +325,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 			logger.log(Level.WARNING, "There is no application select filter valid for the default application");
 			return false;
 		}
-		String applicationFilter = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT);
+		String applicationFilter = (String) properties.get(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT);
 		if (applicationFilter != null) {
 			try {
 				Filter filter = FrameworkUtil.createFilter(applicationFilter);

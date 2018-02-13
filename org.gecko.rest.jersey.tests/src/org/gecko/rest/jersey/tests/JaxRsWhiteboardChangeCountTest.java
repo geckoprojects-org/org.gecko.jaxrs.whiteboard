@@ -55,8 +55,8 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime;
-import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
+import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
@@ -110,7 +110,7 @@ public class JaxRsWhiteboardChangeCountTest {
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
 		
-		ServiceChecker<JaxRSServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxRSServiceRuntime.class, context);
+		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class, context);
 		runtimeChecker.start();
 		
 		ConfigurationAdmin configAdmin = context.getService(configAdminRef);
@@ -126,7 +126,7 @@ public class JaxRsWhiteboardChangeCountTest {
 		/*
 		 * Check that the REST runtime service become available 
 		 */
-		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
+		ServiceReference<JaxrsServiceRuntime> runtimeRef = getServiceReference(JaxrsServiceRuntime.class, 40000l);
 		assertNotNull(runtimeRef);
 		Long firstChangeCount = (Long) runtimeRef.getProperty("service.changecount");
 		
@@ -140,10 +140,10 @@ public class JaxRsWhiteboardChangeCountTest {
 		 * http://localhost:8185/test/customer
 		 */
 		Dictionary<String, Object> appProps = new Hashtable<>();
-		appProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
-		appProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "customerApp");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
 		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new Application(), appProps);
-		Filter f = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
+		Filter f = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
 		Application application = getService(f, 3000l);
 		assertNotNull(application);
 	
@@ -180,7 +180,7 @@ public class JaxRsWhiteboardChangeCountTest {
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
 		
-		ServiceChecker<JaxRSServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxRSServiceRuntime.class, context);
+		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class, context);
 		runtimeChecker.start();
 		
 		ConfigurationAdmin configAdmin = context.getService(configAdminRef);
@@ -197,9 +197,9 @@ public class JaxRsWhiteboardChangeCountTest {
 		/*
 		 * Check that the REST runtime service become available 
 		 */
-		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
+		ServiceReference<JaxrsServiceRuntime> runtimeRef = getServiceReference(JaxrsServiceRuntime.class, 40000l);
 		assertNotNull(runtimeRef);
-		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
+		JaxrsServiceRuntime runtime = getService(JaxrsServiceRuntime.class, 30000l);
 		assertNotNull(runtime);
 		
 		Long lastChangeCount = (Long) runtimeRef.getProperty("service.changecount");
@@ -218,10 +218,10 @@ public class JaxRsWhiteboardChangeCountTest {
 		 * http://localhost:8185/test/customer
 		 */
 		Dictionary<String, Object> appProps = new Hashtable<>();
-		appProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
-		appProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "customerApp");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
 		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new Application(), appProps);
-		Filter f = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
+		Filter f = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
 		Application application = getService(f, 3000l);
 		assertNotNull(application);
 		
@@ -230,12 +230,12 @@ public class JaxRsWhiteboardChangeCountTest {
 		 * http://localhost:8185/test/hello
 		 */
 		Dictionary<String, Object> helloProps = new Hashtable<>();
-		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Hello");
-		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
 		System.out.println("Register resource for uri /hello under application customer");
 		ServiceRegistration<HelloResource> helloRegistration = context.registerService(HelloResource.class, new HelloResource(), helloProps);
-		f = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=Hello)");
+		f = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=Hello)");
 		Object service = getService(f, 3000l);
 		assertNotNull(service);
 		
@@ -289,9 +289,9 @@ public class JaxRsWhiteboardChangeCountTest {
 		 * Tear-down the system
 		 */
 		CountDownLatch deleteLatch = new CountDownLatch(1);
-		TestServiceCustomizer<JaxRSServiceRuntime, JaxRSServiceRuntime> c = new TestServiceCustomizer<>(context, null, deleteLatch);
+		TestServiceCustomizer<JaxrsServiceRuntime, JaxrsServiceRuntime> c = new TestServiceCustomizer<>(context, null, deleteLatch);
 		configuration.delete();
-		awaitRemovedService(JaxRSServiceRuntime.class, c);
+		awaitRemovedService(JaxrsServiceRuntime.class, c);
 		deleteLatch.await(10, TimeUnit.SECONDS);
 		// wait for server shutdown
 		Thread.sleep(2000L);

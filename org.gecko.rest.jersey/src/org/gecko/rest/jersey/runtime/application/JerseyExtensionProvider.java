@@ -34,7 +34,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jaxrs.runtime.dto.BaseExtensionDTO;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
-import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * A wrapper class for a JaxRs extensions 
@@ -128,7 +128,7 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 	 * @return the {@link JaxRSWhiteboardConstants} for this resource type
 	 */
 	protected String getJaxRsResourceConstant() {
-		return JaxRSWhiteboardConstants.JAX_RS_EXTENSION;
+		return JaxrsWhiteboardConstants.JAX_RS_EXTENSION;
 	}
 
 }

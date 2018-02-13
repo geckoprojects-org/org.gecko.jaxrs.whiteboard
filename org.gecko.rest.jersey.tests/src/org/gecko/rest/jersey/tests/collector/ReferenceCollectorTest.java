@@ -24,7 +24,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 import org.osgi.util.pushstream.PushStream;
 import org.osgi.util.tracker.ServiceTracker;
 
@@ -54,15 +54,15 @@ public class ReferenceCollectorTest {
 //		try(PushStream<ServiceReferenceEvent> stream = collector.createPushStream()){
 //			final CountDownLatch latch = new CountDownLatch(3);
 //			stream.forEach(s -> {
-//				System.out.println(s.getReference().getProperty(JaxRSWhiteboardConstants.JAX_RS_NAME));
+//				System.out.println(s.getReference().getProperty(JaxrsWhiteboardConstants.JAX_RS_NAME));
 //				latch.countDown();
 //			});
 //			
 //			assertFalse(latch.await(1, TimeUnit.SECONDS));
 //			
 //			Dictionary<String, Object> helloProps = new Hashtable<>();
-//			helloProps.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
-//			helloProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Hello");
+//			helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+//			helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
 //			System.out.println("Register resource for uri /hello");
 //			toUnregister.add(context.registerService(Object.class, new HelloResource(), helloProps));
 //		
@@ -78,15 +78,15 @@ public class ReferenceCollectorTest {
 //		try(PushStream<ServiceReferenceEvent> stream = collector.createPushStream()){
 //			final CountDownLatch latch = new CountDownLatch(3);
 //			stream.forEach(s -> {
-//				System.out.println(s.getReference().getProperty(JaxRSWhiteboardConstants.JAX_RS_NAME));
+//				System.out.println(s.getReference().getProperty(JaxrsWhiteboardConstants.JAX_RS_NAME));
 //				latch.countDown();
 //			});
 //			
 //			assertFalse(latch.await(1, TimeUnit.SECONDS));
 //			
 //			Dictionary<String, Object> helloProps = new Hashtable<>();
-//			helloProps.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
-//			helloProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Hello");
+//			helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+//			helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
 //			System.out.println("Register resource for uri /hello");
 //			toUnregister.add(context.registerService(Object.class, new HelloResource(), helloProps));
 //			
@@ -95,7 +95,7 @@ public class ReferenceCollectorTest {
 //			try(PushStream<ServiceReferenceEvent> innerStream = collector.createPushStream()){
 //				final CountDownLatch innerLatch = new CountDownLatch(3);
 //				innerStream.forEach(s -> {
-//					System.out.println(s.getReference().getProperty(JaxRSWhiteboardConstants.JAX_RS_NAME));
+//					System.out.println(s.getReference().getProperty(JaxrsWhiteboardConstants.JAX_RS_NAME));
 //					innerLatch.countDown();
 //				});
 //				
@@ -115,8 +115,8 @@ public class ReferenceCollectorTest {
 //			assertFalse(latch.await(1, TimeUnit.SECONDS));
 //			
 //			Dictionary<String, Object> helloProps = new Hashtable<>();
-//			helloProps.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
-//			helloProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Hello");
+//			helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+//			helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
 //			System.out.println("Register resource for uri /hello");
 //			toUnregister.add(context.registerService(Object.class, new HelloResource(), helloProps));
 //			
@@ -124,7 +124,7 @@ public class ReferenceCollectorTest {
 //			Set<ServiceReferenceEvent> extensions = new HashSet<>();
 //			stream.window(Duration.ofSeconds(1), sec -> sec).forEach(sec -> {
 //				System.out.println(System.currentTimeMillis() + " here we are " + sec.size());
-//				sec.forEach(se -> System.out.println("ref: " + se.getReference().getProperty(JaxRSWhiteboardConstants.JAX_RS_NAME)));
+//				sec.forEach(se -> System.out.println("ref: " + se.getReference().getProperty(JaxrsWhiteboardConstants.JAX_RS_NAME)));
 //				sec.stream().filter(sre -> sre.isResource()).forEach(resources::add);
 //				sec.stream().filter(sre -> sre.isExtension()).forEach(extensions::add);
 //				 

@@ -31,13 +31,11 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceObjects;
-import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.BaseApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.BaseExtensionDTO;
-import org.osgi.service.jaxrs.runtime.dto.ExtensionDTO;
 import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.FailedExtensionDTO;
-import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * Test the extension provider. Because it is extended from the resource provider, only the specific behavior is tested.
@@ -58,9 +56,9 @@ public class JaxRsExtensionProviderTest {
 	public void testExtension() {
 		Map<String, Object> applicationProperties = new HashMap<>();
 		applicationProperties.put("something", "else");
-		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(hallo=bla)");
-		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
-		applicationProperties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "test");
+		applicationProperties.put(JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(hallo=bla)");
+		applicationProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
+		applicationProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "test");
 		
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new TestApplication(), applicationProperties);
 		
@@ -71,7 +69,7 @@ public class JaxRsExtensionProviderTest {
 		assertEquals("test", provider.getName());
 		
 		Map<String, Object> resourceProperties = new HashMap<>();
-		resourceProperties.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		resourceProperties.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resourceProperties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
 		when(serviceObject.getService()).thenReturn(new TestExtension());
 		JaxRsExtensionProvider resourceProvider = new JerseyExtensionProvider<Object>(serviceObject, resourceProperties);
@@ -82,7 +80,7 @@ public class JaxRsExtensionProviderTest {
 		assertTrue(resourceProvider.isSingleton());
 		
 		resourceProperties.clear();
-		resourceProperties.put(JaxRSWhiteboardConstants.JAX_RS_EXTENSION, "true");
+		resourceProperties.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, "true");
 		resourceProperties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
 		resourceProvider = new JerseyExtensionProvider<Object>(serviceObject, resourceProperties);
 		

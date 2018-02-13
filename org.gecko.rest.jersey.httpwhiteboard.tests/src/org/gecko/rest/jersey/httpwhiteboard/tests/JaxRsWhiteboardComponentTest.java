@@ -30,11 +30,11 @@ import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 
-import org.apache.felix.http.jetty.JettyConfigConstants;
 import org.gecko.rest.jersey.httpwhiteboard.tests.applications.TestLegacyApplication;
 import org.gecko.rest.jersey.httpwhiteboard.tests.customizer.TestServiceCustomizer;
 import org.gecko.rest.jersey.httpwhiteboard.tests.resources.HelloResource;
 import org.gecko.rest.jersey.provider.JerseyConstants;
+import org.gecko.rest.jersey.tests.customizer.ServiceChecker;
 import org.glassfish.jersey.client.JerseyClient;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.JerseyInvocation;
@@ -56,8 +56,8 @@ import org.osgi.service.http.context.ServletContextHelper;
 import org.osgi.service.http.runtime.HttpServiceRuntime;
 import org.osgi.service.http.runtime.HttpServiceRuntimeConstants;
 import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
-import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime;
-import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
+import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
@@ -115,7 +115,7 @@ public class JaxRsWhiteboardComponentTest {
 		props.put("org.osgi.service.http.port", port);
 		props.put("org.apache.felix.http.context_path", "/");
 		props.put("org.apache.felix.http.name", "Test");
-		props.put(JettyConfigConstants.FELIX_CUSTOM_HTTP_RUNTIME_PROPERTY_PREFIX + "test.id", "endpoints");
+		props.put("org.apache.felix.http.runtime.init." + "test.id", "endpoints");
 		
 		runtimeConfig.update(props);
 		
@@ -151,9 +151,9 @@ public class JaxRsWhiteboardComponentTest {
 		/*
 		 * Check that the REST runtime service become available 
 		 */
-		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
+		ServiceReference<JaxrsServiceRuntime> runtimeRef = getServiceReference(JaxrsServiceRuntime.class, 40000l);
 		assertNotNull(runtimeRef);
-		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
+		JaxrsServiceRuntime runtime = getService(JaxrsServiceRuntime.class, 30000l);
 		assertNotNull(runtime);
 		
 		CountDownLatch cdl = new CountDownLatch(1);
@@ -175,10 +175,10 @@ public class JaxRsWhiteboardComponentTest {
 		 * http://localhost:8185/test/customer
 		 */
 		Dictionary<String, Object> appProps = new Hashtable<>();
-		appProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
-		appProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "customerApp");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
 		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new Application(), appProps);
-		Filter f = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
+		Filter f = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
 		Application application = getService(f, 3000l);
 		assertNotNull(application);
 		
@@ -187,12 +187,12 @@ public class JaxRsWhiteboardComponentTest {
 		 * http://localhost:8185/test/hello
 		 */
 		Dictionary<String, Object> helloProps = new Hashtable<>();
-		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Hello");
-		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
 		System.out.println("Register resource for uri /hello under application customer");
 		ServiceRegistration<Object> helloRegistration = context.registerService(Object.class, new HelloResource(), helloProps);
-		f = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=Hello)");
+		f = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=Hello)");
 		Object service = getService(f, 3000l);
 		assertNotNull(service);
 		
@@ -319,9 +319,9 @@ public class JaxRsWhiteboardComponentTest {
 //		/*
 //		 * Check that the REST runtime service become available 
 //		 */
-//		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
+//		ServiceReference<JaxrsServiceRuntime> runtimeRef = getServiceReference(JaxrsServiceRuntime.class, 40000l);
 //		assertNotNull(runtimeRef);
-//		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
+//		JaxrsServiceRuntime runtime = getService(JaxrsServiceRuntime.class, 30000l);
 //		assertNotNull(runtime);
 //		
 //		CountDownLatch cdl = new CountDownLatch(1);
@@ -343,10 +343,10 @@ public class JaxRsWhiteboardComponentTest {
 //		 * http://localhost:8185/test/customer
 //		 */
 //		Dictionary<String, Object> appProps = new Hashtable<>();
-//		appProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
-//		appProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "customerApp");
+//		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
+//		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
 //		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new Application(), appProps);
-//		Filter appFilter = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
+//		Filter appFilter = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
 //		Application application = getService(appFilter, 3000l);
 //		assertNotNull(application);
 //		
@@ -355,12 +355,12 @@ public class JaxRsWhiteboardComponentTest {
 //		 * http://localhost:8185/test/hello
 //		 */
 //		Dictionary<String, Object> helloProps = new Hashtable<>();
-//		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
-//		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Hello");
-//		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=*)");
+//		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+//		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
+//		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=*)");
 //		System.out.println("Register resource for uri /hello under application customer");
 //		ServiceRegistration<Object> helloRegistration = context.registerService(Object.class, new HelloResource(), helloProps);
-//		Filter resourceFilter = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=Hello)");
+//		Filter resourceFilter = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=Hello)");
 //		Object service = getService(resourceFilter, 3000l);
 //		assertNotNull(service);
 //		
@@ -481,7 +481,7 @@ public class JaxRsWhiteboardComponentTest {
 		props.put("org.osgi.service.http.port", port);
 		props.put("org.apache.felix.http.context_path", "/");
 		props.put("org.apache.felix.http.name", "Test");
-		props.put(JettyConfigConstants.FELIX_CUSTOM_HTTP_RUNTIME_PROPERTY_PREFIX + "test.id", "endpoints");
+		props.put("org.apache.felix.http.runtime.init." + "test.id", "endpoints");
 		
 		runtimeConfig.update(props);
 		
@@ -517,9 +517,9 @@ public class JaxRsWhiteboardComponentTest {
 		/*
 		 * Check that the REST runtime service become available 
 		 */
-		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
+		ServiceReference<JaxrsServiceRuntime> runtimeRef = getServiceReference(JaxrsServiceRuntime.class, 40000l);
 		assertNotNull(runtimeRef);
-		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
+		JaxrsServiceRuntime runtime = getService(JaxrsServiceRuntime.class, 30000l);
 		assertNotNull(runtime);
 		
 		CountDownLatch cdl = new CountDownLatch(1);
@@ -541,10 +541,10 @@ public class JaxRsWhiteboardComponentTest {
 		 * http://localhost:8185/test/customer
 		 */
 		Dictionary<String, Object> appProps = new Hashtable<>();
-		appProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
-		appProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "customerApp");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
 		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new Application(), appProps);
-		Filter appFilter = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
+		Filter appFilter = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
 		Application application = getService(appFilter, 3000l);
 		assertNotNull(application);
 		
@@ -553,12 +553,12 @@ public class JaxRsWhiteboardComponentTest {
 		 * http://localhost:8185/test/hello
 		 */
 		Dictionary<String, Object> helloProps = new Hashtable<>();
-		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Hello");
-		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=*)");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=*)");
 		System.out.println("Register resource for uri /hello under application customer");
 		ServiceRegistration<Object> helloRegistration = context.registerService(Object.class, new HelloResource(), helloProps);
-		Filter resourceFilter = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=Hello)");
+		Filter resourceFilter = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=Hello)");
 		Object service = getService(resourceFilter, 3000l);
 		assertNotNull(service);
 		
@@ -661,7 +661,7 @@ public class JaxRsWhiteboardComponentTest {
 		props.put("org.osgi.service.http.port", port);
 		props.put("org.apache.felix.http.context_path", "/");
 		props.put("org.apache.felix.http.name", "Test");
-		props.put(JettyConfigConstants.FELIX_CUSTOM_HTTP_RUNTIME_PROPERTY_PREFIX + "test.id", "endpoints");
+		props.put("org.apache.felix.http.runtime.init." + "test.id", "endpoints");
 		
 		runtimeConfig1.update(props);
 
@@ -675,7 +675,7 @@ public class JaxRsWhiteboardComponentTest {
 		props2.put("org.osgi.service.http.port", port + 1);
 		props2.put("org.apache.felix.http.context_path", "/");
 		props2.put("org.apache.felix.http.name", "Test");
-		props2.put(JettyConfigConstants.FELIX_CUSTOM_HTTP_RUNTIME_PROPERTY_PREFIX + "test.id", "endpoints");
+		props2.put("org.apache.felix.http.runtime.init." + "test.id", "endpoints");
 		
 		runtimeConfig2.update(props2);
 		
@@ -711,9 +711,9 @@ public class JaxRsWhiteboardComponentTest {
 		/*
 		 * Check that the REST runtime service become available 
 		 */
-		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
+		ServiceReference<JaxrsServiceRuntime> runtimeRef = getServiceReference(JaxrsServiceRuntime.class, 40000l);
 		assertNotNull(runtimeRef);
-		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
+		JaxrsServiceRuntime runtime = getService(JaxrsServiceRuntime.class, 30000l);
 		assertNotNull(runtime);
 		
 		CountDownLatch cdl = new CountDownLatch(1);
@@ -735,10 +735,10 @@ public class JaxRsWhiteboardComponentTest {
 		 * http://localhost:8185/test/customer
 		 */
 		Dictionary<String, Object> appProps = new Hashtable<>();
-		appProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
-		appProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "customerApp");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
 		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new Application(), appProps);
-		Filter appFilter = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
+		Filter appFilter = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
 		Application application = getService(appFilter, 3000l);
 		assertNotNull(application);
 		
@@ -747,12 +747,12 @@ public class JaxRsWhiteboardComponentTest {
 		 * http://localhost:8185/test/hello
 		 */
 		Dictionary<String, Object> helloProps = new Hashtable<>();
-		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Hello");
-		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=*)");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=*)");
 		System.out.println("Register resource for uri /hello under application customer");
 		ServiceRegistration<Object> helloRegistration = context.registerService(Object.class, new HelloResource(), helloProps);
-		Filter resourceFilter = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=Hello)");
+		Filter resourceFilter = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=Hello)");
 		Object service = getService(resourceFilter, 3000l);
 		assertNotNull(service);
 		
@@ -795,7 +795,7 @@ public class JaxRsWhiteboardComponentTest {
 		assertEquals(200, response.getStatus());
 		
 		//change the properties of the second http runtime, so the jaxRS runtime should removed
-		props2.put(JettyConfigConstants.FELIX_CUSTOM_HTTP_RUNTIME_PROPERTY_PREFIX + "test.id", "endpoints2");
+		props2.put("org.apache.felix.http.runtime.init." + "test.id", "endpoints2");
 		runtimeConfig2.update(props2);
 
 		cdl.await(3, TimeUnit.SECONDS);
@@ -910,7 +910,7 @@ public class JaxRsWhiteboardComponentTest {
 		props.put("org.osgi.service.http.port", port);
 		props.put("org.apache.felix.http.context_path", "/");
 		props.put("org.apache.felix.http.name", "Test");
-		props.put(JettyConfigConstants.FELIX_CUSTOM_HTTP_RUNTIME_PROPERTY_PREFIX + "test.id", "endpoints");
+		props.put("org.apache.felix.http.runtime.init." + "test.id", "endpoints");
 
 		runtimeConfig.update(props);
 		
@@ -944,16 +944,14 @@ public class JaxRsWhiteboardComponentTest {
 		assertNull(factoryProperties);
 		jasxRsWhiteBoardConfig.update(properties);
 		
+		
 		/*
 		 * Check that the REST runtime service become available 
 		 */
-		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
-		assertNotNull(runtimeRef);
-		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
-		assertNotNull(runtime);
+		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class, context);
+		runtimeChecker.start();
 		
-		CountDownLatch cdl = new CountDownLatch(1);
-		cdl.await(3, TimeUnit.SECONDS);
+		assertTrue(runtimeChecker.waitCreate());
 		
 		/*
 		 * Check if our RootResource is not available under http://localhost:8185/test
@@ -966,23 +964,24 @@ public class JaxRsWhiteboardComponentTest {
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());
 		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
 		/*
 		 * Mount the application customer that will become available under: test/customer
 		 * http://localhost:8185/test/customer
 		 */
 		Dictionary<String, Object> appProps = new Hashtable<>();
-		appProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "legacy");
-		appProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "legacyApp");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "/legacy");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "legacyApp");
 		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new TestLegacyApplication(), appProps);
-		Filter appFilter = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=legacyApp)");
+		Filter appFilter = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=legacyApp)");
 		Application application = getService(appFilter, 3000l);
 		assertNotNull(application);
 		
-		/*
-		 * Wait a short time to reload the configuration dynamically
-		 */
-		cdl = new CountDownLatch(1);
-		cdl.await(2, TimeUnit.SECONDS);
+		assertTrue(runtimeChecker.waitModify());	
 		
 		/*
 		 * Check if http://localhost:8185/test/customer/hello is available now. 
@@ -993,6 +992,12 @@ public class JaxRsWhiteboardComponentTest {
 		get = webTarget.request().buildGet();
 		response = get.invoke();
 		assertEquals(200, response.getStatus());
+	
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
 		
 		appRegistration.unregister();
 		application = getService(appFilter, 3000l);
@@ -1000,11 +1005,7 @@ public class JaxRsWhiteboardComponentTest {
 		
 		servletContextRegistration.unregister();
 		
-		/*
-		 * Wait a short time to reload the configuration dynamically
-		 */
-		cdl = new CountDownLatch(1);
-		cdl.await(1, TimeUnit.SECONDS);
+		assertTrue(runtimeChecker.waitModify());
 		
 		/*
 		 * Check if http://localhost:8185/test/customer/hello is not available anymore. 
@@ -1082,9 +1083,9 @@ public class JaxRsWhiteboardComponentTest {
 		/*
 		 * Check that the REST runtime service become available 
 		 */
-		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
+		ServiceReference<JaxrsServiceRuntime> runtimeRef = getServiceReference(JaxrsServiceRuntime.class, 40000l);
 		assertNotNull(runtimeRef);
-		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
+		JaxrsServiceRuntime runtime = getService(JaxrsServiceRuntime.class, 30000l);
 		assertNotNull(runtime);
 		
 		CountDownLatch cdl = new CountDownLatch(1);
@@ -1106,10 +1107,10 @@ public class JaxRsWhiteboardComponentTest {
 		 * http://localhost:8185/test/customer
 		 */
 		Dictionary<String, Object> appProps = new Hashtable<>();
-		appProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "legacy");
-		appProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "legacyApp");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "legacy");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "legacyApp");
 		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new TestLegacyApplication(), appProps);
-		Filter appFilter = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=legacyApp)");
+		Filter appFilter = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=legacyApp)");
 		Application application = getService(appFilter, 3000l);
 		assertNotNull(application);
 		
@@ -1187,7 +1188,7 @@ public class JaxRsWhiteboardComponentTest {
 		props.put("org.osgi.service.http.port", port);
 		props.put("org.apache.felix.http.context_path", "/");
 		props.put("org.apache.felix.http.name", "Test");
-		props.put(JettyConfigConstants.FELIX_CUSTOM_HTTP_RUNTIME_PROPERTY_PREFIX + "test.id", "endpoints");
+		props.put("org.apache.felix.http.runtime.init." + "test.id", "endpoints");
 		
 		runtimeConfig.update(props);
 		
@@ -1223,9 +1224,9 @@ public class JaxRsWhiteboardComponentTest {
 		/*
 		 * Check that the REST runtime service become available 
 		 */
-		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
+		ServiceReference<JaxrsServiceRuntime> runtimeRef = getServiceReference(JaxrsServiceRuntime.class, 40000l);
 		assertNotNull(runtimeRef);
-		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
+		JaxrsServiceRuntime runtime = getService(JaxrsServiceRuntime.class, 30000l);
 		assertNotNull(runtime);
 		
 		CountDownLatch cdl = new CountDownLatch(1);
@@ -1247,11 +1248,11 @@ public class JaxRsWhiteboardComponentTest {
 		 * http://localhost:8185/test/hello
 		 */
 		Dictionary<String, Object> helloProps = new Hashtable<>();
-		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Hello");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
 		System.out.println("Register resource for uri /hello");
 		ServiceRegistration<Object> helloRegistration = context.registerService(Object.class, new HelloResource(), helloProps);
-		Filter f = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=Hello)");
+		Filter f = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=Hello)");
 		Object service = getService(f, 3000l);
 		assertNotNull(service);
 		
@@ -1325,7 +1326,7 @@ public class JaxRsWhiteboardComponentTest {
 		props.put("org.osgi.service.http.port", port);
 		props.put("org.apache.felix.http.context_path", "/");
 		props.put("org.apache.felix.http.name", "Test");
-		props.put(JettyConfigConstants.FELIX_CUSTOM_HTTP_RUNTIME_PROPERTY_PREFIX + "test.id", "endpoints");
+		props.put("org.apache.felix.http.runtime.init." + "test.id", "endpoints");
 
 		//Register our Context
 		ServletContextHelper newContext = new ServletContextHelper() {
@@ -1348,6 +1349,9 @@ public class JaxRsWhiteboardComponentTest {
 		ServiceReference<HttpServiceRuntime> httpRuntimeRef = getServiceReference(HttpServiceRuntime.class, 40000l);
 		assertNotNull(httpRuntimeRef);
 		
+		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class, context);
+		runtimeChecker.start();
+		
 		assertNotNull(configAdmin);
 		Configuration jasxRsWhiteBoardConfig = configAdmin.getConfiguration("JaxRsHttpWhiteboardRuntimeComponent", "?");
 		assertNotNull(jasxRsWhiteBoardConfig);
@@ -1361,24 +1365,18 @@ public class JaxRsWhiteboardComponentTest {
 		 * http://localhost:8185/test/hello
 		 */
 		Dictionary<String, Object> helloProps = new Hashtable<>();
-		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		helloProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Hello");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
 		System.out.println("Register resource for uri /hello");
 		ServiceRegistration<Object> helloRegistration = context.registerService(Object.class, new HelloResource(), helloProps);
-		Filter f = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=Hello)");
+		Filter f = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=Hello)");
 		Object service = getService(f, 3000l);
 		assertNotNull(service);
 		
 		/*
 		 * Check that the REST runtime service become available 
 		 */
-		ServiceReference<JaxRSServiceRuntime> runtimeRef = getServiceReference(JaxRSServiceRuntime.class, 40000l);
-		assertNotNull(runtimeRef);
-		JaxRSServiceRuntime runtime = getService(JaxRSServiceRuntime.class, 30000l);
-		assertNotNull(runtime);
-		
-		CountDownLatch cdl = new CountDownLatch(1);
-		cdl.await(1, TimeUnit.SECONDS);
+		assertTrue(runtimeChecker.waitCreate());
 		
 		/*
 		 * Check if http://localhost:8185/test/hello is available now. 
@@ -1392,15 +1390,16 @@ public class JaxRsWhiteboardComponentTest {
 		Response response = get.invoke();
 		assertEquals(200, response.getStatus());
 		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
 		helloRegistration.unregister();
 		service = getService(f, 3000l);
 		assertNull(service);
 		
-		/*
-		 * Wait a short time to reload the configuration dynamically
-		 */
-		cdl = new CountDownLatch(1);
-		cdl.await(1, TimeUnit.SECONDS);
+		assertTrue(runtimeChecker.waitModify());
 		
 		/*
 		 * Check if http://localhost:8185/test/hello is not available anymore. 
@@ -1444,9 +1443,9 @@ public class JaxRsWhiteboardComponentTest {
 		 * Tear-down the system
 		 */
 		CountDownLatch deleteLatch = new CountDownLatch(1);
-		TestServiceCustomizer<JaxRSServiceRuntime, JaxRSServiceRuntime> c = new TestServiceCustomizer<>(context, null, deleteLatch);
+		TestServiceCustomizer<JaxrsServiceRuntime, JaxrsServiceRuntime> c = new TestServiceCustomizer<>(context, null, deleteLatch);
 		configuration.delete();
-		awaitRemovedService(JaxRSServiceRuntime.class, c);
+		awaitRemovedService(JaxrsServiceRuntime.class, c);
 		assertTrue(deleteLatch.await(10, TimeUnit.SECONDS));
 	}
 	
@@ -1475,4 +1474,24 @@ public class JaxRsWhiteboardComponentTest {
 		return tracker.waitForService(timeout);
 	}
 
+	private <T extends Object> ServiceChecker<T> createdCheckerTrackedForCleanUp(Class<T> serviceClass, BundleContext context) {
+		ServiceChecker<T> checker = new ServiceChecker<>(serviceClass, context);
+
+		checker.setCreateCount(1);
+		checker.setDeleteCount(1);
+		checker.setCreateTimeout(5000);
+		checker.setDeleteTimeout(5000);
+		return (ServiceChecker<T>) checker;
+	}
+
+	private <T extends Object> ServiceChecker<T>  createdCheckerTrackedForCleanUp(String filter, BundleContext context) throws InvalidSyntaxException {
+		ServiceChecker<? extends Object> checker = new ServiceChecker<>(filter, context);
+		
+		checker.setCreateCount(1);
+		checker.setDeleteCount(1);
+		checker.setCreateTimeout(5);
+		checker.setDeleteTimeout(5);
+		return (ServiceChecker<T>) checker;
+	}
+	
 }

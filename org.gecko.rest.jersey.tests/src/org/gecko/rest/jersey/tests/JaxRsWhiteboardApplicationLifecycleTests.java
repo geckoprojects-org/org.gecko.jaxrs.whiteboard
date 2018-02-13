@@ -54,8 +54,8 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime;
-import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
+import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
@@ -109,7 +109,7 @@ public class JaxRsWhiteboardApplicationLifecycleTests {
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
 		
-		ServiceChecker<JaxRSServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxRSServiceRuntime.class, context);
+		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class, context);
 		runtimeChecker.start();
 		
 		ConfigurationAdmin configAdmin = context.getService(configAdminRef);
@@ -151,10 +151,10 @@ public class JaxRsWhiteboardApplicationLifecycleTests {
 		 * http://localhost:8185/test/customer
 		 */
 		Dictionary<String, Object> appProps = new Hashtable<>();
-		appProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "/legacy");
-		appProps.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "legacyApp");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "/legacy");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "legacyApp");
 		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new AnnotatedTestLegacyApplication(), appProps);
-		Filter appFilter = FrameworkUtil.createFilter("(" + JaxRSWhiteboardConstants.JAX_RS_NAME + "=legacyApp)");
+		Filter appFilter = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=legacyApp)");
 		Application application = getService(appFilter, 3000l);
 		assertNotNull(application);
 		
@@ -175,7 +175,7 @@ public class JaxRsWhiteboardApplicationLifecycleTests {
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
 
-		appProps.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "legacyChanged");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "legacyChanged");
 		appRegistration.setProperties(appProps);
 		
 		assertTrue(runtimeChecker.waitModify());
@@ -225,9 +225,9 @@ public class JaxRsWhiteboardApplicationLifecycleTests {
 		 * Tear-down the system
 		 */
 		CountDownLatch deleteLatch = new CountDownLatch(1);
-		TestServiceCustomizer<JaxRSServiceRuntime, JaxRSServiceRuntime> c = new TestServiceCustomizer<>(context, null, deleteLatch);
+		TestServiceCustomizer<JaxrsServiceRuntime, JaxrsServiceRuntime> c = new TestServiceCustomizer<>(context, null, deleteLatch);
 		configuration.delete();
-		awaitRemovedService(JaxRSServiceRuntime.class, c);
+		awaitRemovedService(JaxrsServiceRuntime.class, c);
 		deleteLatch.await(10, TimeUnit.SECONDS);
 		// wait for server shutdown
 		Thread.sleep(2000L);

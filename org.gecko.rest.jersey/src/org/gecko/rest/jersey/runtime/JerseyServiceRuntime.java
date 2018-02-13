@@ -11,15 +11,6 @@
  */
 package org.gecko.rest.jersey.runtime;
 
-import static org.gecko.rest.jersey.provider.JerseyConstants.JERSEY_CONTEXT_PATH;
-import static org.gecko.rest.jersey.provider.JerseyConstants.JERSEY_HOST;
-import static org.gecko.rest.jersey.provider.JerseyConstants.JERSEY_PORT;
-import static org.gecko.rest.jersey.provider.JerseyConstants.JERSEY_SCHEMA;
-import static org.gecko.rest.jersey.provider.JerseyConstants.WHITEBOARD_DEFAULT_CONTEXT_PATH;
-import static org.gecko.rest.jersey.provider.JerseyConstants.WHITEBOARD_DEFAULT_HOST;
-import static org.gecko.rest.jersey.provider.JerseyConstants.WHITEBOARD_DEFAULT_PORT;
-import static org.gecko.rest.jersey.provider.JerseyConstants.WHITEBOARD_DEFAULT_SCHEMA;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -41,33 +32,32 @@ import org.eclipse.jetty.servlet.ServletMapping;
 import org.gecko.rest.jersey.helper.JaxRsHelper;
 import org.gecko.rest.jersey.helper.JerseyHelper;
 import org.gecko.rest.jersey.jetty.JettyServerRunnable;
+import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
 import org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime;
 import org.gecko.rest.jersey.runtime.servlet.WhiteboardServletContainer;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
+import org.osgi.annotation.bundle.Capability;
 import org.osgi.namespace.implementation.ImplementationNamespace;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime;
-
-import aQute.bnd.annotation.headers.ProvideCapability;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * Implementation of the {@link JaxRSServiceRuntime} for a Jersey implementation
  * @author Mark Hoffmann
  * @since 12.07.2017
  */
-@ProvideCapability(ns = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, 
-version="1.0", 
-value = "osgi.implementation=\"osgi.jaxrs\";provider=jersey", 
-uses= {"javax.ws.rs", "javax.ws.rs.client", "javax.ws.rs.container", "javax.ws.rs.core", "javax.ws.rs.ext", "org.osgi.service.jaxrs.whiteboard"})
+@Capability(namespace = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, 
+version = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_SPECIFICATION_VERSION, 
+name = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_IMPLEMENTATION)
 public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 
 	private volatile Server jettyServer;
 	private volatile ServletContextHandler contextHandler;
-	private Integer port = WHITEBOARD_DEFAULT_PORT;
-	private String contextPath = WHITEBOARD_DEFAULT_CONTEXT_PATH;
+	private Integer port = JerseyConstants.WHITEBOARD_DEFAULT_PORT;
+	private String contextPath = JerseyConstants.WHITEBOARD_DEFAULT_CONTEXT_PATH;
 	private Logger logger = Logger.getLogger("o.e.o.j.serviceRuntime");
 
 	/* (non-Javadoc)
@@ -126,17 +116,17 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	 */
 	public String[] getURLs(ComponentContext context) {
 		StringBuilder sb = new StringBuilder();
-		String schema = JerseyHelper.getPropertyWithDefault(context, JERSEY_SCHEMA, WHITEBOARD_DEFAULT_SCHEMA);
+		String schema = JerseyHelper.getPropertyWithDefault(context, JerseyConstants.JERSEY_SCHEMA, JerseyConstants.WHITEBOARD_DEFAULT_SCHEMA);
 		sb.append(schema);
 		sb.append("://");
-		String host = JerseyHelper.getPropertyWithDefault(context, JERSEY_HOST, WHITEBOARD_DEFAULT_HOST);
+		String host = JerseyHelper.getPropertyWithDefault(context, JerseyConstants.JERSEY_HOST, JerseyConstants.WHITEBOARD_DEFAULT_HOST);
 		sb.append(host);
-		Object port = JerseyHelper.getPropertyWithDefault(context, JERSEY_PORT, null);
+		Object port = JerseyHelper.getPropertyWithDefault(context, JerseyConstants.JERSEY_PORT, null);
 		if (port != null) {
 			sb.append(":");
 			sb.append(port.toString());
 		}
-		String path = JerseyHelper.getPropertyWithDefault(context, JERSEY_CONTEXT_PATH, WHITEBOARD_DEFAULT_CONTEXT_PATH);
+		String path = JerseyHelper.getPropertyWithDefault(context, JerseyConstants.JERSEY_CONTEXT_PATH, JerseyConstants.WHITEBOARD_DEFAULT_CONTEXT_PATH);
 		path = JaxRsHelper.toServletPath(path);
 		sb.append(path);
 		return new String[] {sb.substring(0,  sb.length() - 1)};

@@ -25,7 +25,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 import org.osgi.util.pushstream.PushStream;
 import org.osgi.util.pushstream.PushStreamProvider;
 import org.osgi.util.pushstream.SimplePushEventSource;
@@ -58,7 +58,7 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 	@Activate
 	public void activate(BundleContext context) throws InvalidSyntaxException {
 		this.context = context;
-		serviceTracker = new ServiceTracker<>(context, context.createFilter("(|(" + JaxRSWhiteboardConstants.JAX_RS_RESOURCE + "=true)(" + JaxRSWhiteboardConstants.JAX_RS_EXTENSION + "=true))"), this);
+		serviceTracker = new ServiceTracker<>(context, context.createFilter("(|(" + JaxrsWhiteboardConstants.JAX_RS_RESOURCE + "=true)(" + JaxrsWhiteboardConstants.JAX_RS_EXTENSION + "=true))"), this);
 		serviceTracker.open();
 
 		source = provider.buildSimpleEventSource(ServiceReferenceEvent.class).build();

@@ -18,7 +18,7 @@ import org.gecko.rest.jersey.provider.application.JaxRsResourceProvider;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jaxrs.runtime.dto.BaseDTO;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
-import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * A wrapper class for a JaxRs resources 
@@ -69,7 +69,7 @@ public class JerseyResourceProvider<T extends Object> extends JerseyApplicationC
 	 * @return the {@link JaxRSWhiteboardConstants} for this resource type
 	 */
 	protected String getJaxRsResourceConstant() {
-		return JaxRSWhiteboardConstants.JAX_RS_RESOURCE;
+		return JaxrsWhiteboardConstants.JAX_RS_RESOURCE;
 	}
 
 }

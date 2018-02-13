@@ -26,7 +26,7 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.component.ComponentConstants;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
-import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * An abstract provider implementation. This provider is intended to have many instances for the same content.
@@ -186,7 +186,7 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 	protected String getProviderName() {
 		String providerName = "." + UUID.randomUUID().toString();
 		if (properties != null) {
-			String jaxRsName = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_NAME);
+			String jaxRsName = (String) properties.get(JaxrsWhiteboardConstants.JAX_RS_NAME);
 			if (jaxRsName != null) {
 				providerName = jaxRsName;
 				if (jaxRsName.startsWith("osgi") || jaxRsName.startsWith(".")) {
@@ -216,7 +216,7 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 		if (serviceId == null) {
 			serviceId = (Long) properties.get(ComponentConstants.COMPONENT_ID);
 		}
-		String filter = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET);
+		String filter = (String) properties.get(JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET);
 		if (filter != null) {
 			try {
 				whiteboardFilter = FrameworkUtil.createFilter(filter);
@@ -225,7 +225,7 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 				updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
 			}
 		}
-		String[] filters = (String[]) properties.get(JaxRSWhiteboardConstants.JAX_RS_EXTENSION_SELECT);
+		String[] filters = (String[]) properties.get(JaxrsWhiteboardConstants.JAX_RS_EXTENSION_SELECT);
 		if (filters != null) {
 			for (String f : filters) {
 				try {

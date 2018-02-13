@@ -29,6 +29,7 @@ import org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime;
 import org.gecko.rest.jersey.runtime.servlet.WhiteboardServletContainer;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
+import org.osgi.annotation.bundle.Capability;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -44,21 +45,18 @@ import org.osgi.service.http.context.ServletContextHelper;
 import org.osgi.service.http.runtime.HttpServiceRuntime;
 import org.osgi.service.http.runtime.HttpServiceRuntimeConstants;
 import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
-import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime;
-
-import aQute.bnd.annotation.headers.ProvideCapability;
-import aQute.bnd.annotation.headers.RequireCapability;
 
 /**
  * Implementation of the {@link JaxRSServiceRuntime} for a Jersey implementation
  * @author Mark Hoffmann
  * @since 12.07.2017
  */
-@ProvideCapability(ns = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, 
+@Capability(namespace = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, 
 version="1.0", 
-value = "osgi.implementation=\"osgi.jaxrs\";provider=jersey;http.whiteboard=true", 
-uses= {"javax.ws.rs", "javax.ws.rs.client", "javax.ws.rs.container", "javax.ws.rs.core", "javax.ws.rs.ext", "org.osgi.service.jaxrs.whiteboard"})
-@RequireCapability(ns = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, filter = "(osgi.implementation=osgi.http)")
+name = "osgi.jaxrs", 
+attribute = {"provider=jersey" , "http.whiteboard=true" }
+//uses= {"javax.ws.rs", "javax.ws.rs.client", "javax.ws.rs.container", "javax.ws.rs.core", "javax.ws.rs.ext", "org.osgi.service.jaxrs.whiteboard"}
+)
 public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 
 	private final Map<String, ServiceRegistration<Servlet>> applicationServletRegistrationMap = new ConcurrentHashMap<>();

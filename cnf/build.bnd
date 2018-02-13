@@ -1,19 +1,15 @@
 # Configure Repositories
 -plugin.1.Central: \
-	aQute.bnd.deployer.repository.wrapper.Plugin; \
-		location = "${build}/cache/wrapper"; \
-		reindex = true, \
-	aQute.bnd.jpm.Repository; \
-		includeStaged = true; \
-		name = Central; \
-		location = ${build}/.bnd/shacache; \
-		index = ${build}/central.json
+	aQute.bnd.repository.maven.provider.MavenBndRepository; \
+		releaseUrl=https://repo.maven.apache.org/maven2/; \
+		index=${.}/central.maven; \
+		name="Central"
 
 -plugin.2.Local: \
 	aQute.bnd.deployer.repository.LocalIndexedRepo; \
 		name = Local; \
 		pretty = true; \
-		local = ${.}/local
+		local = ${build}/local
 
 -plugin.3.Templates: \
 	aQute.bnd.deployer.repository.LocalIndexedRepo; \
@@ -26,55 +22,61 @@
 		name = Release; \
 		pretty = true; \
 		local = ${build}/release
-		
--plugin.5.Maven = \
-   aQute.bnd.repository.maven.provider.MavenBndRepository; \
-       releaseUrl=https://repo.maven.apache.org/maven2/; \
-       index=${.}/cenral.maven; \
-       name="Maven Central"
-       
--plugin.6.OSGi = \
-   aQute.bnd.repository.maven.provider.MavenBndRepository; \
-       snapshotUrl=https://oss.sonatype.org/content/repositories/osgi/; \
-       index=${.}/osgi.maven; \
-       name="OSGi Maven"
-       
--plugin.7.apache = \
-         aQute.bnd.repository.maven.provider.MavenBndRepository;\
-            snapshotUrl="https://repository.apache.org/content/repositories/snapshots/";\
-            index=${.}/apache-snapshots.maven;\
-            name='Apache Snapshots';\
-            readOnly=true       
-#-plugin.8.Nexus = \
-#	aQute.bnd.repository.maven.provider.MavenBndRepository; \
- #      releaseUrl=http://devel.data-in-motion.biz/nexus/repository/maven-releases/; \
-  #     snapshotUrl=http://devel.data-in-motion.biz/nexus/repository/maven-snapshots/; \
-   #    index=${.}/dim.release.maven; \
-	#   name = "Release Nexus"
-
--plugin.9.Jersey = \
-	aQute.bnd.deployer.repository.FixedIndexedRepo; \
-	locations = http://devel.data-in-motion.biz/public/update/repository/p2/obr/jersey-dependencies/index.xml;\
-	readonly = true;\
-	name = "Jersey_Dependencies"
-#-plugin.9.Jersey = \
-#	aQute.bnd.repository.osgi.OSGiRepository; \
-#	locations = http://devel.data-in-motion.biz/public/update/repository/p2/obr/jersey-dependencies/index.xml;\
-#	name = "Jersey_Dependencies"
-
-#-plugin.10.jetty_obr: \
-#	aQute.bnd.repository.osgi.OSGiRepository; \
-#	locations = http://devel.data-in-motion.biz/public/update/repository/p2/obr/jetty-9.4.6/index.xml;\
-#	name = "Jetty OBR" 
-
-#-plugin.11.http_whiteboard: \
-#	aQute.bnd.repository.osgi.OSGiRepository; \
-#	locations = http://devel.data-in-motion.biz/public/update/repository/p2/obr/http-whiteboard/index.xml;\
-#	name = "Jetty HTTP Whiteboard" 
 
 -releaserepo: Release
 -baselinerepo: Release
 
--connection-settings: ${.}/settings.xml
 # JUnit
 junit: org.apache.servicemix.bundles.junit; version=4.12
+
+-plugin: \
+	aQute.bnd.repository.osgi.OSGiRepository;\
+		name=DIM OCL-3.8;\
+		locations=http://devel.data-in-motion.biz/public/update/repository/p2/releases/ocl-3.8/plugins/index.xml;\
+		cache=${build}/dim-ocl-3.8,\
+	aQute.bnd.repository.osgi.OSGiRepository;\
+		name=DIM QVT-3.8;\
+		locations=http://devel.data-in-motion.biz/public/update/repository/p2/releases/qvt-3.8/plugins/index.xml;\
+		cache=${build}/dim-qvt-3.8,\
+	aQute.bnd.repository.osgi.OSGiRepository;\
+		name=DIM EMF-2.13;\
+		locations=http://devel.data-in-motion.biz/public/update/repository/p2/obr/emf-3.8/index.xml;\
+		cache=${build}/dim-emf-3.8,\
+	aQute.bnd.repository.maven.provider.MavenBndRepository;\
+		releaseUrl=https://repo.eclipse.org/content/repositories/orbit-approved-artifacts/;\
+		index=${.}/eclipse.orbit.maven;name=Eclipse Orbit,\
+	aQute.bnd.repository.maven.provider.MavenBndRepository;\
+		releaseUrl=https://oss.sonatype.org/content/repositories/osgi/;\
+		snapshotUrl=https://oss.sonatype.org/content/repositories/osgi/;\
+		index=${.}/osgi.maven;name=OSGi Nexus,\
+	aQute.bnd.repository.maven.provider.MavenBndRepository;\
+		releaseUrl=/https://repo.eclipse.org/;\
+		index=${.}/eclipse.maven;\
+		name=Eclipse Nexus,\
+	aQute.bnd.repository.maven.provider.MavenBndRepository;\
+		snapshotUrl="https://repository.apache.org/content/repositories/snapshots/";\
+		index=${.}/apache-snapshots.maven;\
+		name='Apache Snapshots';\
+		readOnly=true,\
+	aQute.bnd.repository.osgi.OSGiRepository;\
+		name=DIM Eclipse Runtime;\
+		locations=http://devel.data-in-motion.biz/public/update/repository/p2/obr/dim-core-runtime/index.xml;\
+		cache=${build}/dim-core-runtime,\
+	aQute.bnd.repository.osgi.OSGiRepository;\
+		locations=http://devel.data-in-motion.biz/public/update/repository/p2/obr/emf-persistence/index.xml;\
+		name=EMFPersistence;\
+		cache=${build}/releaseOBR,\
+	aQute.bnd.repository.osgi.OSGiRepository;\
+		locations=http://devel.data-in-motion.biz/public/update/repository/p2/obr/bnd-templates/index.xml;\
+		name=BNDtemplates;\
+		cache=${build}/bndtemplates,\
+	aQute.bnd.repository.osgi.OSGiRepository;\
+		locations=http://devel.data-in-motion.biz/public/update/repository/p2/gecko/geckoEMF/index.xml;\
+		name=GeckoEMF;\
+		cache=${build}/GeckoEMF,\
+	aQute.bnd.repository.osgi.OSGiRepository; \
+		locations = http://devel.data-in-motion.biz/public/update/repository/p2/obr/jersey-dependencies/index.xml;\
+		readonly = true;\
+		name = "Jersey_Dependencies";\
+		cache=${build}/JerseyDependencies
+	

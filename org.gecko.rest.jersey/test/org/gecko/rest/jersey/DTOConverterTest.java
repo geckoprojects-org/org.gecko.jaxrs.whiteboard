@@ -49,7 +49,7 @@ import org.osgi.service.jaxrs.runtime.dto.FailedExtensionDTO;
 import org.osgi.service.jaxrs.runtime.dto.FailedResourceDTO;
 import org.osgi.service.jaxrs.runtime.dto.ResourceDTO;
 import org.osgi.service.jaxrs.runtime.dto.ResourceMethodInfoDTO;
-import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * Tests the DTO converter
@@ -79,8 +79,8 @@ public class DTOConverterTest {
 		assertEquals(DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE, dto.failureReason);
 		
 		properties.put(Constants.SERVICE_ID, Long.valueOf(12));
-		properties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "MyApp");
-		properties.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
+		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "MyApp");
+		properties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
 		
 		resourceProvider = new JerseyApplicationProvider(new Application(), properties);
 		dto = DTOConverter.toFailedApplicationDTO(resourceProvider, DTOConstants.FAILURE_REASON_SHADOWED_BY_OTHER_SERVICE);
@@ -109,8 +109,8 @@ public class DTOConverterTest {
 		assertEquals(-1, dto.serviceId);
 		
 		properties.put(Constants.SERVICE_ID, Long.valueOf(12));
-		properties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "MyApp");
-		properties.put(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
+		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "MyApp");
+		properties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
 		
 		resourceProvider = new JerseyApplicationProvider(new Application(), properties);
 		dto = DTOConverter.toApplicationDTO(resourceProvider);
@@ -139,7 +139,7 @@ public class DTOConverterTest {
 		assertEquals(DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE, dto.failureReason);
 		
 		properties.put(Constants.SERVICE_ID, Long.valueOf(12));
-		properties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Myresource");
+		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Myresource");
 		
 		resourceProvider = new JerseyResourceProvider<Object>(serviceObject, properties);
 		dto = DTOConverter.toFailedResourceDTO(resourceProvider, DTOConstants.FAILURE_REASON_SHADOWED_BY_OTHER_SERVICE);
@@ -170,7 +170,7 @@ public class DTOConverterTest {
 		assertEquals(2, methodInfoDTOs.length);
 		
 		properties.put(Constants.SERVICE_ID, Long.valueOf(12));
-		properties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Myresource");
+		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Myresource");
 		
 		resourceProvider = new JerseyResourceProvider<Object>(serviceObject, properties);
 		dto = DTOConverter.toResourceDTO(resourceProvider);
@@ -184,7 +184,7 @@ public class DTOConverterTest {
 		
 		properties = new Hashtable<>();
 		properties.put(ComponentConstants.COMPONENT_ID, Long.valueOf(13));
-		properties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Myresource2");
+		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Myresource2");
 
 		resourceProvider = new JerseyResourceProvider<Object>(serviceObject, properties);
 		dto = DTOConverter.toResourceDTO(resourceProvider);
@@ -215,7 +215,7 @@ public class DTOConverterTest {
 		assertEquals(DTOConstants.FAILURE_REASON_NOT_AN_EXTENSION_TYPE, dto.failureReason);
 		
 		properties.put(Constants.SERVICE_ID, Long.valueOf(12));
-		properties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Myresource");
+		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Myresource");
 		
 		extensionProvider = new JerseyExtensionProvider<Object>(serviceObject, properties);
 		dto = DTOConverter.toFailedExtensionDTO(extensionProvider, DTOConstants.FAILURE_REASON_DUPLICATE_NAME);
@@ -244,7 +244,7 @@ public class DTOConverterTest {
 		assertEquals(-1, dto.serviceId);
 		
 		properties.put(Constants.SERVICE_ID, Long.valueOf(12));
-		properties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Myresource");
+		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Myresource");
 		
 		extensionProvider = new JerseyExtensionProvider<Object>(serviceObject, properties);
 		dto = DTOConverter.toExtensionDTO(extensionProvider);
@@ -257,7 +257,7 @@ public class DTOConverterTest {
 		
 		properties = new Hashtable<>();
 		properties.put(ComponentConstants.COMPONENT_ID, Long.valueOf(13));
-		properties.put(JaxRSWhiteboardConstants.JAX_RS_NAME, "Myresource2");
+		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Myresource2");
 		properties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
 		extensionProvider = new JerseyExtensionProvider<Object>(serviceObject, properties);
 		dto = DTOConverter.toExtensionDTO(extensionProvider);

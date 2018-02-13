@@ -26,7 +26,7 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
-import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * A wrapper class for a JaxRs resources 
@@ -128,7 +128,7 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 		if (applicationFilter == null) {
 			return true;
 		} else {
-			Map<String, Object> properties = Collections.singletonMap(JaxRSWhiteboardConstants.JAX_RS_NAME, ".default");
+			Map<String, Object> properties = Collections.singletonMap(JaxrsWhiteboardConstants.JAX_RS_NAME, ".default");
 			return applicationFilter.matches(properties);
 		}
 	}
@@ -161,7 +161,7 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 			updateStatus(INVALID);
 			return;
 		}
-		String filter = (String) properties.get(JaxRSWhiteboardConstants.JAX_RS_APPLICATION_SELECT);
+		String filter = (String) properties.get(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT);
 		if (filter != null) {
 			try {
 				applicationFilter = FrameworkUtil.createFilter(filter);

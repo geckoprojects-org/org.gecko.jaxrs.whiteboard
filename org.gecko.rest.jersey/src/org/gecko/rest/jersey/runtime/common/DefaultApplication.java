@@ -15,16 +15,16 @@ import javax.ws.rs.core.Application;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
-import org.osgi.service.jaxrs.whiteboard.JaxRSWhiteboardConstants;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsApplicationBase;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsName;
 
 /**
  * The default Appplication for a Whiteboard 
  * @author Juergen Albert
  */
-@Component(service = Application.class, scope = ServiceScope.PROTOTYPE, property = {
-		JaxRSWhiteboardConstants.JAX_RS_NAME + "=.default",
-		JaxRSWhiteboardConstants.JAX_RS_APPLICATION_BASE + "=/"
-})
+@Component(service = Application.class, scope = ServiceScope.PROTOTYPE)
+@JaxrsName(".default")
+@JaxrsApplicationBase("/")
 public class DefaultApplication extends Application {
 
 }

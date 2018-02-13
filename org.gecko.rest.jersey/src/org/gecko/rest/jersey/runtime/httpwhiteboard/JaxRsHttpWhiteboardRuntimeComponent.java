@@ -27,7 +27,6 @@ import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime;
 
 /**
  * This component handles the lifecycle of a {@link JaxRSServiceRuntime}

@@ -1,3 +1,4 @@
 org.apache.felix:org.apache.felix.configurator:0.0.1-SNAPSHOT
 org.apache.felix:org.apache.felix.scr:2.1.0-SNAPSHOT
 org.apache.felix:org.apache.felix.configadmin:1.9.0-SNAPSHOT
+org.apache.felix:org.apache.felix.framework:5.7.0-SNAPSHOT

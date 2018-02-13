@@ -3,6 +3,7 @@
  */
 package org.gecko.rest.jersey;
 
+import java.util.Dictionary;
 import java.util.Map;
 
 import org.osgi.framework.Bundle;
