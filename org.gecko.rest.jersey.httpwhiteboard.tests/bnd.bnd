@@ -23,8 +23,6 @@ Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 	org.gecko.rest.jersey.tests;version=latest
 
 -runrequires: \
-	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.shell)',\
-	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.command)',\
 	osgi.identity;filter:='(&(osgi.identity=org.apache.felix.eventadmin)(version>=1.4.8))',\
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.configadmin)',\
 	osgi.identity;filter:='(osgi.identity=org.gecko.rest.jersey.httpwhiteboard.tests)'
@@ -54,15 +52,14 @@ javac.target: 1.8
 	javax.ws.rs-api;version='[2.1.0,2.1.1)',\
 	org.apache.felix.configadmin;version='[1.9.0,1.9.1)',\
 	org.apache.felix.eventadmin;version='[1.4.10,1.4.11)',\
-	org.apache.felix.gogo.command;version='[1.0.2,1.0.3)',\
-	org.apache.felix.gogo.runtime;version='[1.0.10,1.0.11)',\
-	org.apache.felix.gogo.shell;version='[1.0.0,1.0.1)',\
 	org.apache.felix.scr;version='[2.1.0,2.1.1)',\
 	org.eclipselabs.jaxrs.jersey.contract;version='[2.26.0,2.26.1)',\
 	org.glassfish.javax.activation;version='[3.0.0,3.0.1)',\
 	org.glassfish.jersey.bundles.repackaged.jersey-guava;version='[2.26.0,2.26.1)',\
 	org.gecko.rest.jersey.tests;version=snapshot,\
-	org.apache.felix.http.jetty;version='[3.4.8,3.4.9)'
+	org.apache.felix.http.jetty;version='[3.4.8,3.4.9)',\
+	org.apache.felix.log;version='[1.0.1,1.0.2)',\
+	org.osgi.service.jaxrs;version='[1.0.0,1.0.1)'
 
 Bundle-Version: 1.0.0.${tstamp}
 Bundle-Copyright: Data In Motion Consulting
@@ -85,4 +82,7 @@ Require-Capability: \
 -runfw: org.apache.felix.framework;version='[5.7.0.SNAPSHOT,5.7.0.SNAPSHOT]'
 -runvm: -ea
 -runee: JavaSE-1.8
--runproperties: org.osgi.service.http.port=0
+-runproperties: \
+	org.osgi.service.http.port=0,\
+	launch.keep=true,\
+	launch.trace=true
