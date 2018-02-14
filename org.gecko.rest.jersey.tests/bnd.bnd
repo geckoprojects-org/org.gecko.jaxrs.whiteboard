@@ -88,6 +88,4 @@ Require-Capability: osgi.implementation;filter:='(&(osgi.implementation=osgi.jax
 -runee: JavaSE-1.8
 Export-Package: org.gecko.rest.jersey.tests.customizer
 -runproperties: \
-	org.osgi.service.http.port=0,\
-	launch.keep=true,\
-	launch.trace=true
+	org.osgi.service.http.port=0,
