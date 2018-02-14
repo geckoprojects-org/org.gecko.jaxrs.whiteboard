@@ -12,7 +12,7 @@ Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 -buildpath: \
 	${junit},\
 	${mockito},\
-	osgi.annotation;version=7.0,\
+	osgi.annotation;version=7.0.0,\
 	osgi.core;version=6.0,\
 	osgi.cmpn;version=6.0,\
 	org.gecko.rest.jersey.api;version=latest,\
@@ -23,6 +23,10 @@ Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 	org.osgi.util.pushstream,\
 	javax.servlet
 	
+-runrequires: \
+	osgi.identity;filter:='(&(osgi.identity=org.apache.felix.eventadmin)(version>=1.4.8))',\
+	osgi.identity;filter:='(osgi.identity=org.apache.felix.configadmin)',\
+	osgi.identity;filter:='(osgi.identity=org.gecko.rest.jersey.tests)'	
 
 javac.source: 1.8
 javac.target: 1.8
@@ -49,21 +53,12 @@ javac.target: 1.8
 	javax.ws.rs-api;version='[2.1.0,2.1.1)',\
 	javax.inject;version='[1.0.0,1.0.1)',\
 	org.apache.felix.eventadmin;version='[1.4.10,1.4.11)',\
-	org.apache.felix.gogo.command;version='[1.0.2,1.0.3)',\
-	org.apache.felix.gogo.runtime;version='[1.0.10,1.0.11)',\
-	org.apache.felix.gogo.shell;version='[1.0.0,1.0.1)',\
 	org.apache.felix.http.jetty;version='[3.4.8,3.4.9)',\
 	org.eclipselabs.jaxrs.jersey.contract;version='[2.26.0,2.26.1)',\
 	org.glassfish.javax.activation;version='[3.0.0,3.0.1)',\
-	org.glassfish.jersey.bundles.repackaged.jersey-guava;version='[2.26.0,2.26.1)'
+	org.glassfish.jersey.bundles.repackaged.jersey-guava;version='[2.26.0,2.26.1)',\
+	org.apache.felix.log;version='[1.0.1,1.0.2)',\
 	
--runrequires: \
-	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.shell)',\
-	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.command)',\
-	osgi.identity;filter:='(&(osgi.identity=org.apache.felix.eventadmin)(version>=1.4.8))',\
-	osgi.identity;filter:='(osgi.identity=org.apache.felix.configadmin)',\
-	osgi.identity;filter:='(osgi.identity=org.gecko.rest.jersey.tests)'
-
 Bundle-Version: 1.0.0.${tstamp}
 Bundle-Copyright: Data In Motion Consulting
 Bundle-License: Eclipse Public License v1.0
@@ -82,9 +77,9 @@ Require-Capability: osgi.implementation;filter:='(&(osgi.implementation=osgi.jax
 -runsystempackages.objenesis: sun.misc,sun.reflect
 
 # Use Felix by default
--runfw: org.apache.felix.framework;version=5
+-runfw: org.apache.felix.framework;version='[5.7.0.SNAPSHOT,5.7.0.SNAPSHOT]'
 -runvm: -ea
 -runee: JavaSE-1.8
 Export-Package: org.gecko.rest.jersey.tests.customizer
 -runproperties: \
-	org.osgi.service.http.port=0,
+	org.osgi.service.http.port=0
