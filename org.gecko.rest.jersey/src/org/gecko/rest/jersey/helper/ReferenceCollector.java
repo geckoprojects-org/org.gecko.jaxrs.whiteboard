@@ -58,10 +58,11 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 	@Activate
 	public void activate(BundleContext context) throws InvalidSyntaxException {
 		this.context = context;
+		source = provider.buildSimpleEventSource(ServiceReferenceEvent.class).build();
+
 		serviceTracker = new ServiceTracker<>(context, context.createFilter("(|(" + JaxrsWhiteboardConstants.JAX_RS_RESOURCE + "=true)(" + JaxrsWhiteboardConstants.JAX_RS_EXTENSION + "=true))"), this);
 		serviceTracker.open();
 
-		source = provider.buildSimpleEventSource(ServiceReferenceEvent.class).build();
 	}
 
 	/**
