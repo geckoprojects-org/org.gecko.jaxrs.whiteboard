@@ -120,6 +120,11 @@ public class JerseyApplication extends Application {
 		contentProviders.put(key, contentProvider);
 		if(contentProvider instanceof JaxRsExtensionProvider) {
 			Class<?> extensionClass = contentProvider.getObjectClass();
+			if (extensionClass == null) {
+				contentProviders.remove(key);
+				Object removed = extensions.remove(key);
+				return removed != null;
+			}
 			JaxRsExtensionProvider result = extensions.put(key, (JaxRsExtensionProvider) contentProvider);
 			return  result == null || !extensionClass.equals(result.getObjectClass());
 		} else if (contentProvider.isSingleton()) {
@@ -131,11 +136,15 @@ public class JerseyApplication extends Application {
 				 * Maybe we are in shutdown mode
 				 */
 				if (providerObject == null) {
-					return false;
+					contentProviders.remove(key);
+					Object removed = singletons.remove(key);
+					return removed != null;
 				}
 				Object service = ((ServiceObjects<?>) providerObject).getService();
 				if (service == null) {
-					return false;
+					contentProviders.remove(key);
+					Object removed = singletons.remove(key);
+					return removed != null;
 				}
 				result = singletons.put(key, service);
 				if(result != null) {
@@ -146,6 +155,11 @@ public class JerseyApplication extends Application {
 			return false;
 		} else {
 			Class<?> resourceClass = contentProvider.getObjectClass();
+			if (resourceClass == null) {
+				contentProviders.remove(key);
+				Object removed = classes.remove(key);
+				return removed != null;
+			}
 			Object result = classes.put(key, resourceClass);
 			return !resourceClass.equals(result) || result == null;
 		}

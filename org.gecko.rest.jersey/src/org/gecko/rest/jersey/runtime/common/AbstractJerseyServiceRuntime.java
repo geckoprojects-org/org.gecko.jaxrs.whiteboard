@@ -346,6 +346,12 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 			Object value = context.getProperties().get(key);
 			properties.put(key, value);
 		}
+		if (serviceRuntime != null) {
+			String[] runtimeKeys = serviceRuntime.getReference().getPropertyKeys();
+			for (String k : runtimeKeys) {
+				properties.put(k, serviceRuntime.getReference().getProperty(k));
+			}
+		}
 		return properties;
 	}
 
