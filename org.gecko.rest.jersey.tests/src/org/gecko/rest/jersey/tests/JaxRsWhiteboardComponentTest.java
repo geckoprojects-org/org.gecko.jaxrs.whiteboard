@@ -316,7 +316,7 @@ public class JaxRsWhiteboardComponentTest {
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=*)");
 		System.out.println("Register resource for uri /hello under application customer");
-		ServiceRegistration<Object> helloRegistration = context.registerService(Object.class, new HelloResource(), helloProps);
+		ServiceRegistration<HelloResource> helloRegistration = context.registerService(HelloResource.class, new HelloResource(), helloProps);
 		Filter resourceFilter = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=Hello)");
 		Object service = getService(resourceFilter, 3000l);
 		assertNotNull(service);

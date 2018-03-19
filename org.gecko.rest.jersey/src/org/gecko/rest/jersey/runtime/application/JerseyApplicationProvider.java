@@ -289,7 +289,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 			if (!changed && added) {
 				changed = added;
 			}
-			return added;
+//			return added;
 		}
 		return filterValid;
 	}

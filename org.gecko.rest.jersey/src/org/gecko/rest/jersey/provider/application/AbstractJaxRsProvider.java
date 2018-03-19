@@ -184,7 +184,8 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 	 * @return the provider name
 	 */
 	protected String getProviderName() {
-		String providerName = "." + UUID.randomUUID().toString();
+		Long serviceId = getServiceId();
+		String providerName = serviceId != null ? ".sid_" + serviceId : "." + UUID.randomUUID().toString();
 		if (properties != null) {
 			String jaxRsName = (String) properties.get(JaxrsWhiteboardConstants.JAX_RS_NAME);
 			if (jaxRsName != null) {
@@ -202,11 +203,11 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 	 */
 	protected void validateProperties() {
 		updateStatus(NO_FAILURE);
-		name = getProviderName();
 		serviceId = (Long) properties.get(Constants.SERVICE_ID);
 		if (serviceId == null) {
 			serviceId = (Long) properties.get(ComponentConstants.COMPONENT_ID);
 		}
+		name = getProviderName();
 		Object sr = properties.get(Constants.SERVICE_RANKING);
 		if (sr != null && sr instanceof Integer) {
 			serviceRank = (Integer)sr;

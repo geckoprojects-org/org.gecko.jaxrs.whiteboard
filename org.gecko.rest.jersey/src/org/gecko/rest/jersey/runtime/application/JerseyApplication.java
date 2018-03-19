@@ -110,14 +110,25 @@ public class JerseyApplication extends Application {
 		String name = contentProvider.getName();
 		contentProviders.put(name, contentProvider);
 		if(contentProvider instanceof JaxRsExtensionProvider) {
-			Class<?> resourceClass = contentProvider.getObjectClass();
+			Class<?> extensionClass = contentProvider.getObjectClass();
 			JaxRsExtensionProvider result = extensions.put(name, (JaxRsExtensionProvider) contentProvider);
-			return  result == null || !resourceClass.equals(result.getObjectClass());
+			return  result == null || !extensionClass.equals(result.getObjectClass());
 		} else if (contentProvider.isSingleton()) {
 			Class<?> resourceClass = contentProvider.getObjectClass();
 			Object result = singletons.get(name);
 			if(result == null || !result.getClass().equals(resourceClass)){
-				result = singletons.put(name, ((ServiceObjects<?>) contentProvider.getProviderObject()).getService());
+				Object providerObject = contentProvider.getProviderObject();
+				/*
+				 * Maybe we are in shutdown mode
+				 */
+				if (providerObject == null) {
+					return false;
+				}
+				Object service = ((ServiceObjects<?>) providerObject).getService();
+				if (service == null) {
+					return false;
+				}
+				result = singletons.put(name, service);
 				if(result != null) {
 					((ServiceObjects) contentProvider.getProviderObject()).ungetService(result);
 				}

@@ -12,6 +12,7 @@
 package org.gecko.rest.jersey.provider.application;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Map;
 
 import org.gecko.rest.jersey.provider.JaxRsConstants;
@@ -24,6 +25,30 @@ import org.gecko.rest.jersey.provider.JaxRsConstants;
  * @since 09.10.2017
  */
 public interface JaxRsApplicationContentProvider extends JaxRsProvider, JaxRsConstants {
+	
+	static class ContentProviderComparator implements Comparator<JaxRsApplicationContentProvider> {
+
+		/* 
+		 * (non-Javadoc)
+		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+		 */
+		@Override
+		public int compare(JaxRsApplicationContentProvider o1, JaxRsApplicationContentProvider o2) {
+			if (o1 == null || o2 == null) {
+				return -1;
+			}
+			return o1.getName().compareTo(o2.getName());
+		}
+		
+	}
+	
+	/**
+	 * Creates the comparator instance
+	 * @return the comparator instance
+	 */
+	public static ContentProviderComparator getComparator() {
+		return new ContentProviderComparator();
+	}
 	
 	/**
 	 * Returns <code>true</code>, if this resource is a singleton service

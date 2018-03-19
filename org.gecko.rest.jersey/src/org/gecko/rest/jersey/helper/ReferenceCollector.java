@@ -15,6 +15,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
+import java.util.logging.Logger;
 
 import org.gecko.rest.jersey.helper.ServiceReferenceEvent.Type;
 import org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher;
@@ -41,6 +42,7 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 @SuppressWarnings("rawtypes")
 public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Object> {
 
+	private static final Logger logger = Logger.getLogger("jersey.referenceCollector");
 	private ServiceTracker<Object, Object> serviceTracker;
 	private PushStreamProvider provider = new PushStreamProvider();
 	private final Map<ServiceReference, ServiceReferenceEvent> contentReferences = new ConcurrentHashMap<>(); 
@@ -90,7 +92,9 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 			
 			pushStream = pushStream.buffer().distinct();
 			
-			pushStream.window(Duration.ofMillis(500), sec -> sec).forEach(sec -> {
+			final Duration batchDuration = Duration.ofMillis(50);
+//			final Duration batchDuration = Duration.ofMillis(500);
+			pushStream.window(batchDuration, sec -> sec).forEach(sec -> {
 				sec.stream().filter(sre -> sre.isResource()).forEach(sre -> {
 					handleResourceReferences(dispatcher, sre);
 				});
@@ -103,15 +107,19 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 		
 	}
 	
+	/**
+	 * @param dispatcher
+	 * @param sre
+	 */
 	@SuppressWarnings("unchecked")
 	private void handleExtensionReferences(final JaxRsWhiteboardDispatcher dispatcher, ServiceReferenceEvent sre) {
 		Map<String, Object> properties = JerseyHelper.getServiceProperties(sre.getReference());
 		switch (sre.getType()) {
 		case ADD:
+		case MODIFY:
+			logger.info("Handle extension " + sre.getType() + " properties: " + properties);
 			ServiceObjects so = context.getServiceObjects(sre.getReference());
 			dispatcher.addExtension(so, properties);
-			break;
-		case MODIFY:
 			break;
 		default:
 			dispatcher.removeExtension(properties);
@@ -119,15 +127,19 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 		};
 	}
 
+	/**
+	 * @param dispatcher
+	 * @param sre
+	 */
 	@SuppressWarnings("unchecked")
 	private void handleResourceReferences(final JaxRsWhiteboardDispatcher dispatcher, ServiceReferenceEvent sre) {
 		Map<String, Object> properties = JerseyHelper.getServiceProperties(sre.getReference());
 		switch (sre.getType()) {
 		case ADD:
+		case MODIFY:
+			logger.info("Handle resource " + sre.getType() + " properties: " + properties);
 			ServiceObjects so = context.getServiceObjects(sre.getReference());
 			dispatcher.addResource(so, properties);
-			break;
-		case MODIFY:
 			break;
 		default:
 			dispatcher.removeResource(properties);

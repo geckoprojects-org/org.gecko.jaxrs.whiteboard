@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -289,12 +290,12 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 		logger.log(Level.INFO, "Reload an application provider " + applicationProvider.getName());
 		JaxRsApplicationProvider provider = applicationContainerMap.get(applicationProvider.getName());
 		if (provider == null) {
-			logger.log(Level.WARNING, "No application provider was registered nothing to reload, registering instead");
+			logger.log(Level.INFO, "No application provider was registered nothing to reload, registering instead for " + applicationProvider.getName());
 			registerApplication(applicationProvider);
 		} else {
 			List<ServletContainer> servletContainers = provider.getServletContainers();
 			if(!servletContainers.isEmpty()) {
-				logger.log(Level.INFO, "Reload servlet container " + applicationProvider.getName());
+				logger.log(Level.FINE, "Reload servlet container for application " + applicationProvider.getName());
 				servletContainers.forEach(servletContainer -> {
 					try{
 						ResourceConfig config = createResourceConfig(provider);
@@ -305,7 +306,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 					}
 				});
 			} else {
-				logger.log(Level.INFO, "No servlet container is available to reload " + applicationProvider.getName());
+				logger.log(Level.INFO, "-- No servlet container is available to reload " + applicationProvider.getName());
 			}
 			updateRuntimeProperties();
 		}
@@ -359,21 +360,25 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 			return null;
 		}
 		Application application = applicationProvider.getJaxRsApplication();
+		logger.log(Level.FINE, "Create configuration for application " + applicationProvider.getName() + " Singletons: " + application.getSingletons() + ", Classes: " + application.getClasses());
 		ResourceConfig config = ResourceConfig.forApplication(application);
 		
 		PrototypeServiceBinder binder = new PrototypeServiceBinder();
+		AtomicBoolean registered = new AtomicBoolean(false);
 		applicationProvider.getContentProviers().forEach(provider -> {
-			logger.info("Register prototype provider for classes " + provider.getObjectClass() + " in the application " + applicationProvider.getName());
+			logger.fine("Register prototype provider for classes " + provider.getObjectClass() + " in the application " + applicationProvider.getName());
 			if (context == null) {
 				throw new IllegalStateException("Cannot create prototype factories without component context");
 			}
 			if(provider instanceof JaxRsResourceProvider) {
+				registered.set(true);
 				Factory<?> factory = new JerseyResourceInstanceFactory<>(provider);
-				logger.info("registering for real " + provider.getObjectClass());
 				binder.register(provider.getObjectClass(), factory);
 			}
 		});
-		config.register(binder);
+		if (registered.get()) {
+			config.register(binder);
+		}
 		return config;
 	}
 

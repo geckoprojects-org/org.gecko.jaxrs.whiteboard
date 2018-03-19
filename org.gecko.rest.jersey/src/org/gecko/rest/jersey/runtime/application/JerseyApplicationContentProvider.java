@@ -101,7 +101,7 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 			try {
 				boolean applicationMatch = applicationFilter.matches(application.getApplicationProperties());
 				if (!applicationMatch) {
-					logger.log(Level.WARNING, "The given application select filter does not match to this application for this resource/extension: " + getName());
+					logger.log(Level.FINE, "[" + getName() + "] The given application select filter does not match to this application " + application.getName() + " for this resource/extension: " + getName());
 					return false;
 				}
 			} catch (Exception e) {
@@ -110,7 +110,7 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 			}
 		} else {
 			if (!application.isDefault()) {
-				logger.log(Level.INFO, "There is no application select filter defined, using default application");
+				logger.log(Level.FINE, "[" + getName() + "] There is no application select filter defined, using default application");
 				return false;
 			} else {
 				return canHandleDefaultApplication();

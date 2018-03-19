@@ -34,6 +34,7 @@ import org.gecko.rest.jersey.tests.customizer.ServiceChecker;
 import org.gecko.rest.jersey.tests.customizer.TestServiceCustomizer;
 import org.gecko.rest.jersey.tests.resources.ContractedExtension;
 import org.gecko.rest.jersey.tests.resources.HelloResource;
+import org.gecko.rest.jersey.tests.resources.HelloResourceLongPath;
 import org.gecko.rest.jersey.tests.resources.PrototypeExtension;
 import org.gecko.rest.jersey.tests.resources.PrototypeResource;
 import org.glassfish.jersey.client.JerseyClient;
@@ -203,6 +204,292 @@ public class JaxRsWhiteboardApplicationLifecycleTests {
 		
 		appRegistration.unregister();
 		application = getService(appFilter, 3000l);
+		assertNull(application);
+		
+		assertTrue(runtimeChecker.waitModify());
+		
+		/*
+		 * Check if http://localhost:8185/test/customer/hello is not available anymore. 
+		 * Check as well, if http://localhost:8185/test/hello is still not available
+		 */
+		System.out.println("Checking URL is not available anymore " + url + "/legacy/annotated/hello/mark");
+		webTarget = jerseyClient.target(url + "/legacy/annotated/hello/mark");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(404, response.getStatus());
+		
+		tearDownTest(configuration, get);
+	}
+	
+	/**
+	 * Tests ---- before 88s 
+	 * @throws IOException 
+	 * @throws InterruptedException 
+	 * @throws InvalidSyntaxException 
+	 */
+	@Test
+	public void testWhiteboardResourceChange() throws IOException, InterruptedException, InvalidSyntaxException {
+		/*
+		 *  The server runs on localhost port 8185 using context path test: http://localhost:8185/test
+		 *  We mount the system with a resource RootResource under http://localhost:8185/test that will return a 
+		 *  HTTP::200 using a GET request
+		 */
+		int port = 8185;
+		String contextPath = "test";
+		String url = "http://localhost:" + port + "/" + contextPath;
+		
+		/*
+		 * Initial setup for the REST runtime 
+		 */
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
+		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
+		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
+		
+		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class, context);
+		runtimeChecker.start();
+		
+		ConfigurationAdmin configAdmin = context.getService(configAdminRef);
+		assertNotNull(configAdmin);
+		Configuration configuration = configAdmin.getConfiguration("JaxRsWhiteboardComponent", "?");
+		assertNotNull(configuration);
+		assertEquals(1, configuration.getChangeCount());
+		Dictionary<String,Object> factoryProperties = configuration.getProperties();
+		assertNull(factoryProperties);
+		configuration.update(properties);
+		
+		assertTrue(runtimeChecker.waitCreate());
+		
+		/*
+		 * Check if our RootResource is not available under http://localhost:8185/test
+		 */
+		System.out.println("Checking URL is not available: " + url);
+		JerseyInvocation get = null;
+		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
+		JerseyWebTarget webTarget = jerseyClient.target(url);
+		get = webTarget.request().buildGet();
+		Response response = get.invoke();
+		assertEquals(404, response.getStatus());
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		/*
+		 * Mount the application customer that will become available under: test/customer
+		 * http://localhost:8185/test/app1
+		 */
+		Dictionary<String, Object> app1Props = new Hashtable<>();
+		app1Props.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "/app1");
+		app1Props.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "App1");
+		ServiceRegistration<Application> app1Registration = context.registerService(Application.class, new Application(), app1Props);
+		Filter app1Filter = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=App1)");
+		Application application = getService(app1Filter, 3000l);
+		assertNotNull(application);
+		
+		assertTrue(runtimeChecker.waitModify());
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		/*
+		 * Mount the application customer that will become available under: test/customer
+		 * http://localhost:8185/test/app2
+		 */
+		Dictionary<String, Object> app2Props = new Hashtable<>();
+		app2Props.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "/app2");
+		app2Props.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "App2");
+		ServiceRegistration<Application> app2Registration = context.registerService(Application.class, new Application(), app2Props);
+		Filter app2Filter = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=App1)");
+		application = getService(app2Filter, 3000l);
+		assertNotNull(application);
+		
+		assertTrue(runtimeChecker.waitModify());
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		/*
+		 * Mount the resource HelloResource that will become available under:
+		 * http://localhost:8185/test/hello
+		 */
+		Dictionary<String, Object> helloProps = new Hashtable<>();
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		helloProps.put("test", "Hello");
+//		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=*)");
+		System.out.println("Register resource for uri /hello under application customer");
+		ServiceRegistration<HelloResource> helloRegistration = context.registerService(HelloResource.class, new HelloResource(), helloProps);
+//		ServiceRegistration<HelloResourceLongPath> helloRegistration = context.registerService(HelloResourceLongPath.class, new HelloResourceLongPath(), helloProps);
+		Filter resourceFilter = FrameworkUtil.createFilter("(test=Hello)");
+		Object service = getService(resourceFilter, 3000l);
+		assertNotNull(service);
+		
+		assertTrue(runtimeChecker.waitModify());
+		
+		/*
+		 * Check if http://localhost:8185/test/customer/hello is available now. 
+		 * Check as well, if http://localhost:8185/test is /hello is not available
+		 */
+		System.out.println("Checking URL is available " + url + "/hello");
+		webTarget = jerseyClient.target(url + "/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(200, response.getStatus());
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		helloProps.put(
+				JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
+				"(osgi.jaxrs.name=App2)");
+		helloRegistration.setProperties(helloProps);
+		
+		assertTrue(runtimeChecker.waitModify());
+		
+		System.out.println("Checking URL is available " + url + "/app2/hello");
+		webTarget = jerseyClient.target(url + "/app2/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(200, response.getStatus());
+		
+		System.out.println("Checking URL is not available yet: " + url + "/app1/hello");
+		webTarget = jerseyClient.target(url + "/app1/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(404, response.getStatus());
+		
+		System.out.println("Checking URL is not available anymore: " + url + "/hello");
+		webTarget = jerseyClient.target(url + "/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(404, response.getStatus());
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		helloProps.put(
+				JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
+				"(osgi.jaxrs.name=App1)");
+		helloRegistration.setProperties(helloProps);
+		
+		assertTrue(runtimeChecker.waitModify());
+		
+		System.out.println("Checking URL is available " + url + "/app1/hello");
+		webTarget = jerseyClient.target(url + "/app1/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(200, response.getStatus());
+		
+		System.out.println("Checking URL is not available anymore: " + url + "/app2/hello");
+		webTarget = jerseyClient.target(url + "/app2/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(404, response.getStatus());
+		
+		System.out.println("Checking URL is not available anymore: " + url + "/hello");
+		webTarget = jerseyClient.target(url + "/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(404, response.getStatus());
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		helloProps.put(
+				JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
+				"(osgi.jaxrs.name=*)");
+		helloRegistration.setProperties(helloProps);
+		
+		assertTrue(runtimeChecker.waitModify());
+		
+		System.out.println("Checking URL is available " + url + "/app1/hello");
+		webTarget = jerseyClient.target(url + "/app1/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(200, response.getStatus());
+		
+		System.out.println("Checking URL is available " + url + "/app2/hello");
+		webTarget = jerseyClient.target(url + "/app2/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(200, response.getStatus());
+		
+		System.out.println("Checking URL is available " + url + "/hello");
+		webTarget = jerseyClient.target(url + "/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(200, response.getStatus());
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		helloProps.put(
+				JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
+				"(osgi.jaxrs.name=App1)");
+		helloRegistration.setProperties(helloProps);
+		
+		assertTrue(runtimeChecker.waitModify());
+		
+		System.out.println("Checking URL is available " + url + "/app1/hello");
+		webTarget = jerseyClient.target(url + "/app1/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(200, response.getStatus());
+		
+		System.out.println("Checking URL is not available anymore: " + url + "/app2/hello");
+		webTarget = jerseyClient.target(url + "/app2/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(404, response.getStatus());
+		
+		System.out.println("Checking URL is not available anymore: " + url + "/hello");
+		webTarget = jerseyClient.target(url + "/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(404, response.getStatus());
+//		
+//		app2Props.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "legacyChanged");
+//		app2Registration.setProperties(app2Props);
+//		
+//		assertTrue(runtimeChecker.waitModify());
+//		
+//		/*
+//		 * Check if http://localhost:8185/test/customer/hello is available now. 
+//		 * Check as well, if http://localhost:8185/test is /hello is not available
+//		 */
+//		System.out.println("Checking URL is available " + url + "/legacyChanged/annotated/hello/mark");
+//		webTarget = jerseyClient.target(url + "/legacyChanged/annotated/hello/mark");
+//		get = webTarget.request().buildGet();
+//		response = get.invoke();
+//		assertEquals(200, response.getStatus());
+//		
+//		System.out.println("Checking URL is available " + url + "/legacy/annotated/hello/mark");
+//		webTarget = jerseyClient.target(url + "/legacy/annotated/hello/mark");
+//		get = webTarget.request().buildGet();
+//		response = get.invoke();
+//		assertEquals(404, response.getStatus());
+//		
+//		runtimeChecker.stop();
+		
+		app1Registration.unregister();
+		app2Registration.unregister();
+		helloRegistration.unregister();
+		application = getService(app1Filter, 3000l);
+		assertNull(application);
+		application = getService(app2Filter, 3000l);
 		assertNull(application);
 		
 		assertTrue(runtimeChecker.waitModify());

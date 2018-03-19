@@ -13,9 +13,11 @@ package org.gecko.rest.jersey.runtime.dispatcher;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
@@ -80,7 +82,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 
 	public JerseyWhiteboardDispatcher() {
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher#setBatchMode(boolean)
 	 */
@@ -191,10 +193,9 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	public void addResource(ServiceObjects<?> serviceObject, Map<String, Object> properties) {
 		JaxRsResourceProvider provider = new JerseyResourceProvider<>(serviceObject, properties);
 		String name = provider.getName();
-		if (!resourceProviderCache.containsKey(name)) {
-			resourceProviderCache.put(name, provider);
-			checkDispatch();
-		}
+		logger.fine("Dispatcher add resource with name: " + name + " and class " + provider.getObjectClass().getName());
+		resourceProviderCache.put(name, provider);
+		checkDispatch();
 	}
 
 	/* 
@@ -349,18 +350,18 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 					if (applicationCandidates.contains(app)) {
 						if (whiteboard.isRegistered(app)) {
 							// unregister applications that are now empty
-//							if (app.isEmpty()) {
-//								whiteboard.unregisterApplication(app);
-//							} else 
+							//							if (app.isEmpty()) {
+							//								whiteboard.unregisterApplication(app);
+							//							} else 
 							if (app.isChanged()) {
 								whiteboard.reloadApplication(app);
 							}
 						} else {
-							
+
 							// we don't register empty applications and legacy application in general or changed applications 
-//							if (!app.isEmpty() && app.isChanged()) {
-								whiteboard.registerApplication(app);
-//							}
+							//							if (!app.isEmpty() && app.isChanged()) {
+							whiteboard.registerApplication(app);
+							//							}
 						}
 						// the application doesn't fit to the whiteboard anymore
 					} else {
@@ -398,9 +399,17 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	 */
 	private void unassignContent(Collection<JaxRsApplicationProvider> applications, Collection<? extends JaxRsApplicationContentProvider> content) {
 		applications.forEach((app)->{
-			content.forEach((c)->removeContentFromApplication(app, c));
+			content.forEach((c)->{
+				if (removeContentFromApplication(app, c)) {
+					logger.info("Removed content " + c.getName() + " from application " + app.getName());
+				}
+			});
 		});
-		content.forEach((c)->removeContentFromApplication(defaultProvider, c));
+		content.forEach((c)->{
+			if (removeContentFromApplication(defaultProvider, c)) {
+				logger.info("Removed content " + c.getName() + " from default application");
+			}
+		});
 	}
 
 	/**
@@ -421,28 +430,46 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 						if (candidates.contains(app) && 
 								c != null &&
 								c.canHandleApplication(app)) {
-							if (!matched.get()) {
-								matched.set(addContentToApplication(app, c));
-							} else {
-								addContentToApplication(app, c);
+							boolean added = addContentToApplication(app, c);
+							if (added) {
+								logger.info("Added content " + c.getName() + " to application " + app.getName());
 							}
+							if (!matched.get()) {
+								matched.set(added);
+							} 
 						} else {
-							removeContentFromApplication(app, c);
+							if (removeContentFromApplication(app, c)) {
+								logger.info("Removed content " + c.getName() + " from application " + app.getName());
+							}
 						}
 					});
 					return matched.get();
 				}).collect(Collectors.toSet());
-		// add all other content to the default application or remove it, if the content fits to an other application now
+		
+		/* 
+		 * Add all other content to the default application or remove it, if the content fits to an other application now
+		 * For that we have to use a comparator that compares the content provider byname
+		 */
+		Comparator<JaxRsApplicationContentProvider> comparator = JaxRsApplicationContentProvider.getComparator();
+		final Set<JaxRsApplicationContentProvider> cc = new TreeSet<JaxRsApplicationContentProvider>(comparator);
+		cc.addAll(contentCandidates);
+		logger.info("Content candidates are " + cc);
 		content.stream().
-			map(this::cloneContent).forEach((c)->{
-			if (contentCandidates.contains(c)) {
+		map(this::cloneContent).forEach((c)->{
+			if (cc.contains(c)) {
 				if (c.canHandleApplication(defaultProvider)) {
-					addContentToApplication(defaultProvider, c);
+					if (addContentToApplication(defaultProvider, c)) {
+						logger.info("Added content candidate " + c.getName() + " to default application");
+					}
 				} else {
-					removeContentFromApplication(defaultProvider, c);
+					if (removeContentFromApplication(defaultProvider, c)) {
+						logger.info("Removed content candidate " + c.getName() + " from default application");
+					}
 				}
 			} else {
-				addContentToApplication(defaultProvider, c);
+				if (addContentToApplication(defaultProvider, c)) {
+					logger.info("Added content " + c.getName() + " to default application " + defaultProvider.getName());
+				} 
 			}
 		});
 	}
@@ -454,7 +481,6 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	 * @return <code>true</code>, if adding was successful
 	 */
 	private boolean addContentToApplication(JaxRsApplicationProvider application, JaxRsApplicationContentProvider content) {
-		logger.info("Add content " + content.getName() + " to application " + application.getName());
 		if (content instanceof JaxRsResourceProvider) {
 			return application.addResource((JaxRsResourceProvider) content);
 		}
@@ -471,7 +497,6 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	 * @return <code>true</code>, if removal was successful
 	 */
 	private boolean removeContentFromApplication(JaxRsApplicationProvider application, JaxRsApplicationContentProvider content) {
-		logger.info("Remove content " + content.getName() + " from application " + application.getName());
 		if (content instanceof JaxRsResourceProvider) {
 			return application.removeResource((JaxRsResourceProvider) content);
 		}
