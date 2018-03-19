@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,16 +48,17 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	private List<ServletContainer> applicationContainers = new LinkedList<>();
 	private String applicationBase;
 	private boolean changed = true;
-	private JerseyApplication wrappedApplication;
+	private JerseyApplication wrappedApplication = null;
 
 	public JerseyApplicationProvider(Application application, Map<String, Object> properties) {
 		super(application, properties);
 		// create name after validation, because some fields are needed eventually
 		if(application != null) {
-			wrappedApplication = new JerseyApplication(getProviderName(), application);
+			wrappedApplication = new JerseyApplication(getProviderName(), application, properties);
 		}
+		validateProperties();
 	}
-	
+
 	/* 
 	 * (non-Javadoc)
 	 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsApplicationProvider#setServletContainer(org.glassfish.jersey.servlet.ServletContainer)
@@ -250,6 +250,9 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 		Map<String, Object> providerProperties = getProviderProperties();
 		if (providerProperties != null) {
 			String baseProperty = (String) providerProperties.get(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE);
+			if (wrappedApplication != null) {
+				baseProperty = getPath();
+			}
 			name = (String) providerProperties.get(JaxrsWhiteboardConstants.JAX_RS_NAME);
 			if (name == null && baseProperty != null) {
 				name = "." + baseProperty;
@@ -257,7 +260,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 				updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
 			}
 		}
-		return name == null ? "." + UUID.randomUUID().toString() : name;
+		return name == null ? getProviderId() : name;
 	}
 
 	/* 
@@ -331,7 +334,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 				Filter filter = FrameworkUtil.createFilter(applicationFilter);
 				boolean applicationMatch = filter.matches(getApplicationProperties());
 				if (!applicationMatch) {
-					logger.log(Level.WARNING, "The given application select filter does not math to this application for this resource/extension: " + getName());
+					logger.log(Level.WARNING, "The given application select filter does not math to this application for this resource/extension: " + getId());
 					return false;
 				}
 			} catch (InvalidSyntaxException e) {

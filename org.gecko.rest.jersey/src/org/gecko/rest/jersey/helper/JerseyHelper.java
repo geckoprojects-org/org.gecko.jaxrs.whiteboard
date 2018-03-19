@@ -53,8 +53,7 @@ public class JerseyHelper {
 			return true;
 		}
 		return application.getClasses().isEmpty() && 
-				application.getSingletons().isEmpty() && 
-				application.getProperties().isEmpty();
+				application.getSingletons().isEmpty();
 
 	}
 

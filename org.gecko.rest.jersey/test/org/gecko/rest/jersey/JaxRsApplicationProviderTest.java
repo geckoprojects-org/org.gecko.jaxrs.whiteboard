@@ -89,7 +89,7 @@ public class JaxRsApplicationProviderTest {
 		assertEquals(DTOConstants.FAILURE_REASON_VALIDATION_FAILED, failedDto.failureReason);
 		
 		assertEquals("/test/*", provider.getPath());
-		assertEquals(".test", provider.getName());
+		assertEquals("./test/*", provider.getName());
 	}
 	
 	@Test
@@ -124,7 +124,7 @@ public class JaxRsApplicationProviderTest {
 		assertFalse(dto instanceof FailedApplicationDTO);
 		
 		assertEquals("/test/*", provider.getPath());
-		assertEquals(".test", provider.getName());
+		assertEquals("./test/*", provider.getName());
 	}
 	
 	@Test

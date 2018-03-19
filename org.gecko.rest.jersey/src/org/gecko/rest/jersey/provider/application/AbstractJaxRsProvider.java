@@ -39,6 +39,7 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 	private static final Logger logger = Logger.getLogger("jersey.abstractProvider");
 	private final Map<String, Object> properties;
 	private String name;
+	private String id;
 	private Long serviceId;
 	private Integer serviceRank;
 	private int status = NO_FAILURE;
@@ -57,6 +58,15 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 		this.properties = properties == null ? Collections.emptyMap() : properties;
 		this.providerObject = providerObject;
 		validateProperties();
+	}
+	
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.rest.jersey.provider.application.JaxRsProvider#getId()
+	 */
+	@Override
+	public String getId() {
+		return id;
 	}
 
 	/* 
@@ -177,6 +187,17 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 	protected void setProviderName(String name) {
 		this.name = name;
 	}
+	
+	/**
+	 * Returns the provider name. This method should always return a unique name for the content, so that there can many provider instance can exist.
+	 * with same content, that can be identified by the name.
+	 * @return the provider name
+	 */
+	protected String getProviderId() {
+		Long serviceId = getServiceId();
+		String id = serviceId != null ? "sid_" + serviceId : "." + UUID.randomUUID().toString();
+		return id;
+	}
 
 	/**
 	 * Returns the provider name. This method should always return a unique name for the content, so that there can many provider instance can exist.
@@ -184,8 +205,7 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 	 * @return the provider name
 	 */
 	protected String getProviderName() {
-		Long serviceId = getServiceId();
-		String providerName = serviceId != null ? ".sid_" + serviceId : "." + UUID.randomUUID().toString();
+		String providerName = getProviderId();
 		if (properties != null) {
 			String jaxRsName = (String) properties.get(JaxrsWhiteboardConstants.JAX_RS_NAME);
 			if (jaxRsName != null) {
@@ -207,6 +227,7 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 		if (serviceId == null) {
 			serviceId = (Long) properties.get(ComponentConstants.COMPONENT_ID);
 		}
+		id = getProviderId();
 		name = getProviderName();
 		Object sr = properties.get(Constants.SERVICE_RANKING);
 		if (sr != null && sr instanceof Integer) {
@@ -226,7 +247,13 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 				updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
 			}
 		}
-		String[] filters = (String[]) properties.get(JaxrsWhiteboardConstants.JAX_RS_EXTENSION_SELECT);
+		Object filterObject = properties.get(JaxrsWhiteboardConstants.JAX_RS_EXTENSION_SELECT);
+		String[] filters = null;
+		if (filterObject instanceof String) {
+			filters = new String[] {filterObject.toString()};
+		} else if (filterObject instanceof String[]) {
+			filters = (String[])filterObject;
+		}
 		if (filters != null) {
 			for (String f : filters) {
 				try {

@@ -67,7 +67,7 @@ public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 			if (e instanceof IllegalStateException) {
 				throw e;
 			}
-			throw new IllegalStateException("Cannot create prototype instance for class " + provider.getName(), e);
+			throw new IllegalStateException("Cannot create prototype instance for class " + provider.getId(), e);
 		}
 	}
 

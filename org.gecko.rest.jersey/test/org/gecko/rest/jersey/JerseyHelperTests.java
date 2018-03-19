@@ -62,7 +62,7 @@ public class JerseyHelperTests {
 		TestApplication app = new TestApplication();
 	
 		app.getProperties().put("test", "me");
-		assertFalse(JerseyHelper.isEmpty(app));
+		assertTrue(JerseyHelper.isEmpty(app));
 		app.getProperties().clear();
 		assertTrue(JerseyHelper.isEmpty(app));
 

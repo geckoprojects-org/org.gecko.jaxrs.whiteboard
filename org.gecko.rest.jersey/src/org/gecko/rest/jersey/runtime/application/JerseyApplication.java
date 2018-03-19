@@ -13,6 +13,7 @@ package org.gecko.rest.jersey.runtime.application;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -26,6 +27,7 @@ import org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvide
 import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
 import org.gecko.rest.jersey.runtime.application.feature.WhiteboardFeature;
 import org.osgi.framework.ServiceObjects;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * Special JaxRs application implementation that holds and updates all resource and extension given by the application provider
@@ -47,10 +49,17 @@ public class JerseyApplication extends Application {
 		this.applicationName = applicationName;
 	}
 
-	public JerseyApplication(String applicationName, Application sourceApplication) {
+	public JerseyApplication(String applicationName, Application sourceApplication, Map<String, Object> additionalProperites) {
 		this.applicationName = applicationName;
 		this.sourceApplication = sourceApplication;
-		properties = Collections.unmodifiableMap(sourceApplication.getProperties());
+		Map<String, Object> props = new HashMap<String, Object>();
+		if(additionalProperites != null) {
+			props.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SERVICE_PROPERTIES, additionalProperites);
+		}
+		if(sourceApplication.getProperties() != null) {
+			props.putAll(sourceApplication.getProperties());
+		}
+		properties = Collections.unmodifiableMap(props);
 	}
 
 	@Override
@@ -107,15 +116,15 @@ public class JerseyApplication extends Application {
 			return false;
 		}
 		
-		String name = contentProvider.getName();
-		contentProviders.put(name, contentProvider);
+		String key = contentProvider.getId();
+		contentProviders.put(key, contentProvider);
 		if(contentProvider instanceof JaxRsExtensionProvider) {
 			Class<?> extensionClass = contentProvider.getObjectClass();
-			JaxRsExtensionProvider result = extensions.put(name, (JaxRsExtensionProvider) contentProvider);
+			JaxRsExtensionProvider result = extensions.put(key, (JaxRsExtensionProvider) contentProvider);
 			return  result == null || !extensionClass.equals(result.getObjectClass());
 		} else if (contentProvider.isSingleton()) {
 			Class<?> resourceClass = contentProvider.getObjectClass();
-			Object result = singletons.get(name);
+			Object result = singletons.get(key);
 			if(result == null || !result.getClass().equals(resourceClass)){
 				Object providerObject = contentProvider.getProviderObject();
 				/*
@@ -128,7 +137,7 @@ public class JerseyApplication extends Application {
 				if (service == null) {
 					return false;
 				}
-				result = singletons.put(name, service);
+				result = singletons.put(key, service);
 				if(result != null) {
 					((ServiceObjects) contentProvider.getProviderObject()).ungetService(result);
 				}
@@ -137,7 +146,7 @@ public class JerseyApplication extends Application {
 			return false;
 		} else {
 			Class<?> resourceClass = contentProvider.getObjectClass();
-			Object result = classes.put(name, resourceClass);
+			Object result = classes.put(key, resourceClass);
 			return !resourceClass.equals(result) || result == null;
 		}
 		
@@ -155,22 +164,22 @@ public class JerseyApplication extends Application {
 			}
 			return false;
 		}
-		String name = contentProvider.getName();
+		String key = contentProvider.getId();
 		if(contentProvider instanceof JaxRsExtensionProvider) {
 			synchronized (extensions) {
-				extensions.remove(name);
+				extensions.remove(key);
 			}
 		} else if (contentProvider.isSingleton()) {
 			synchronized (singletons) {
-				singletons.remove(name);
+				singletons.remove(key);
 			}
 		} else {
 			synchronized (classes) {
-				classes.remove(name);
+				classes.remove(key);
 			}
 		}
 		synchronized (contentProviders) {
-			return contentProviders.remove(name) != null;
+			return contentProviders.remove(key) != null;
 		}
 	}
 

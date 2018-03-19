@@ -164,9 +164,10 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			}
 			return;
 		}
-		String name = provider.getName();
-		if (!applicationProviderCache.containsKey(name)) {
-			applicationProviderCache.put(name, provider);
+		String key = provider.getId();
+		if (!applicationProviderCache.containsKey(key)) {
+			logger.info("Adding Application with id " + provider.getName());
+			applicationProviderCache.put(key, provider);
 			checkDispatch();
 		}
 	}
@@ -178,8 +179,9 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	@Override
 	public void removeApplication(Application application, Map<String, Object> properties) {
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(null, properties);
-		String name = provider.getName();
-		JaxRsApplicationProvider removed = applicationProviderCache.remove(name);
+		String key = provider.getId();
+		JaxRsApplicationProvider removed = applicationProviderCache.remove(key);
+		logger.info("Removing Application with name " + provider.getName());
 		if (removed != null) {
 			removedApplications.add(removed);
 			checkDispatch();
@@ -192,9 +194,9 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	@Override
 	public void addResource(ServiceObjects<?> serviceObject, Map<String, Object> properties) {
 		JaxRsResourceProvider provider = new JerseyResourceProvider<>(serviceObject, properties);
-		String name = provider.getName();
-		logger.fine("Dispatcher add resource with name: " + name + " and class " + provider.getObjectClass().getName());
-		resourceProviderCache.put(name, provider);
+		String key = provider.getId();
+		logger.fine("Dispatcher add resource with id: " + key + " and class " + provider.getObjectClass().getName());
+		resourceProviderCache.put(key, provider);
 		checkDispatch();
 	}
 
@@ -205,8 +207,8 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	@Override
 	public void removeResource(Map<String, Object> properties) {
 		JaxRsResourceProvider provider = new JerseyResourceProvider<Object>(null, properties);
-		String name = provider.getName();
-		JaxRsResourceProvider removed = resourceProviderCache.remove(name);
+		String key = provider.getId();
+		JaxRsResourceProvider removed = resourceProviderCache.remove(key);
 		if (removed != null) {
 			removedResources.add(removed);
 			checkDispatch();
@@ -220,9 +222,11 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	@Override
 	public void addExtension(ServiceObjects<?> serviceObject, Map<String, Object> properties) {
 		JaxRsExtensionProvider provider = new JerseyExtensionProvider<>(serviceObject, properties);
-		String name = provider.getName();
-		if (!extensionProviderCache.containsKey(name)) {
-			extensionProviderCache.put(name, provider);
+		String key = provider.getId();
+		logger.info("Add extension " + key + " name: " + provider.getName());
+		if (!extensionProviderCache.containsKey(key)) {
+			logger.info("Added extension " + key + " name: " + provider.getName());
+			extensionProviderCache.put(key, provider);
 			checkDispatch();
 		}
 	}
@@ -234,9 +238,11 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	@Override
 	public void removeExtension(Map<String, Object> properties) {
 		JaxRsExtensionProvider provider = new JerseyExtensionProvider<Object>(null, properties);
-		String name = provider.getName();
-		JaxRsExtensionProvider removed = extensionProviderCache.remove(name);
+		String key = provider.getId();
+		JaxRsExtensionProvider removed = extensionProviderCache.remove(key);
+		logger.info("Remove extension " + key + " name: " + provider.getName());
 		if (removed != null) {
+			logger.info("Removed extension " + key + " name: " + provider.getName());
 			removedExtensions.add(removed);
 			checkDispatch();
 		}
@@ -432,7 +438,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 								c.canHandleApplication(app)) {
 							boolean added = addContentToApplication(app, c);
 							if (added) {
-								logger.info("Added content " + c.getName() + " to application " + app.getName());
+								logger.info("Added content " + c.getName() + " to application " + app.getName() + " " + c.getObjectClass());
 							}
 							if (!matched.get()) {
 								matched.set(added);
@@ -468,7 +474,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 				}
 			} else {
 				if (addContentToApplication(defaultProvider, c)) {
-					logger.info("Added content " + c.getName() + " to default application " + defaultProvider.getName());
+					logger.info("Added content " + c.getName() + " to default application " + defaultProvider.getName() + " " + c.getObjectClass());
 				} 
 			}
 		});
@@ -518,7 +524,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		try {
 			return (JaxRsApplicationContentProvider) source.clone();
 		} catch (CloneNotSupportedException e) {
-			logger.log(Level.SEVERE, "Cannot clone object " + source.getName() + " because it is not clonable", e);
+			logger.log(Level.SEVERE, "Cannot clone object " + source.getId() + " because it is not clonable", e);
 		}
 		return null;
 	}

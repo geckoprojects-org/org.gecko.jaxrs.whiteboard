@@ -187,12 +187,12 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 			
 		}, props);
 		
-		applicationServletRegistrationMap.put(provider.getName(), serviceRegistration);
+		applicationServletRegistrationMap.put(provider.getId(), serviceRegistration);
 	}
 	
 	@Override
 	protected void doUnregisterApplication(JaxRsApplicationProvider applicationProvider) {
-		ServiceRegistration<Servlet> serviceRegistration = applicationServletRegistrationMap.remove(applicationProvider.getName());
+		ServiceRegistration<Servlet> serviceRegistration = applicationServletRegistrationMap.remove(applicationProvider.getId());
 		if(serviceRegistration != null) {
 			serviceRegistration.unregister();
 		}

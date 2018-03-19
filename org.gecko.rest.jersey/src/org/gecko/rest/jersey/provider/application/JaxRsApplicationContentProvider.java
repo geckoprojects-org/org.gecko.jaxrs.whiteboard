@@ -37,7 +37,7 @@ public interface JaxRsApplicationContentProvider extends JaxRsProvider, JaxRsCon
 			if (o1 == null || o2 == null) {
 				return -1;
 			}
-			return o1.getName().compareTo(o2.getName());
+			return o1.getId().compareTo(o2.getId());
 		}
 		
 	}

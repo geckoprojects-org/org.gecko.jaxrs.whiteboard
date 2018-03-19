@@ -39,6 +39,7 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
@@ -194,6 +195,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		
 		Map<String, Object> appProperties = new HashMap<>();
 		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
+		appProperties.put(Constants.SERVICE_ID, Long.valueOf(10));
 		Application application = new TestLegacyApplication();
 		
 		assertEquals(0, dispatcher.getApplications().size());
@@ -407,6 +409,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		Map<String, Object> appProperties = new HashMap<>();
 		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
 		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "testApp");
+		appProperties.put(Constants.SERVICE_ID, Long.valueOf(100));
 		Application application = new Application();
 		
 		assertEquals(0, dispatcher.getApplications().size());
@@ -424,6 +427,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=testApp)");
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res01");
+		resProperties01.put(Constants.SERVICE_ID, Long.valueOf(10));
 		assertEquals(0, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties01);
 		assertEquals(1, dispatcher.getResources().size());
@@ -439,6 +443,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=testApp)");
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res02");
+		resProperties02.put(Constants.SERVICE_ID, Long.valueOf(20));
 		assertEquals(1, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties02);
 		assertEquals(2, dispatcher.getResources().size());
@@ -501,6 +506,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		Map<String, Object> appProperties = new HashMap<>();
 		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
 		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "testApp");
+		appProperties.put(Constants.SERVICE_ID, Long.valueOf(100));
 		Application application = new Application();
 		
 		assertEquals(0, dispatcher.getApplications().size());
@@ -518,6 +524,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=*)");
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res01");
+		resProperties01.put(Constants.SERVICE_ID, Long.valueOf(10));
 		assertEquals(0, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties01);
 		assertEquals(1, dispatcher.getResources().size());
@@ -538,6 +545,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=testApp)");
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res02");
+		resProperties02.put(Constants.SERVICE_ID, Long.valueOf(20));
 		assertEquals(1, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties02);
 		assertEquals(2, dispatcher.getResources().size());
@@ -606,6 +614,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		Map<String, Object> appProperties = new HashMap<>();
 		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
 		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "testApp");
+		appProperties.put(Constants.SERVICE_ID, Long.valueOf(100));
 		Application application = new Application();
 		
 		assertEquals(0, dispatcher.getApplications().size());
@@ -623,6 +632,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=*)");
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res01");
+		resProperties01.put(Constants.SERVICE_ID, Long.valueOf(10));
 		assertEquals(0, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties01);
 		assertEquals(1, dispatcher.getResources().size());
@@ -643,6 +653,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=testApp)");
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res02");
+		resProperties02.put(Constants.SERVICE_ID, Long.valueOf(20));
 		assertEquals(1, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties02);
 		assertEquals(2, dispatcher.getResources().size());
@@ -707,6 +718,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
 		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "testApp");
 		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(name=hello)");
+		appProperties.put(Constants.SERVICE_ID, Long.valueOf(100));
 		Application application = new Application();
 		
 		assertEquals(0, dispatcher.getApplications().size());
@@ -724,6 +736,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=*)");
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res01");
+		resProperties01.put(Constants.SERVICE_ID, Long.valueOf(10));
 		assertEquals(0, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties01);
 		assertEquals(1, dispatcher.getResources().size());
@@ -744,6 +757,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=testApp)");
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res02");
+		resProperties02.put(Constants.SERVICE_ID, Long.valueOf(20));
 		assertEquals(1, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties02);
 		assertEquals(2, dispatcher.getResources().size());
@@ -808,6 +822,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
 		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "testApp");
 		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(customer=my)");
+		appProperties.put(Constants.SERVICE_ID, Long.valueOf(100));
 		Application application = new Application();
 		
 		assertEquals(0, dispatcher.getApplications().size());
@@ -825,6 +840,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=*)");
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res01");
+		resProperties01.put(Constants.SERVICE_ID, Long.valueOf(10));
 		assertEquals(0, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties01);
 		assertEquals(1, dispatcher.getResources().size());
@@ -845,6 +861,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=testApp)");
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res02");
+		resProperties02.put(Constants.SERVICE_ID, Long.valueOf(20));
 		assertEquals(1, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties02);
 		assertEquals(2, dispatcher.getResources().size());
@@ -909,6 +926,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
 		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "testApp");
 		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(customer=my)");
+		appProperties.put(Constants.SERVICE_ID, Long.valueOf(100));
 		Application application = new Application();
 		
 		assertEquals(0, dispatcher.getApplications().size());
@@ -927,6 +945,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(test=my)");
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=*)");
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res01");
+		resProperties01.put(Constants.SERVICE_ID, Long.valueOf(10));
 		assertEquals(0, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties01);
 		assertEquals(1, dispatcher.getResources().size());
@@ -945,6 +964,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=testApp)");
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res02");
+		resProperties02.put(Constants.SERVICE_ID, Long.valueOf(20));
 		assertEquals(1, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties02);
 		assertEquals(2, dispatcher.getResources().size());
@@ -1010,6 +1030,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
 		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "testApp");
 		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(customer=my)");
+		appProperties.put(Constants.SERVICE_ID, Long.valueOf(100));
 		Application application = new Application();
 		
 		assertEquals(0, dispatcher.getApplications().size());
@@ -1028,6 +1049,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(customer=my)");
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=*)");
 		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res01");
+		resProperties01.put(Constants.SERVICE_ID, Long.valueOf(10));
 		assertEquals(0, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties01);
 		assertEquals(1, dispatcher.getResources().size());
@@ -1046,6 +1068,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=testApp)");
 		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res02");
+		resProperties02.put(Constants.SERVICE_ID, Long.valueOf(20));
 		assertEquals(1, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties02);
 		assertEquals(2, dispatcher.getResources().size());

@@ -25,6 +25,12 @@ import org.osgi.framework.Filter;
 public interface JaxRsProvider extends Cloneable {
 	
 	/**
+	 * Returns the primary identifier for the provider, which is usually the service id
+	 * @return the application id
+	 */
+	public String getId();
+	
+	/**
 	 * Returns the application name which targets to the property osgi.jaxrs.name
 	 * @return the application name
 	 */
