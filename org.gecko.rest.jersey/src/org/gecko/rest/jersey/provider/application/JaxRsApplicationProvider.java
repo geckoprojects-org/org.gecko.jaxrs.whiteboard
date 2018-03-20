@@ -140,5 +140,11 @@ public interface JaxRsApplicationProvider extends JaxRsProvider, JaxRsConstants 
 	 * @param applicationContainer the {@link ServletContainer} to remove
 	 */
 	public void removeServletContainer(ServletContainer applicationContainer);
+	
+	/**
+	 * Updates the application base property. section 151.6.1 JaxRs Whiteboard Specification
+	 * @param applicationBase the property to update
+	 */
+	public void updateApplicationBase(String applicationBase);
 
 }

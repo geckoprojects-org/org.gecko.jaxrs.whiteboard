@@ -287,7 +287,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 		if (applicationProvider == null) {
 			logger.log(Level.WARNING, "No application provider was given to be reloaded");
 		}
-		logger.log(Level.INFO, "Reload an application provider " + applicationProvider.getId());
+		logger.log(Level.INFO, "Reload an application provider " + applicationProvider.getName());
 		JaxRsApplicationProvider provider = applicationContainerMap.get(applicationProvider.getId());
 		if (provider == null) {
 			logger.log(Level.INFO, "No application provider was registered nothing to reload, registering instead for " + applicationProvider.getId());
@@ -295,7 +295,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 		} else {
 			List<ServletContainer> servletContainers = provider.getServletContainers();
 			if(!servletContainers.isEmpty()) {
-				logger.log(Level.FINE, "Reload servlet container for application " + applicationProvider.getId());
+				logger.log(Level.FINE, "Reload servlet container for application " + applicationProvider.getName());
 				servletContainers.forEach(servletContainer -> {
 					try{
 						ResourceConfig config = createResourceConfig(provider);
@@ -306,7 +306,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 					}
 				});
 			} else {
-				logger.log(Level.INFO, "-- No servlet container is available to reload " + applicationProvider.getId());
+				logger.log(Level.INFO, "-- No servlet container is available to reload " + applicationProvider.getName());
 			}
 			updateRuntimeProperties();
 		}

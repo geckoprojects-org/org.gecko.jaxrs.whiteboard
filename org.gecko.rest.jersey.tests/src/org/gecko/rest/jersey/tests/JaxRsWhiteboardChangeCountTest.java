@@ -11,7 +11,11 @@
  */
 package org.gecko.rest.jersey.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -20,28 +24,14 @@ import java.util.Hashtable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import javax.enterprise.inject.CreationException;
 import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.MessageBodyReader;
 
 import org.gecko.rest.jersey.provider.JerseyConstants;
-import org.gecko.rest.jersey.tests.applications.AnnotatedTestLegacyApplication;
-import org.gecko.rest.jersey.tests.applications.TestLegacyApplication;
 import org.gecko.rest.jersey.tests.customizer.ServiceChecker;
 import org.gecko.rest.jersey.tests.customizer.TestServiceCustomizer;
-import org.gecko.rest.jersey.tests.resources.ContractedExtension;
 import org.gecko.rest.jersey.tests.resources.HelloResource;
-import org.gecko.rest.jersey.tests.resources.PrototypeExtension;
-import org.gecko.rest.jersey.tests.resources.PrototypeResource;
-import org.glassfish.jersey.client.JerseyClient;
-import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.JerseyInvocation;
-import org.glassfish.jersey.client.JerseyWebTarget;
-import org.glassfish.jersey.message.internal.EntityInputStream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

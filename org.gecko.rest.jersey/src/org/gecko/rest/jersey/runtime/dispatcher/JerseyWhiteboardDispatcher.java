@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
@@ -37,6 +38,7 @@ import org.gecko.rest.jersey.runtime.application.JerseyApplicationProvider;
 import org.gecko.rest.jersey.runtime.application.JerseyExtensionProvider;
 import org.gecko.rest.jersey.runtime.application.JerseyResourceProvider;
 import org.osgi.framework.ServiceObjects;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * Implementation of the dispatcher.
@@ -157,10 +159,24 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	@Override
 	public void addApplication(Application application, Map<String, Object> properties) {
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(application, properties);
+		/*
+		 * Section 151.6.1 The default application can be replaced, with another one using another base path
+		 */
 		if(provider.isDefault()) {
 			defaultProvider = provider;
 			if(whiteboard != null) {
 				whiteboard.registerApplication(defaultProvider);
+			}
+			return;
+		} else if (provider.getName().equals(".default") && defaultProvider != null) {
+			Object providerBase = provider.getApplicationProperties().get(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE);
+			Object currentBase = defaultProvider.getApplicationProperties().get(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE);
+			if (providerBase != null && !providerBase.equals(currentBase)) {
+				defaultProvider.updateApplicationBase((String) providerBase);
+				if (whiteboard != null) {
+					whiteboard.unregisterApplication(defaultProvider);
+					whiteboard.registerApplication(defaultProvider);
+				}
 			}
 			return;
 		}
@@ -271,17 +287,24 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		if (!isDispatching()) {
 			return;
 		}
-		dispatching = false;
-		whiteboard.unregisterApplication(defaultProvider);
-		applicationProviderCache.values().forEach((app)->{
-			if (whiteboard.isRegistered(app)) {
-				whiteboard.unregisterApplication(app);
-			}
-		});
-		defaultProvider = null;
-		applicationProviderCache.clear();
-		resourceProviderCache.clear();
-		extensionProviderCache.clear();
+		try {
+			lock.tryLock(5, TimeUnit.SECONDS);
+			dispatching = false;
+			whiteboard.unregisterApplication(defaultProvider);
+			applicationProviderCache.values().forEach((app)->{
+				if (whiteboard.isRegistered(app)) {
+					whiteboard.unregisterApplication(app);
+				}
+			});
+			defaultProvider = null;
+			applicationProviderCache.clear();
+			resourceProviderCache.clear();
+			extensionProviderCache.clear();
+		} catch (InterruptedException e) {
+			logger.log(Level.SEVERE, "Interrupted deactivate call of the dispatcher", e);
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	/* 
@@ -487,6 +510,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	 * @return <code>true</code>, if adding was successful
 	 */
 	private boolean addContentToApplication(JaxRsApplicationProvider application, JaxRsApplicationContentProvider content) {
+		System.out.println("add to content application " + application + " content " + content);
 		if (content instanceof JaxRsResourceProvider) {
 			return application.addResource((JaxRsResourceProvider) content);
 		}

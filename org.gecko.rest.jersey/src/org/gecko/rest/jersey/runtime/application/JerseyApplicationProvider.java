@@ -12,6 +12,7 @@
 package org.gecko.rest.jersey.runtime.application;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -316,6 +317,14 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	@Override
 	public Collection<JaxRsApplicationContentProvider> getContentProviers() {
 		return wrappedApplication.getContentProviders();
+	}
+	
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider#updateApplicationBase(java.lang.String)
+	 */
+	public void updateApplicationBase(String applicationBase) {
+		doValidateProperties(Collections.singletonMap(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, applicationBase));
 	}
 
 	/**
