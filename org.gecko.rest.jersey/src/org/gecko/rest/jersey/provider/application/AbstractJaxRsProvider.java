@@ -243,7 +243,7 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 			try {
 				whiteboardFilter = FrameworkUtil.createFilter(filter);
 			} catch (InvalidSyntaxException e) {
-				logger.log(Level.SEVERE, "The given whiteboard target filter is invalid: " + filter, e);
+				logger.log(Level.SEVERE, "The given whiteboard target filter is invalid: " + filter);
 				updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
 			}
 		}
@@ -291,6 +291,28 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 				status = newStatus;
 			}
 		}
+	}
+	
+	/* 
+	 * (non-Javadoc)
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	@Override
+	public int compareTo(JaxRsProvider o) {
+		if (o == null) {
+			return -1;
+		}
+		// service id is equal -> same provider
+		int r = getServiceId().compareTo(o.getServiceId());
+		if (r == 0) {
+			return r;
+		}
+		// same name -> sort descending by service rank
+		r = getName().compareTo(o.getName());
+		if (r == 0) {
+			r = getServiceRank().compareTo(o.getServiceRank()) * -1;
+		}
+		return r;
 	}
 
 }

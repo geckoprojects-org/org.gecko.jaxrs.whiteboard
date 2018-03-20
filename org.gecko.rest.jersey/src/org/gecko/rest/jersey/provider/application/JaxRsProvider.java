@@ -22,7 +22,7 @@ import org.osgi.framework.Filter;
  * @author Mark Hoffmann
  * @since 11.10.2017
  */
-public interface JaxRsProvider extends Cloneable {
+public interface JaxRsProvider extends Cloneable, Comparable<JaxRsProvider> {
 	
 	/**
 	 * Returns the primary identifier for the provider, which is usually the service id
