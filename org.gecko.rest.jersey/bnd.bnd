@@ -11,7 +11,9 @@ mockito: org.mockito.mockito-core;version="[1.9,2)",\
 	org.eclipselabs.osgi.hk2.repackaged,\
 	org.apache.felix.http.jetty;version=3.4,\
 	org.osgi.service.jaxrs,\
-	org.osgi.util.pushstream
+	org.osgi.util.pushstream,\
+	org.keycloak.keycloak-jetty94-adapter,\
+	org.keycloak.keycloak-jetty-core
 
 -testpath: \
 	${junit},\

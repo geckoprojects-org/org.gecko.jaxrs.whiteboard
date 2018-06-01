@@ -24,6 +24,10 @@ import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
+//import org.eclipse.jetty.security.ConstraintMapping;
+//import org.eclipse.jetty.util.security.Constraint;
+//import org.eclipse.jetty.security.ConstraintSecurityHandler;
+//import org.keycloak.adapters.jetty.KeycloakJettyAuthenticator;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
@@ -214,6 +218,21 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 				stopServer();
 			}
 			jettyServer = new Server(port);
+//			http://static.helloworld114.com/pages/demo/55448.html
+//		    ConstraintMapping cm = new ConstraintMapping();
+//		    cm.setConstraint(new Constraint());
+//		    cm.getConstraint().setAuthenticate(true);
+//		    cm.getConstraint().setDataConstraint(Constraint.DC_NONE);
+//		    cm.getConstraint().setRoles(new String[] { "rest" });
+//		    cm.setPathSpec("/topic/");
+//		 
+//		    KeycloakJettyAuthenticator kja = new KeycloakJettyAuthenticator();
+//			ConstraintSecurityHandler csh = new ConstraintSecurityHandler();
+//			csh.setRealmName("test");
+//			csh.setAuthenticator(kja);
+//			csh.setConstraintMappings(new ConstraintMapping[] { cm });
+//			csh.setHandler(servletContextHandler);
+//			jettyServer.setHandler(csh);
 			contextHandler = new ServletContextHandler(jettyServer, contextPath);
 			logger.info("Created white-board server context handler for context: " + contextPath);
 		} catch (Exception e) {
