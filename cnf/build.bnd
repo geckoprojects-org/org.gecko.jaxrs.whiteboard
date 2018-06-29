@@ -1,3 +1,10 @@
+-include: ${.}/gecko/gecko.bnd,\
+		  ${.}/dim/dim.bnd,\
+		  ${if;${def;release.dir};\
+              ${.}/releng/release.bnd;\
+              ${.}/releng/snapshot.bnd\
+          }
+
 # Configure Repositories
 -plugin.1.Central: \
 	aQute.bnd.repository.maven.provider.MavenBndRepository; \
@@ -17,31 +24,14 @@
 		pretty = true; \
 		local = ${build}/templates
 
--plugin.4.Release: \
-	aQute.bnd.deployer.repository.LocalIndexedRepo; \
-		name = Release; \
-		pretty = true; \
-		local = ${build}/release
-
--releaserepo: Release
+-releaserepo: Release,DIM_Nexus
 -baselinerepo: Release
+-groupid: org.gecko.rest
 
 # JUnit
 junit: org.apache.servicemix.bundles.junit; version=4.12
 
 -plugin: \
-	aQute.bnd.repository.osgi.OSGiRepository;\
-		name=DIM OCL-3.8;\
-		locations=http://devel.data-in-motion.biz/public/update/repository/p2/releases/ocl-3.8/plugins/index.xml;\
-		cache=${build}/dim-ocl-3.8,\
-	aQute.bnd.repository.osgi.OSGiRepository;\
-		name=DIM QVT-3.8;\
-		locations=http://devel.data-in-motion.biz/public/update/repository/p2/releases/qvt-3.8/plugins/index.xml;\
-		cache=${build}/dim-qvt-3.8,\
-	aQute.bnd.repository.osgi.OSGiRepository;\
-		name=DIM EMF-2.13;\
-		locations=http://devel.data-in-motion.biz/public/update/repository/p2/obr/emf-3.8/index.xml;\
-		cache=${build}/dim-emf-3.8,\
 	aQute.bnd.repository.maven.provider.MavenBndRepository;\
 		releaseUrl=https://repo.eclipse.org/content/repositories/orbit-approved-artifacts/;\
 		index=${.}/eclipse.orbit.maven;name=Eclipse Orbit,\
@@ -57,26 +47,4 @@ junit: org.apache.servicemix.bundles.junit; version=4.12
 		snapshotUrl="https://repository.apache.org/content/repositories/snapshots/";\
 		index=${.}/apache-snapshots.maven;\
 		name='Apache Snapshots';\
-		readOnly=true,\
-	aQute.bnd.repository.osgi.OSGiRepository;\
-		name=DIM Eclipse Runtime;\
-		locations=http://devel.data-in-motion.biz/public/update/repository/p2/obr/dim-core-runtime/index.xml;\
-		cache=${build}/dim-core-runtime,\
-	aQute.bnd.repository.osgi.OSGiRepository;\
-		locations=http://devel.data-in-motion.biz/public/update/repository/p2/obr/emf-persistence/index.xml;\
-		name=EMFPersistence;\
-		cache=${build}/releaseOBR,\
-	aQute.bnd.repository.osgi.OSGiRepository;\
-		locations=http://devel.data-in-motion.biz/public/update/repository/p2/obr/bnd-templates/index.xml;\
-		name=BNDtemplates;\
-		cache=${build}/bndtemplates,\
-	aQute.bnd.repository.osgi.OSGiRepository;\
-		locations=http://devel.data-in-motion.biz/public/update/repository/p2/gecko/geckoEMF/index.xml;\
-		name=GeckoEMF;\
-		cache=${build}/GeckoEMF,\
-	aQute.bnd.repository.osgi.OSGiRepository; \
-		locations = http://devel.data-in-motion.biz/public/update/repository/p2/obr/jersey-dependencies/index.xml;\
-		readonly = true;\
-		name = "Jersey_Dependencies";\
-		cache=${build}/JerseyDependencies
-	
+		readOnly=true

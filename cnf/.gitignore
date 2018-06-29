@@ -1,4 +1,9 @@
 /cache/
 .bnd
 /dim-emf-3.8/*
+/dim-ocl-3.8/*
+/dim-qvt-3.8/*
+/GeckoEMF/*
+/GeckoEMFRespository/*
+/GeckoMongoEMF/*
 /JerseyDependencies/*

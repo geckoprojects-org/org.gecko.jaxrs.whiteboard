@@ -52,14 +52,14 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  * @author Mark Hoffmann
  * @since 12.07.2017
  */
-@Capability(namespace = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, 
-version = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_SPECIFICATION_VERSION, 
-name = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_IMPLEMENTATION, 
-attribute= { 
-		"uses:=\"javax.ws.rs,javax.ws.rs.sse,javax.ws.rs.core,javax.ws.rs.ext,javax.ws.rs.client,javax.ws.rs.container,org.osgi.service.jaxrs.whiteboard\"",
-		"provider=jersey", 
-		"http.whiteboard=true"
-})
+//@Capability(namespace = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, 
+//version = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_SPECIFICATION_VERSION, 
+//name = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_IMPLEMENTATION, 
+//attribute= { 
+//		"uses:=\"javax.ws.rs,javax.ws.rs.sse,javax.ws.rs.core,javax.ws.rs.ext,javax.ws.rs.client,javax.ws.rs.container,org.osgi.service.jaxrs.whiteboard\"",
+//		"provider=jersey", 
+//		"http.whiteboard=true"
+//})
 public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 
 	private final Map<String, ServiceRegistration<Servlet>> applicationServletRegistrationMap = new ConcurrentHashMap<>();

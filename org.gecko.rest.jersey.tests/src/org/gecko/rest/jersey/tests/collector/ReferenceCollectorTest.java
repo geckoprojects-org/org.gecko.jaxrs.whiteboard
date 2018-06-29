@@ -1,21 +1,9 @@
 package org.gecko.rest.jersey.tests.collector;
 
-import static org.junit.Assert.*;
-
-import java.time.Duration;
-import java.util.Dictionary;
-import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import org.gecko.rest.jersey.helper.ReferenceCollector;
-import org.gecko.rest.jersey.helper.ServiceReferenceEvent;
-import org.gecko.rest.jersey.tests.resources.HelloResource;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,8 +12,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
-import org.osgi.util.pushstream.PushStream;
 import org.osgi.util.tracker.ServiceTracker;
 
 @RunWith(MockitoJUnitRunner.class)
