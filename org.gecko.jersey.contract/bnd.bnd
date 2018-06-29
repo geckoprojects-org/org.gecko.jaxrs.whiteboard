@@ -10,7 +10,7 @@ Require-Capability: \
 	osgi.identity;filter:='(osgi.identity=org.glassfish.javax.activation)',\
 	osgi.identity;filter:='(osgi.identity=org.glassfish.jersey.bundles.jaxrs-ri)',\
 	osgi.identity;filter:='(osgi.identity=org.glassfish.jersey.bundles.repackaged.jersey-guava)',\
-	osgi.identity;filter:='(osgi.identity=org.eclipselabs.osgi.hk2.repackaged)',\
+	osgi.identity;filter:='(osgi.identity=org.gecko.osgi.hk2.repackaged)',\
 	osgi.contract;filter:='(osgi.contract=JavaServlet)
 #	osgi.identity;filter:='(osgi.identity=org.glassfish.jersey.media.jersey-media-jaxb)',\
 Provide-Capability: osgi.contract; osgi.contract=JavaJAXRS; version:List<Version>="2.1,2";provider=jersey;jersey.version:Version="2.26";uses:="javax.ws.rs, javax.ws.rs.core, javax.ws.rs.ext, javax.ws.rs.client, javax.ws.rs.container"
