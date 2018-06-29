@@ -12,7 +12,7 @@ mockito: org.mockito.mockito-core;version="[1.9,2)",\
 	org.apache.felix.http.jetty;version=3.4,\
 	org.osgi.service.jaxrs,\
 	org.osgi.util.pushstream
-
+	
 -testpath: \
 	${junit},\
 	${mockito}

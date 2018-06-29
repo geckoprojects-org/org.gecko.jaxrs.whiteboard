@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.Application;
 
+import org.gecko.rest.jersey.helper.DispatcherHelper;
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
@@ -74,10 +76,14 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	private volatile Map<String, JaxRsResourceProvider> resourceProviderCache = new ConcurrentHashMap<>();
 	private volatile Map<String, JaxRsExtensionProvider> extensionProviderCache = new ConcurrentHashMap<>();
 	private volatile Set<JaxRsApplicationProvider> removedApplications = new HashSet<>();
+	private volatile Set<JaxRsApplicationProvider> failedApplications = new HashSet<>();
 	private volatile Set<JaxRsResourceProvider> removedResources = new HashSet<>();
 	private volatile Set<JaxRsExtensionProvider> removedExtensions = new HashSet<>();
 	private volatile boolean dispatching = false;
+	// The implicit default application
 	private volatile JaxRsApplicationProvider defaultProvider;
+	// The shadowed default application with name '.default'
+	private volatile JaxRsApplicationProvider currentDefaultProvider;
 	private ReentrantLock lock = new ReentrantLock();
 	private AtomicBoolean lockedChange = new AtomicBoolean();
 	private boolean batchMode = false;
@@ -111,8 +117,8 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			throw new IllegalStateException("Error setting whiteboard provider, when dispatching is active");
 		}
 		this.whiteboard = whiteboard;
-		if(defaultProvider != null) {
-			whiteboard.registerApplication(defaultProvider);
+		if(currentDefaultProvider != null) {
+			whiteboard.registerApplication(currentDefaultProvider);
 		}
 	}
 
@@ -164,18 +170,19 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		 */
 		if(provider.isDefault()) {
 			defaultProvider = provider;
+			currentDefaultProvider = provider;
 			if(whiteboard != null) {
-				whiteboard.registerApplication(defaultProvider);
+				whiteboard.registerApplication(currentDefaultProvider);
 			}
 			return;
-		} else if (provider.getName().equals(".default") && defaultProvider != null) {
+		} else if (provider.getName().equals(".default") && currentDefaultProvider != null) {
 			Object providerBase = provider.getApplicationProperties().get(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE);
-			Object currentBase = defaultProvider.getApplicationProperties().get(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE);
+			Object currentBase = currentDefaultProvider.getApplicationProperties().get(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE);
 			if (providerBase != null && !providerBase.equals(currentBase)) {
-				defaultProvider.updateApplicationBase((String) providerBase);
+				currentDefaultProvider.updateApplicationBase((String) providerBase);
 				if (whiteboard != null) {
-					whiteboard.unregisterApplication(defaultProvider);
-					whiteboard.registerApplication(defaultProvider);
+					whiteboard.unregisterApplication(currentDefaultProvider);
+					whiteboard.registerApplication(currentDefaultProvider);
 				}
 			}
 			return;
@@ -290,12 +297,14 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		try {
 			lock.tryLock(5, TimeUnit.SECONDS);
 			dispatching = false;
-			whiteboard.unregisterApplication(defaultProvider);
+			whiteboard.unregisterApplication(currentDefaultProvider);
+//			whiteboard.unregisterApplication(currentShadowed);
 			applicationProviderCache.values().forEach((app)->{
 				if (whiteboard.isRegistered(app)) {
 					whiteboard.unregisterApplication(app);
 				}
 			});
+			currentDefaultProvider = null;
 			defaultProvider = null;
 			applicationProviderCache.clear();
 			resourceProviderCache.clear();
@@ -338,6 +347,36 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			Collection<JaxRsResourceProvider> remResources = getRemovedList(removedResources);
 			Collection<JaxRsExtensionProvider> remExtensions = getRemovedList(removedExtensions);
 			try {
+				/*
+				 * Determine all default applications. We are only interested in the highest ranked one, that
+				 * will substitute the implicit default application. All other default applications are added 
+				 * to the failed application list
+				 * Section 151.6.1
+				 */
+				Set<JaxRsApplicationProvider> defaultApplications = DispatcherHelper.getDefaultApplications(applications);
+				final Optional<JaxRsApplicationProvider> defaultApplication = defaultApplications.stream().findFirst();
+				defaultApplications
+					.stream()
+					.filter(app->defaultApplication.isPresent() && !app.equals(defaultApplication.get()))
+					.forEach(failedApplications::add);
+//				substituteDefaultApplication(defaultApplication, Optional.empty());
+				
+				/*
+				 * Go over all applications and filter application with name '.default' ordered by service rank (highest first)
+				 * Check substitution of defaultProvider through this application
+				 * No matching applications should be stored in the failedApplication list. All failed application from
+				 * this step should be filtered out of the application list
+				 * #18 151.6.1
+				 */
+				/*
+				 * Go over all applications and filter application with same path (shadowed) ordered by service rank (highest first)
+				 * Check substitution of an application through the matched one 
+				 * No matching applications should be stored in the failedApplication list. All failed application from
+				 * this step should be filtered out of the application list
+				 * #19 151.6.1
+				 */
+				
+				
 				/*
 				 * Unregister all applications that are declared as deleted.
 				 * Further remove all resources and extension from applications that are declared as deleted
@@ -401,11 +440,11 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 					// reset change marker
 					app.markUnchanged();
 				});
-				if (defaultProvider != null && defaultProvider.isChanged()) {
-					if (whiteboard.isRegistered(defaultProvider)) {
-						whiteboard.reloadApplication(defaultProvider);
+				if (currentDefaultProvider != null && currentDefaultProvider.isChanged()) {
+					if (whiteboard.isRegistered(currentDefaultProvider)) {
+						whiteboard.reloadApplication(currentDefaultProvider);
 					}
-					defaultProvider.markUnchanged();
+					currentDefaultProvider.markUnchanged();
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -435,7 +474,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			});
 		});
 		content.forEach((c)->{
-			if (removeContentFromApplication(defaultProvider, c)) {
+			if (removeContentFromApplication(currentDefaultProvider, c)) {
 				logger.info("Removed content " + c.getName() + " from default application");
 			}
 		});
@@ -482,22 +521,21 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		Comparator<JaxRsApplicationContentProvider> comparator = JaxRsApplicationContentProvider.getComparator();
 		final Set<JaxRsApplicationContentProvider> cc = new TreeSet<JaxRsApplicationContentProvider>(comparator);
 		cc.addAll(contentCandidates);
-		logger.info("Content candidates are " + cc);
 		content.stream().
 		map(this::cloneContent).forEach((c)->{
 			if (cc.contains(c)) {
-				if (c.canHandleApplication(defaultProvider)) {
-					if (addContentToApplication(defaultProvider, c)) {
+				if (c.canHandleApplication(currentDefaultProvider)) {
+					if (addContentToApplication(currentDefaultProvider, c)) {
 						logger.info("Added content candidate " + c.getName() + " to default application");
 					}
 				} else {
-					if (removeContentFromApplication(defaultProvider, c)) {
+					if (removeContentFromApplication(currentDefaultProvider, c)) {
 						logger.info("Removed content candidate " + c.getName() + " from default application");
 					}
 				}
 			} else {
-				if (addContentToApplication(defaultProvider, c)) {
-					logger.info("Added content " + c.getName() + " to default application " + defaultProvider.getName() + " " + c.getObjectClass());
+				if (addContentToApplication(currentDefaultProvider, c)) {
+					logger.info("Added content " + c.getName() + " to default application " + currentDefaultProvider.getName() + " " + c.getObjectClass());
 				} 
 			}
 		});
@@ -551,6 +589,36 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			logger.log(Level.SEVERE, "Cannot clone object " + source.getId() + " because it is not clonable", e);
 		}
 		return null;
+	}
+	
+	/**
+	 * Substitutes the current default provider with the provider from the parameter. If the parameter is <code>null</code>,
+	 * it is expected to reuse the original implicit default provider
+	 * @param newDefaultProvider the new provider or <code>null</code> 
+	 * @param shadowedProvider the shadow application provider
+	 */
+	private void substituteDefaultApplication(Optional<JaxRsApplicationProvider> newDefaultProvider, Optional<JaxRsApplicationProvider> shadowedProvider) {
+		/*
+		 * We check, if an un-registration of the application is really necessary
+		 */
+		boolean unregisterNeeded = false;
+		Long shadowSID = shadowedProvider.isPresent() ? shadowedProvider.get().getServiceId() : null;
+		Long providerSID = newDefaultProvider.isPresent() ? newDefaultProvider.get().getServiceId() : null;
+		Long currentSID = currentDefaultProvider != null ? currentDefaultProvider.getServiceId() : null;
+		
+		if (currentSID != null) {
+			if (providerSID != null) {
+				unregisterNeeded = providerSID != currentSID;
+			} else {
+				unregisterNeeded = true;
+			}
+		}
+		if (whiteboard != null && 
+				unregisterNeeded && 
+				whiteboard.isRegistered(currentDefaultProvider)) {
+			whiteboard.unregisterApplication(currentDefaultProvider);
+		}
+		currentDefaultProvider = newDefaultProvider.orElse(defaultProvider);
 	}
 
 	/**

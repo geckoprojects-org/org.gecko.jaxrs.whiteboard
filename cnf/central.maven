@@ -36,4 +36,10 @@ org.mongodb:mongo-java-driver:3.4.2
 org.objenesis:objenesis:2.2
 
 org.glassfish.jersey.core:jersey-client:2.26
+org.glassfish.jersey.media:jersey-media-sse:2.26-b09
 
+org.keycloak:keycloak-adapter-core:3.4.3.Final
+org.keycloak:keycloak-jetty-adapter-spi:3.4.3.Final
+org.keycloak:keycloak-jetty-core:3.4.3.Final
+org.keycloak:keycloak-jetty94-adapter:3.4.3.Final
+org.keycloak:keycloak-osgi-adapter:3.4.3.Final
