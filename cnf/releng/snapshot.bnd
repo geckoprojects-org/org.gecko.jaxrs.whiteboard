@@ -1,0 +1,11 @@
+-plugin.nexus.snapshot: \
+	aQute.bnd.repository.maven.provider.MavenBndRepository;\
+		releaseUrl=http://devel.data-in-motion.biz/nexus/repository/maven-snapshots/;\
+		index=${.}/dim_nexus.maven;\
+		name='DIM_Nexus'
+-plugin.Release: \
+	aQute.bnd.deployer.repository.LocalIndexedRepo; \
+		name = Release; \
+		pretty = true; \
+		local = ${build}/release
+		

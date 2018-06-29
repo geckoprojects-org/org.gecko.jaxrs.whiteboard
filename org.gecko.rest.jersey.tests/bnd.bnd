@@ -14,10 +14,9 @@ Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 	${mockito},\
 	osgi.annotation;version=7.0.0,\
 	osgi.core;version=6.0,\
-	osgi.cmpn;version=6.0,\
+	osgi.cmpn;version=7.0,\
 	org.gecko.rest.jersey.api;version=latest,\
 	org.gecko.rest.jersey.impl;version=latest,\
-	org.osgi.service.jaxrs;version=1.0,\
 	org.glassfish.jersey.bundles.jaxrs-ri,\
 	javax.annotation-api;version=1.3,\
 	org.osgi.util.pushstream,\
@@ -59,7 +58,7 @@ javac.target: 1.8
 	org.apache.felix.log;version='[1.0.1,1.0.2)',\
 	org.glassfish.jersey.core.jersey-client;version='[2.26.0,2.26.1)',\
 	org.gecko.rest.jersey.impl;version=snapshot
-Bundle-Version: 1.0.0.${tstamp}
+Bundle-Version: 1.0.0.SNAPSHOT
 Bundle-Copyright: Data In Motion Consulting
 Bundle-License: Eclipse Public License v1.0
 Bundle-Name: Jersey JaxRS Whiteboard integration test

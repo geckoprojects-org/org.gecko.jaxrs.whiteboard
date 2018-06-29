@@ -5,13 +5,12 @@ mockito: org.mockito.mockito-core;version="[1.9,2)",\
 -buildpath: \
 	osgi.annotation;version=7.0.0,\
 	osgi.core;version=6.0,\
-	osgi.cmpn;version=6.0,\
+	osgi.cmpn;version=7.0,\
 	javax.servlet;version=3.1,\
 	org.glassfish.jersey.bundles.jaxrs-ri;version=2.26,\
-	org.eclipselabs.osgi.hk2.repackaged,\
 	org.apache.felix.http.jetty;version=3.4,\
-	org.osgi.service.jaxrs,\
-	org.osgi.util.pushstream
+	org.osgi.util.pushstream,\
+	org.gecko.osgi.hk2.repackaged;version=latest
 	
 -testpath: \
 	${junit},\
@@ -20,7 +19,7 @@ mockito: org.mockito.mockito-core;version="[1.9,2)",\
 javac.source: 1.8
 javac.target: 1.8
 
-Bundle-Version: 1.0.0.${tstamp}
+Bundle-Version: 1.0.0.SNAPSHOT
 Bundle-Copyright: Data In Motion Consulting
 Bundle-License: Eclipse Public License v1.0
 Bundle-Name: Jersey JaxRS Whiteboard
