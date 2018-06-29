@@ -29,6 +29,7 @@ import org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime;
 import org.gecko.rest.jersey.runtime.servlet.WhiteboardServletContainer;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
+import org.osgi.annotation.bundle.Capability;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -37,24 +38,28 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.PrototypeServiceFactory;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.namespace.implementation.ImplementationNamespace;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.http.context.ServletContextHelper;
 import org.osgi.service.http.runtime.HttpServiceRuntime;
 import org.osgi.service.http.runtime.HttpServiceRuntimeConstants;
 import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * Implementation of the {@link JaxRSServiceRuntime} for a Jersey implementation
  * @author Mark Hoffmann
  * @since 12.07.2017
  */
-//@Capability(namespace = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, 
-//version="1.0", 
-//name = "osgi.jaxrs", 
-//attribute = {"provider=jersey" , "http.whiteboard=true" }
-//uses= {"javax.ws.rs", "javax.ws.rs.client", "javax.ws.rs.container", "javax.ws.rs.core", "javax.ws.rs.ext", "org.osgi.service.jaxrs.whiteboard"}
-//)
+@Capability(namespace = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, 
+version = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_SPECIFICATION_VERSION, 
+name = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_IMPLEMENTATION, 
+attribute= { 
+		"uses:=\"javax.ws.rs,javax.ws.rs.sse,javax.ws.rs.core,javax.ws.rs.ext,javax.ws.rs.client,javax.ws.rs.container,org.osgi.service.jaxrs.whiteboard\"",
+		"provider=jersey", 
+		"http.whiteboard=true"
+})
 public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 
 	private final Map<String, ServiceRegistration<Servlet>> applicationServletRegistrationMap = new ConcurrentHashMap<>();
@@ -165,8 +170,6 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 		if(select != null){
 			props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT, select);
 		}
-		
-		//TODO: We have to register this as a prototype service, but how?O
 		
 		ServiceRegistration<Servlet> serviceRegistration = context.getBundleContext().registerService(Servlet.class, new PrototypeServiceFactory<Servlet>() {
 

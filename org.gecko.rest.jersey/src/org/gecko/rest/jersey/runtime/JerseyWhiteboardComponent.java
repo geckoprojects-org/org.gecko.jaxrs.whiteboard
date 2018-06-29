@@ -101,15 +101,44 @@ public class JerseyWhiteboardComponent {
 	}
 	
 	/**
+	 * Adds a new default application
+	 * @param application the application to add
+	 * @param properties the service properties
+	 */
+	@Reference(name="defaultApplication", cardinality=ReferenceCardinality.AT_LEAST_ONE, policy=ReferencePolicy.DYNAMIC, unbind="removeDefaultApplication", updated = "modifedDefaultApplication", target="(osgi.jaxrs.name=.default)")
+	public void addDefaultApplication(Application application, Map<String, Object> properties) {
+		dispatcher.addApplication(application, properties);
+	}
+
+	/**
+	 * Modifies a default application
+	 * @param application the application to add
+	 * @param properties the service properties
+	 */
+	public void modifedDefaultApplication(Application application, Map<String, Object> properties) {
+		dispatcher.removeApplication(application, properties);
+		dispatcher.addApplication(application, properties);
+	}
+
+	/**
+	 * Removes a default application 
+	 * @param application the application to remove
+	 * @param properties the service properties
+	 */
+	public void removeDefaultApplication(Application application, Map<String, Object> properties) {
+		dispatcher.removeApplication(application, properties);
+	}
+	
+	/**
 	 * Adds a new application
 	 * @param application the application to add
 	 * @param properties the service properties
 	 */
-	@Reference(name="application", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeApplication", updated = "modifedApplication")
+	@Reference(name="application", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeApplication", updated = "modifedApplication", target="(!(osgi.jaxrs.name=.default))")
 	public void addApplication(Application application, Map<String, Object> properties) {
 		dispatcher.addApplication(application, properties);
 	}
-
+	
 	/**
 	 * Adds a new application
 	 * @param application the application to add
@@ -119,7 +148,6 @@ public class JerseyWhiteboardComponent {
 		dispatcher.removeApplication(application, properties);
 		dispatcher.addApplication(application, properties);
 	}
-
 	
 	/**
 	 * Removes a application 

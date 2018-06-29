@@ -117,10 +117,10 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 */
 	private Dictionary<String, Object> getRuntimeProperties() {
 		Dictionary<String, Object> properties = new Hashtable<>();
-		properties.put("service.changecount", changeCount .incrementAndGet());
 		getProperties().entrySet().forEach(e -> properties.put(e.getKey(), e.getValue()));
 		properties.put(JaxrsServiceRuntimeConstants.JAX_RS_SERVICE_ENDPOINT, getURLs(context));
 		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, name);
+		properties.put("service.changecount", changeCount.incrementAndGet());
 		return properties;
 	}
 	
