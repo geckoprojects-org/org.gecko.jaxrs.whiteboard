@@ -25,7 +25,7 @@
 		local = ${build}/templates
 
 -releaserepo: Release,DIM_Nexus
--baselinerepo: Release
+-baselinerepo: GeckoREST
 -groupid: org.gecko.rest
 
 # JUnit
