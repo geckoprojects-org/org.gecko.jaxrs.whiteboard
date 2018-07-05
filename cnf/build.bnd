@@ -25,26 +25,27 @@
 		local = ${build}/templates
 
 -releaserepo: Release,DIM_Nexus
--baselinerepo: Release
+-baselinerepo: GeckoREST
 -groupid: org.gecko.rest
+-baseline: *
 
 # JUnit
 junit: org.apache.servicemix.bundles.junit; version=4.12
 
 -plugin: \
 	aQute.bnd.repository.maven.provider.MavenBndRepository;\
-		releaseUrl=https://repo.eclipse.org/content/repositories/orbit-approved-artifacts/;\
+		releaseUrl=http://devel.data-in-motion.biz/nexus/repository/EclipseOrbitRelease/;\
 		index=${.}/eclipse.orbit.maven;name=Eclipse Orbit,\
 	aQute.bnd.repository.maven.provider.MavenBndRepository;\
 		releaseUrl=https://oss.sonatype.org/content/repositories/osgi/;\
 		snapshotUrl=https://oss.sonatype.org/content/repositories/osgi/;\
 		index=${.}/osgi.maven;name=OSGi Nexus,\
 	aQute.bnd.repository.maven.provider.MavenBndRepository;\
-		releaseUrl=/https://repo.eclipse.org/;\
+		releaseUrl=/http://devel.data-in-motion.biz/nexus/repository/EclipseNexus/;\
 		index=${.}/eclipse.maven;\
 		name=Eclipse Nexus,\
 	aQute.bnd.repository.maven.provider.MavenBndRepository;\
-		snapshotUrl="https://repository.apache.org/content/repositories/snapshots/";\
+		snapshotUrl="http://devel.data-in-motion.biz/nexus/repository/ApacheSnapshot/";\
 		index=${.}/apache-snapshots.maven;\
 		name='Apache Snapshots';\
 		readOnly=true
