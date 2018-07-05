@@ -4,7 +4,7 @@
 		locations=http://devel.data-in-motion.biz/public/update/repository/p2/obr/emf-3.8/index.xml;\
 		cache=${build}/cache/dim-emf-3.8,\
 	aQute.bnd.repository.osgi.OSGiRepository;\
-		locations=http://devel.data-in-motion.biz/public/repository/gecko/snapshot/geckoEMF/index.xml;\
+		locations=http://devel.data-in-motion.biz/public/repository/gecko/release/geckoEMF/index.xml;\
 		name=GeckoEMF;\
 		cache=${build}/cache/GeckoEMF,\
 	aQute.bnd.repository.osgi.OSGiRepository;\
@@ -20,7 +20,7 @@
 		name=GeckoEMFRepository;\
 		cache=${build}/cache/GeckoEMFRepository,\
 	aQute.bnd.repository.osgi.OSGiRepository;\
-		locations=http://devel.data-in-motion.biz/public/repository/gecko/release/geckoAddons/index.xml;\
+		locations=http://devel.data-in-motion.biz/public/repository/gecko/snapshot/geckoAddons/index.xml;\
 		name=GeckoAddons;\
 		cache=${build}/cache/GeckoAddons,\
 	aQute.bnd.repository.osgi.OSGiRepository; \

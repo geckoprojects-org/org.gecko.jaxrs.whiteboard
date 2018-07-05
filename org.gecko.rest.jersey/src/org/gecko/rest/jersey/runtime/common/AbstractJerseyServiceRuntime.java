@@ -191,7 +191,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 			BaseApplicationDTO appDTO = ap.getApplicationDTO();
 			if(appDTO instanceof ApplicationDTO) {
 				ApplicationDTO curDTO = (ApplicationDTO) appDTO;
-				if (name.equals(".default")) {
+				if (curDTO.name.equals(".default")) {
 					runtimeDTO.defaultApplication = curDTO;
 				} else {
 					appDTOList.add(curDTO);
