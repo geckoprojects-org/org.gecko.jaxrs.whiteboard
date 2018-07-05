@@ -26,7 +26,7 @@ Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 -runrequires: \
 	osgi.identity;filter:='(&(osgi.identity=org.apache.felix.eventadmin)(version>=1.4.8))',\
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.configadmin)',\
-	osgi.identity;filter:='(osgi.identity=org.gecko.rest.jersey.tests)'	
+	bnd.identity;id='org.gecko.rest.jersey.tests'
 
 javac.source: 1.8
 javac.target: 1.8
@@ -51,10 +51,10 @@ javac.target: 1.8
 	org.apache.felix.eventadmin;version='[1.4.10,1.4.11)',\
 	org.glassfish.jersey.core.jersey-client;version='[2.26.0,2.26.1)',\
 	org.gecko.osgi.hk2.repackaged;version=snapshot,\
-	org.gecko.rest.jersey.api;version='[1.0.0,1.0.1)',\
-	org.gecko.rest.jersey.impl;version='[1.0.0,1.0.1)',\
 	org.apache.felix.http.jetty;version='[4.0.0,4.0.1)',\
-	org.gecko.util.test.common;version='[1.0.0,1.0.1)'
+	org.gecko.util.test.common;version='[1.0.0,1.0.1)',\
+	org.gecko.rest.jersey.impl;version=snapshot,\
+	org.gecko.rest.jersey.api;version=snapshot
 Bundle-Version: 1.0.1.SNAPSHOT
 Bundle-Copyright: Data In Motion Consulting
 Bundle-License: Eclipse Public License v1.0
@@ -79,3 +79,26 @@ Require-Capability: osgi.implementation;filter:='(&(osgi.implementation=osgi.jax
 Export-Package: org.gecko.rest.jersey.tests.customizer
 -runproperties: \
 	org.osgi.service.http.port=0
+-runrepos: \
+	Workspace,\
+	Eclipse Orbit,\
+	OSGi Nexus,\
+	Eclipse Nexus,\
+	Apache Snapshots,\
+	Central,\
+	Local,\
+	Templates,\
+	Release,\
+	DIM OCL-3.8,\
+	DIM QVT-3.8,\
+	DIM EMF-2.13,\
+	DIM Eclipse Runtime,\
+	BNDtemplates,\
+	DIM EMF-2.13,\
+	GeckoEMF,\
+	GeckoMongoEMF,\
+	GeckoEMFRepository,\
+	GeckoAddons,\
+	GeckoRuntime,\
+	GeckoEMFAddons,\
+	DIM_Nexus
