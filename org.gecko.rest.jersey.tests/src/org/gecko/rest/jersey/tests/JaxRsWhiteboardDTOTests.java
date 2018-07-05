@@ -110,8 +110,6 @@ public class JaxRsWhiteboardDTOTests extends AbstractOSGiTest {
 		assertTrue(runtimeChecker.waitCreate());
 		
 		JaxrsServiceRuntime jaxRSRuntime = getService(JaxrsServiceRuntime.class);
-		CountDownLatch latch = new CountDownLatch(1);
-		latch.await(1, TimeUnit.SECONDS);
 		RuntimeDTO runtimeDTO = jaxRSRuntime.getRuntimeDTO();
 		assertNotNull(runtimeDTO);
 		

@@ -72,7 +72,9 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 */
 	@Override
 	public RuntimeDTO getRuntimeDTO() {
-		return runtimeDTO;
+		synchronized (runtimeDTO) {
+			return runtimeDTO;
+		}
 	}
 
 	/* 
@@ -101,8 +103,10 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 		Dictionary<String, Object> properties = getRuntimeProperties();
 		String[] service = new String[] {JaxrsServiceRuntime.class.getName(), JaxRsWhiteboardProvider.class.getName()};
 		try {
-			serviceRuntime = (ServiceRegistration<JaxrsServiceRuntime>) context.getBundleContext().registerService(service, this, properties);
-			updateRuntimeDTO(serviceRuntime.getReference());
+			synchronized (runtimeDTO) {
+				serviceRuntime = (ServiceRegistration<JaxrsServiceRuntime>) context.getBundleContext().registerService(service, this, properties);
+				updateRuntimeDTO(serviceRuntime.getReference());
+			}
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Error starting JaxRsRuntimeService ", e);
 			if (serviceRuntime != null) {
