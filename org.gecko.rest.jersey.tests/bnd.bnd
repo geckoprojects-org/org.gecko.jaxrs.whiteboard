@@ -55,7 +55,7 @@ javac.target: 1.8
 	org.gecko.util.test.common;version='[1.0.0,1.0.1)',\
 	org.gecko.rest.jersey.impl;version=snapshot,\
 	org.gecko.rest.jersey.api;version=snapshot
-Bundle-Version: 1.0.1.SNAPSHOT
+Bundle-Version: 1.0.2.SNAPSHOT
 Bundle-Copyright: Data In Motion Consulting
 Bundle-License: Eclipse Public License v1.0
 Bundle-Name: Jersey JaxRS Whiteboard integration test
