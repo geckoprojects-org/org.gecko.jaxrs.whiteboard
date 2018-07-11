@@ -26,28 +26,22 @@ import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.MessageBodyReader;
 
 import org.gecko.rest.jersey.provider.JerseyConstants;
-import org.gecko.rest.jersey.tests.applications.AnnotatedTestLegacyApplication;
-import org.gecko.rest.jersey.tests.customizer.ServiceChecker;
 import org.gecko.rest.jersey.tests.customizer.TestServiceCustomizer;
+import org.gecko.rest.jersey.tests.resources.ContractedExtension;
+import org.gecko.rest.jersey.tests.resources.DtoTestExtension;
+import org.gecko.rest.jersey.tests.resources.DtoTestResource;
 import org.gecko.rest.jersey.tests.resources.HelloResource;
 import org.gecko.util.test.common.test.AbstractOSGiTest;
-import org.glassfish.jersey.client.JerseyClient;
-import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.JerseyInvocation;
-import org.glassfish.jersey.client.JerseyWebTarget;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -59,14 +53,18 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * Tests the whiteboard dispatcher
+ * 
  * @author Mark Hoffmann
  * @since 12.10.2017
  */
 @RunWith(MockitoJUnitRunner.class)
 public class JaxRsWhiteboardDTOTests extends AbstractOSGiTest {
 
+	BundleContext context = FrameworkUtil.getBundle(JaxRsWhiteboardDTOTests.class).getBundleContext();
+
 	/**
 	 * Creates a new instance.
+	 * 
 	 * @param bundleContext
 	 */
 	public JaxRsWhiteboardDTOTests() {
@@ -74,45 +72,117 @@ public class JaxRsWhiteboardDTOTests extends AbstractOSGiTest {
 	}
 
 	/**
-	 * Tests ---- before 88s 
-	 * @throws IOException 
-	 * @throws InterruptedException 
-	 * @throws InvalidSyntaxException 
+	 * Tests ---- before 88s
+	 * 
+	 * @throws IOException
+	 * @throws InterruptedException
+	 * @throws InvalidSyntaxException
 	 */
 	@Test
-	public void testDefaultApplicationDTOSet() throws IOException, InterruptedException, InvalidSyntaxException {
+	public void testDTOSet() throws IOException, InterruptedException, InvalidSyntaxException {
 		/*
-		 *  The server runs on localhost port 8185 using context path test: http://localhost:8185/test
-		 *  We mount the system with a resource RootResource under http://localhost:8185/test that will return a 
-		 *  HTTP::200 using a GET request
+		 * The server runs on localhost port 8185 using context path test:
+		 * http://localhost:8185/test We mount the system with a resource RootResource
+		 * under http://localhost:8185/test that will return a HTTP::200 using a GET
+		 * request
 		 */
 		int port = 8185;
 		String contextPath = "test";
-		String url = "http://localhost:" + port + "/" + contextPath;
-		
 		/*
-		 * Initial setup for the REST runtime 
+		 * Initial setup for the REST runtime
 		 */
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
-		
-		org.gecko.util.test.common.service.ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
+
+		org.gecko.util.test.common.service.ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(
+				JaxrsServiceRuntime.class);
 		runtimeChecker.start();
-		
+
 		ConfigurationAdmin configAdmin = (ConfigurationAdmin) getConfigAdmin();
 		assertNotNull(configAdmin);
 		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
 		assertNotNull(configuration);
 		configuration.update(properties);
-		
+
 		assertTrue(runtimeChecker.waitCreate());
-		
-		JaxrsServiceRuntime jaxRSRuntime = getService(JaxrsServiceRuntime.class);
-		RuntimeDTO runtimeDTO = jaxRSRuntime.getRuntimeDTO();
+
+		RuntimeDTO runtimeDTO = getRuntimeDTO();
 		assertNotNull(runtimeDTO);
-		
+
 		assertNotNull(runtimeDTO.defaultApplication);
+
+		/*
+		 * Mount the application customer that will become available under:
+		 * test/customer http://localhost:8185/test/customer
+		 */
+		Dictionary<String, Object> appProps = new Hashtable<>();
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "dtoApp");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "dtoApplication");
+		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new Application(){},
+				appProps);
+		CountDownLatch cdl = new CountDownLatch(1);
+		cdl.await(1, TimeUnit.SECONDS);
+
+		runtimeDTO = getRuntimeDTO();
+
+		assertNotNull(runtimeDTO);
+
+		/*
+		 * Mount the extension DtoTestExtension 
+		 */
+		Dictionary<String, Object> extensionProps = new Hashtable<>();
+		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, "true");
+		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "DtoTestExtension");
+		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
+				"(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=dtoApplication)");
+
+
+		ServiceRegistration<?> dtoExtRegistration = context.registerService(DtoTestExtension.class,
+				new DtoTestExtension(), extensionProps);
+
+		cdl = new CountDownLatch(1);
+		cdl.await(1, TimeUnit.SECONDS);
+		runtimeDTO = getRuntimeDTO();
+
+		assertNotNull(runtimeDTO);
+
+		/*
+		 * Mount the resource DtoTestResource
+		 */
+		Dictionary<String, Object> helloProps = new Hashtable<>();
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "DtoTestResource");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
+				"(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=dtoApplication)");
+
+		System.out.println("Register resource");
+		ServiceRegistration<DtoTestResource> dtoResRegistration = context.registerService(DtoTestResource.class,
+				new DtoTestResource(), helloProps);
+
+		runtimeDTO = getRuntimeDTO();
+		assertNotNull(runtimeDTO);
+
+	}
+	
+
+	
+
+
+	/**
+	 * @return
+	 */
+	private RuntimeDTO getRuntimeDTO() {
+		JaxrsServiceRuntime jaxRSRuntime = getJaxRsRuntimeService();
+		return jaxRSRuntime.getRuntimeDTO();
+	}
+
+	/**
+	 * @return
+	 */
+	private JaxrsServiceRuntime getJaxRsRuntimeService() {
+		JaxrsServiceRuntime jaxRSRuntime = getService(JaxrsServiceRuntime.class);
+		return jaxRSRuntime;
 	}
 }

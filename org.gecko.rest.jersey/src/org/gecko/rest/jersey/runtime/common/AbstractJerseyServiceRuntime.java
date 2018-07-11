@@ -132,9 +132,15 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 * Updates the properties and the changecount of the registered Runtime
 	 */
 	protected void updateRuntimeProperties() {
-		if(serviceRuntime != null) {
+		if (serviceRuntime != null) {
 			Dictionary<String, Object> properties = getRuntimeProperties();
 			serviceRuntime.setProperties(properties);
+			if (serviceRuntime.getReference() != null) {
+				synchronized (runtimeDTO) {
+
+					updateRuntimeDTO(serviceRuntime.getReference());
+				}
+			}
 		}
 	}
 
