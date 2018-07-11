@@ -111,7 +111,26 @@ public class JaxRsWhiteboardDTOTests extends AbstractOSGiTest {
 		RuntimeDTO runtimeDTO = getRuntimeDTO();
 		assertNotNull(runtimeDTO);
 
+		assertNotNull(runtimeDTO.serviceDTO);
+		
 		assertNotNull(runtimeDTO.defaultApplication);
+		assertNotNull(runtimeDTO.defaultApplication.resourceDTOs);
+		
+		//TODO: why is a Resource named 'ptr' registered?
+		//assertEquals(0,runtimeDTO.defaultApplication.resourceDTOs.length);
+		
+		assertNotNull(runtimeDTO.applicationDTOs);
+		assertEquals(0,runtimeDTO.applicationDTOs.length);
+		
+		assertNotNull(runtimeDTO.failedApplicationDTOs);
+		assertEquals(0,runtimeDTO.failedApplicationDTOs.length);
+		
+		assertNotNull(runtimeDTO.failedExtensionDTOs);
+		assertEquals(0,runtimeDTO.failedExtensionDTOs.length);
+		
+		assertNotNull(runtimeDTO.failedResourceDTOs);
+		assertEquals(0,runtimeDTO.failedResourceDTOs.length);	
+
 
 		/*
 		 * Mount the application customer that will become available under:
@@ -151,15 +170,15 @@ public class JaxRsWhiteboardDTOTests extends AbstractOSGiTest {
 		/*
 		 * Mount the resource DtoTestResource
 		 */
-		Dictionary<String, Object> helloProps = new Hashtable<>();
-		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "DtoTestResource");
-		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
+		Dictionary<String, Object> resProps = new Hashtable<>();
+		resProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		resProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "DtoTestResource");
+		resProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
 				"(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=dtoApplication)");
 
 		System.out.println("Register resource");
 		ServiceRegistration<DtoTestResource> dtoResRegistration = context.registerService(DtoTestResource.class,
-				new DtoTestResource(), helloProps);
+				new DtoTestResource(), resProps);
 
 		runtimeDTO = getRuntimeDTO();
 		assertNotNull(runtimeDTO);
