@@ -105,7 +105,7 @@ public class JerseyWhiteboardComponent {
 	 * @param application the application to add
 	 * @param properties the service properties
 	 */
-	@Reference(name="defaultApplication", cardinality=ReferenceCardinality.AT_LEAST_ONE, policy=ReferencePolicy.DYNAMIC, unbind="removeDefaultApplication", updated = "modifedDefaultApplication", target="(&(osgi.jaxrs.application.base=*)(osgi.jaxrs.name=.default)")
+	@Reference(name="defaultApplication", cardinality=ReferenceCardinality.AT_LEAST_ONE, policy=ReferencePolicy.DYNAMIC, unbind="removeDefaultApplication", updated = "modifedDefaultApplication", target="(&(osgi.jaxrs.application.base=*)(osgi.jaxrs.name=.default))")
 	public void addDefaultApplication(Application application, Map<String, Object> properties) {
 		dispatcher.addApplication(application, properties);
 	}
