@@ -27,6 +27,7 @@ import javax.ws.rs.HEAD;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvider;
@@ -240,6 +241,11 @@ public class DTOConverter {
 		String methodString = getMethodStrings(method);
 		if (methodString != null) {
 			dto.method = methodString;
+			empty = false;
+		}
+		Path path = method.getAnnotation(Path.class);
+		if (path != null) {
+			dto.path = path.value();
 			empty = false;
 		}
 		return empty ? null : dto;

@@ -295,6 +295,7 @@ public class DTOConverterTest {
 		Method method = TestResource.class.getDeclaredMethod("postMe", new Class[] {String.class});
 		ResourceMethodInfoDTO dto = DTOConverter.toResourceMethodInfoDTO(method);
 		assertNotNull(dto);
+		assertEquals("pdf", dto.path);
 		assertEquals("POST", dto.method);
 		assertEquals(1, dto.consumingMimeType.length);
 		assertEquals("pdf", dto.consumingMimeType[0]);

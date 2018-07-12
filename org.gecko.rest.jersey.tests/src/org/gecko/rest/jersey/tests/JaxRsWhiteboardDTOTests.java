@@ -129,8 +129,8 @@ public class JaxRsWhiteboardDTOTests extends AbstractOSGiTest {
 		assertEquals(1, resourceDtoPtr.resourceMethods.length);
 
 		ResourceMethodInfoDTO methodInfoDTO = getResMethIOof(resourceDtoPtr.resourceMethods, "test");
-		//assertNotNull(methodInfoDTO);
-		//assertEquals("GET", methodInfoDTO.method);
+		assertNotNull(methodInfoDTO);
+		assertEquals("GET", methodInfoDTO.method);
 
 		assertNotNull(runtimeDTO.applicationDTOs);
 		assertEquals(0, runtimeDTO.applicationDTOs.length);
