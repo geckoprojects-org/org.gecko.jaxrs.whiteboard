@@ -297,7 +297,7 @@ public class JaxRsWhiteboardApplicationLifecycleTests {
 		Dictionary<String, Object> app2Props = new Hashtable<>();
 		app2Props.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "/app2");
 		app2Props.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "App2");
-		ServiceRegistration<Application> app2Registration = context.registerService(Application.class, new Application(), app2Props);
+		ServiceRegistration<Application> app2Registration = context.registerService(Application.class, new Application(){}, app2Props);
 		Filter app2Filter = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=App1)");
 		application = getService(app2Filter, 3000l);
 		assertNotNull(application);
