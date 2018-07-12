@@ -73,13 +73,17 @@ public class DTOConverter {
 
 		// Search for contentProvider and generate ResourceDTOs and ExtensionDTOs
 		List<ResourceDTO> rdtos = new ArrayList<>();
+		List<ResourceMethodInfoDTO> rmidtos = new ArrayList<>();
 		List<ExtensionDTO> edtos = new ArrayList<>();
+
+		// todo: add methods of static defined Ressources to ResourceMethodInfoDTO rmidtos.add()
+		
 		if (applicationProvider.getContentProviers() != null) {
 
 			for (JaxRsApplicationContentProvider contentProvider : applicationProvider.getContentProviers()) {
 
 				if (contentProvider instanceof JerseyResourceProvider) {
-					rdtos.add(toResourceDTO((JaxRsResourceProvider) contentProvider));
+					rdtos.add(toResourceDTO((JaxRsResourceProvider) contentProvider));					
 				} else if (contentProvider instanceof JerseyExtensionProvider) {
 					edtos.add(toExtensionDTO((JerseyExtensionProvider<?>) contentProvider));
 				}
@@ -87,7 +91,7 @@ public class DTOConverter {
 		}
 		dto.resourceDTOs = rdtos.toArray(new ResourceDTO[rdtos.size()]);
 		dto.extensionDTOs = edtos.toArray(new ExtensionDTO[edtos.size()]);
-		dto.resourceMethods = getResourceMethodInfoDTOs(applicationProvider.getProviderObject().getClass());
+		dto.resourceMethods = rmidtos.toArray(new ResourceMethodInfoDTO[rmidtos.size()]);
 		return dto;
 	}
 	
