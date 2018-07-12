@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -46,6 +47,10 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
+import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
+import org.osgi.service.jaxrs.runtime.dto.BaseDTO;
+import org.osgi.service.jaxrs.runtime.dto.ResourceDTO;
+import org.osgi.service.jaxrs.runtime.dto.ResourceMethodInfoDTO;
 import org.osgi.service.jaxrs.runtime.dto.RuntimeDTO;
 import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 import org.osgi.util.tracker.ServiceTracker;
@@ -116,15 +121,23 @@ public class JaxRsWhiteboardDTOTests extends AbstractOSGiTest {
 		assertNotNull(runtimeDTO.defaultApplication);
 		assertNotNull(runtimeDTO.defaultApplication.resourceDTOs);
 		
-		//TODO: why is a Resource named 'ptr' registered?
-		//assertEquals(0,runtimeDTO.defaultApplication.resourceDTOs.length);
-		
+		//TODO: The resource 'ptr' is registered because of its ComponentProperties. ? neccessary?
+		assertEquals(1,runtimeDTO.defaultApplication.resourceDTOs.length);
+		ResourceDTO resourceDtoPtr = getDTOof(runtimeDTO.defaultApplication.resourceDTOs, "ptr");
+		assertNotNull(resourceDtoPtr);
+		assertNotNull(resourceDtoPtr.resourceMethods);
+		assertEquals(1, resourceDtoPtr.resourceMethods.length);
+
+		ResourceMethodInfoDTO methodInfoDTO = getResMethIOof(resourceDtoPtr.resourceMethods, "test");
+		//assertNotNull(methodInfoDTO);
+		//assertEquals("GET", methodInfoDTO.method);
+
 		assertNotNull(runtimeDTO.applicationDTOs);
-		assertEquals(0,runtimeDTO.applicationDTOs.length);
-		
+		assertEquals(0, runtimeDTO.applicationDTOs.length);
+
 		assertNotNull(runtimeDTO.failedApplicationDTOs);
-		assertEquals(0,runtimeDTO.failedApplicationDTOs.length);
-		
+		assertEquals(0, runtimeDTO.failedApplicationDTOs.length);
+
 		assertNotNull(runtimeDTO.failedExtensionDTOs);
 		assertEquals(0,runtimeDTO.failedExtensionDTOs.length);
 		
@@ -188,6 +201,28 @@ public class JaxRsWhiteboardDTOTests extends AbstractOSGiTest {
 
 	
 
+	private ResourceMethodInfoDTO getResMethIOof(ResourceMethodInfoDTO[] resourceMethodInfoDTOs,String path) {
+		for (ResourceMethodInfoDTO resourceMethodInfoDTO : resourceMethodInfoDTOs) {
+			if (path.equals(resourceMethodInfoDTO.path)) {
+				return resourceMethodInfoDTO;
+			}
+		}
+		return null;
+	}
+
+
+	/**
+	 * @param runtimeDTO
+	 * @return
+	 */
+	private <T extends BaseDTO> T getDTOof(T[] baseDTOs,String appName) {
+		for (T baseDTO : baseDTOs) {
+			if (baseDTO.name.equals(appName)) {
+				return baseDTO;
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * @return
