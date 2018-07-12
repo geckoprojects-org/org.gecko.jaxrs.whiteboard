@@ -67,7 +67,11 @@ public class DTOConverter {
 		}
 		ApplicationDTO dto = new JerseyApplicationDTO();
 		dto.name = applicationProvider.getName();
-		dto.base = applicationProvider.getPath();
+		String basePath = applicationProvider.getPath();
+		if(basePath!=null) {
+			dto.base = basePath.replaceAll("/\\*", "/");	
+		}
+	
 		Long sid = applicationProvider.getServiceId();
 		dto.serviceId = sid != null ? sid.longValue() : -1;
 

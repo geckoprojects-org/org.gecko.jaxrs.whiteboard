@@ -118,7 +118,7 @@ public class DTOConverterTest {
 		dto = DTOConverter.toApplicationDTO(resourceProvider);
 		
 		assertNotNull(dto);
-		assertEquals("/test/*", dto.base);
+		assertEquals("/test/", dto.base);
 		assertEquals("MyApp", dto.name);
 		assertEquals(12, dto.serviceId);
 
@@ -126,7 +126,7 @@ public class DTOConverterTest {
 		dto = DTOConverter.toApplicationDTO(resourceProvider);
 
 		assertNotNull(dto);
-		assertEquals("/test/applpath/*", dto.base);
+		assertEquals("/test/applpath/", dto.base);
 
 		// TODO: test resourceMethofs - The RequestPaths handled by statically defined
 		// resources in this Application
@@ -135,7 +135,7 @@ public class DTOConverterTest {
 		dto = DTOConverter.toApplicationDTO(resourceProvider);
 
 		assertNotNull(dto);
-		assertEquals("/test/*", dto.base);
+		assertEquals("/test/", dto.base);
 	}
 	
 	/**
