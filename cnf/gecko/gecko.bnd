@@ -20,7 +20,7 @@
 		name=GeckoEMFRepository;\
 		cache=${build}/cache/GeckoEMFRepository,\
 	aQute.bnd.repository.osgi.OSGiRepository;\
-		locations=http://devel.data-in-motion.biz/public/repository/gecko/snapshot/geckoAddons/index.xml;\
+		locations=http://devel.data-in-motion.biz/public/repository/gecko/release/geckoAddons/index.xml;\
 		name=GeckoAddons;\
 		cache=${build}/cache/GeckoAddons,\
 	aQute.bnd.repository.osgi.OSGiRepository; \

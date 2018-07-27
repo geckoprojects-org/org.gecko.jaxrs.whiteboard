@@ -23,6 +23,12 @@
 		name = Templates; \
 		pretty = true; \
 		local = ${build}/templates
+		
+-plugin.4.Temp: \
+	aQute.bnd.deployer.repository.LocalIndexedRepo; \
+		name = Temp; \
+		pretty = true; \
+		local = ${build}/cache/temp
 
 -releaserepo: Release,DIM_Nexus
 -baselinerepo: GeckoREST

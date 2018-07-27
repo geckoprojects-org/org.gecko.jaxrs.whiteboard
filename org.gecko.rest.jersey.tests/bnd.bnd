@@ -21,7 +21,7 @@ Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 	javax.annotation-api;version=1.3,\
 	org.osgi.util.pushstream,\
 	javax.servlet,\
-	org.gecko.util.test.common
+	org.gecko.util.test.common;version=1.1
 	
 -runrequires: \
 	osgi.identity;filter:='(&(osgi.identity=org.apache.felix.eventadmin)(version>=1.4.8))',\
@@ -50,7 +50,7 @@ javac.target: 1.8
 	org.apache.felix.eventadmin;version='[1.4.10,1.4.11)',\
 	org.gecko.osgi.hk2.repackaged;version=snapshot,\
 	org.apache.felix.http.jetty;version='[4.0.0,4.0.1)',\
-	org.gecko.util.test.common;version='[1.0.0,1.0.1)',\
+	org.gecko.util.test.common;version='[1.1.0,1.1.1)',\
 	org.gecko.rest.jersey.impl;version=snapshot,\
 	org.gecko.rest.jersey.api;version=snapshot,\
 	javax.inject;version='[1.0.0,1.0.1)'
