@@ -62,7 +62,7 @@ javac.target: 1.8
 	org.apache.felix.http.jetty;version='[3.4.8,3.4.9)',\
 	org.osgi.service.jaxrs;version='[1.0.0,1.0.1)'
 
-Bundle-Version: 1.0.1.SNAPSHOT
+Bundle-Version: 1.0.2.SNAPSHOT
 Bundle-Copyright: Data In Motion Consulting
 Bundle-License: Eclipse Public License v1.0
 Bundle-Name: Jersey JaxRS Whiteboard HTTP Whiteboard based integration test
