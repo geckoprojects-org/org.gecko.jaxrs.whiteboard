@@ -29,7 +29,9 @@ import org.gecko.rest.jersey.dto.DTOConverter;
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsResourceProvider;
+import org.gecko.rest.jersey.resources.TestApplPathApplication;
 import org.gecko.rest.jersey.resources.TestExtension;
+import org.gecko.rest.jersey.resources.TestPathApplication;
 import org.gecko.rest.jersey.resources.TestResource;
 import org.gecko.rest.jersey.runtime.application.JerseyApplicationProvider;
 import org.gecko.rest.jersey.runtime.application.JerseyExtensionProvider;
@@ -116,9 +118,24 @@ public class DTOConverterTest {
 		dto = DTOConverter.toApplicationDTO(resourceProvider);
 		
 		assertNotNull(dto);
-		assertEquals("/test/*", dto.base);
+		assertEquals("/test/", dto.base);
 		assertEquals("MyApp", dto.name);
 		assertEquals(12, dto.serviceId);
+
+		resourceProvider = new JerseyApplicationProvider(new TestApplPathApplication(), properties);
+		dto = DTOConverter.toApplicationDTO(resourceProvider);
+
+		assertNotNull(dto);
+		assertEquals("/test/applpath/", dto.base);
+
+		// TODO: test resourceMethofs - The RequestPaths handled by statically defined
+		// resources in this Application
+
+		resourceProvider = new JerseyApplicationProvider(new TestPathApplication(), properties);
+		dto = DTOConverter.toApplicationDTO(resourceProvider);
+
+		assertNotNull(dto);
+		assertEquals("/test/", dto.base);
 	}
 	
 	/**
@@ -295,6 +312,7 @@ public class DTOConverterTest {
 		Method method = TestResource.class.getDeclaredMethod("postMe", new Class[] {String.class});
 		ResourceMethodInfoDTO dto = DTOConverter.toResourceMethodInfoDTO(method);
 		assertNotNull(dto);
+		assertEquals("pdf", dto.path);
 		assertEquals("POST", dto.method);
 		assertEquals(1, dto.consumingMimeType.length);
 		assertEquals("pdf", dto.consumingMimeType[0]);

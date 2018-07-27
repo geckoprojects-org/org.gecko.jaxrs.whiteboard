@@ -156,7 +156,7 @@ public class JaxRsWhiteboardComponentTest {
 		Dictionary<String, Object> appProps = new Hashtable<>();
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
-		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new Application(), appProps);
+		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new Application(){}, appProps);
 		Filter f = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
 		Application application = getService(f, 3000l);
 		assertNotNull(application);
@@ -302,7 +302,7 @@ public class JaxRsWhiteboardComponentTest {
 		Dictionary<String, Object> appProps = new Hashtable<>();
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
-		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new Application(), appProps);
+		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new Application(){}, appProps);
 		Filter appFilter = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
 		Application application = getService(appFilter, 3000l);
 		assertNotNull(application);
@@ -949,7 +949,7 @@ public class JaxRsWhiteboardComponentTest {
 		Dictionary<String, Object> appProps = new Hashtable<>();
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
-		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new Application(), appProps);
+		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new Application(){}, appProps);
 		Filter f = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
 		Application application = getService(f, 3000l);
 		assertNotNull(application);

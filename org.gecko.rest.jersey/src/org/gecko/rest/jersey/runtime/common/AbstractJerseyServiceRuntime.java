@@ -46,6 +46,9 @@ import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntimeConstants;
 import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.BaseApplicationDTO;
+import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
+import org.osgi.service.jaxrs.runtime.dto.FailedExtensionDTO;
+import org.osgi.service.jaxrs.runtime.dto.FailedResourceDTO;
 import org.osgi.service.jaxrs.runtime.dto.RuntimeDTO;
 import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
@@ -132,9 +135,15 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 * Updates the properties and the changecount of the registered Runtime
 	 */
 	protected void updateRuntimeProperties() {
-		if(serviceRuntime != null) {
+		if (serviceRuntime != null) {
 			Dictionary<String, Object> properties = getRuntimeProperties();
 			serviceRuntime.setProperties(properties);
+			if (serviceRuntime.getReference() != null) {
+				synchronized (runtimeDTO) {
+
+					updateRuntimeDTO(serviceRuntime.getReference());
+				}
+			}
 		}
 	}
 
@@ -191,26 +200,34 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 */
 	public synchronized void updateRuntimeDTO(ServiceReference<?> serviceRef) {
 		List<ApplicationDTO> appDTOList = new LinkedList<>();
-		applicationContainerMap.forEach((name, ap)->{
+		List<FailedApplicationDTO> fappDTOList = new LinkedList<>();
+		applicationContainerMap.forEach((name, ap) -> {
 			BaseApplicationDTO appDTO = ap.getApplicationDTO();
-			if(appDTO instanceof ApplicationDTO) {
+			if (appDTO instanceof ApplicationDTO) {
 				ApplicationDTO curDTO = (ApplicationDTO) appDTO;
 				if (curDTO.name.equals(".default")) {
 					runtimeDTO.defaultApplication = curDTO;
 				} else {
 					appDTOList.add(curDTO);
 				}
-			} else {
-				//TODO: What about the failed DTOs
+			} else if (appDTO instanceof FailedApplicationDTO) {
+				fappDTOList.add((FailedApplicationDTO) appDTO);
 			}
 		});
 		if (serviceRef != null) {
 			ServiceReferenceDTO srDTO = DTOConverter.toServiceReferenceDTO(serviceRef);
 			runtimeDTO.serviceDTO = srDTO;
-			// the defaults application service id is the same, like this, because it comes from here
-			//			runtimeDTO.defaultApplication.serviceId = srDTO.id;
+			// the defaults application service id is the same, like this, because it comes
+			// from here
+			// runtimeDTO.defaultApplication.serviceId = srDTO.id;
 		}
 		runtimeDTO.applicationDTOs = appDTOList.toArray(new ApplicationDTO[appDTOList.size()]);
+		runtimeDTO.failedApplicationDTOs = fappDTOList.toArray(new FailedApplicationDTO[fappDTOList.size()]);
+
+		// TODO: handle FailedExtensionDTO and FailedResourceDTO in RuntimeDTO
+		runtimeDTO.failedExtensionDTOs = new FailedExtensionDTO[0];
+		runtimeDTO.failedResourceDTOs = new FailedResourceDTO[0];
+
 	}
 
 	/* 
