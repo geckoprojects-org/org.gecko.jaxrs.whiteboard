@@ -34,16 +34,11 @@ import org.gecko.rest.jersey.httpwhiteboard.tests.applications.TestLegacyApplica
 import org.gecko.rest.jersey.httpwhiteboard.tests.customizer.TestServiceCustomizer;
 import org.gecko.rest.jersey.httpwhiteboard.tests.resources.HelloResource;
 import org.gecko.rest.jersey.provider.JerseyConstants;
-import org.gecko.rest.jersey.tests.customizer.ServiceChecker;
+import org.gecko.util.test.common.service.ServiceChecker;
 import org.glassfish.jersey.client.JerseyClient;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.glassfish.jersey.client.JerseyInvocation;
 import org.glassfish.jersey.client.JerseyWebTarget;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
