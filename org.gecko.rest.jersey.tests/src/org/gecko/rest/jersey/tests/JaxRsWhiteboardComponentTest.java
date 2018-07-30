@@ -66,7 +66,7 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 	 * Creates a new instance.
 	 * @param bundleContext
 	 */
-	public JaxRsWhiteboardComponentTest(BundleContext bundleContext) {
+	public JaxRsWhiteboardComponentTest() {
 		super(FrameworkUtil.getBundle(JaxRsWhiteboardComponentTest.class).getBundleContext());
 	}
 
@@ -100,7 +100,7 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		
 		
 		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
-		assertEquals(1, configuration.getChangeCount());
+		
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
@@ -224,7 +224,7 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		
 		
 		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
-		assertEquals(1, configuration.getChangeCount());
+		
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
@@ -357,7 +357,6 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		runtimeChecker.start();
 		
 		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
-		assertEquals(1, configuration.getChangeCount());
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
@@ -465,7 +464,7 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		
 		
 		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
-		assertEquals(1, configuration.getChangeCount());
+		
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
@@ -557,7 +556,7 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		
 		
 		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
-		assertEquals(1, configuration.getChangeCount());
+		
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
@@ -662,7 +661,7 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		
 		
 		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
-		assertEquals(1, configuration.getChangeCount());
+		
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
@@ -730,7 +729,6 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		
 		
 		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
-		assertEquals(1, configuration.getChangeCount());
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
@@ -795,7 +793,7 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		runtimeChecker.start();
 		
 		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
-		assertEquals(1, configuration.getChangeCount());
+		
 		
 		assertTrue(runtimeChecker.waitCreate());
 
@@ -833,7 +831,7 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		
 		ContractedExtension extension = new ContractedExtension();
 		
-		registerServiceForCleanup(Application.class, extension, extensionProps);
+		registerServiceForCleanup(ContractedExtension.class, extension, extensionProps);
 		
 		assertTrue(runtimeChecker.waitModify());
 		
@@ -877,10 +875,13 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		assertTrue(result01.contains(ContractedExtension.WRITER_POSTFIX));
 
 		runtimeChecker.stop();
-		runtimeChecker.setModifyCount(1);
+		runtimeChecker.setModifyCount(2);
 		runtimeChecker.start();
 		
+		assertFalse(runtimeChecker.waitModify());
+		
 		unregisterService(extension);
+		registerServiceForCleanup(MessageBodyReader.class, extension, extensionProps);
 		
 		assertTrue(runtimeChecker.waitModify());
 		

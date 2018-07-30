@@ -87,7 +87,6 @@ public class JaxRsWhiteboardApplicationLifecycleTests extends AbstractOSGiTest{
 		
 		
 		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
-		assertEquals(1, configuration.getChangeCount());
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
@@ -211,7 +210,6 @@ public class JaxRsWhiteboardApplicationLifecycleTests extends AbstractOSGiTest{
 		
 		
 		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
-		assertEquals(1, configuration.getChangeCount());
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
@@ -442,7 +440,6 @@ public class JaxRsWhiteboardApplicationLifecycleTests extends AbstractOSGiTest{
 		
 		
 		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
-		assertEquals(1, configuration.getChangeCount());
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
