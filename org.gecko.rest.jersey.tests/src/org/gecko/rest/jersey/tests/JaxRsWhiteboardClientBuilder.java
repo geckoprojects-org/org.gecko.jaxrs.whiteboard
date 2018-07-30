@@ -92,14 +92,9 @@ public class JaxRsWhiteboardClientBuilder extends AbstractOSGiTest{
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
 		
-		ConfigurationAdmin configAdmin = getConfigAdmin();
-		assertNotNull(configAdmin);
-		Configuration configuration = configAdmin.getConfiguration("JaxRsWhiteboardComponent", "?");
-		assertNotNull(configuration);
-		assertEquals(1, configuration.getChangeCount());
-		Dictionary<String,Object> factoryProperties = configuration.getProperties();
-		assertNull(factoryProperties);
-		configuration.update(properties);
+		
+		
+		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
 		
 		assertTrue(runtimeChecker.waitCreate());
 		

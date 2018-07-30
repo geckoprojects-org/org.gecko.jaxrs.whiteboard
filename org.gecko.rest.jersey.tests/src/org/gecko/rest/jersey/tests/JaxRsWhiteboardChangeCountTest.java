@@ -15,29 +15,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
-import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Application;
 
 import org.gecko.rest.jersey.provider.JerseyConstants;
-import org.gecko.rest.jersey.tests.customizer.ServiceChecker;
-import org.gecko.rest.jersey.tests.customizer.TestServiceCustomizer;
 import org.gecko.rest.jersey.tests.resources.HelloResource;
-import org.glassfish.jersey.client.JerseyInvocation;
-import org.junit.After;
-import org.junit.Before;
+import org.gecko.util.test.common.service.ServiceChecker;
+import org.gecko.util.test.common.test.AbstractOSGiTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
@@ -47,8 +38,6 @@ import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
 import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
-import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * Tests the whiteboard dispatcher
@@ -56,23 +45,13 @@ import org.osgi.util.tracker.ServiceTrackerCustomizer;
  * @since 12.10.2017
  */
 @RunWith(MockitoJUnitRunner.class)
-public class JaxRsWhiteboardChangeCountTest {
+public class JaxRsWhiteboardChangeCountTest extends AbstractOSGiTest{
 
-	private final BundleContext context = FrameworkUtil.getBundle(JaxRsWhiteboardChangeCountTest.class).getBundleContext();
-	
-	private ServiceReference<ConfigurationAdmin> configAdminRef = null;
-
-	@Before
-	public void before() {
-		configAdminRef = context.getServiceReference(ConfigurationAdmin.class);
-		assertNotNull(configAdminRef);
-	}
-
-	@After
-	public void after() {
-		if (configAdminRef != null) {
-			context.ungetService(configAdminRef);
-		}
+	/**
+	 * Creates a new instance.
+	 */
+	public JaxRsWhiteboardChangeCountTest() {
+		super(FrameworkUtil.getBundle(JaxRsWhiteboardChangeCountTest.class).getBundleContext());
 	}
 	
 	/**
@@ -100,26 +79,21 @@ public class JaxRsWhiteboardChangeCountTest {
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
 		
-		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class, context);
+		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
 		runtimeChecker.start();
 		
-		ConfigurationAdmin configAdmin = context.getService(configAdminRef);
-		assertNotNull(configAdmin);
-		Configuration configuration = configAdmin.getConfiguration("JaxRsWhiteboardComponent", "?");
-		assertNotNull(configuration);
+		
+		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
 		assertEquals(1, configuration.getChangeCount());
-		Dictionary<String,Object> factoryProperties = configuration.getProperties();
-		assertNull(factoryProperties);
-		configuration.update(properties);
-
+		
 		assertTrue(runtimeChecker.waitCreate());
+		
 		/*
 		 * Check that the REST runtime service become available 
 		 */
-		ServiceReference<JaxrsServiceRuntime> runtimeRef = getServiceReference(JaxrsServiceRuntime.class, 40000l);
+		ServiceReference<JaxrsServiceRuntime> runtimeRef = getServiceReference(JaxrsServiceRuntime.class);
 		assertNotNull(runtimeRef);
 		Long firstChangeCount = (Long) runtimeRef.getProperty("service.changecount");
-		
 		
 		runtimeChecker.stop();
 		runtimeChecker.setModifyTimeout(60);
@@ -132,17 +106,12 @@ public class JaxRsWhiteboardChangeCountTest {
 		Dictionary<String, Object> appProps = new Hashtable<>();
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
-		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new Application(), appProps);
-		Filter f = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
-		Application application = getService(f, 3000l);
-		assertNotNull(application);
+		Application application = new Application();
+		registerServiceForCleanup(Application.class, application, appProps);
 	
 		assertTrue(runtimeChecker.waitModify());
 		assertTrue(firstChangeCount < (Long) runtimeRef.getProperty("service.changecount"));
 		
-		appRegistration.unregister();
-		
-		tearDownTest(configuration, null);
 	}
 
 	/**
@@ -170,26 +139,21 @@ public class JaxRsWhiteboardChangeCountTest {
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
 		
-		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class, context);
+		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
 		runtimeChecker.start();
 		
-		ConfigurationAdmin configAdmin = context.getService(configAdminRef);
-		assertNotNull(configAdmin);
-		Configuration configuration = configAdmin.getConfiguration("JaxRsWhiteboardComponent", "?");
-		assertNotNull(configuration);
+		
+		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
 		assertEquals(1, configuration.getChangeCount());
-		Dictionary<String,Object> factoryProperties = configuration.getProperties();
-		assertNull(factoryProperties);
-		configuration.update(properties);
-	
+		
 		assertTrue(runtimeChecker.waitCreate());
 		
 		/*
 		 * Check that the REST runtime service become available 
 		 */
-		ServiceReference<JaxrsServiceRuntime> runtimeRef = getServiceReference(JaxrsServiceRuntime.class, 40000l);
+		ServiceReference<JaxrsServiceRuntime> runtimeRef = getServiceReference(JaxrsServiceRuntime.class);
 		assertNotNull(runtimeRef);
-		JaxrsServiceRuntime runtime = getService(JaxrsServiceRuntime.class, 30000l);
+		JaxrsServiceRuntime runtime = getService(JaxrsServiceRuntime.class);
 		assertNotNull(runtime);
 		
 		Long lastChangeCount = (Long) runtimeRef.getProperty("service.changecount");
@@ -210,10 +174,8 @@ public class JaxRsWhiteboardChangeCountTest {
 		Dictionary<String, Object> appProps = new Hashtable<>();
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
-		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new Application(), appProps);
-		Filter f = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
-		Application application = getService(f, 3000l);
-		assertNotNull(application);
+		Application application = new Application();
+		registerServiceForCleanup(Application.class, application , appProps);
 		
 		/*
 		 * Mount the resource HelloResource that will become available under:
@@ -224,10 +186,9 @@ public class JaxRsWhiteboardChangeCountTest {
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
 		System.out.println("Register resource for uri /hello under application customer");
-		ServiceRegistration<HelloResource> helloRegistration = context.registerService(HelloResource.class, new HelloResource(), helloProps);
-		f = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=Hello)");
-		Object service = getService(f, 3000l);
-		assertNotNull(service);
+		
+		HelloResource resource = new HelloResource();
+		registerServiceForCleanup(HelloResource.class, resource , helloProps);
 		
 		assertTrue(runtimeChecker.waitModify());
 		assertTrue(lastChangeCount < (Long) runtimeRef.getProperty("service.changecount"));
@@ -242,7 +203,7 @@ public class JaxRsWhiteboardChangeCountTest {
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
 		
-		helloRegistration.unregister();
+		unregisterService(resource);
 		
 		assertTrue(runtimeChecker.waitModify());
 		assertTrue(lastChangeCount < (Long) runtimeRef.getProperty("service.changecount"));
@@ -259,7 +220,7 @@ public class JaxRsWhiteboardChangeCountTest {
 		runtimeChecker.start();
 		
 		System.out.println("unregistering =============================");
-		appRegistration.unregister();
+		unregisterService(application);
 		System.out.println("unregistered =============================");
 		
 		
@@ -271,74 +232,6 @@ public class JaxRsWhiteboardChangeCountTest {
 		System.out.println("Application removed service.changecount: " + lastChangeCount);
 		System.out.println("----------------------------");
 		
-		tearDownTest(configuration, null);
-	}
-	
-	private void tearDownTest(Configuration configuration, JerseyInvocation get) throws IOException, InterruptedException {
-		/*
-		 * Tear-down the system
-		 */
-		CountDownLatch deleteLatch = new CountDownLatch(1);
-		TestServiceCustomizer<JaxrsServiceRuntime, JaxrsServiceRuntime> c = new TestServiceCustomizer<>(context, null, deleteLatch);
-		configuration.delete();
-		awaitRemovedService(JaxrsServiceRuntime.class, c);
-		deleteLatch.await(10, TimeUnit.SECONDS);
-		// wait for server shutdown
-		Thread.sleep(2000L);
-		if(get != null) {
-			try {
-				get.invoke();
-				fail("Not expected to reach this line of code");
-			} catch (ProcessingException e) {
-				assertNotNull(e.getCause());
-				assertTrue(e.getCause() instanceof ConnectException);
-			}
-		}
-	}
-
-	private <T extends Object> ServiceChecker<T> createdCheckerTrackedForCleanUp(Class<T> serviceClass, BundleContext context) {
-		ServiceChecker<T> checker = new ServiceChecker<>(serviceClass, context);
-
-		checker.setCreateCount(1);
-		checker.setDeleteCount(1);
-		checker.setCreateTimeout(5000);
-		checker.setDeleteTimeout(5000);
-		return (ServiceChecker<T>) checker;
-	}
-
-	private <T extends Object> ServiceChecker<T>  createdCheckerTrackedForCleanUp(String filter, BundleContext context) throws InvalidSyntaxException {
-		ServiceChecker<? extends Object> checker = new ServiceChecker<>(filter, context);
-		
-		checker.setCreateCount(1);
-		checker.setDeleteCount(1);
-		checker.setCreateTimeout(5);
-		checker.setDeleteTimeout(5);
-		return (ServiceChecker<T>) checker;
-	}
-
-	
-	<T> T getService(Class<T> clazz, long timeout) throws InterruptedException {
-		ServiceTracker<T, T> tracker = new ServiceTracker<>(context, clazz, null);
-		tracker.open();
-		return tracker.waitForService(timeout);
-	}
-	
-	<T> void awaitRemovedService(Class<T> clazz, ServiceTrackerCustomizer<T, T> customizer) throws InterruptedException {
-		ServiceTracker<T, T> tracker = new ServiceTracker<>(context, clazz, customizer);
-		tracker.open(true);
-	}
-
-	<T> ServiceReference<T> getServiceReference(Class<T> clazz, long timeout) throws InterruptedException {
-		ServiceTracker<T, T> tracker = new ServiceTracker<>(context, clazz, null);
-		tracker.open();
-		tracker.waitForService(timeout);
-		return tracker.getServiceReference();
-	}
-	
-	<T> T getService(Filter filter, long timeout) throws InterruptedException {
-		ServiceTracker<T, T> tracker = new ServiceTracker<>(context, filter, null);
-		tracker.open();
-		return tracker.waitForService(timeout);
 	}
 
 }

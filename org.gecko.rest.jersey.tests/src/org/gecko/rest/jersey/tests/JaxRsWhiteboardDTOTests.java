@@ -13,48 +13,32 @@ package org.gecko.rest.jersey.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
-import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Application;
-import javax.ws.rs.ext.MessageBodyReader;
 
 import org.gecko.rest.jersey.provider.JerseyConstants;
-import org.gecko.rest.jersey.tests.customizer.TestServiceCustomizer;
-import org.gecko.rest.jersey.tests.resources.ContractedExtension;
 import org.gecko.rest.jersey.tests.resources.DtoTestExtension;
 import org.gecko.rest.jersey.tests.resources.DtoTestResource;
-import org.gecko.rest.jersey.tests.resources.HelloResource;
 import org.gecko.util.test.common.test.AbstractOSGiTest;
-import org.glassfish.jersey.client.JerseyInvocation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
-import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.BaseDTO;
 import org.osgi.service.jaxrs.runtime.dto.ResourceDTO;
 import org.osgi.service.jaxrs.runtime.dto.ResourceMethodInfoDTO;
 import org.osgi.service.jaxrs.runtime.dto.RuntimeDTO;
 import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
-import org.osgi.util.tracker.ServiceTracker;
-import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
 /**
  * Tests the whiteboard dispatcher
@@ -152,11 +136,15 @@ public class JaxRsWhiteboardDTOTests extends AbstractOSGiTest {
 		Dictionary<String, Object> appProps = new Hashtable<>();
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "dtoApp");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "dtoApplication");
-		ServiceRegistration<Application> appRegistration = context.registerService(Application.class, new Application(){},
-				appProps);
-		CountDownLatch cdl = new CountDownLatch(1);
-		cdl.await(1, TimeUnit.SECONDS);
-
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		registerServiceForCleanup(new Application(){}, appProps, Application.class);
+		
+		assertTrue(runtimeChecker.waitModify());
+		
 		runtimeDTO = getRuntimeDTO();
 
 		assertNotNull(runtimeDTO);
@@ -170,12 +158,15 @@ public class JaxRsWhiteboardDTOTests extends AbstractOSGiTest {
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
 				"(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=dtoApplication)");
 
-
-		ServiceRegistration<?> dtoExtRegistration = context.registerService(DtoTestExtension.class,
-				new DtoTestExtension(), extensionProps);
-
-		cdl = new CountDownLatch(1);
-		cdl.await(1, TimeUnit.SECONDS);
+		runtimeChecker.stop();
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		
+		registerServiceForCleanup(new DtoTestExtension(), extensionProps, DtoTestExtension.class);
+		
+		assertTrue(runtimeChecker.waitModify());
+		
 		runtimeDTO = getRuntimeDTO();
 
 		assertNotNull(runtimeDTO);
@@ -189,10 +180,18 @@ public class JaxRsWhiteboardDTOTests extends AbstractOSGiTest {
 		resProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
 				"(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=dtoApplication)");
 
+		runtimeChecker.stop();
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		
 		System.out.println("Register resource");
-		ServiceRegistration<DtoTestResource> dtoResRegistration = context.registerService(DtoTestResource.class,
-				new DtoTestResource(), resProps);
-
+		registerServiceForCleanup(new DtoTestResource(), resProps, DtoTestResource.class);
+		
+		assertTrue(runtimeChecker.waitModify());
+		
+		
+		
 		runtimeDTO = getRuntimeDTO();
 		assertNotNull(runtimeDTO);
 

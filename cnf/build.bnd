@@ -32,6 +32,7 @@
 
 -releaserepo: Release,DIM_Nexus
 -baselinerepo: GeckoREST
+-buildrepo: Temp
 -groupid: org.gecko.rest
 -baseline: *
 
