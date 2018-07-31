@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
+import org.osgi.framework.Constants;
 
 /**
  * Helper class for the dispatcher
@@ -42,7 +43,7 @@ public class DispatcherHelper {
 				.collect(Collectors.toCollection(LinkedHashSet::new));
 		return resultSet;
 	}
-	
+
 	/**
 	 * Returns the highest ranked default application with name default
 	 * @param applications the {@link Collection} of applications

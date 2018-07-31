@@ -27,11 +27,15 @@ import javax.ws.rs.HEAD;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsResourceProvider;
+import org.gecko.rest.jersey.runtime.application.JerseyExtensionProvider;
+import org.gecko.rest.jersey.runtime.application.JerseyResourceProvider;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
@@ -63,9 +67,35 @@ public class DTOConverter {
 		}
 		ApplicationDTO dto = new JerseyApplicationDTO();
 		dto.name = applicationProvider.getName();
-		dto.base = applicationProvider.getPath();
+		String basePath = applicationProvider.getPath();
+		if(basePath!=null) {
+			dto.base = basePath.replaceAll("/\\*", "/");	
+		}
+	
 		Long sid = applicationProvider.getServiceId();
-		dto.serviceId = sid != null ? sid.longValue() : -1; 
+		dto.serviceId = sid != null ? sid.longValue() : -1;
+
+		// Search for contentProvider and generate ResourceDTOs and ExtensionDTOs
+		List<ResourceDTO> rdtos = new ArrayList<>();
+		List<ResourceMethodInfoDTO> rmidtos = new ArrayList<>();
+		List<ExtensionDTO> edtos = new ArrayList<>();
+
+		// todo: add methods of static defined Ressources to ResourceMethodInfoDTO rmidtos.add()
+		
+		if (applicationProvider.getContentProviers() != null) {
+
+			for (JaxRsApplicationContentProvider contentProvider : applicationProvider.getContentProviers()) {
+
+				if (contentProvider instanceof JerseyResourceProvider) {
+					rdtos.add(toResourceDTO((JaxRsResourceProvider) contentProvider));					
+				} else if (contentProvider instanceof JerseyExtensionProvider) {
+					edtos.add(toExtensionDTO((JerseyExtensionProvider<?>) contentProvider));
+				}
+			}
+		}
+		dto.resourceDTOs = rdtos.toArray(new ResourceDTO[rdtos.size()]);
+		dto.extensionDTOs = edtos.toArray(new ExtensionDTO[edtos.size()]);
+		dto.resourceMethods = rmidtos.toArray(new ResourceMethodInfoDTO[rmidtos.size()]);
 		return dto;
 	}
 	
@@ -219,6 +249,11 @@ public class DTOConverter {
 		String methodString = getMethodStrings(method);
 		if (methodString != null) {
 			dto.method = methodString;
+			empty = false;
+		}
+		Path path = method.getAnnotation(Path.class);
+		if (path != null) {
+			dto.path = path.value();
 			empty = false;
 		}
 		return empty ? null : dto;
