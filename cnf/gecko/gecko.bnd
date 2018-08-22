@@ -2,14 +2,17 @@
 	aQute.bnd.repository.osgi.OSGiRepository;\
 		name=DIM EMF-2.13;\
 		locations=http://devel.data-in-motion.biz/public/update/repository/p2/obr/emf-3.8/index.xml;\
+		max.stale=-1;\
 		cache=${build}/cache/dim-emf-3.8,\
 	aQute.bnd.repository.osgi.OSGiRepository;\
 		locations=http://devel.data-in-motion.biz/public/repository/gecko/release/geckoEMF/index.xml;\
 		name=GeckoEMF;\
+		max.stale=-1;\
 		cache=${build}/cache/GeckoEMF,\
 	aQute.bnd.repository.osgi.OSGiRepository;\
 		locations=http://devel.data-in-motion.biz/public/repository/gecko/release/geckoMongoEMF/index.xml;\
 		name=GeckoMongoEMF;\
+		max.stale=-1;\
 		cache=${build}/cache/GeckoMongoEMF,\
 	aQute.bnd.repository.osgi.OSGiRepository;\
 		locations=http://devel.data-in-motion.biz/public/repository/gecko/release/geckoREST/index.xml;\
@@ -18,20 +21,24 @@
 	aQute.bnd.repository.osgi.OSGiRepository;\
 		locations=http://devel.data-in-motion.biz/public/repository/gecko/release/geckoEMFRepository/index.xml;\
 		name=GeckoEMFRepository;\
+		max.stale=-1;\
 		cache=${build}/cache/GeckoEMFRepository,\
 	aQute.bnd.repository.osgi.OSGiRepository;\
 		locations=http://devel.data-in-motion.biz/public/repository/gecko/release/geckoAddons/index.xml;\
 		name=GeckoAddons;\
+		max.stale=-1;\
 		cache=${build}/cache/GeckoAddons,\
 	aQute.bnd.repository.osgi.OSGiRepository; \
 		locations = http://devel.data-in-motion.biz/public/repository/gecko/release/geckoRuntime/index.xml;\
 		readonly = true;\
 		name = "GeckoRuntime";\
+		max.stale=-1;\
 		cache=${build}/cache/GeckoRuntime,\
 	aQute.bnd.repository.osgi.OSGiRepository; \
 		locations = http://devel.data-in-motion.biz/public/repository/gecko/release/geckoEMFAddons/index.xml;\
 		readonly = true;\
 		name = "GeckoEMFAddons";\
+		max.stale=-1;\
 		cache=${build}/cache/GeckoEMFAddons
 		
 -plugin.exporter: \

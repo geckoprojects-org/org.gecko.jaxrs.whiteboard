@@ -238,4 +238,24 @@ public class JaxRsWhiteboardDTOTests extends AbstractOSGiTest {
 		JaxrsServiceRuntime jaxRSRuntime = getService(JaxrsServiceRuntime.class);
 		return jaxRSRuntime;
 	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.util.test.common.test.AbstractOSGiTest#doBefore()
+	 */
+	@Override
+	public void doBefore() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.util.test.common.test.AbstractOSGiTest#doAfter()
+	 */
+	@Override
+	public void doAfter() {
+		// TODO Auto-generated method stub
+		
+	}
 }

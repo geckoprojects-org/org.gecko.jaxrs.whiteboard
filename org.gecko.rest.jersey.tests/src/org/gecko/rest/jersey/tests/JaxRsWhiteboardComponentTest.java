@@ -14,7 +14,6 @@ package org.gecko.rest.jersey.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -44,13 +43,10 @@ import org.glassfish.jersey.client.JerseyWebTarget;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
-import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
 import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
@@ -895,5 +891,25 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		
 		assertTrue(result01.contains(ContractedExtension.READER_POSTFIX));
 		assertFalse(result01.contains(ContractedExtension.WRITER_POSTFIX));
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.util.test.common.test.AbstractOSGiTest#doBefore()
+	 */
+	@Override
+	public void doBefore() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.util.test.common.test.AbstractOSGiTest#doAfter()
+	 */
+	@Override
+	public void doAfter() {
+		// TODO Auto-generated method stub
+		
 	}
 }
