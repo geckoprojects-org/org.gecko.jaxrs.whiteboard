@@ -279,7 +279,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 			JettyServerRunnable jettyServerRunnable = new JettyServerRunnable(jettyServer, port);
 
 			Executors.newSingleThreadExecutor().submit(jettyServerRunnable);
-			if (jettyServerRunnable.isStarted(1, TimeUnit.SECONDS)) {
+			if (jettyServerRunnable.isStarted(5, TimeUnit.SECONDS)) {
 
 				logger.info("Started JaxRs white-board server for port: " + port + " and context: " + contextPath);
 
@@ -290,7 +290,6 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 					logger.info("Started JaxRs white-board server for port: " + port + " and context: " + contextPath
 							+ " took to long");
 					throw new IllegalStateException("Server Startup took too long");
-
 				case STARTED:
 					// finished in last second
 					break;
