@@ -16,7 +16,7 @@ before_script:
 
 build:
   stage: build
-  script: ./gradlew --continue
+  script: ./gradlew --info
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
@@ -27,7 +27,7 @@ build:
 
 test:
   stage: test
-  script: ./gradlew clean build test testOSGi
+  script: ./gradlew clean build test testOSGi --info
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: pull
