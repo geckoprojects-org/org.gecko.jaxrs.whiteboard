@@ -16,7 +16,7 @@ before_script:
 
 build:
   stage: build
-  script: ./gradlew --info
+  script: ./gradlew build -x testOSGi --info
   cache:
     key: "$CI_COMMIT_REF_NAME"
     policy: push
