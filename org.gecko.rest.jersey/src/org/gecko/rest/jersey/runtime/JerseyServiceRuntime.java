@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -50,37 +49,41 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * Implementation of the {@link JaxRSServiceRuntime} for a Jersey implementation
+ * 
  * @author Mark Hoffmann
  * @since 12.07.2017
  */
-@Capability(namespace = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, 
-version = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_SPECIFICATION_VERSION, 
-name = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_IMPLEMENTATION, 
-attribute= { 
+@Capability(namespace = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, version = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_SPECIFICATION_VERSION, name = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_IMPLEMENTATION, attribute = {
 		"uses:=\"javax.ws.rs,javax.ws.rs.sse,javax.ws.rs.core,javax.ws.rs.ext,javax.ws.rs.client,javax.ws.rs.container,org.osgi.service.jaxrs.whiteboard\"",
-		"provider=jersey"
-})
+		"provider=jersey" })
 public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 
+	public enum State {
+		INIT, STARTED, STOPPED, EXCEPTION
+	}
 	private volatile Server jettyServer;
 	private volatile ServletContextHandler contextHandler;
 	private Integer port = JerseyConstants.WHITEBOARD_DEFAULT_PORT;
 	private String contextPath = JerseyConstants.WHITEBOARD_DEFAULT_CONTEXT_PATH;
 	private Logger logger = Logger.getLogger("o.e.o.j.serviceRuntime");
 
-	/* (non-Javadoc)
-	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#doInitialize(org.osgi.service.component.ComponentContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#
+	 * doInitialize(org.osgi.service.component.ComponentContext)
 	 */
 	@Override
-	protected void doInitialize(ComponentContext context){
+	protected void doInitialize(ComponentContext context) {
 		createServerAndContext();
 	}
-	
-	
 
-	/* 
+	/*
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#modified(org.osgi.service.component.ComponentContext)
+	 * 
+	 * @see
+	 * org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#modified(
+	 * org.osgi.service.component.ComponentContext)
 	 */
 	public void doModified(ComponentContext ctx) throws ConfigurationException {
 		Integer oldPort = port;
@@ -92,7 +95,8 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 		if (!pathChanged && !portChanged) {
 			return;
 		}
-		// if port changed, both parts need to be restarted, no matter, if the context path has changed
+		// if port changed, both parts need to be restarted, no matter, if the context
+		// path has changed
 		if (portChanged || pathChanged) {
 			stopContextHandler();
 			stopServer();
@@ -100,17 +104,24 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 			startServer();
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#doStartup()
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#doStartup()
 	 */
 	@Override
 	public void doStartup() {
 		startServer();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#doTeardown()
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#doTeardown(
+	 * )
 	 */
 	@Override
 	protected void doTeardown() {
@@ -118,36 +129,48 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 		stopServer();
 	}
 
-	/* 
+	/*
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#getURLs(org.osgi.service.component.ComponentContext)
+	 * 
+	 * @see
+	 * org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#getURLs(org
+	 * .osgi.service.component.ComponentContext)
 	 */
 	public String[] getURLs(ComponentContext context) {
 		StringBuilder sb = new StringBuilder();
-		String schema = JerseyHelper.getPropertyWithDefault(context, JerseyConstants.JERSEY_SCHEMA, JerseyConstants.WHITEBOARD_DEFAULT_SCHEMA);
+		String schema = JerseyHelper.getPropertyWithDefault(context, JerseyConstants.JERSEY_SCHEMA,
+				JerseyConstants.WHITEBOARD_DEFAULT_SCHEMA);
 		sb.append(schema);
 		sb.append("://");
-		String host = JerseyHelper.getPropertyWithDefault(context, JerseyConstants.JERSEY_HOST, JerseyConstants.WHITEBOARD_DEFAULT_HOST);
+		String host = JerseyHelper.getPropertyWithDefault(context, JerseyConstants.JERSEY_HOST,
+				JerseyConstants.WHITEBOARD_DEFAULT_HOST);
 		sb.append(host);
 		Object port = JerseyHelper.getPropertyWithDefault(context, JerseyConstants.JERSEY_PORT, null);
 		if (port != null) {
 			sb.append(":");
 			sb.append(port.toString());
 		}
-		String path = JerseyHelper.getPropertyWithDefault(context, JerseyConstants.JERSEY_CONTEXT_PATH, JerseyConstants.WHITEBOARD_DEFAULT_CONTEXT_PATH);
+		String path = JerseyHelper.getPropertyWithDefault(context, JerseyConstants.JERSEY_CONTEXT_PATH,
+				JerseyConstants.WHITEBOARD_DEFAULT_CONTEXT_PATH);
 		path = JaxRsHelper.toServletPath(path);
 		sb.append(path);
-		return new String[] {sb.substring(0,  sb.length() - 1)};
+		return new String[] { sb.substring(0, sb.length() - 1) };
 	}
 
-	/* (non-Javadoc)
-	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#doRegisterServletContainer(org.glassfish.jersey.servlet.ServletContainer, org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#
+	 * doRegisterServletContainer(org.glassfish.jersey.servlet.ServletContainer,
+	 * org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider)
 	 */
 	@Override
-	protected void doRegisterServletContainer(JaxRsApplicationProvider applicationProvider, String path, ResourceConfig config) {
+	protected void doRegisterServletContainer(JaxRsApplicationProvider applicationProvider, String path,
+			ResourceConfig config) {
 		WhiteboardServletContainer container = new WhiteboardServletContainer(config);
-		if(!applicationProvider.getServletContainers().isEmpty()) {
-			throw new IllegalStateException("There is alread a ServletContainer registered for this application " + applicationProvider.getId());
+		if (!applicationProvider.getServletContainers().isEmpty()) {
+			throw new IllegalStateException("There is alread a ServletContainer registered for this application "
+					+ applicationProvider.getId());
 		}
 		applicationProvider.getServletContainers().add(container);
 		ServletHolder servlet = new ServletHolder(container);
@@ -157,13 +180,13 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	@Override
 	protected void doUnregisterApplication(JaxRsApplicationProvider applicationProvider) {
 		List<ServletContainer> servletContainers = applicationProvider.getServletContainers();
-		if(!servletContainers.isEmpty()) {
+		if (!servletContainers.isEmpty()) {
 			ServletContainer container = servletContainers.remove(0);
 			if (container != null && contextHandler != null) {
 				ServletHandler handler = contextHandler.getServletHandler();
 				List<ServletHolder> servlets = new ArrayList<ServletHolder>();
 				Set<String> names = new HashSet<String>();
-				for( ServletHolder holder : handler.getServlets()) {
+				for (ServletHolder holder : handler.getServlets()) {
 					/* If it is the class we want to remove, then just keep track of its name */
 					try {
 						if (container.equals(holder.getServlet())) {
@@ -172,27 +195,31 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 							servlets.add(holder);
 						}
 					} catch (ServletException e) {
-						logger.log(Level.SEVERE, "Error unregistering servlets from holder with name: " + holder.getName());
+						logger.log(Level.SEVERE,
+								"Error unregistering servlets from holder with name: " + holder.getName());
 					}
 				}
-				
+
 				List<ServletMapping> mappings = new ArrayList<ServletMapping>();
-				for( ServletMapping mapping : handler.getServletMappings() )  {
+				for (ServletMapping mapping : handler.getServletMappings()) {
 					/* Only keep the mappings that didn't point to one of the servlets we removed */
-					if(!names.contains(mapping.getServletName())) {
+					if (!names.contains(mapping.getServletName())) {
 						mappings.add(mapping);
 					}
 				}
-				
+
 				/* Set the new configuration for the mappings and the servlets */
-				handler.setServletMappings( mappings.toArray(new ServletMapping[0]) );
-				handler.setServlets( servlets.toArray(new ServletHolder[0]) );
+				handler.setServletMappings(mappings.toArray(new ServletMapping[0]));
+				handler.setServlets(servlets.toArray(new ServletHolder[0]));
 			}
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#doUpdateProperties(org.osgi.service.component.ComponentContext)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#
+	 * doUpdateProperties(org.osgi.service.component.ComponentContext)
 	 */
 	protected void doUpdateProperties(ComponentContext ctx) {
 		String[] urls = getURLs(ctx);
@@ -215,7 +242,8 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	private void createServerAndContext() {
 		try {
 			if (jettyServer != null && !jettyServer.isStopped()) {
-				logger.log(Level.WARNING, "Stopping JaxRs white-board server on startup, but it wasn't exepected to run");
+				logger.log(Level.WARNING,
+						"Stopping JaxRs white-board server on startup, but it wasn't exepected to run");
 				stopContextHandler();
 				stopServer();
 			}
@@ -243,23 +271,44 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	}
 
 	/**
-	 * Starts the Jetty server 
+	 * Starts the Jetty server
 	 */
 	private void startServer() {
 		if (jettyServer != null && contextHandler != null && !jettyServer.isRunning()) {
-			try {
-				CountDownLatch awaitStart = new CountDownLatch(1);
-				Executors.newSingleThreadExecutor().submit(new JettyServerRunnable(jettyServer, port, awaitStart));
-				if(!awaitStart.await(1, TimeUnit.SECONDS)) {
-					// TODO: We have todo something I guess
-					logger.info("Started JaxRs white-board server for port: " + port + " and context: " + contextPath + " took to long");
+
+			JettyServerRunnable jettyServerRunnable = new JettyServerRunnable(jettyServer, port);
+
+			Executors.newSingleThreadExecutor().submit(jettyServerRunnable);
+			if (jettyServerRunnable.isStarted(1, TimeUnit.SECONDS)) {
+
+				logger.info("Started JaxRs white-board server for port: " + port + " and context: " + contextPath);
+
+			} else {
+				switch (jettyServerRunnable.getState()) {
+				case INIT:
+
+					logger.info("Started JaxRs white-board server for port: " + port + " and context: " + contextPath
+							+ " took to long");
 					throw new IllegalStateException("Server Startup took too long");
-				} else {
-					logger.info("Started JaxRs white-board server for port: " + port + " and context: " + contextPath);
+
+				case STARTED:
+					// finished in last second
+					break;
+				case STOPPED:
+
+					logger.info("Started JaxRs white-board server for port: " + port + " and context: " + contextPath
+							+ " was stopped with unknown reasons");
+					throw new IllegalStateException("Server Startup was stopped with unknown reasons");
+
+				case EXCEPTION:
+					logger.severe("Started JaxRs white-board server for port: " + port + " and context: " + contextPath
+							+ " throws exception");
+					throw new IllegalStateException("Server Startup was stopped with exception",
+							jettyServerRunnable.getThrowable());
+
+				default:
+					throw new IllegalStateException("Server Startup - has unknown state ");
 				}
-			} catch (Exception e) {
-				logger.log(Level.SEVERE, "Error starting JaxRs white-board because of an exception", e);
-				// TODO: We have todo something I guess like throw an Exception
 			}
 		}
 	}
