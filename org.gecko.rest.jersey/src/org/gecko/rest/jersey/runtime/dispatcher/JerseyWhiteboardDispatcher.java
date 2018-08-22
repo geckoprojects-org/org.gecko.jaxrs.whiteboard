@@ -548,13 +548,13 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	 * @return <code>true</code>, if adding was successful
 	 */
 	private boolean addContentToApplication(JaxRsApplicationProvider application, JaxRsApplicationContentProvider content) {
-		System.out.println("add to content application " + application + " content " + content);
 		if (content instanceof JaxRsResourceProvider) {
 			return application.addResource((JaxRsResourceProvider) content);
 		}
 		if (content instanceof JaxRsExtensionProvider) {
 			return application.addExtension((JaxRsExtensionProvider) content);
 		}
+		logger.warning("unhandled JaxRsApplicationContentProvider. coult not add application " + application + " to content " + content);
 		return false;
 	}
 
@@ -571,6 +571,8 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		if (content instanceof JaxRsExtensionProvider) {
 			return application.removeExtension((JaxRsExtensionProvider) content);
 		}
+		logger.warning("unhandled JaxRsApplicationContentProvider. coult not remove application " + application + " to content " + content);
+
 		return false;
 	}
 
