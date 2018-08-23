@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012 - 2017 Data In Motion and others.
+ * Copyright (c) 2012 - 2018 Data In Motion and others.
  * All rights reserved. 
  * 
  * This program and the accompanying materials are made available under the terms of the 
@@ -237,5 +237,25 @@ public class JaxRsWhiteboardDTOTests extends AbstractOSGiTest {
 	private JaxrsServiceRuntime getJaxRsRuntimeService() {
 		JaxrsServiceRuntime jaxRSRuntime = getService(JaxrsServiceRuntime.class);
 		return jaxRSRuntime;
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.util.test.common.test.AbstractOSGiTest#doBefore()
+	 */
+	@Override
+	public void doBefore() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.util.test.common.test.AbstractOSGiTest#doAfter()
+	 */
+	@Override
+	public void doAfter() {
+		// TODO Auto-generated method stub
+		
 	}
 }

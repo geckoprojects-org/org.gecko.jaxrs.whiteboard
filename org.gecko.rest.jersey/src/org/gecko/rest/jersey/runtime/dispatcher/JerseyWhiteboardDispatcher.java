@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012 - 2017 Data In Motion and others.
+ * Copyright (c) 2012 - 2018 Data In Motion and others.
  * All rights reserved. 
  * 
  * This program and the accompanying materials are made available under the terms of the 
@@ -548,13 +548,13 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	 * @return <code>true</code>, if adding was successful
 	 */
 	private boolean addContentToApplication(JaxRsApplicationProvider application, JaxRsApplicationContentProvider content) {
-		System.out.println("add to content application " + application + " content " + content);
 		if (content instanceof JaxRsResourceProvider) {
 			return application.addResource((JaxRsResourceProvider) content);
 		}
 		if (content instanceof JaxRsExtensionProvider) {
 			return application.addExtension((JaxRsExtensionProvider) content);
 		}
+		logger.warning("unhandled JaxRsApplicationContentProvider. coult not add application " + application + " to content " + content);
 		return false;
 	}
 
@@ -571,6 +571,8 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		if (content instanceof JaxRsExtensionProvider) {
 			return application.removeExtension((JaxRsExtensionProvider) content);
 		}
+		logger.warning("unhandled JaxRsApplicationContentProvider. coult not remove application " + application + " to content " + content);
+
 		return false;
 	}
 
