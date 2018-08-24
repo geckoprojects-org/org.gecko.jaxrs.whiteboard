@@ -17,6 +17,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.Application;
 
+import org.gecko.rest.jersey.helper.DestroyListener;
 import org.gecko.rest.jersey.provider.JaxRsConstants;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
@@ -28,7 +29,7 @@ import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
  * @author Mark Hoffmann
  * @since 30.07.2017
  */
-public interface JaxRsApplicationProvider extends JaxRsProvider, JaxRsConstants {
+public interface JaxRsApplicationProvider extends JaxRsProvider, JaxRsConstants, DestroyListener {
 	
 	/**
 	 * Return the context path for this application

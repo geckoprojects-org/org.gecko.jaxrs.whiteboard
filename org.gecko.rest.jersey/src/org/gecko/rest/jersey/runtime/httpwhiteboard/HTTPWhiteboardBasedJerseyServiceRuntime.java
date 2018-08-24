@@ -176,7 +176,7 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 			@Override
 			public Servlet getService(Bundle bundle, ServiceRegistration<Servlet> registration) {
 				ResourceConfig config = createResourceConfig(provider);
-				ServletContainer container = new WhiteboardServletContainer(config);
+				ServletContainer container = new WhiteboardServletContainer(config, provider);
 				provider.addServletContainer(container);
 				return container;
 			}

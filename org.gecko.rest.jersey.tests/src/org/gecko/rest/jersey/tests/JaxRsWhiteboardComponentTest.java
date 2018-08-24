@@ -197,6 +197,165 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 	 * @throws InvalidSyntaxException 
 	 */
 	@Test
+	public void testWhiteboardComponentApplicationAndResourceContextPathChange() throws IOException, InterruptedException, InvalidSyntaxException {
+		/*
+		 *  The server runs on localhost port 8185 using context path test: http://localhost:8185/test
+		 *  We mount the system with a resource RootResource under http://localhost:8185/test that will return a 
+		 *  HTTP::200 using a GET request
+		 */
+		int port = 8185;
+		String contextPath = "test";
+		String url = "http://localhost:" + port + "/" + contextPath;
+		
+		/*
+		 * Mount the resource HelloResource that will become available under:
+		 * http://localhost:8185/test/hello
+		 */
+		Dictionary<String, Object> helloProps = new Hashtable<>();
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
+		System.out.println("Register resource for uri /hello");
+		HelloResource helloResource = new HelloResource();
+		registerServiceForCleanup(HelloResource.class, helloResource , helloProps);
+		
+		/*
+		 * Initial setup for the REST runtime 
+		 */
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
+		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
+		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
+		
+		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
+		runtimeChecker.start();
+		
+		
+		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
+		
+		
+		assertTrue(runtimeChecker.waitCreate());
+		
+		/*
+		 * Check if http://localhost:8185/test/hello is available now. 
+		 * Check as well, if http://localhost:8185/test is still available
+		 */
+		System.out.println("Checking URL is available " + url + "/hello");
+		JerseyInvocation get = null;
+		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
+		JerseyWebTarget webTarget = jerseyClient.target(url + "/hello");
+		get = webTarget.request().buildGet();
+		Response response = get.invoke();
+		assertEquals(200, response.getStatus());
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath + "2");
+		configuration.update(properties);
+		
+		assertTrue(runtimeChecker.waitModify());
+		CountDownLatch latch = new CountDownLatch(1);
+		latch.await(1, TimeUnit.SECONDS);
+		/*
+		 * Check if http://localhost:8185/test/hello is not available anymore. 
+		 * Check as well, if http://localhost:8185/test is still available
+		 */
+		System.out.println("Checking URL is available anymore " + url + "2/hello");
+		webTarget = jerseyClient.target(url + "2/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(200, response.getStatus());
+	}
+	
+	/**
+	 * Tests 
+	 * @throws IOException 
+	 * @throws InterruptedException 
+	 * @throws InvalidSyntaxException 
+	 */
+	@Test
+	public void testWhiteboardComponentApplicationAndResourceContextPortChange() throws IOException, InterruptedException, InvalidSyntaxException {
+		/*
+		 *  The server runs on localhost port 8185 using context path test: http://localhost:8185/test
+		 *  We mount the system with a resource RootResource under http://localhost:8185/test that will return a 
+		 *  HTTP::200 using a GET request
+		 */
+		int port = 8185;
+		String contextPath = "test";
+		String url = "http://localhost:" + port + "/" + contextPath;
+		
+		/*
+		 * Mount the resource HelloResource that will become available under:
+		 * http://localhost:8185/test/hello
+		 */
+		Dictionary<String, Object> helloProps = new Hashtable<>();
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
+		System.out.println("Register resource for uri /hello");
+		HelloResource helloResource = new HelloResource();
+		registerServiceForCleanup(HelloResource.class, helloResource , helloProps);
+		
+		/*
+		 * Initial setup for the REST runtime 
+		 */
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
+		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
+		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
+		
+		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
+		runtimeChecker.start();
+		
+		
+		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
+		
+		
+		assertTrue(runtimeChecker.waitCreate());
+		
+		/*
+		 * Check if http://localhost:8185/test/hello is available now. 
+		 * Check as well, if http://localhost:8185/test is still available
+		 */
+		System.out.println("Checking URL is available " + url + "/hello");
+		JerseyInvocation get = null;
+		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
+		JerseyWebTarget webTarget = jerseyClient.target(url + "/hello");
+		get = webTarget.request().buildGet();
+		Response response = get.invoke();
+		assertEquals(200, response.getStatus());
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyTimeout(5);
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		port += 1;
+		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
+		configuration.update(properties);
+		
+		assertTrue(runtimeChecker.waitModify());
+		CountDownLatch latch = new CountDownLatch(1);
+		latch.await(1, TimeUnit.SECONDS);
+		/*
+		 * Check if http://localhost:8185/test/hello is not available anymore. 
+		 * Check as well, if http://localhost:8185/test is still available
+		 */
+		url = "http://localhost:" + port + "/" + contextPath;
+		System.out.println("Checking URL is available anymore " + url + "/hello");
+		webTarget = jerseyClient.target(url + "/hello");
+		get = webTarget.request().buildGet();
+		response = get.invoke();
+		assertEquals(200, response.getStatus());
+	}
+	
+	/**
+	 * Tests 
+	 * @throws IOException 
+	 * @throws InterruptedException 
+	 * @throws InvalidSyntaxException 
+	 */
+	@Test
 	public void testWhiteboardComponentApplicationAndResourceWildcard() throws IOException, InterruptedException, InvalidSyntaxException {
 		/*
 		 *  The server runs on localhost port 8185 using context path test: http://localhost:8185/test

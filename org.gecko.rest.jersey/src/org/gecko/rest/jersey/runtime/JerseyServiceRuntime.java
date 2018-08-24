@@ -167,7 +167,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	@Override
 	protected void doRegisterServletContainer(JaxRsApplicationProvider applicationProvider, String path,
 			ResourceConfig config) {
-		WhiteboardServletContainer container = new WhiteboardServletContainer(config);
+		WhiteboardServletContainer container = new WhiteboardServletContainer(config, applicationProvider);
 		if (!applicationProvider.getServletContainers().isEmpty()) {
 			throw new IllegalStateException("There is alread a ServletContainer registered for this application "
 					+ applicationProvider.getId());
@@ -347,6 +347,10 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 		}
 		try {
 			contextHandler.stop();
+//			for (ServletHolder servletHolder : contextHandler.getServletHandler().getServlets()) {
+//				servletHolder.doStop();	
+////				servletHolder.getServlet().destroy();
+//			}
 			contextHandler.destroy();
 			contextHandler = null;
 		} catch (Exception e) {

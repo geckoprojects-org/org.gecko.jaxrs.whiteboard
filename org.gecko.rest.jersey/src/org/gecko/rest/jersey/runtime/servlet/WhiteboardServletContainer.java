@@ -11,6 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.gecko.rest.jersey.helper.DestroyListener;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
@@ -32,8 +33,11 @@ public class WhiteboardServletContainer extends ServletContainer {
 	private AtomicBoolean initialized = new AtomicBoolean();
 	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-	public WhiteboardServletContainer(ResourceConfig config) {
+	private DestroyListener destroyListener;
+
+	public WhiteboardServletContainer(ResourceConfig config, DestroyListener destroyListener) {
 		super(config);
+		this.destroyListener = destroyListener;
 	}
 
 	/* (non-Javadoc)
@@ -82,6 +86,18 @@ public class WhiteboardServletContainer extends ServletContainer {
 			super.service(request, response);
 		} finally {
 			lock.readLock().unlock();
+		}
+	}
+	
+	/* 
+	 * (non-Javadoc)
+	 * @see org.glassfish.jersey.servlet.ServletContainer#destroy()
+	 */
+	@Override
+	public void destroy() {
+		super.destroy();
+		if(destroyListener != null) {
+			destroyListener.servletContainerDestroyed(this);
 		}
 	}
 }

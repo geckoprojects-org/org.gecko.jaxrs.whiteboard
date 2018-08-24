@@ -357,5 +357,14 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 		return true;
 	}
 
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.rest.jersey.runtime.servlet.DestroyListener#servletContainerDestroyed(org.glassfish.jersey.servlet.ServletContainer)
+	 */
+	@Override
+	public void servletContainerDestroyed(ServletContainer container) {
+		applicationContainers.remove(container);
+	}
+
 
 }

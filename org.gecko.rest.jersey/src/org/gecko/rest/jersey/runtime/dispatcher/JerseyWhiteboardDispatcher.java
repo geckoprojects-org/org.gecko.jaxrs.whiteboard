@@ -173,6 +173,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			currentDefaultProvider = provider;
 			if(whiteboard != null) {
 				whiteboard.registerApplication(currentDefaultProvider);
+				currentDefaultProvider.markUnchanged();
 			}
 			return;
 		} else if (provider.getName().equals(".default") && currentDefaultProvider != null) {
@@ -183,6 +184,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 				if (whiteboard != null) {
 					whiteboard.unregisterApplication(currentDefaultProvider);
 					whiteboard.registerApplication(currentDefaultProvider);
+					currentDefaultProvider.markUnchanged();
 				}
 			}
 			return;
@@ -440,7 +442,10 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 					// reset change marker
 					app.markUnchanged();
 				});
-				if (currentDefaultProvider != null && currentDefaultProvider.isChanged()) {
+				if(!whiteboard.isRegistered(currentDefaultProvider)) {
+					whiteboard.registerApplication(currentDefaultProvider);
+					currentDefaultProvider.markUnchanged();
+				} else 	if (currentDefaultProvider != null &&  currentDefaultProvider.isChanged()) {
 					if (whiteboard.isRegistered(currentDefaultProvider)) {
 						whiteboard.reloadApplication(currentDefaultProvider);
 					}

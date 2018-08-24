@@ -163,8 +163,9 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 */
 	@Override
 	public void modified(ComponentContext context) throws ConfigurationException {
-		updateProperties(context);
 		doModified(context);
+		applicationContainerMap.clear();
+		updateRuntimeProperties();
 	}
 	
 	protected abstract void doModified(ComponentContext context) throws ConfigurationException ;
@@ -362,16 +363,16 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	public Map<String, Object> getProperties() {
 		Map<String, Object> properties = new HashMap<>();
 		Enumeration<String> keys = context.getProperties().keys();
-		while(keys.hasMoreElements()) {
-			String key = keys.nextElement();
-			Object value = context.getProperties().get(key);
-			properties.put(key, value);
-		}
 		if (serviceRuntime != null) {
 			String[] runtimeKeys = serviceRuntime.getReference().getPropertyKeys();
 			for (String k : runtimeKeys) {
 				properties.put(k, serviceRuntime.getReference().getProperty(k));
 			}
+		}
+		while(keys.hasMoreElements()) {
+			String key = keys.nextElement();
+			Object value = context.getProperties().get(key);
+			properties.put(key, value);
 		}
 		return properties;
 	}
