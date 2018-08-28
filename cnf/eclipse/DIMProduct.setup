@@ -5,7 +5,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:setup="http://www.eclipse.org/oomph/setup/1.0"
     xmlns:setup.p2="http://www.eclipse.org/oomph/setup/p2/1.0"
-    name="dim.product"
+    name="dim.product.v2"
     label="DIM Product">
   <annotation
       source="http://www.eclipse.org/oomph/setup/BrandingInfo">
@@ -109,12 +109,16 @@
           name="org.eclipse.m2m.qvt.oml.sdk.feature.group"/>
       <requirement
           name="org.eclipse.m2e.feature.feature.group"/>
+      <requirement
+          name="org.gecko.emf.osgi.tools.feature.feature.group"/>
       <repository
-            url="http://download.eclipse.org/technology/epp/packages/oxygen"/>
+          url="http://download.eclipse.org/technology/epp/packages/oxygen"/>
       <repository
           url="http://download.eclipse.org/releases/oxygen"/>
       <repository
           url="https://dl.bintray.com/bndtools/bndtools/latest/"/>
+      <repository
+          url="http://devel.data-in-motion.biz/public/update/repository/p2/gecko/geckoEMF/"/>
     </setupTask>
     <setupTask
         xsi:type="setup:CompoundTask"
@@ -143,6 +147,149 @@
       <description>BNDTools Preferences</description>
     </setupTask>
     <description>DIM Product for Oxygen.</description>
+  </version>
+  <version name="dim-bnd-photon"
+      label="DIM BND Photon"
+      requiredJavaVersion="1.8">
+    <setupTask
+        xsi:type="setup.p2:P2Task"
+        label="${scope.product.label} (${scope.product.version.label})">
+      <requirement
+          name="epp.package.modeling"
+          versionRange="[4.8.0,5.0.0)"/>
+      <requirement
+          name="org.eclipse.platform.feature.group"
+          versionRange="[4.8.0,5.0.0)"/>
+      <requirement
+          name="org.eclipse.rcp.feature.group"
+          versionRange="[4.8.0,5.0.0)"/>
+      <requirement
+          name="org.eclipse.amalgam.discovery.feature.group"/>
+      <requirement
+          name="org.eclipse.e4.core.tools.feature.feature.group"/>
+      <requirement
+          name="org.eclipse.egit.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.cdo.epp.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.compare.diagram.sirius.source.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.compare.egit.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.compare.ide.ui.source.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.compare.source.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.ecoretools.design.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.ecoretools.explorer.contextual.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.ecp.sdk.feature.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.emfstore.sdk.feature.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.parsley.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.parsley.sdk.source.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.query.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.transaction.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.validation.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.gef.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.gmf.runtime.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.jdt.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.bugzilla_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.context_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.ide_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.java_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.pde_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.wikitext_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.ocl.all.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.oomph.setup.feature.group"/>
+      <requirement
+          name="org.eclipse.pde.feature.group"/>
+      <requirement
+          name="org.eclipse.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.uml2.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.xsd.sdk.feature.group"/>
+      <requirement
+          name="bndtools.main.feature.feature.group"/>
+      <requirement
+          name="org.eclipse.m2m.qvt.oml.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.acceleo.feature.group"/>
+      <requirement
+          name="jsonedit-feature.feature.group"/>
+      <requirement
+          name="org.eclipse.m2e.feature.feature.group"/>
+      <requirement
+          name="org.gecko.emf.osgi.tools.feature.feature.group"/>
+      <repository
+          url="http://download.eclipse.org/technology/epp/packages/photon"/>
+      <repository
+          url="http://download.eclipse.org/releases/photon"/>
+      <repository
+          url="https://dl.bintray.com/bndtools/bndtools/latest/"/>
+      <repository
+          url="http://devel.data-in-motion.biz/public/repository/gecko/release/geckoEMF.eclipse.tooling/"/>
+      <repository
+          url="http://boothen.github.io/Json-Eclipse-Plugin/"/>
+    </setupTask>
+    <setupTask
+        xsi:type="setup:CompoundTask"
+        id="org.bndtools.prefs.photon"
+        name="Preferences">
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.bndtools.templating.gitrepo/gitRepos"
+          value="https://gitlab.com/datainmotion_opensource/bnd-workspace.git;name=&quot;DIM Workspace&quot;"/>
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.eclipse.core.resources/encoding"
+          value="UTF-8"/>
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.eclipse.jdt.ui/org.eclipse.jdt.ui.typefilter.enabled"
+          value="java.awt.*;"/>
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.eclipse.ui.editors/lineNumberRuler"
+          value="true"/>
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.eclipse.ui/SHOW_TEXT_ON_PERSPECTIVE_BAR"
+          value="false"/>
+      <description>BNDTools Preferences</description>
+    </setupTask>
+    <setupTask
+        xsi:type="setup:ResourceCreationTask"
+        id="photon.gnome.desktop"
+        content="[Desktop Entry]&#xA;Encoding=UTF-8&#xA;Version=Photon&#xA;Type=Application&#xA;Name=${installation.name}&#xA;Terminal=false&#xA;Icon=${installation.location}/eclipse/icon.xpm&#xA;Path=${installation.location}/eclipse&#xA;Exec=env UBUNTU_MENUPROXY=0 SWT_GTK3=0 GDK_DPI_SCALE=1.5 ${installation.location}/eclipse/eclipse -data ${installation.location}/workspace -clean&#xA;Categories=Application;Development;IDE;"
+        targetURL="${user.home}/.local/share/applications/${installation.name}.desktop"/>
+    <setupTask
+        xsi:type="setup:VariableTask"
+        name="installation.name"
+        label="Installation Name"/>
+    <description>DIM Product for Photon.</description>
   </version>
   <version name="dim-bnd-oxygen-latest"
       label="DIM BND Latest Oxygen"
@@ -231,16 +378,20 @@
           name="org.eclipse.m2m.qvt.oml.sdk.feature.group"/>
       <requirement
           name="org.eclipse.m2e.feature.feature.group"/>
+      <requirement
+          name="org.gecko.emf.osgi.tools.feature.feature.group"/>
       <repository
-            url="http://download.eclipse.org/technology/epp/packages/oxygen"/>
+          url="http://download.eclipse.org/technology/epp/packages/oxygen"/>
       <repository
           url="http://download.eclipse.org/releases/oxygen"/>
       <repository
           url="https://bndtools.ci.cloudbees.com/job/bndtools.master/lastSuccessfulBuild/artifact/build/generated/p2/"/>
+      <repository
+          url="http://devel.data-in-motion.biz/public/update/repository/p2/gecko/geckoEMF/"/>
     </setupTask>
     <setupTask
         xsi:type="setup:CompoundTask"
-        id="org.bndtools.prefs"
+        id="org.bndtools.prefs.bnd.latest"
         name="Preferences">
       <setupTask
           xsi:type="setup:PreferenceTask"
@@ -264,7 +415,423 @@
           value="false"/>
       <description>BNDTools Preferences</description>
     </setupTask>
+    <setupTask
+        xsi:type="setup:ResourceCreationTask"
+        id="oxygen.gnome.desktop"
+        content="[Desktop Entry]&#xA;Encoding=UTF-8&#xA;Version=Oxygene&#xA;Type=Application&#xA;Name=${installation.name}&#xA;Terminal=false&#xA;Icon=/home/mark/Development/eclipse/neon/eclipse-neon.png&#xA;Path=${installation.location}/eclipse&#xA;Exec=env UBUNTU_MENUPROXY=0 SWT_GTK3=0 GDK_DPI_SCALE=1.5 ${installation.location}/eclipse/eclipse -data ${installation.location}/workspace -clean&#xA;Categories=Application;Development;IDE;"
+        targetURL="${user.home}/.local/share/applications/${installation.name}.desktop"/>
+    <setupTask
+        xsi:type="setup:VariableTask"
+        name="installation.name"
+        label="Installation Name"/>
     <description>DIM Product for Oxygen.</description>
+  </version>
+  <version name="dim-bnd-photon-latest"
+      label="DIM BND Latest Photon"
+      requiredJavaVersion="1.8">
+    <setupTask
+        xsi:type="setup.p2:P2Task"
+        label="${scope.product.label} (${scope.product.version.label})">
+      <requirement
+          name="epp.package.modeling"
+          versionRange="[4.8.0,5.0.0)"/>
+      <requirement
+          name="org.eclipse.platform.feature.group"
+          versionRange="[4.8.0,5.0.0)"/>
+      <requirement
+          name="org.eclipse.rcp.feature.group"
+          versionRange="[4.8.0,5.0.0)"/>
+      <requirement
+          name="org.eclipse.amalgam.discovery.feature.group"/>
+      <requirement
+          name="org.eclipse.e4.core.tools.feature.feature.group"/>
+      <requirement
+          name="org.eclipse.egit.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.cdo.epp.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.compare.diagram.sirius.source.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.compare.egit.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.compare.ide.ui.source.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.compare.source.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.ecoretools.design.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.ecoretools.explorer.contextual.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.ecp.sdk.feature.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.emfstore.sdk.feature.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.parsley.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.parsley.sdk.source.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.query.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.transaction.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.validation.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.gef.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.gmf.runtime.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.jdt.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.bugzilla_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.context_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.ide_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.java_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.pde_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.wikitext_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.ocl.all.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.oomph.setup.feature.group"/>
+      <requirement
+          name="org.eclipse.pde.feature.group"/>
+      <requirement
+          name="org.eclipse.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.uml2.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.xsd.sdk.feature.group"/>
+      <requirement
+          name="bndtools.main.feature.feature.group"/>
+      <requirement
+          name="org.eclipse.m2m.qvt.oml.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.acceleo.feature.group"/>
+      <requirement
+          name="jsonedit-feature.feature.group"/>
+      <requirement
+          name="org.eclipse.m2e.feature.feature.group"/>
+      <requirement
+          name="org.gecko.emf.osgi.tools.feature.feature.group"/>
+      <repository
+          url="http://download.eclipse.org/technology/epp/packages/photon"/>
+      <repository
+          url="http://download.eclipse.org/releases/photon"/>
+      <repository
+          url="https://bndtools.ci.cloudbees.com/job/bndtools.master/lastSuccessfulBuild/artifact/build/generated/p2/"/>
+      <repository
+          url="http://devel.data-in-motion.biz/public/repository/gecko/release/geckoEMF.eclipse.tooling/"/>
+      <repository
+          url="http://boothen.github.io/Json-Eclipse-Plugin/"/>
+    </setupTask>
+    <setupTask
+        xsi:type="setup:CompoundTask"
+        id="org.bndtools.prefs.photon.latest"
+        name="Preferences">
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.bndtools.templating.gitrepo/gitRepos"
+          value="https://gitlab.com/datainmotion_opensource/bnd-workspace.git;name=&quot;DIM Workspace&quot;"/>
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.eclipse.core.resources/encoding"
+          value="UTF-8"/>
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.eclipse.jdt.ui/org.eclipse.jdt.ui.typefilter.enabled"
+          value="java.awt.*;"/>
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.eclipse.ui.editors/lineNumberRuler"
+          value="true"/>
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.eclipse.ui/SHOW_TEXT_ON_PERSPECTIVE_BAR"
+          value="false"/>
+      <description>BNDTools Preferences</description>
+    </setupTask>
+    <setupTask
+        xsi:type="setup:ResourceCreationTask"
+        id="photon.gnome.desktop.latest"
+        content="[Desktop Entry]&#xA;Encoding=UTF-8&#xA;Version=Photon&#xA;Type=Application&#xA;Name=${installation.name}&#xA;Terminal=false&#xA;Icon=${installation.location}/eclipse/icon.xpm&#xA;Path=${installation.location}/eclipse&#xA;Exec=env UBUNTU_MENUPROXY=0 SWT_GTK3=0 GDK_DPI_SCALE=1.5 ${installation.location}/eclipse/eclipse -data ${installation.location}/workspace -clean&#xA;Categories=Application;Development;IDE;"
+        targetURL="${user.home}/.local/share/applications/${installation.name}.desktop"/>
+    <setupTask
+        xsi:type="setup:VariableTask"
+        name="installation.name"
+        label="Installation Name"/>
+    <description>DIM Product for Photon.</description>
+  </version>
+  <version name="dim-bnd-photon-win"
+      label="DIM BND Photon Windows"
+      requiredJavaVersion="1.8">
+    <setupTask
+        xsi:type="setup.p2:P2Task"
+        label="${scope.product.label} (${scope.product.version.label})">
+      <requirement
+          name="epp.package.modeling"
+          versionRange="[4.8.0,5.0.0)"/>
+      <requirement
+          name="org.eclipse.platform.feature.group"
+          versionRange="[4.8.0,5.0.0)"/>
+      <requirement
+          name="org.eclipse.rcp.feature.group"
+          versionRange="[4.8.0,5.0.0)"/>
+      <requirement
+          name="org.eclipse.amalgam.discovery.feature.group"/>
+      <requirement
+          name="org.eclipse.e4.core.tools.feature.feature.group"/>
+      <requirement
+          name="org.eclipse.egit.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.cdo.epp.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.compare.diagram.sirius.source.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.compare.egit.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.compare.ide.ui.source.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.compare.source.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.ecoretools.design.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.ecoretools.explorer.contextual.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.ecp.sdk.feature.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.emfstore.sdk.feature.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.parsley.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.parsley.sdk.source.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.query.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.transaction.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.validation.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.gef.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.gmf.runtime.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.jdt.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.bugzilla_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.context_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.ide_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.java_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.pde_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.wikitext_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.ocl.all.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.oomph.setup.feature.group"/>
+      <requirement
+          name="org.eclipse.pde.feature.group"/>
+      <requirement
+          name="org.eclipse.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.uml2.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.xsd.sdk.feature.group"/>
+      <requirement
+          name="bndtools.main.feature.feature.group"/>
+      <requirement
+          name="org.eclipse.m2m.qvt.oml.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.acceleo.feature.group"/>
+      <requirement
+          name="jsonedit-feature.feature.group"/>
+      <requirement
+          name="org.eclipse.m2e.feature.feature.group"/>
+      <requirement
+          name="org.gecko.emf.osgi.tools.feature.feature.group"/>
+      <repository
+          url="http://download.eclipse.org/technology/epp/packages/photon"/>
+      <repository
+          url="http://download.eclipse.org/releases/photon"/>
+      <repository
+          url="https://dl.bintray.com/bndtools/bndtools/latest/"/>
+      <repository
+          url="http://devel.data-in-motion.biz/public/repository/gecko/release/geckoEMF.eclipse.tooling/"/>
+      <repository
+          url="http://boothen.github.io/Json-Eclipse-Plugin/"/>
+    </setupTask>
+    <setupTask
+        xsi:type="setup:CompoundTask"
+        id="org.bndtools.prefs.photon.win"
+        name="Preferences">
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.bndtools.templating.gitrepo/gitRepos"
+          value="https://gitlab.com/datainmotion_opensource/bnd-workspace.git;name=&quot;DIM Workspace&quot;"/>
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.eclipse.core.resources/encoding"
+          value="UTF-8"/>
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.eclipse.jdt.ui/org.eclipse.jdt.ui.typefilter.enabled"
+          value="java.awt.*;"/>
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.eclipse.ui.editors/lineNumberRuler"
+          value="true"/>
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.eclipse.ui/SHOW_TEXT_ON_PERSPECTIVE_BAR"
+          value="false"/>
+      <description>BNDTools Preferences</description>
+    </setupTask>
+    <setupTask
+        xsi:type="setup:VariableTask"
+        name="installation.name"
+        label="Installation Name"/>
+    <description>DIM Product for Photon.</description>
+  </version>
+  <version name="dim-bnd-oxygen-win"
+      label="DIM BND Oxygen Windows"
+      requiredJavaVersion="1.8">
+    <setupTask
+        xsi:type="setup.p2:P2Task"
+        label="${scope.product.label} (${scope.product.version.label})">
+      <requirement
+          name="epp.package.modeling"
+          versionRange="[4.7.0,4.8.0)"/>
+      <requirement
+          name="org.eclipse.platform.feature.group"
+          versionRange="[4.7.0,4.8.0)"/>
+      <requirement
+          name="org.eclipse.rcp.feature.group"
+          versionRange="[4.7.0,4.8.0)"/>
+      <requirement
+          name="org.eclipse.amalgam.discovery.feature.group"/>
+      <requirement
+          name="org.eclipse.e4.core.tools.feature.feature.group"/>
+      <requirement
+          name="org.eclipse.egit.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.cdo.epp.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.compare.diagram.sirius.source.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.compare.egit.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.compare.ide.ui.source.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.compare.source.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.ecoretools.design.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.ecoretools.explorer.contextual.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.ecp.sdk.feature.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.emfstore.sdk.feature.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.parsley.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.parsley.sdk.source.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.query.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.transaction.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.emf.validation.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.gef.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.gmf.runtime.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.jdt.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.bugzilla_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.context_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.ide_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.java_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.pde_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn.wikitext_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.mylyn_feature.feature.group"/>
+      <requirement
+          name="org.eclipse.ocl.all.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.pde.feature.group"/>
+      <requirement
+          name="org.eclipse.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.uml2.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.xsd.sdk.feature.group"/>
+      <requirement
+          name="bndtools.main.feature.feature.group"/>
+      <requirement
+          name="org.eclipse.m2m.qvt.oml.sdk.feature.group"/>
+      <requirement
+          name="org.eclipse.m2e.feature.feature.group"/>
+      <requirement
+          name="org.gecko.emf.osgi.tools.feature.feature.group"/>
+      <repository
+          url="http://download.eclipse.org/technology/epp/packages/oxygen"/>
+      <repository
+          url="http://download.eclipse.org/releases/oxygen"/>
+      <repository
+          url="https://dl.bintray.com/bndtools/bndtools/latest/"/>
+      <repository
+          url="http://devel.data-in-motion.biz/public/update/repository/p2/gecko/geckoEMF/"/>
+    </setupTask>
+    <setupTask
+        xsi:type="setup:CompoundTask"
+        id="org.bndtools.prefs.oxygen.win"
+        name="Preferences">
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.bndtools.templating.gitrepo/gitRepos"
+          value="https://gitlab.com/datainmotion_opensource/bnd-workspace.git;name=&quot;DIM Workspace&quot;"/>
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.eclipse.core.resources/encoding"
+          value="UTF-8"/>
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.eclipse.jdt.ui/org.eclipse.jdt.ui.typefilter.enabled"
+          value="java.awt.*;"/>
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.eclipse.ui.editors/lineNumberRuler"
+          value="true"/>
+      <setupTask
+          xsi:type="setup:PreferenceTask"
+          key="/instance/org.eclipse.ui/SHOW_TEXT_ON_PERSPECTIVE_BAR"
+          value="false"/>
+      <description>BNDTools Preferences</description>
+    </setupTask>
+    <description>DIM Product for Oxygen Windows.</description>
   </version>
   <description>Data In Motion Product </description>
 </setup:Product>

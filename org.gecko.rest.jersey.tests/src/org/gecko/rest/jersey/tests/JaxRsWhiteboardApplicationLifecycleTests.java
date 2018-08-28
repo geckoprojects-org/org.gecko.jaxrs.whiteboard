@@ -19,6 +19,10 @@ import java.io.IOException;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 
@@ -27,10 +31,6 @@ import org.gecko.rest.jersey.tests.applications.AnnotatedTestLegacyApplication;
 import org.gecko.rest.jersey.tests.resources.HelloResource;
 import org.gecko.util.test.common.service.ServiceChecker;
 import org.gecko.util.test.common.test.AbstractOSGiTest;
-import org.glassfish.jersey.client.JerseyClient;
-import org.glassfish.jersey.client.JerseyClientBuilder;
-import org.glassfish.jersey.client.JerseyInvocation;
-import org.glassfish.jersey.client.JerseyWebTarget;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -99,9 +99,9 @@ public class JaxRsWhiteboardApplicationLifecycleTests extends AbstractOSGiTest{
 		 * Check if our RootResource is not available under http://localhost:8185/test
 		 */
 		System.out.println("Checking URL is not available: " + url);
-		JerseyInvocation get = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(url);
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(url);
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());
@@ -217,9 +217,9 @@ public class JaxRsWhiteboardApplicationLifecycleTests extends AbstractOSGiTest{
 		 * Check if our RootResource is not available under http://localhost:8185/test
 		 */
 		System.out.println("Checking URL is not available: " + url);
-		JerseyInvocation get = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(url);
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(url);
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());
@@ -447,9 +447,9 @@ public class JaxRsWhiteboardApplicationLifecycleTests extends AbstractOSGiTest{
 		 * Check if our RootResource is not available under http://localhost:8185/test
 		 */
 		System.out.println("Checking URL is not available: " + url);
-		JerseyInvocation get = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(url);
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();;
+		WebTarget webTarget = jerseyClient.target(url);
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());

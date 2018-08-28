@@ -1,16 +1,17 @@
 buildscript {
-	repositories { mavenCentral() }
-	dependencies { classpath "biz.aQute.bnd:biz.aQute.bnd.gradle:${bnd_version}" }
+	repositories {
+		maven { url "https://plugins.gradle.org/m2/" }
+		jcenter() 
+		mavenCentral()
+	}
+	dependencies { 
+		classpath "biz.aQute.bnd:biz.aQute.bnd.gradle:${bnd_version}" 
+		classpath "com.bmuschko:gradle-docker-plugin:3.2.8"
+	}
 	
 	/* Add bnd gradle plugin to buildscript classpath of rootProject */
 	def bndPlugin = files(configurations.classpath.files)
-	gradle.projectsLoaded { gradle ->
-		gradle.rootProject.buildscript {
-		  dependencies {
-			classpath bndPlugin
-		  }
-		}
-	}
+	gradle.rootProject { buildscript { dependencies { classpath bndPlugin } } }
 }
 
 apply plugin: 'biz.aQute.bnd.workspace'

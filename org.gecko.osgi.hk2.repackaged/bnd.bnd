@@ -1,24 +1,25 @@
--classpath: libs/hk2-api-2.5.0-b59.jar,\
-	  libs/hk2-api-2.5.0-b59-sources.jar,\
-	  libs/hk2-locator-2.5.0-b59.jar,\
-	  libs/hk2-locator-2.5.0-b59-souces.jar,\
-	  libs/hk2-utils-2.5.0-b59.jar,\
-	  libs/hk2-utils-2.5.0-b59-sources.jar,\
-	  libs/osgi-resource-locator-2.5.0-b42.jar,\
-	  libs/osgi-resource-locator-2.5.0-b42-sources.jar,\
-	  libs/javassist-3.22.0-GA.jar,\
-	  libs/javassist-3.22.0-GA-source.jar,\
-	  libs/aopalliance-repackaged-2.5.0-b59.jar,\
-	  libs/aopalliance-repackaged-2.5.0-b59-sources.jar,\
-	  libs/javax.inject-2.5.0-b59.jar,\
-	  libs/javax.inject-2.5.0-b59-sources.jar
-
 ver: 2.5.0
 
 -output: ${bsn}-${ver}.jar
 Bundle-Version: ${ver}.SNAPSHOT
 Export-Package: javax.inject;version=1.0.0,\
 	*;version=${ver}
-Import-Package: !com.sun.*,!org.hibernate.*,!sun.*,*
+Import-Package: !com.sun.*,\
+	!org.hibernate.*,\
+	!sun.*,\
+	!org.glassfish.hk2.*,\
+	!org.aopalliance.*,\
+	!org.jvnet.hk2.*,\
+	!javassist.*,\
+	!javax.inject.*,\
+	*
 -includeresource: META-INF/services=META-INF/services
 Bundle-Vendor: Data In Motion Consulting GmbH
+-buildpath: \
+	javassist;version=3.22,\
+	org.glassfish.hk2.external.aopalliance-repackaged;version=2.5,\
+	org.glassfish.hk2.external.javax.inject;version=2.5,\
+	org.glassfish.hk2:hk2-api;version=2.5,\
+	org.glassfish.hk2:hk2-locator;version=2.5,\
+	org.glassfish.hk2:hk2-utils;version=2.5,\
+	org.glassfish.hk2.osgi-resource-locator;version=2.5
