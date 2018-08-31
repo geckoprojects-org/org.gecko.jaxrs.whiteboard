@@ -28,6 +28,7 @@ import javax.servlet.ServletException;
 //import org.eclipse.jetty.security.ConstraintSecurityHandler;
 //import org.keycloak.adapters.jetty.KeycloakJettyAuthenticator;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -248,22 +249,12 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 				stopServer();
 			}
 			jettyServer = new Server(port);
-//			http://static.helloworld114.com/pages/demo/55448.html
-//		    ConstraintMapping cm = new ConstraintMapping();
-//		    cm.setConstraint(new Constraint());
-//		    cm.getConstraint().setAuthenticate(true);
-//		    cm.getConstraint().setDataConstraint(Constraint.DC_NONE);
-//		    cm.getConstraint().setRoles(new String[] { "rest" });
-//		    cm.setPathSpec("/topic/");
-//		 
-//		    KeycloakJettyAuthenticator kja = new KeycloakJettyAuthenticator();
-//			ConstraintSecurityHandler csh = new ConstraintSecurityHandler();
-//			csh.setRealmName("test");
-//			csh.setAuthenticator(kja);
-//			csh.setConstraintMappings(new ConstraintMapping[] { cm });
-//			csh.setHandler(servletContextHandler);
-//			jettyServer.setHandler(csh);
+
 			contextHandler = new ServletContextHandler(jettyServer, contextPath);
+			Object disableSessions = context.getProperties().get(JerseyConstants.JERSEY_DISABLE_SESSION);
+			if(disableSessions == null || !Boolean.valueOf(disableSessions.toString())) {
+				contextHandler.setSessionHandler(new SessionHandler());
+			}
 			logger.info("Created white-board server context handler for context: " + contextPath);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Error starting JaxRs white-board because of an exception", e);
