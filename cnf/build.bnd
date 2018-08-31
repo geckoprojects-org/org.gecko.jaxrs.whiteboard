@@ -36,7 +36,7 @@
 -baselinerepo: GeckoREST
 
 # JUnit
-junit: org.apache.servicemix.bundles.junit; version=4.12
+junit: org.apache.servicemix.bundles.junit;version=4.12
 
 -plugin: \
 	aQute.bnd.repository.maven.provider.MavenBndRepository;\

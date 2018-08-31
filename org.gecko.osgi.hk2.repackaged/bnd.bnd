@@ -1,7 +1,7 @@
-ver: 2.5.0
+ver: 2.5.1
 
 -output: ${bsn}-${ver}.jar
-Bundle-Version: ${ver}.SNAPSHOT
+Bundle-Version: ${ver}
 Export-Package: javax.inject;version=1.0.0,\
 	*;version=${ver}
 Import-Package: !com.sun.*,\
@@ -22,4 +22,5 @@ Bundle-Vendor: Data In Motion Consulting GmbH
 	org.glassfish.hk2:hk2-api;version=2.5,\
 	org.glassfish.hk2:hk2-locator;version=2.5,\
 	org.glassfish.hk2:hk2-utils;version=2.5,\
-	org.glassfish.hk2.osgi-resource-locator;version=2.5
+	org.glassfish.hk2.osgi-resource-locator;version=2.5,\
+	javax.activation-api;version=1.2
