@@ -8,4 +8,6 @@
 		name = Release; \
 		pretty = true; \
 		local = ${build}/release
+
+-snapshot: ${tstamp}
 		

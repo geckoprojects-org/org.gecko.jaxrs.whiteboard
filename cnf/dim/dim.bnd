@@ -1,21 +1,5 @@
 -plugin.dim: \
 	aQute.bnd.repository.osgi.OSGiRepository;\
-		name=DIM OCL-3.8;\
-		locations=http://devel.data-in-motion.biz/public/update/repository/p2/releases/ocl-3.8/plugins/index.xml;\
-		cache=${build}/cache/dim-ocl-3.8,\
-	aQute.bnd.repository.osgi.OSGiRepository;\
-		name=DIM QVT-3.8;\
-		locations=http://devel.data-in-motion.biz/public/update/repository/p2/releases/qvt-3.8/plugins/index.xml;\
-		cache=${build}/cache/dim-qvt-3.8,\
-	aQute.bnd.repository.osgi.OSGiRepository;\
-		name=DIM EMF-2.13;\
-		locations=http://devel.data-in-motion.biz/public/update/repository/p2/obr/emf-3.8/index.xml;\
-		cache=${build}/cache/dim-emf-3.8,\
-	aQute.bnd.repository.osgi.OSGiRepository;\
-		name=DIM Eclipse Runtime;\
-		locations=http://devel.data-in-motion.biz/public/update/repository/p2/obr/dim-core-runtime/index.xml;\
-		cache=${build}/cache/dim-core-runtime,\
-	aQute.bnd.repository.osgi.OSGiRepository;\
 		locations=http://devel.data-in-motion.biz/public/update/repository/p2/obr/bnd-templates/index.xml;\
-		name=BNDtemplates;\
+		name=DIM BNDtemplates;\
 		cache=${build}/cache/bndtemplates

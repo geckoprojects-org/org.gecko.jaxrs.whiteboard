@@ -22,7 +22,11 @@ import java.util.Hashtable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -36,10 +40,6 @@ import org.gecko.rest.jersey.tests.resources.PrototypeExtension;
 import org.gecko.rest.jersey.tests.resources.PrototypeResource;
 import org.gecko.util.test.common.service.ServiceChecker;
 import org.gecko.util.test.common.test.AbstractOSGiTest;
-import org.glassfish.jersey.client.JerseyClient;
-import org.glassfish.jersey.client.JerseyClientBuilder;
-import org.glassfish.jersey.client.JerseyInvocation;
-import org.glassfish.jersey.client.JerseyWebTarget;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -104,9 +104,9 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		 * Check if our RootResource is available under http://localhost:8185/test
 		 */
 		System.out.println("Checking URL is available: " + url);
-		JerseyInvocation get = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(url);
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(url);
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());
@@ -240,9 +240,9 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		 * Check as well, if http://localhost:8185/test is still available
 		 */
 		System.out.println("Checking URL is available " + url + "/hello");
-		JerseyInvocation get = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(url + "/hello");
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(url + "/hello");
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(200, response.getStatus());
@@ -319,9 +319,9 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		 * Check as well, if http://localhost:8185/test is still available
 		 */
 		System.out.println("Checking URL is available " + url + "/hello");
-		JerseyInvocation get = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(url + "/hello");
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(url + "/hello");
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(200, response.getStatus());
@@ -387,9 +387,9 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		 * Check if our RootResource is available under http://localhost:8185/test
 		 */
 		System.out.println("Checking URL is available: " + url);
-		JerseyInvocation get = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(url);
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(url);
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());
@@ -519,9 +519,9 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		 * Check if our RootResource is not available under http://localhost:8185/test
 		 */
 		System.out.println("Checking URL is not available: " + url);
-		JerseyInvocation get = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(url);
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(url);
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());
@@ -627,9 +627,9 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		 * Check if our RootResource is not available under http://localhost:8185/test
 		 */
 		System.out.println("Checking URL is not available: " + url);
-		JerseyInvocation get = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(url);
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(url);
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());
@@ -719,9 +719,9 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		 * Check if our RootResource is available under http://localhost:8185/test
 		 */
 		System.out.println("Checking URL is available: " + url);
-		JerseyInvocation get = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(url);
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(url);
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());
@@ -825,9 +825,9 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		 * Check as well, if http://localhost:8185/test is still available
 		 */
 		System.out.println("Checking URL is available " + url + "/hello");
-		JerseyInvocation get = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(url + "/hello");
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(url + "/hello");
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(200, response.getStatus());
@@ -900,9 +900,9 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		 */
 		String checkUrl = url + "/test";
 		System.out.println("Checking URL is available: " + checkUrl);
-		JerseyInvocation get = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(checkUrl);
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(checkUrl);
 		get = webTarget.request().buildGet();
 		
 		cdl = new CountDownLatch(1);
@@ -1015,9 +1015,9 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		 */
 		String checkUrl = url + "/customer/hello";
 		System.out.println("Checking URL is available: " + checkUrl);
-		JerseyInvocation post = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(checkUrl);
+		Invocation post = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(checkUrl);
 		post = webTarget.request().buildPost(Entity.entity("test", "application/testThing"));
 		Response response = post.invoke();
 		assertEquals(200, response.getStatus());

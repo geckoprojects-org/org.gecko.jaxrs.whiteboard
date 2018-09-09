@@ -27,6 +27,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 
@@ -35,10 +39,6 @@ import org.gecko.rest.jersey.httpwhiteboard.tests.customizer.TestServiceCustomiz
 import org.gecko.rest.jersey.httpwhiteboard.tests.resources.HelloResource;
 import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.gecko.util.test.common.service.ServiceChecker;
-import org.glassfish.jersey.client.JerseyClient;
-import org.glassfish.jersey.client.JerseyClientBuilder;
-import org.glassfish.jersey.client.JerseyInvocation;
-import org.glassfish.jersey.client.JerseyWebTarget;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
@@ -158,9 +158,9 @@ public class JaxRsWhiteboardComponentTest {
 		 * Check if our RootResource is available under http://localhost:8185/test
 		 */
 		System.out.println("Checking URL is available: " + url);
-		JerseyInvocation get = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(url);
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(url);
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());
@@ -524,9 +524,9 @@ public class JaxRsWhiteboardComponentTest {
 		 * Check if our RootResource is available under http://localhost:8185/test
 		 */
 		System.out.println("Checking URL is available: " + url);
-		JerseyInvocation get = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(url);
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(url);
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());
@@ -718,9 +718,9 @@ public class JaxRsWhiteboardComponentTest {
 		 * Check if our RootResource is available under http://localhost:8185/test
 		 */
 		System.out.println("Checking URL is available: " + urlWhiteboard1);
-		JerseyInvocation get = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(urlWhiteboard1);
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(urlWhiteboard1);
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());
@@ -961,9 +961,9 @@ public class JaxRsWhiteboardComponentTest {
 		 * Check if our RootResource is not available under http://localhost:8185/test
 		 */
 		System.out.println("Checking URL is not available: " + url);
-		JerseyInvocation get = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(url);
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(url);
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());
@@ -1106,9 +1106,9 @@ public class JaxRsWhiteboardComponentTest {
 		 * Check if our RootResource is not available under http://localhost:8185/test
 		 */
 		System.out.println("Checking URL is not available: " + url);
-		JerseyInvocation get = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(url);
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(url);
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());
@@ -1247,9 +1247,9 @@ public class JaxRsWhiteboardComponentTest {
 		 * Check if our RootResource is available under http://localhost:8185/test
 		 */
 		System.out.println("Checking URL is available: " + url);
-		JerseyInvocation get = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(url);
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(url);
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());
@@ -1394,9 +1394,9 @@ public class JaxRsWhiteboardComponentTest {
 		 * Check as well, if http://localhost:8185/test is still available
 		 */
 		System.out.println("Checking URL is available " + url + "/hello");
-		JerseyInvocation get = null;
-		JerseyClient jerseyClient = JerseyClientBuilder.createClient();
-		JerseyWebTarget webTarget = jerseyClient.target(url + "/hello");
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(url + "/hello");
 		get = webTarget.request().buildGet();
 		Response response = get.invoke();
 		assertEquals(200, response.getStatus());
@@ -1428,7 +1428,7 @@ public class JaxRsWhiteboardComponentTest {
 		
 	}
 	
-	private <T> void tearDownTest(Class<T> clazz, Configuration configuration, JerseyInvocation get) throws IOException, InterruptedException {
+	private <T> void tearDownTest(Class<T> clazz, Configuration configuration, Invocation get) throws IOException, InterruptedException {
 		/*
 		 * Tear-down the system
 		 */
