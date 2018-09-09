@@ -30,6 +30,7 @@ public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 
 	private volatile Set<T> instanceCache = new HashSet<>();
 	private JaxRsApplicationContentProvider provider;
+	private ServiceObjects<T> serviceObjects;
 
 	/**
 	 * Creates a new instance. A service reference will be cached lazily, on the first request
@@ -37,6 +38,7 @@ public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 	 */
 	public JerseyResourceInstanceFactory(JaxRsApplicationContentProvider provider) {
 		this.provider = provider;
+		serviceObjects = provider.getProviderObject();;
 	}
 
 	/* (non-Javadoc)
@@ -53,12 +55,11 @@ public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 	@Override
 	public T provide() {
 		try {
-			ServiceObjects<T> soInstance = getServiceObjects();
 			// If the service objects is null, the service is obviously gone and we return null to avoid exception in jersey
-			if (soInstance == null) {
+			if (serviceObjects == null) {
 				return null;
 			}
-			T instance = soInstance.getService();
+			T instance = serviceObjects.getService();
 			synchronized (instanceCache) {
 				instanceCache.add(instance);
 			}
@@ -77,9 +78,8 @@ public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 	 */
 	public void dispose() {
 		// release all cached service instances
-		ServiceObjects<T> soInstance = getServiceObjects();
-		if (soInstance != null) {
-			instanceCache.forEach((i) -> soInstance.ungetService(i));
+		if (serviceObjects != null) {
+			instanceCache.forEach((i) -> serviceObjects.ungetService(i));
 		}
 		instanceCache.clear();
 	}
@@ -93,14 +93,6 @@ public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 	}
 
 	/**
-	 * Returns the {@link ServiceObjects} instance or <code>null</code>, in case the service is already gone
-	 * @return the {@link ServiceObjects} instance or <code>null</code>
-	 */
-	private ServiceObjects<T> getServiceObjects() {
-		return provider.getProviderObject();
-	}
-
-	/**
 	 * Disposes a service instance. If it is a prototype instance, it will be removed from the cache.
 	 * @param instance the instance to be released
 	 */
@@ -110,8 +102,7 @@ public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 		}
 		if (instanceCache.remove(instance)) {
 			try {
-				ServiceObjects<T> soInstance = getServiceObjects();
-				soInstance.ungetService(instance);
+				serviceObjects.ungetService(instance);
 			} catch (Exception e) {
 				if (e instanceof IllegalStateException) {
 					throw e;
