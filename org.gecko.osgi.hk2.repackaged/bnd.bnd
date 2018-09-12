@@ -1,17 +1,12 @@
-ver: 2.5.1
+ver: 2.5.2
 
 -output: ${bsn}-${ver}.jar
 Bundle-Version: ${ver}
 Export-Package: javax.inject;version=1.0.0,\
-	*;version=${ver}
+	*
 Import-Package: !com.sun.*,\
 	!org.hibernate.*,\
 	!sun.*,\
-	!org.glassfish.hk2.*,\
-	!org.aopalliance.*,\
-	!org.jvnet.hk2.*,\
-	!javassist.*,\
-	!javax.inject.*,\
 	*
 -includeresource: META-INF/services=META-INF/services
 Bundle-Vendor: Data In Motion Consulting GmbH
@@ -24,3 +19,5 @@ Bundle-Vendor: Data In Motion Consulting GmbH
 	org.glassfish.hk2:hk2-utils;version=2.5,\
 	org.glassfish.hk2.osgi-resource-locator;version=2.5,\
 	javax.activation-api;version=1.2
+	
+-source: true
