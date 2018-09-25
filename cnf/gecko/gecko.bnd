@@ -1,10 +1,5 @@
 -plugin.gecko: \
 	aQute.bnd.repository.osgi.OSGiRepository;\
-		name=DIM EMF-2.13;\
-		max.stale=-1;\
-		locations=http://devel.data-in-motion.biz/public/update/repository/p2/obr/emf-3.8/index.xml;\
-		cache=${build}/cache/dim-emf-3.8,\
-	aQute.bnd.repository.osgi.OSGiRepository;\
 		locations=http://devel.data-in-motion.biz/public/repository/gecko/release/geckoEMF/index.xml;\
 		max.stale=-1;\
 		name=GeckoEMF;\

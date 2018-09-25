@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import javax.servlet.Servlet;
 
 import org.gecko.rest.jersey.helper.JerseyHelper;
+import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
 import org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime;
 import org.gecko.rest.jersey.runtime.servlet.WhiteboardServletContainer;
@@ -66,6 +67,7 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 	private Logger logger = Logger.getLogger("o.e.o.j.HTTPWhiteboardBasedJerseyServiceRuntime");
 	private Filter httpContextSelect;
 	private Filter httpWhiteboardTarget;
+	private String basePath;
 	
 	/* (non-Javadoc)
 	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#doInitialize(org.osgi.service.component.ComponentContext)
@@ -152,7 +154,7 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 		if(path.startsWith("/")) {
 			path = path.substring(1); 
 		}
-		return endpoint + path;
+		return endpoint + basePath + path;
 	}
 	
 	/* (non-Javadoc)
@@ -161,7 +163,7 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 	@Override
 	protected void doRegisterServletContainer(JaxRsApplicationProvider provider, String path, ResourceConfig config) {
 		Dictionary<String, Object> props = new Hashtable<>();
-		props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, path);
+		props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, basePath + path);
 		String target = (String) context.getProperties().get(HttpWhiteboardConstants.HTTP_WHITEBOARD_TARGET);
 		if(target != null){
 			props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_TARGET, target);
@@ -216,6 +218,19 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 		} catch (InvalidSyntaxException e) {
 			throw new ConfigurationException(HttpWhiteboardConstants.HTTP_WHITEBOARD_TARGET, "Invalid filter syntax: " + e.getMessage());
 		}
+		
+		basePath = JerseyHelper.getPropertyWithDefault(ctx, JerseyConstants.JERSEY_CONTEXT_PATH, "");
+		if(basePath.length() > 0) {
+			if(!basePath.startsWith("/")) {
+				basePath = "/" + basePath;
+			}
+			if(basePath.endsWith("/")) {
+				basePath = basePath.substring(0, basePath.length() - 1);
+			} else if(basePath.endsWith("/*")) {
+				basePath = basePath.substring(0, basePath.length() - 2);
+			}
+		}
+		
 	}
 
 	/* (non-Javadoc)
