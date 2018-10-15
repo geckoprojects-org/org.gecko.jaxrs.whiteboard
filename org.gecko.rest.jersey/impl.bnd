@@ -1,4 +1,4 @@
-Bundle-Version: 1.0.7.SNAPSHOT
+Bundle-Version: 1.0.8.SNAPSHOT
 Bundle-Copyright: Data In Motion Consulting
 Bundle-License: Eclipse Public License v1.0
 Bundle-Name: Jersey JaxRS Whiteboard
@@ -16,4 +16,5 @@ Private-Package: \
 	org.gecko.rest.jersey.runtime.httpwhiteboard,\
 	org.gecko.rest.jersey.runtime.servlet,\
 	org.gecko.rest.jersey.runtime.application.feature
-Require-Capability: osgi.implementation;filter:='(osgi.implementation=osgi.http)' 
+Require-Capability: osgi.implementation;filter:='(osgi.implementation=osgi.http)'
+Provide-Capability: osgi.service;objectClass:List<String>="org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime" 
