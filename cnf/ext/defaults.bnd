@@ -29,9 +29,6 @@ Bundle-Icon: icons/gecko.ico;size=64
 #cnf: ${workspace}/cnf
 junit: org.apache.servicemix.bundles.junit;version="[4.11,5)"
 
-# String to substitute for "SNAPSHOT" in the bundle version's qualifier.
--snapshot: ${tstamp}
-
 -groupid: org.gecko.rest
 -releaserepo: Release,DIM_Nexus
 -pom: version=${versionmask;===s;${@version}}
