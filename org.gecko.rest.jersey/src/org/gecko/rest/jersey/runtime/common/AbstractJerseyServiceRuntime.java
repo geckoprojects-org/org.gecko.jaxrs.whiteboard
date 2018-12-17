@@ -11,6 +11,7 @@
  */
 package org.gecko.rest.jersey.runtime.common;
 
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -318,7 +319,10 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 			List<ServletContainer> servletContainers = provider.getServletContainers();
 			if(!servletContainers.isEmpty()) {
 				logger.log(Level.FINE, "Reload servlet container for application " + applicationProvider.getName());
-				servletContainers.forEach(servletContainer -> {
+
+				List<ServletContainer> copyList = new ArrayList<>(servletContainers);
+				
+				copyList.forEach(servletContainer -> {
 					try{
 						ResourceConfig config = createResourceConfig(provider);
 						servletContainer.reload(config);

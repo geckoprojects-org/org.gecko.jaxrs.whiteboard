@@ -54,4 +54,14 @@ public class ServiceReferenceMock<T> implements ServiceReference<T> {
 		return 0;
 	}
 
+	/* 
+	 * (non-Javadoc)
+	 * @see org.osgi.framework.ServiceReference#getProperties()
+	 */
+	@Override
+	public Dictionary<String, Object> getProperties() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

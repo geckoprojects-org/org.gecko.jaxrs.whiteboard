@@ -323,11 +323,6 @@
           value="bndtools.perspective"/>
       <setupTask
           xsi:type="setup:PreferenceTask"
-          id="preferences.general.workspace.lineDelimiter"
-          key="/instance/org.eclipse.core.runtime/line.separator"
-          value="${0x0A}"/>
-      <setupTask
-          xsi:type="setup:PreferenceTask"
           key="/instance/org.eclipse.egit.ui/commit_dialog_signed_off_by"
           value="true"/>
       <description>BNDTools Preferences</description>

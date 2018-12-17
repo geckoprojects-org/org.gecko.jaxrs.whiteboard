@@ -1,12 +1,10 @@
 buildscript {
 	repositories {
-		maven { url "https://plugins.gradle.org/m2/" }
 		jcenter() 
 		mavenCentral()
 	}
 	dependencies { 
 		classpath "biz.aQute.bnd:biz.aQute.bnd.gradle:${bnd_version}" 
-		classpath "com.bmuschko:gradle-docker-plugin:3.2.8"
 	}
 	
 	/* Add bnd gradle plugin to buildscript classpath of rootProject */

@@ -1,4 +1,4 @@
-package org.gecko.rest.jersey.helper;
+package org.gecko.rest.jersey.runtime.common;
 
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;

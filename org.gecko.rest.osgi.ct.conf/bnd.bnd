@@ -9,7 +9,7 @@
 javac.source: 1.8
 javac.target: 1.8
 
-Bundle-Version: 1.0.4.SNAPSHOT
+Bundle-Version: 1.0.5.SNAPSHOT
 
 Include-Resource: {OSGI-INF/configurator/config.json=configs/config.json}
 Require-Capability: osgi.extender;filter:='(osgi.extender=osgi.configurator)'

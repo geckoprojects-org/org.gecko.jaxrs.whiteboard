@@ -1,0 +1,55 @@
+java: java
+javac: javac
+javac.source: 1.8
+javac.target: 1.8
+javac.debug:  on
+
+#Bundle-DocURL: https://yourdoc.de
+Bundle-License: Eclipse Public License 1.0
+Bundle-Copyright:Data In Motion GmbH all rights reserved
+Bundle-Vendor: Data In Motion GmbH
+Bundle-ContactAddress: info@data-in-motion.biz
+Bundle-Icon: icons/gecko.ico;size=64
+
+#if you want bnd to tell you more during the build
+#-verbose: true
+
+# Includes sources from bundle
+-sources: true
+
+-includeresource.license: \
+	META-INF/LICENSE=${workspace}/cnf/license/LICENSE
+
+-includeresource.icon: \
+	icons=${workspace}/cnf/icons
+		
+-removeheaders: Bnd-LastModified, Tool, Created-By, Private-Package
+
+# Path to ...
+#cnf: ${workspace}/cnf
+junit: org.apache.servicemix.bundles.junit;version="[4.11,5)"
+
+# String to substitute for "SNAPSHOT" in the bundle version's qualifier.
+-snapshot: ${tstamp}
+
+-groupid: org.gecko.rest
+-releaserepo: Release,DIM_Nexus
+-pom: version=${versionmask;===s;${@version}}
+-maven-release: pom
+
+# Enable semantic versioning for all bundles
+-baselinerepo: GeckoREST
+-baseline: *
+
+# Ignore files for baselining
+#-diffignore: *.xml
+
+# define global blacklist
+-runblacklist.default: osgi.identity;filter:='(osgi.identity=osgi.cmpn)'
+
+-testpath: ${junit}
+
+-resolve.effective: active
+# > Java 8 runtime
+#modules: --add-opens=java.base/jdk.internal.loader=ALL-UNNAMED, --add-opens=java.base/java.lang=ALL-UNNAMED, --add-opens=java.base/java.net=ALL-UNNAMED, --add-opens=java.base/java.security=ALL-UNNAMED
+#-runvm.default: ${if;${isempty;${system_allow_fail;java --list-modules}};;${modules}}

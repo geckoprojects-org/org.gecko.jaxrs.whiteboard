@@ -1,0 +1,17 @@
+-plugin.gecko: \
+	aQute.bnd.repository.maven.provider.MavenBndRepository;\
+		snapshotUrl=http://devel.data-in-motion.biz/nexus/repository/maven-snapshots/;\
+		releaseUrl=http://devel.data-in-motion.biz/nexus/repository/maven-releases/;\
+		index=${.}/gecko_rest.maven;\
+		name='DIM_Nexus',\
+	aQute.bnd.repository.osgi.OSGiRepository;\
+		locations=http://devel.data-in-motion.biz/public/repository/gecko/release/geckoREST/index.xml;\
+		max.stale=-1;\
+		name=GeckoREST;\
+		cache=${build}/cache/GeckoREST,\
+	aQute.bnd.repository.osgi.OSGiRepository;\
+		locations=http://devel.data-in-motion.biz/public/repository/gecko/release/geckoAddons/index.xml;\
+		max.stale=-1;\
+		name=GeckoAddons;\
+		cache=${build}/cache/GeckoAddons
+		

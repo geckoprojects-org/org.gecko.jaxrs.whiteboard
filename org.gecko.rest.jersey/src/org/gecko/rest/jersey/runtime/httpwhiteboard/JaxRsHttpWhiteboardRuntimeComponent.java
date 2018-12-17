@@ -15,8 +15,8 @@ import java.util.Map;
 
 import javax.ws.rs.core.Application;
 
-import org.gecko.rest.jersey.helper.ReferenceCollector;
 import org.gecko.rest.jersey.runtime.JerseyWhiteboardComponent;
+import org.gecko.rest.jersey.runtime.common.ReferenceCollector;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;

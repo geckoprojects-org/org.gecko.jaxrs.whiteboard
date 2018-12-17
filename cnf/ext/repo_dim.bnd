@@ -1,0 +1,5 @@
+-plugin.dim: \
+	aQute.bnd.repository.osgi.OSGiRepository;\
+		locations=http://devel.data-in-motion.biz/public/update/repository/p2/obr/bnd-templates/index.xml;\
+		name=DIM BNDtemplates;\
+		cache=${build}/cache/bndtemplates

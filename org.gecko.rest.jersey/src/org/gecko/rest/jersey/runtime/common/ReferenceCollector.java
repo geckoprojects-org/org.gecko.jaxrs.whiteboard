@@ -9,7 +9,7 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.rest.jersey.helper;
+package org.gecko.rest.jersey.runtime.common;
 
 import java.time.Duration;
 import java.util.Map;
@@ -17,8 +17,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-import org.gecko.rest.jersey.helper.ServiceReferenceEvent.Type;
+import org.gecko.rest.jersey.helper.JerseyHelper;
 import org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher;
+import org.gecko.rest.jersey.runtime.common.ServiceReferenceEvent.Type;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceObjects;

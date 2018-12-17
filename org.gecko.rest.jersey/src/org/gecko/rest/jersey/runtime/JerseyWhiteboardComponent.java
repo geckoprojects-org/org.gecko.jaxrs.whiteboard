@@ -17,9 +17,9 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.Application;
 
 import org.gecko.rest.jersey.helper.JerseyHelper;
-import org.gecko.rest.jersey.helper.ReferenceCollector;
 import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
+import org.gecko.rest.jersey.runtime.common.ReferenceCollector;
 import org.gecko.rest.jersey.runtime.dispatcher.JerseyWhiteboardDispatcher;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
