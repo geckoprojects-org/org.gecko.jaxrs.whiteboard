@@ -39,7 +39,7 @@ junit: org.apache.servicemix.bundles.junit;version="[4.11,5)"
 -baseline: *
 
 # Ignore files for baselining
-#-diffignore: *.xml
+-diffignore: *.xml, */pom.properties
 
 # define global blacklist
 -runblacklist.default: osgi.identity;filter:='(osgi.identity=osgi.cmpn)'
