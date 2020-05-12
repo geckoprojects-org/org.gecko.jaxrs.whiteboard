@@ -220,6 +220,10 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	public void addResource(ServiceObjects<?> serviceObject, Map<String, Object> properties) {
 		JaxRsResourceProvider provider = new JerseyResourceProvider<>(serviceObject, properties);
 		String key = provider.getId();
+		if(serviceObject == null) {
+			logger.log(Level.WARNING, "Dispatcher cannot add resource with id: " + key + "!");
+			return;
+		}
 		logger.fine("Dispatcher add resource with id: " + key + " and class " + provider.getObjectClass().getName());
 		resourceProviderCache.put(key, provider);
 		checkDispatch();
