@@ -172,9 +172,13 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 	@Override
 	public Object addingService(ServiceReference<Object> reference) {
 		ServiceReferenceEvent event = new ServiceReferenceEvent(reference, Type.ADD);
+		Object service = context.getService(reference);
+		if(service == null) {
+			return null;
+		}
 		source.publish(event);
 		contentReferences.put(reference, event);
-		return context.getService(reference);
+		return service;
 	}
 
 	/* (non-Javadoc)
