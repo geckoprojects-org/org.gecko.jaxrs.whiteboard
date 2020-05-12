@@ -1,7 +1,7 @@
 -plugin.gecko: \
 	aQute.bnd.repository.maven.provider.MavenBndRepository;\
-		snapshotUrl=http://devel.data-in-motion.biz/nexus/repository/dim-snapshot/;\
-		releaseUrl=http://devel.data-in-motion.biz/nexus/repository/dim-release/;\
+		snapshotUrl=https://devel.data-in-motion.biz/nexus/repository/dim-snapshot/;\
+		releaseUrl=https://devel.data-in-motion.biz/nexus/repository/dim-release/;\
 		name='DIM_Release',\
 	aQute.bnd.repository.osgi.OSGiRepository;\
 		locations=http://devel.data-in-motion.biz/public/repository/gecko/release/geckoREST/index.xml;\
