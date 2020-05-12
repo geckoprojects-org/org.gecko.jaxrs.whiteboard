@@ -93,7 +93,6 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 			
 			pushStream = pushStream.buffer().distinct();
 			
-//			final Duration batchDuration = Duration.ofMillis(50);
 			final Duration batchDuration = Duration.ofMillis(500);
 			pushStream.window(batchDuration, sec -> sec).forEach(sec -> {
 				sec.stream().filter(sre -> sre.isResource()).forEach(sre -> {
@@ -102,7 +101,7 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 				sec.stream().filter(sre -> sre.isExtension()).forEach(sre -> {
 					handleExtensionReferences(dispatcher, sre);
 				});
-//				dispatcher.batchDispatch();
+				dispatcher.batchDispatch();
 			});
 		}
 		
