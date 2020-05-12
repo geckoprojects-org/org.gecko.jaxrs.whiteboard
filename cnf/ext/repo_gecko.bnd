@@ -4,12 +4,12 @@
 		releaseUrl=https://devel.data-in-motion.biz/nexus/repository/dim-release/;\
 		name='DIM_Release',\
 	aQute.bnd.repository.osgi.OSGiRepository;\
-		locations=http://devel.data-in-motion.biz/public/repository/gecko/release/geckoREST/index.xml;\
+		locations=https://devel.data-in-motion.biz/public/repository/gecko/release/geckoREST/index.xml;\
 		max.stale=-1;\
 		name=GeckoREST;\
 		cache=${build}/cache/GeckoREST,\
 	aQute.bnd.repository.osgi.OSGiRepository;\
-		locations=http://devel.data-in-motion.biz/public/repository/gecko/release/geckoAddons/index.xml;\
+		locations=https://devel.data-in-motion.biz/public/repository/gecko/release/geckoAddons/index.xml;\
 		max.stale=-1;\
 		name=GeckoAddons;\
 		cache=${build}/cache/GeckoAddons

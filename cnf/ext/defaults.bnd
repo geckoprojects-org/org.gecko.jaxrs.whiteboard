@@ -31,7 +31,6 @@ junit: org.apache.servicemix.bundles.junit;version="[4.11,5)"
 
 -groupid: org.gecko.rest
 -releaserepo: Release,DIM_Release
--pom: true
 -maven-release: pom
 
 # Enable semantic versioning for all bundles
