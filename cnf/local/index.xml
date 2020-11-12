@@ -1,64 +1,72 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<repository xmlns="http://www.osgi.org/xmlns/repository/v1.0.0" name="Local" increment="1535459337150">
+<repository xmlns="http://www.osgi.org/xmlns/repository/v1.0.0" name="Local" increment="1605171293208">
   <resource>
     <capability namespace="osgi.identity">
-      <attribute name="license" value="Apache-2.0; description=&quot;Apache License, Version 2.0&quot;; link=&quot;http://www.apache.org/licenses/LICENSE-2.0&quot;"/>
-      <attribute name="osgi.identity" value="biz.aQute.tester"/>
+      <attribute name="license" value="Eclipse Public License v1.0"/>
+      <attribute name="osgi.identity" value="org.gecko.util.test.common"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="4.0.0.201802140043-SNAPSHOT" type="Version"/>
-      <attribute name="documentation" value="http://bnd.bndtools.org/"/>
+      <attribute name="version" value="1.3.2" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="org.osgi.framework"/>
+      <attribute name="bundle-symbolic-name" value="org.gecko.util.test.common"/>
+      <attribute name="bundle-version" value="1.3.2" type="Version"/>
+      <attribute name="version" value="1.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.gecko.util.test.common.service"/>
+      <attribute name="bnd.hashes" value="1996777312,-1923478059" type="List&lt;Long&gt;"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="org.osgi.framework,org.osgi.util.tracker"/>
+      <attribute name="bundle-symbolic-name" value="org.gecko.util.test.common"/>
+      <attribute name="bundle-version" value="1.3.2" type="Version"/>
+      <attribute name="version" value="1.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.gecko.util.test.common.service.customizer"/>
+      <attribute name="bnd.hashes" value="131228885,-1923478059" type="List&lt;Long&gt;"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="org.gecko.util.test.common.service,org.junit,org.osgi.framework,org.osgi.service.cm"/>
+      <attribute name="bundle-symbolic-name" value="org.gecko.util.test.common"/>
+      <attribute name="bundle-version" value="1.3.2" type="Version"/>
+      <attribute name="version" value="1.3.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.gecko.util.test.common.test"/>
+      <attribute name="bnd.hashes" value="1768845786,-1923478059" type="List&lt;Long&gt;"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="4.0.0.201802140043-SNAPSHOT" type="Version"/>
-      <attribute name="osgi.wiring.bundle" value="biz.aQute.tester"/>
+      <attribute name="bundle-version" value="1.3.2" type="Version"/>
+      <attribute name="osgi.wiring.bundle" value="org.gecko.util.test.common"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="4.0.0.201802140043-SNAPSHOT" type="Version"/>
-      <attribute name="osgi.wiring.host" value="biz.aQute.tester"/>
+      <attribute name="bundle-version" value="1.3.2" type="Version"/>
+      <attribute name="osgi.wiring.host" value="org.gecko.util.test.common"/>
     </capability>
     <capability namespace="osgi.content">
-      <attribute name="size" value="65024" type="Long"/>
-      <attribute name="url" value="biz.aQute.tester/biz.aQute.tester-4.0.0.jar"/>
+      <attribute name="size" value="26629" type="Long"/>
+      <attribute name="url" value="org.gecko.util.test.common/org.gecko.util.test.common-1.3.2.jar"/>
       <attribute name="mime" value="application/vnd.osgi.bundle"/>
-      <attribute name="osgi.content" value="066DA045AE0DD93E338B0ADE36BC53F9CFBD6CC872787F00745F55457707FF6C"/>
+      <attribute name="osgi.content" value="6031F0D6B9AC362C0F6B50A8B9BBB3B7A93143F3AF10B2194CD8A205E0235B88"/>
     </capability>
     <requirement namespace="osgi.wiring.package">
-      <directive name="filter" value="(&amp;(osgi.wiring.package=aQute.bnd.build)(version&gt;=2.11.0)(!(version&gt;=3.0.0)))"/>
-      <directive name="resolution" value="optional"/>
-      <attribute name="osgi.wiring.package" value="aQute.bnd.build"/>
+      <directive name="filter" value="(&amp;(osgi.wiring.package=org.gecko.util.test.common.service)(version&gt;=1.0.0)(!(version&gt;=2.0.0)))"/>
+      <attribute name="osgi.wiring.package" value="org.gecko.util.test.common.service"/>
     </requirement>
     <requirement namespace="osgi.wiring.package">
-      <directive name="filter" value="(&amp;(osgi.wiring.package=aQute.bnd.osgi)(version&gt;=4.0.0)(!(version&gt;=5.0.0)))"/>
-      <directive name="resolution" value="optional"/>
-      <attribute name="osgi.wiring.package" value="aQute.bnd.osgi"/>
+      <directive name="filter" value="(&amp;(osgi.wiring.package=org.gecko.util.test.common.service.customizer)(version&gt;=1.0.0)(!(version&gt;=2.0.0)))"/>
+      <attribute name="osgi.wiring.package" value="org.gecko.util.test.common.service.customizer"/>
     </requirement>
     <requirement namespace="osgi.wiring.package">
-      <directive name="filter" value="(&amp;(osgi.wiring.package=aQute.bnd.service)(version&gt;=4.3.0)(!(version&gt;=5.0.0)))"/>
-      <directive name="resolution" value="optional"/>
-      <attribute name="osgi.wiring.package" value="aQute.bnd.service"/>
+      <directive name="filter" value="(&amp;(osgi.wiring.package=org.junit)(version&gt;=4.12.0)(!(version&gt;=5.0.0)))"/>
+      <attribute name="osgi.wiring.package" value="org.junit"/>
     </requirement>
     <requirement namespace="osgi.wiring.package">
-      <directive name="filter" value="(&amp;(osgi.wiring.package=junit.framework)(version&gt;=3.8.0)(!(version&gt;=5.0.0)))"/>
-      <attribute name="osgi.wiring.package" value="junit.framework"/>
-    </requirement>
-    <requirement namespace="osgi.wiring.package">
-      <directive name="filter" value="(&amp;(osgi.wiring.package=org.junit.runner)(version&gt;=4.11.0)(!(version&gt;=5.0.0)))"/>
-      <attribute name="osgi.wiring.package" value="org.junit.runner"/>
-    </requirement>
-    <requirement namespace="osgi.wiring.package">
-      <directive name="filter" value="(&amp;(osgi.wiring.package=org.junit.runner.manipulation)(version&gt;=4.11.0)(!(version&gt;=5.0.0)))"/>
-      <attribute name="osgi.wiring.package" value="org.junit.runner.manipulation"/>
-    </requirement>
-    <requirement namespace="osgi.wiring.package">
-      <directive name="filter" value="(&amp;(osgi.wiring.package=org.osgi.framework)(version&gt;=1.5.0)(!(version&gt;=2.0.0)))"/>
+      <directive name="filter" value="(&amp;(osgi.wiring.package=org.osgi.framework)(version&gt;=1.9.0)(!(version&gt;=2.0.0)))"/>
       <attribute name="osgi.wiring.package" value="org.osgi.framework"/>
     </requirement>
     <requirement namespace="osgi.wiring.package">
-      <directive name="filter" value="(&amp;(osgi.wiring.package=org.osgi.service.packageadmin)(version&gt;=1.2.0)(!(version&gt;=2.0.0)))"/>
-      <attribute name="osgi.wiring.package" value="org.osgi.service.packageadmin"/>
+      <directive name="filter" value="(&amp;(osgi.wiring.package=org.osgi.service.cm)(version&gt;=1.6.0)(!(version&gt;=2.0.0)))"/>
+      <attribute name="osgi.wiring.package" value="org.osgi.service.cm"/>
     </requirement>
     <requirement namespace="osgi.wiring.package">
-      <directive name="filter" value="(osgi.wiring.package=org.osgi.util.tracker)"/>
+      <directive name="filter" value="(&amp;(osgi.wiring.package=org.osgi.util.tracker)(version&gt;=1.5.0)(!(version&gt;=2.0.0)))"/>
       <attribute name="osgi.wiring.package" value="org.osgi.util.tracker"/>
     </requirement>
     <requirement namespace="osgi.ee">
