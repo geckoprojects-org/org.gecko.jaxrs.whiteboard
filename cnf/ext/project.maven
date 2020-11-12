@@ -6,7 +6,7 @@ org.glassfish.hk2.external:aopalliance-repackaged:2.6.1
 org.glassfish.hk2.external:jakarta.inject:2.6.1
 org.javassist:javassist:3.27.0-GA
 
-Jersey
+# Jersey
 org.glassfish.jersey.core:jersey-common:2.32
 org.glassfish.jersey.core:jersey-client:2.32
 org.glassfish.jersey.core:jersey-server:2.32
