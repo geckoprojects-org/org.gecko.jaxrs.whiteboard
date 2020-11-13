@@ -38,8 +38,11 @@ import org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime;
 import org.gecko.rest.jersey.runtime.servlet.WhiteboardServletContainer;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
+import org.osgi.annotation.bundle.Capability;
+import org.osgi.namespace.implementation.ImplementationNamespace;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * Implementation of the {@link JaxRSServiceRuntime} for a Jersey implementation
@@ -47,9 +50,9 @@ import org.osgi.service.component.ComponentContext;
  * @author Mark Hoffmann
  * @since 12.07.2017
  */
-//@Capability(namespace = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, version = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_SPECIFICATION_VERSION, name = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_IMPLEMENTATION, attribute = {
-//		"uses:=\"javax.ws.rs,javax.ws.rs.sse,javax.ws.rs.core,javax.ws.rs.ext,javax.ws.rs.client,javax.ws.rs.container,org.osgi.service.jaxrs.whiteboard\"",
-//		"provider=jersey" })
+@Capability(namespace = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, version = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_SPECIFICATION_VERSION, name = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_IMPLEMENTATION, attribute = {
+		"uses:=\"javax.ws.rs,javax.ws.rs.sse,javax.ws.rs.core,javax.ws.rs.ext,javax.ws.rs.client,javax.ws.rs.container,org.osgi.service.jaxrs.whiteboard\"",
+		"provider=jersey", "jersey.version=2.32" })
 public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 
 	public enum State {
@@ -173,7 +176,6 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 
 	@Override
 	protected void doUnregisterApplication(JaxRsApplicationProvider applicationProvider) {
-//		applicationProvider.getJaxRsApplication().getSingletons().stream().forEach(s->s.);
 		List<ServletContainer> servletContainers = applicationProvider.getServletContainers();
 		if (!servletContainers.isEmpty()) {
 			ServletContainer container = servletContainers.remove(0);

@@ -52,14 +52,12 @@ javac.target: 1.8
 	org.glassfish.jersey.containers.jersey-container-servlet-core;version='[2.32.0,2.32.1)',\
 	org.glassfish.jersey.core.jersey-common;version='[2.32.0,2.32.1)',\
 	org.glassfish.jersey.core.jersey-server;version='[2.32.0,2.32.1)',\
-	org.gecko.rest.jersey;version=snapshot,\
-	org.gecko.rest.jersey.api;version='[3.0.0,3.0.1)',\
-	org.gecko.rest.jersey.impl;version='[1.0.10,1.0.11)'
+	org.gecko.rest.jersey;version=snapshot
 
 Bundle-Name: Jersey JaxRS Whiteboard integration test
 Bundle-Description: Jersey OSGi JaxRs Whiteboard integration tests
 
-Require-Capability: osgi.implementation;filter:='(&(osgi.implementation=osgi.jaxrs)(provider=jersey))'
+Require-Capability: osgi.implementation;filter:='(&(osgi.implementation=osgi.jaxrs)(provider=jersey)(jersey.version=2.32))'
 
 # Needed for Mockito's mocking to work
 -runsystempackages.objenesis: sun.misc,sun.reflect
