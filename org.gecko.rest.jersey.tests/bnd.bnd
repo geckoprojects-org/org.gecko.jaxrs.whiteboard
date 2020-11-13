@@ -57,7 +57,7 @@ javac.target: 1.8
 Bundle-Name: Jersey JaxRS Whiteboard integration test
 Bundle-Description: Jersey OSGi JaxRs Whiteboard integration tests
 
-Require-Capability: osgi.implementation;filter:='(&(osgi.implementation=osgi.jaxrs)(provider=jersey))'
+Require-Capability: osgi.implementation;filter:='(&(osgi.implementation=osgi.jaxrs)(provider=jersey)(jersey.version=2.32))'
 
 # Needed for Mockito's mocking to work
 -runsystempackages.objenesis: sun.misc,sun.reflect

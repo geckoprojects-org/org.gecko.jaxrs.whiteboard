@@ -52,7 +52,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  */
 @Capability(namespace = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, version = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_SPECIFICATION_VERSION, name = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_IMPLEMENTATION, attribute = {
 		"uses:=\"javax.ws.rs,javax.ws.rs.sse,javax.ws.rs.core,javax.ws.rs.ext,javax.ws.rs.client,javax.ws.rs.container,org.osgi.service.jaxrs.whiteboard\"",
-		"provider=jersey" })
+		"provider=jersey", "jersey.version=2.32" })
 public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 
 	public enum State {

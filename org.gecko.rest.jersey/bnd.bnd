@@ -37,8 +37,10 @@ Require-Capability: \
 	osgi.identity;filter:='(&(osgi.identity=jakarta.activation-api))'
 
 Provide-Capability: \
-	osgi.service;objectClass:List<String>="org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime",\
-	osgi.contract; osgi.contract=JavaJAXRS; version:List<Version>="2.1,2";provider=jersey;jersey.version:Version="2.32";uses:="javax.ws.rs, javax.ws.rs.core, javax.ws.rs.ext, javax.ws.rs.client, javax.ws.rs.container" 
+	osgi.contract; osgi.contract=JavaJAXRS; version:List<Version>="2.1,2";provider=jersey;jersey.version:Version="2.32";uses:="javax.ws.rs, javax.ws.rs.core, javax.ws.rs.ext, javax.ws.rs.client, javax.ws.rs.container",\
+	osgi.service;objectClass:List<String>="org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime";uses:="org.osgi.service.jaxrs.runtime,org.osgi.service.jaxrs.runtime.dto",\
+	osgi.service;objectClass:List<String>="javax.ws.rs.client.ClientBuilder";uses:="javax.ws.rs.client,org.osgi.service.jaxrs.client";service.scope="prototype",\
+	osgi.service;objectClass:List<String>="org.osgi.service.jaxrs.client.SseEventSourceFactory";uses:="org.osgi.service.jaxrs.client"
 
 -privatepackage: \
 	org.gecko.rest.jersey.provider.application,\
