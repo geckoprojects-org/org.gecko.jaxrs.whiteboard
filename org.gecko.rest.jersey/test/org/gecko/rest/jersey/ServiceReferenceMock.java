@@ -23,6 +23,14 @@ public class ServiceReferenceMock<T> implements ServiceReference<T> {
 		this.props = props;
 	}
 	
+	/**
+	 * Returns the service.
+	 * @return the service
+	 */
+	public T getService() {
+		return service;
+	}
+	
 	@Override
 	public Object getProperty(String key) {
 		return props.get(key);

@@ -9,7 +9,7 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.rest.jersey.httpwhiteboard.tests.customizer;
+package org.gecko.rest.jersey.tests.whiteboard.customizer;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;

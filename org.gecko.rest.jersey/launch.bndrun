@@ -14,4 +14,4 @@
 -runrequires:\
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.shell)',\
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.command)',\
-	osgi.identity;filter:='(osgi.identity=org.gecko.rest.jersey)'
+	osgi.contract;filter:='(&(osgi.contract=JavaJAXRS)(provider=jersey))'

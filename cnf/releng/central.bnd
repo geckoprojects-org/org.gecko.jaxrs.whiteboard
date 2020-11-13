@@ -1,0 +1,14 @@
+-plugin.sonatype: \
+	aQute.bnd.repository.maven.provider.MavenBndRepository;\
+		snapshotUrl=https://oss.sonatype.org/content/repositories/snapshots/;\
+		releaseUrl=https://oss.sonatype.org/service/local/staging/deploy/maven2/;\
+		index=${.}/sonatype.maven;\
+		name='Sonatype'
+				
+-releaserepo.sonatype: Sonatype
+#We have to substitude the -SNAPSHOT with an empty String for releases				
+
+-maven-release: pom,\
+	sign;passphrase=${env;GNUPG_PASSPHRASE}
+gpg-dir: 
+gpg: gpg --homedir /var/jenkins_home/.gnupg --pinentry-mode loopback

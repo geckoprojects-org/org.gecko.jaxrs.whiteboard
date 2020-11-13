@@ -9,14 +9,14 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.rest.jersey.httpwhiteboard.tests.applications;
+package org.gecko.rest.jersey.tests.whiteboard.applications;
 
 import java.util.Collections;
 import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
-import org.gecko.rest.jersey.httpwhiteboard.tests.resources.LegacyResource;
+import org.gecko.rest.jersey.tests.whiteboard.resources.LegacyResource;
 
 /**
  * 

@@ -332,6 +332,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 * @param properties the resource/extension properties
 	 * @return <code>true</code>, if the handling is valid
 	 */
+	@SuppressWarnings("unused")
 	private boolean isApplicationFilterValid(Map<String, Object> properties) {
 		if (isDefault()) {
 			logger.log(Level.WARNING, "There is no application select filter valid for the default application");

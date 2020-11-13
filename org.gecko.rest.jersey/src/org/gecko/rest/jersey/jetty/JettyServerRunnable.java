@@ -19,7 +19,6 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.component.LifeCycle.Listener;
 import org.gecko.rest.jersey.runtime.JerseyServiceRuntime;
-import org.gecko.rest.jersey.runtime.JerseyServiceRuntime.State;
 
 /**
  * Runnable to start a Jetty server in a different thread

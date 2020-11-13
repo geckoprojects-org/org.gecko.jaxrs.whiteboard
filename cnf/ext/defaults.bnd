@@ -4,15 +4,52 @@ javac.source: 1.8
 javac.target: 1.8
 javac.debug:  on
 
-#Bundle-DocURL: https://yourdoc.de
-Bundle-License: Eclipse Public License 1.0
-Bundle-Copyright:Data In Motion GmbH all rights reserved
-Bundle-Vendor: Data In Motion GmbH
-Bundle-ContactAddress: info@data-in-motion.biz
-Bundle-Icon: icons/gecko.ico;size=64
+# Version of this JaxRs Whiteboard implementation
+whiteboard-version: 4.0.0.SNAPSHOT
 
-#if you want bnd to tell you more during the build
-#-verbose: true
+#Set Git revision information in the manifests of built bundles
+#Git-Descriptor:           ${system-allow-fail;git describe --dirty --always}
+Git-SHA:                  ${system-allow-fail;git rev-list -1 HEAD}
+
+Bundle-License: Eclipse Public License 1.0
+Bundle-Copyright:Data In Motion Consuling GmbH - All rights reserved
+Bundle-Vendor: Data In Motion Consuling GmbH
+Bundle-Version: ${whiteboard-version}
+Bundle-ContactAddress: info@data-in-motion.biz
+Bundle-DocURL: https://gitlab.com/gecko.io/jersey_jaxrs_whiteboard
+Bundle-SCM: url=https://gitlab.com/gecko.io/jersey_jaxrs_whiteboard, \
+	connection=scm:git:https://gitlab.com/gecko.io/jersey_jaxrs_whiteboard.git, \
+    developerConnection=scm:git:git@gitlab.com:gecko.io/jersey_jaxrs_whiteboard.git
+Bundle-Developers: \
+    jalbert; \
+        email="j.albert@data-in-motion.biz"; \
+        name="Juergen Albert"; \
+        organization="Data In Motion"; \
+        organizationUrl="https://www.datainmotion.de"; \
+        roles="architect,developer", \
+    mhoffmann; \
+        name="Mark Hoffmann"; \
+        email="m.hoffmann@data-in-motion.biz"; \
+        url="https://www.datainmotion.de"; \
+        organization="Data In Motion"; \
+        organizationUrl="https://www.datainmotion.de"; \
+        roles="developer,architect"
+
+# This is the version of JUnit that will be used at build time and runtime
+geckotest: org.gecko.util.test.common;version=latest,\
+	org.osgi.util.promise;version=latest,\
+	org.osgi.util.function;version=latest
+# This is the version of JUnit that will be used at build time and runtime
+junit: org.apache.servicemix.bundles.junit;version="[4.11,5)"
+# This is the version of Mockito that will be used at build time and run time
+mockito: org.mockito.mockito-core;version="[1.9,2)",\
+  org.objenesis;version="[2.1,3)"
+
+-maven-release: pom
+-pom: true
+-digest: sha256
+
+-groupid: org.geckoprojects.jaxrs
 
 # Includes sources from bundle
 -sources: true
@@ -20,18 +57,9 @@ Bundle-Icon: icons/gecko.ico;size=64
 -includeresource.license: \
 	META-INF/LICENSE=${workspace}/cnf/license/LICENSE
 
--includeresource.icon: \
-	icons=${workspace}/cnf/icons
-		
 -removeheaders: Bnd-LastModified, Tool, Created-By, Private-Package
 
-# Path to ...
-#cnf: ${workspace}/cnf
-junit: org.apache.servicemix.bundles.junit;version="[4.11,5)"
-
--groupid: org.gecko.rest
--releaserepo: Release,DIM_Release
--maven-release: pom
+-releaserepo: Release, DIM_Release
 
 # Enable semantic versioning for all bundles
 -baselinerepo: GeckoREST
@@ -39,15 +67,32 @@ junit: org.apache.servicemix.bundles.junit;version="[4.11,5)"
 
 # Ignore files for baselining
 -diffignore: *.xml,\
-    */pom.properties,\
-     OSGI-OPT/*
+	*/pom.properties,\
+	 Git-SHA,\
+	 Bundle-Vendor,\
+	 Bundle-License,\
+	 Bundle-DocURL,\
+	 Bundle-SCM,\
+	 Bundle-Developers,\
+	 Bundle-Copyright,\
+	 Bundle-ContactAddress,\
+	 OSGI-OPT/*
 
 # define global blacklist
 -runblacklist.default: osgi.identity;filter:='(osgi.identity=osgi.cmpn)'
 
 -testpath: ${junit}
 
--resolve.effective: active
+-resolve.effective: active;skip:='osgi.service'
+
 # > Java 8 runtime
 #modules: --add-opens=java.base/jdk.internal.loader=ALL-UNNAMED, --add-opens=java.base/java.lang=ALL-UNNAMED, --add-opens=java.base/java.net=ALL-UNNAMED, --add-opens=java.base/java.security=ALL-UNNAMED
 #-runvm.default: ${if;${isempty;${system_allow_fail;java --list-modules}};;${modules}}
+
+-include: ${if;${def;release.dir};\
+              ${cnf}/releng/release.bnd;\
+              ${cnf}/releng/snapshot.bnd\
+          },\
+		  ${if;${env;GNUPG_PASSPHRASE};\
+              ${cnf}/releng/central.bnd\
+          }

@@ -2,15 +2,16 @@
 	aQute.bnd.repository.maven.provider.MavenBndRepository;\
 		snapshotUrl=https://devel.data-in-motion.biz/nexus/repository/dim-snapshot/;\
 		releaseUrl=https://devel.data-in-motion.biz/nexus/repository/dim-release/;\
-		name='DIM_Release'
-		
--plugin.geckonexus: \
+		name='DIM_Release',\
 	aQute.bnd.repository.maven.provider.MavenBndRepository;\
 		releaseUrl=https://devel.data-in-motion.biz/nexus/repository/maven-public/;\
 		index=${.}/dim_nexus.maven;\
-		name='DIM_Nexus'
-		
--plugin.geckorest: \
+		name='DIM_Nexus',\
+	aQute.bnd.repository.maven.provider.MavenBndRepository;\
+		snapshotUrl=https://oss.sonatype.org/content/repositories/snapshots/;\
+		releaseUrl=https://oss.sonatype.org/service/local/staging/deploy/maven2/;\
+		index=${.}/sonatype.maven;\
+		name='Sonatype',\
 	aQute.bnd.repository.osgi.OSGiRepository;\
 		locations=https://devel.data-in-motion.biz/public/repository/gecko/release/geckoREST/index.xml;\
 		max.stale=-1;\

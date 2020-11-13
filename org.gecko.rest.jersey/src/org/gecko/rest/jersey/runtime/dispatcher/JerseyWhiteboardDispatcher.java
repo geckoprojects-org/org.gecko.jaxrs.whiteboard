@@ -608,6 +608,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	 * @param newDefaultProvider the new provider or <code>null</code> 
 	 * @param shadowedProvider the shadow application provider
 	 */
+	@SuppressWarnings("unused")
 	private void substituteDefaultApplication(Optional<JaxRsApplicationProvider> newDefaultProvider, Optional<JaxRsApplicationProvider> shadowedProvider) {
 		/*
 		 * We check, if an un-registration of the application is really necessary

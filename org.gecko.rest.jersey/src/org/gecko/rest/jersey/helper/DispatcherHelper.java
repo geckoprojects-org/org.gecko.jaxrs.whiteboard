@@ -19,7 +19,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
-import org.osgi.framework.Constants;
 
 /**
  * Helper class for the dispatcher

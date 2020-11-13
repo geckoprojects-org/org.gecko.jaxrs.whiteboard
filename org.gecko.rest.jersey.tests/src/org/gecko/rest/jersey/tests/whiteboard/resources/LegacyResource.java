@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.gecko.rest.jersey.httpwhiteboard.tests.resources;
+package org.gecko.rest.jersey.tests.whiteboard.resources;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

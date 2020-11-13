@@ -9,7 +9,7 @@
  * Contributors:
  *     Data In Motion - initial API and implementation
  */
-package org.gecko.rest.jersey.httpwhiteboard.tests;
+package org.gecko.rest.jersey.tests.whiteboard;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -34,10 +34,10 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 
-import org.gecko.rest.jersey.httpwhiteboard.tests.applications.TestLegacyApplication;
-import org.gecko.rest.jersey.httpwhiteboard.tests.customizer.TestServiceCustomizer;
-import org.gecko.rest.jersey.httpwhiteboard.tests.resources.HelloResource;
+import org.gecko.rest.jersey.tests.whiteboard.applications.TestLegacyApplication;
+import org.gecko.rest.jersey.tests.whiteboard.resources.HelloResource;
 import org.gecko.rest.jersey.provider.JerseyConstants;
+import org.gecko.rest.jersey.tests.whiteboard.customizer.TestServiceCustomizer;
 import org.gecko.util.test.common.service.ServiceChecker;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
@@ -915,8 +915,6 @@ public class JaxRsWhiteboardComponentTest {
 		
 		assertTrue(httpRuntimeChecker.waitCreate());
 		
-		ServiceReference<HttpServiceRuntime> httpServiceRuntimeRef = getServiceReference(FrameworkUtil.createFilter("(test.id=endpoints)"), 5000);
-		
 		//Register our Context
 		ServletContextHelper newContext = new ServletContextHelper() {
 		};
@@ -1502,6 +1500,7 @@ public class JaxRsWhiteboardComponentTest {
 		return (ServiceChecker<T>) checker;
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T extends Object> ServiceChecker<T>  createdCheckerTrackedForCleanUp(String filter, BundleContext context) throws InvalidSyntaxException {
 		ServiceChecker<? extends Object> checker = new ServiceChecker<>(filter, context);
 		

@@ -1,5 +1,0 @@
--plugin.project: \
-	aQute.bnd.repository.maven.provider.MavenBndRepository; \
-		releaseUrl=https://repo.maven.apache.org/maven2/; \
-		index=${.}/project.maven; \
-		name="Project Specific Maven Central"
