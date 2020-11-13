@@ -29,7 +29,15 @@ public class HelloResource {
 	@POST
 	@Path("hello")
 	public Response getTestPost(String body) {
-		return Response.ok(body + "_Hello").build();
+		Response r = Response.ok(body + "_Hello").build();
+		return r;
+	}
+	
+	@POST
+	@Path("replace")
+	public Response postTest(String body) {
+		Response r = Response.ok(body).build();
+		return r;
 	}
 
 }

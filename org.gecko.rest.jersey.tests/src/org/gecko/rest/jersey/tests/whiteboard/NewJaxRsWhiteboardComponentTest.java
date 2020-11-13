@@ -27,8 +27,8 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
-import org.gecko.rest.jersey.tests.whiteboard.resources.HelloResource;
 import org.gecko.rest.jersey.provider.JerseyConstants;
+import org.gecko.rest.jersey.tests.whiteboard.resources.HelloResource;
 import org.gecko.util.test.common.service.ServiceChecker;
 import org.gecko.util.test.common.test.AbstractOSGiTest;
 import org.junit.Test;

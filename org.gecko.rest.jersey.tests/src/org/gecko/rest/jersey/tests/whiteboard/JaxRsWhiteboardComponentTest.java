@@ -34,10 +34,10 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 
-import org.gecko.rest.jersey.tests.whiteboard.applications.TestLegacyApplication;
-import org.gecko.rest.jersey.tests.whiteboard.resources.HelloResource;
 import org.gecko.rest.jersey.provider.JerseyConstants;
+import org.gecko.rest.jersey.tests.whiteboard.applications.TestLegacyApplication;
 import org.gecko.rest.jersey.tests.whiteboard.customizer.TestServiceCustomizer;
+import org.gecko.rest.jersey.tests.whiteboard.resources.HelloResource;
 import org.gecko.util.test.common.service.ServiceChecker;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;

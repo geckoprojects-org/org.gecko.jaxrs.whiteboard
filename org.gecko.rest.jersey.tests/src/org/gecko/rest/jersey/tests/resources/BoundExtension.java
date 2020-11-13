@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2012 - 2018 Data In Motion and others.
+ * Copyright (c) 2012 - 2020 Data In Motion and others.
  * All rights reserved. 
  * 
  * This program and the accompanying materials are made available under the terms of the 
@@ -14,9 +14,14 @@ package org.gecko.rest.jersey.tests.resources;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.NameBinding;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -24,16 +29,25 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
+import org.gecko.rest.jersey.tests.resources.BoundExtension.NameBound;
+
 /**
- * Sample rest resource as prototype
  * 
- * @author Stefan Bischof
- * @since 11.07.2018
+ * @author ilenia
+ * @since Jun 15, 2020
  */
 @Provider
 @Consumes(MediaType.WILDCARD)
 @Produces(MediaType.WILDCARD)
-public class DtoTestExtension implements MessageBodyWriter<String> {
+@NameBound
+public class BoundExtension implements MessageBodyWriter<String> {
+
+	@Target({
+		ElementType.TYPE, ElementType.METHOD
+	})
+	@Retention(RetentionPolicy.RUNTIME)
+	@NameBinding
+	public @interface NameBound {}
 
 	/*
 	 * (non-Javadoc)
@@ -59,8 +73,8 @@ public class DtoTestExtension implements MessageBodyWriter<String> {
 	@Override
 	public void writeTo(String t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
 			MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
-			throws IOException, WebApplicationException {
-		
+					throws IOException, WebApplicationException {
+
 
 	}
 

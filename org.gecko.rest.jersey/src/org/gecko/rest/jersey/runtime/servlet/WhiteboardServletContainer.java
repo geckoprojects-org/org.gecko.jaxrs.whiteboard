@@ -17,7 +17,7 @@ import org.glassfish.jersey.servlet.ServletContainer;
 
 /**
  * As Wrapper for the {@link ServletContainer} that locks the Servlet while its configuration is reloaded.
- * Ruthermore it takes care that a reload is done, if a new configuration comes available while it is initialized
+ * Furthermore it takes care that a reload is done, if a new configuration comes available while it is initialized
  * @author Juergen Albert
  * @since 1.0
  */

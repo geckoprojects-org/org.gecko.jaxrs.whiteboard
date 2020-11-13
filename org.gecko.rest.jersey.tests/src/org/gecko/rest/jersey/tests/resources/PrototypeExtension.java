@@ -23,6 +23,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
+import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
@@ -33,7 +34,8 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @since 21.10.2017
  */
 @Provider
-@Component(service=PrototypeExtension.class, scope=ServiceScope.PROTOTYPE, property= {"osgi.jaxrs.name=pte", "osgi.jaxrs.extension=true"})
+@Component(service= MessageBodyWriter.class, scope=ServiceScope.PROTOTYPE, property= {"osgi.jaxrs.name=pte", 
+		"osgi.jaxrs.extension=true", Constants.OBJECTCLASS +"=javax.ws.rs.ext.MessageBodyWriter"})
 public class PrototypeExtension implements MessageBodyWriter<String>{
 
 	public static final String PROTOTYPE_POSTFIX = "_protoExtension";

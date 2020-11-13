@@ -74,13 +74,15 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 				try {
 					possibleContracts.add(Class.forName(objectClass));
 				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			} 
 		}
 		if(!possibleContracts.isEmpty()) {
 			contracts = possibleContracts.toArray(new Class[0]);
+		}
+		else {
+			updateStatus(DTOConstants.FAILURE_REASON_NOT_AN_EXTENSION_TYPE); //if possibleContracts is empty the extension should record a failure DTO
 		}
 	}
 
@@ -129,6 +131,15 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 	 */
 	protected String getJaxRsResourceConstant() {
 		return JaxrsWhiteboardConstants.JAX_RS_EXTENSION;
+	}
+	
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.rest.jersey.provider.application.AbstractJaxRsProvider#updateStatus(int)
+	 */
+	@Override
+	public void updateStatus(int newStatus) {
+		super.updateStatus(newStatus);
 	}
 
 }

@@ -37,8 +37,8 @@ public class DispatcherHelper {
 			return Collections.emptySet();
 		}
 		Set<JaxRsApplicationProvider> resultSet = applications.stream()
-				.filter(app->".default".equals(app.getName()) && !app.isDefault())
-				.sorted()
+				.filter(app->(".default".equals(app.getName()) || "/*".equals(app.getPath())) && !app.isDefault())
+				.sorted((a1, a2) -> a2.compareTo(a2))
 				.collect(Collectors.toCollection(LinkedHashSet::new));
 		return resultSet;
 	}
@@ -54,4 +54,5 @@ public class DispatcherHelper {
 		}
 		return getDefaultApplications(applications).stream().findFirst();
 	}
+	
 }

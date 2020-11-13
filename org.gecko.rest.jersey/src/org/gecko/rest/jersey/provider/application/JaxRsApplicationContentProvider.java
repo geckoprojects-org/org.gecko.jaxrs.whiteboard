@@ -79,10 +79,20 @@ public interface JaxRsApplicationContentProvider extends JaxRsProvider, JaxRsCon
 	
 	/**
 	 * Returns <code>true</code>, if this resource can be handled by the default application. If no application select is given.
-	 * If the application select is given an the application name matches .default, this call returns <code>true</code>, as well 
+	 * If the application select is given and the application name matches .default, this call returns <code>true</code>, as well 
 	 * @return <code>true</code>, if the resource can be handled by the default application. 
-	 */
+	 */	
 	public boolean canHandleDefaultApplication();
+	
+	/**
+	 * Returns <code>true</code> if this resource can be handled by the provided default application.
+	 * If the provided application is the basic .default one, then delegates to canHandleDefaultApplication(), 
+	 * otherwise check if the current application can handle the resource
+	 *  
+	 * @param currentDefaultApplication
+	 * @return <code>true</code>, if the resource can be handled by the provided default application. 
+	 */
+	public boolean canHandleDefaultApplication(JaxRsApplicationProvider currentDefaultApplication);
 	
 	/**
 	 * Returns <code>true</code>, if this resource can handle one of theses applications or the default application.

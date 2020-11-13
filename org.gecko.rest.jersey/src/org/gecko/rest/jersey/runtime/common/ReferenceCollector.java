@@ -15,8 +15,8 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.gecko.rest.jersey.helper.JerseyHelper;
 import org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher;
@@ -85,6 +85,9 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 					handleExtensionReferences(dispatcher, sre);
 				} else {
 					handleResourceReferences(dispatcher, sre);
+					for(String k : sre.getReference().getPropertyKeys()) {
+						System.out.println("Ref Property " + k + " " + sre.getReference().getProperty(k));
+					}					
 				}
 			});
 			
@@ -98,6 +101,9 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 			pushStream.window(batchDuration, sec -> sec).onError(e -> logger.log(Level.SEVERE, "Error adding new JaxRs Provider ", e)).forEach(sec -> {
 				sec.stream().filter(sre -> sre.isResource()).forEach(sre -> {
 					handleResourceReferences(dispatcher, sre);
+					for(String k : sre.getReference().getPropertyKeys()) {
+						System.out.println("Ref Property " + k + " " + sre.getReference().getProperty(k));
+					}
 				});
 				sec.stream().filter(sre -> sre.isExtension()).forEach(sre -> {
 					handleExtensionReferences(dispatcher, sre);
@@ -169,12 +175,27 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 	/* (non-Javadoc)
 	 * @see org.osgi.util.tracker.ServiceTrackerCustomizer#addingService(org.osgi.framework.ServiceReference)
 	 */
+//	@Override
+//	public Object addingService(ServiceReference<Object> reference) {
+//		ServiceReferenceEvent event = new ServiceReferenceEvent(reference, Type.ADD);
+//		Object service = context.getService(reference);
+//		if(service == null) {
+//			return null;
+//		}
+//		source.publish(event);
+//		contentReferences.put(reference, event);
+//		return service;
+//	}
+	
 	@Override
 	public Object addingService(ServiceReference<Object> reference) {
 		ServiceReferenceEvent event = new ServiceReferenceEvent(reference, Type.ADD);
-		Object service = context.getService(reference);
-		if(service == null) {
-			return null;
+		Object service = null;
+		try {
+			service = context.getServiceObjects(reference);
+		} catch (Exception e) {
+			System.out.println("I am in the ServiceException!!");
+			logger.warning(e.getMessage());
 		}
 		source.publish(event);
 		contentReferences.put(reference, event);

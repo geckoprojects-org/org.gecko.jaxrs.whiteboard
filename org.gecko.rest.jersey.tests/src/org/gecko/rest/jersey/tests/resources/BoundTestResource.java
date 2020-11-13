@@ -11,25 +11,28 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.gecko.rest.jersey.tests.resources.BoundExtension.NameBound;
+
 /**
  * @author Stefan Bischof
  *
  */
-@Path("/dtores")
+@Path("/dtobound")
 @Consumes(MediaType.WILDCARD)
 @Produces(MediaType.WILDCARD)
-public class DtoTestResource {
+public class BoundTestResource {
 
 	@GET
 	@Produces(MediaType.WILDCARD)
-	@Path("dtoget")
+	@Path("bound")
+	@NameBound
 	public Response getTest() {
-		return Response.ok().build();
+		return Response.ok("test").build();
 	}
 
 	@POST
 	@Consumes(MediaType.WILDCARD)
-	@Path("dtopost")
+	@Path("unbound")
 	public Response getTestPost(String body) {
 		return Response.ok().build();
 	}

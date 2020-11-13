@@ -14,33 +14,51 @@ package org.gecko.rest.jersey.dto;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
+import javax.ws.rs.NameBinding;
 import javax.ws.rs.OPTIONS;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.DynamicFeature;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Feature;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.ParamConverterProvider;
+import javax.ws.rs.ext.ReaderInterceptor;
+import javax.ws.rs.ext.WriterInterceptor;
 
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsResourceProvider;
+import org.gecko.rest.jersey.runtime.application.JerseyApplication;
 import org.gecko.rest.jersey.runtime.application.JerseyExtensionProvider;
 import org.gecko.rest.jersey.runtime.application.JerseyResourceProvider;
+import org.gecko.rest.jersey.runtime.application.feature.WhiteboardFeature;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
+import org.osgi.service.jaxrs.runtime.dto.BaseDTO;
 import org.osgi.service.jaxrs.runtime.dto.ExtensionDTO;
 import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.FailedExtensionDTO;
@@ -48,12 +66,29 @@ import org.osgi.service.jaxrs.runtime.dto.FailedResourceDTO;
 import org.osgi.service.jaxrs.runtime.dto.ResourceDTO;
 import org.osgi.service.jaxrs.runtime.dto.ResourceMethodInfoDTO;
 
+
 /**
  * Helper class to convert object into DTO's
  * @author Mark Hoffmann
  * @since 14.07.2017
  */
 public class DTOConverter {
+	
+	private static final List<String> POSSIBLE_EXTENSION_INTERFACES = Arrays.asList(new String[] {
+			ContainerRequestFilter.class.getName(),
+			ContainerResponseFilter.class.getName(),
+			ReaderInterceptor.class.getName(),
+			WriterInterceptor.class.getName(),
+			MessageBodyReader.class.getName(),
+			MessageBodyWriter.class.getName(),
+			ContextResolver.class.getName(),
+			ExceptionMapper.class.getName(),
+			ParamConverterProvider.class.getName(),
+			Feature.class.getName(),
+			DynamicFeature.class.getName()
+		});
+	
+	private static final String WHITEBOARD_FEATURE = WhiteboardFeature.class.getName();
 	
 	/**
 	 * This mapping sequence was taken from:
@@ -79,22 +114,62 @@ public class DTOConverter {
 		List<ResourceDTO> rdtos = new ArrayList<>();
 		List<ResourceMethodInfoDTO> rmidtos = new ArrayList<>();
 		List<ExtensionDTO> edtos = new ArrayList<>();
-
-		// todo: add methods of static defined Ressources to ResourceMethodInfoDTO rmidtos.add()
+		
+//		Create the DTO for the static resources and extensions --> how should I know whether is a resource or an extension??
+		if(applicationProvider.getJaxRsApplication() instanceof JerseyApplication) {
+			Application sourceApp = ((JerseyApplication) applicationProvider.getJaxRsApplication()).getSourceApplication();
+			Set<Object> singletons = sourceApp.getSingletons();
+			Set<Class<?>> classes = sourceApp.getClasses();
+			for(Object obj : singletons) {
+				if(WHITEBOARD_FEATURE.equals(obj.getClass().getName())) {
+					continue;
+				}
+				BaseDTO baseDTO = toDTO(obj.getClass());
+				if(baseDTO instanceof ResourceDTO) {
+					rdtos.add(((ResourceDTO) baseDTO));
+					rmidtos.addAll(Arrays.asList(((ResourceDTO) baseDTO).resourceMethods));
+					
+				}
+				else {
+					edtos.add((ExtensionDTO) baseDTO);
+				}
+				
+			}
+			for(Class<?> c : classes) {
+				if(WHITEBOARD_FEATURE.equals(c.getName())) {
+					continue;
+				}
+				BaseDTO baseDTO = toDTO(c);
+				if(baseDTO instanceof ResourceDTO) {
+					rdtos.add(((ResourceDTO) baseDTO));
+					rmidtos.addAll(Arrays.asList(((ResourceDTO) baseDTO).resourceMethods));
+				}
+				else {
+					edtos.add((ExtensionDTO) baseDTO);
+				}
+			}	
+		}
+			
 		
 		if (applicationProvider.getContentProviers() != null) {
 
 			for (JaxRsApplicationContentProvider contentProvider : applicationProvider.getContentProviers()) {
 
 				if (contentProvider instanceof JerseyResourceProvider) {
-					rdtos.add(toResourceDTO((JaxRsResourceProvider) contentProvider));					
+					ResourceDTO resDTO = toResourceDTO((JaxRsResourceProvider) contentProvider);
+					rdtos.add(resDTO);
+					if(resDTO.resourceMethods != null) {
+						rmidtos.addAll(Arrays.asList(resDTO.resourceMethods));
+					}					
 				} else if (contentProvider instanceof JerseyExtensionProvider) {
+					System.out.println("Adding Extension DTO for APP " + applicationProvider.getName() + " with name " + contentProvider.getName());
 					edtos.add(toExtensionDTO((JerseyExtensionProvider<?>) contentProvider));
 				}
 			}
 		}
+		
 		dto.resourceDTOs = rdtos.toArray(new ResourceDTO[rdtos.size()]);
-		dto.extensionDTOs = edtos.toArray(new ExtensionDTO[edtos.size()]);
+		dto.extensionDTOs = edtos.toArray(new ExtensionDTO[edtos.size()]);		
 		dto.resourceMethods = rmidtos.toArray(new ResourceMethodInfoDTO[rmidtos.size()]);
 		return dto;
 	}
@@ -141,6 +216,47 @@ public class DTOConverter {
 		return dto;
 	}
 	
+	
+	
+	/**
+	 * This creates a DTO for resources and extensions which have been added to an application in a 
+	 * static way. To check whether to create a ResourceDTO or an ExtensionDTO, it looks if some 
+	 * ResourceMethodInfo can be created. If yes, then the clazz is treated as a Resource and the 
+	 * ResourceDTO is created, otherwise the clazz is treated as an Extension and the ExtensionDTO
+	 * is created
+	 * 
+	 * @param <T>
+	 * @param clazz
+	 * @return
+	 */
+	public static <T> BaseDTO toDTO(Class<?> clazz) {
+		
+		BaseDTO dto = null;
+		ResourceMethodInfoDTO[] rmiDTOs = getResourceMethodInfoDTOs(clazz);
+		if(rmiDTOs != null) {
+//			We have a Resource
+			ResourceDTO resDTO = new ResourceDTO();
+			resDTO.name = clazz.getName();
+			resDTO.resourceMethods = rmiDTOs;
+			dto = resDTO;
+		}
+		else {
+//			We have an Extension
+			ExtensionDTO extDTO = new ExtensionDTO();
+			extDTO.name = clazz.getName();
+			List<String> extTypeList = new LinkedList<String>();
+			for(Class<?> c : clazz.getInterfaces()) {
+				if(POSSIBLE_EXTENSION_INTERFACES.contains(c.getName())) {
+					extTypeList.add(c.getName());
+				}
+			}
+			extDTO.extensionTypes = extTypeList.toArray(new String[0]);
+			extDTO = toExtensionDTO(clazz, extDTO);
+			dto = extDTO;			
+		}		
+		return dto;
+	}
+	
 	/**
 	 * Maps resource provider into a {@link FailedResourceDTO}
 	 * @param resourceProvider the resource provider instance, needed to be inspect
@@ -170,6 +286,37 @@ public class DTOConverter {
 		}
 		ExtensionDTO dto = new JerseyExtensionDTO();
 		Class<?> clazz = provider.getObjectClass();
+		dto = toExtensionDTO(clazz, dto);
+				
+		String[] extTypes = new String[provider.getContracts().length];
+		for(int c = 0; c < provider.getContracts().length; c++) {
+			extTypes[c] = provider.getContracts()[c].getName();
+		}
+		dto.extensionTypes = extTypes;
+		
+		dto.name = provider.getName();
+		Long serviceId = provider.getServiceId();
+		dto.serviceId = -1;
+		if (serviceId != null) {
+			dto.serviceId = serviceId.longValue();
+		} 		
+		return dto;
+	}
+	
+	private static <T> ExtensionDTO toExtensionDTO(Class<?> clazz, ExtensionDTO dto) {
+		List<String> nbList = new LinkedList<String>();
+		for(Class<?> dc : clazz.getDeclaredClasses()) {
+			NameBinding nb = dc.getAnnotation(NameBinding.class);
+			if(nb != null) {
+				if(!nbList.contains(dc.getName())) {
+					nbList.add(dc.getName());	
+				}				
+			}
+		}		
+		if(nbList.size() > 0) {
+			dto.nameBindings = nbList.toArray(new String[0]);
+		}		
+		
 		Produces produces = clazz.getAnnotation(Produces.class);
 		if (produces != null) {
 			dto.produces = produces.value();
@@ -178,12 +325,6 @@ public class DTOConverter {
 		if (consumes != null) {
 			dto.consumes = consumes.value();
 		}
-		dto.name = provider.getName();
-		Long serviceId = provider.getServiceId();
-		dto.serviceId = -1;
-		if (serviceId != null) {
-			dto.serviceId = serviceId.longValue();
-		} 
 		return dto;
 	}
 	
@@ -211,12 +352,25 @@ public class DTOConverter {
 	 * @param resource the object class to parse
 	 * @return an array of method objects or <code>null</code>
 	 */
+//	public static <T> ResourceMethodInfoDTO[] getResourceMethodInfoDTOs(Class<T> clazz) {
+//		Method[] methods = clazz.getDeclaredMethods();
+//		List<ResourceMethodInfoDTO> dtos = new ArrayList<>(methods.length);
+//		
+//		for (Method method : methods) {
+//			ResourceMethodInfoDTO dto = toResourceMethodInfoDTO(method);
+//			if (dto != null) {
+//				dtos.add(dto);
+//			}
+//		}
+//		return dtos.isEmpty() ? null : dtos.toArray(new ResourceMethodInfoDTO[dtos.size()]);
+//	}
+	
 	public static <T> ResourceMethodInfoDTO[] getResourceMethodInfoDTOs(Class<T> clazz) {
 		Method[] methods = clazz.getDeclaredMethods();
 		List<ResourceMethodInfoDTO> dtos = new ArrayList<>(methods.length);
-
+		Path resPath = clazz.getAnnotation(Path.class);
 		for (Method method : methods) {
-			ResourceMethodInfoDTO dto = toResourceMethodInfoDTO(method);
+			ResourceMethodInfoDTO dto = toResourceMethodInfoDTO(method, resPath);
 			if (dto != null) {
 				dtos.add(dto);
 			}
@@ -252,8 +406,61 @@ public class DTOConverter {
 			empty = false;
 		}
 		Path path = method.getAnnotation(Path.class);
-		if (path != null) {
+		if (path != null) {			
 			dto.path = path.value();
+			empty = false;
+		}
+		return empty ? null : dto;
+	}
+	
+	public static <T> ResourceMethodInfoDTO toResourceMethodInfoDTO(Method method, Path resPath) {
+		if (method == null) {
+			throw new IllegalArgumentException("Expected a method instance to introspect annpotations and create a ResourceMethodInfoDTO");
+		}
+		boolean empty = true;
+		ResourceMethodInfoDTO dto = new ResourceMethodInfoDTO();
+		
+//		Added nameBindings to ResourceDTO
+		List<String> nbList = new LinkedList<String>();
+		for(Annotation a : method.getAnnotations()) {					
+			NameBinding nb = a.annotationType().getAnnotation(NameBinding.class);		
+			if(nb != null) {
+				if(!nbList.contains(a.annotationType().getName())) {
+					nbList.add(a.annotationType().getName());	
+				}				
+			}
+		}		
+		if(nbList.size() > 0) {
+			dto.nameBindings = nbList.toArray(new String[0]);
+		}				
+		
+		Consumes consumes = method.getAnnotation(Consumes.class);
+		if (consumes != null) {
+			dto.consumingMimeType = consumes.value();
+			empty = false;
+		}
+		Produces produces = method.getAnnotation(Produces.class);
+		if (produces != null) {
+			dto.producingMimeType = produces.value();
+			empty = false;
+		}
+		String methodString = getMethodStrings(method);
+		if (methodString != null) {
+			dto.method = methodString;
+			empty = false;
+		}
+		Path path = method.getAnnotation(Path.class);
+		if (path != null) {		
+			if(resPath != null) {
+				dto.path = resPath.value() + "/" + path.value();
+			}
+			else {
+				dto.path = path.value();
+			}			
+			empty = false;
+		}
+		else if(resPath != null) {
+			dto.path = resPath.value();
 			empty = false;
 		}
 		return empty ? null : dto;

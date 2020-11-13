@@ -31,16 +31,20 @@ public class SessionManipulator {
 	@GET
 	@Path("{name}")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String getValue(@Context HttpServletRequest req,
+	public Response getValue(@Context HttpServletRequest req,
 			@PathParam("name") String name) {
-		return String.valueOf(req.getSession().getAttribute(name));
+		System.out.println("Session in GET " + req.getSession());
+		String r = String.valueOf(req.getSession().getAttribute(name));
+		return Response.ok(r).build();
 	}
 
 	@PUT
 	@Path("{name}")
-	public Response getValue(@Context HttpServletRequest req,
-			@PathParam("name") String name, String body) {
+	public Response setValue(@Context HttpServletRequest req,
+			@PathParam("name") String name, String body) {		
+		System.out.println("Session in PUT " + req.getSession());
 		req.getSession().setAttribute(name, body);
+		String r = String.valueOf(req.getSession().getAttribute(name));
 		return Response.ok().build();
 	}
 

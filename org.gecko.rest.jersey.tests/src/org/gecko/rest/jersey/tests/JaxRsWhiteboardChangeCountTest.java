@@ -11,9 +11,7 @@
  */
 package org.gecko.rest.jersey.tests;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -29,13 +27,9 @@ import org.gecko.util.test.common.test.AbstractOSGiTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.cm.Configuration;
-import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
 import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
@@ -69,7 +63,7 @@ public class JaxRsWhiteboardChangeCountTest extends AbstractOSGiTest{
 		 */
 		int port = 8185;
 		String contextPath = "test";
-		String url = "http://localhost:" + port + "/" + contextPath;
+//		String url = "http://localhost:" + port + "/" + contextPath;
 		
 		/*
 		 * Initial setup for the REST runtime 
@@ -83,7 +77,7 @@ public class JaxRsWhiteboardChangeCountTest extends AbstractOSGiTest{
 		runtimeChecker.start();
 		
 		
-		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
+		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
@@ -128,7 +122,7 @@ public class JaxRsWhiteboardChangeCountTest extends AbstractOSGiTest{
 		 */
 		int port = 8185;
 		String contextPath = "test";
-		String url = "http://localhost:" + port + "/" + contextPath;
+//		String url = "http://localhost:" + port + "/" + contextPath;
 		
 		/*
 		 * Initial setup for the REST runtime 
@@ -142,7 +136,7 @@ public class JaxRsWhiteboardChangeCountTest extends AbstractOSGiTest{
 		runtimeChecker.start();
 		
 		
-		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
+		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
 		
 		assertTrue(runtimeChecker.waitCreate());
 		

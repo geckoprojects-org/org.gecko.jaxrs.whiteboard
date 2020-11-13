@@ -44,6 +44,7 @@ public class JerseyApplication extends Application {
 	private final Logger log = Logger.getLogger("jersey.application");
 	private Map<String, Object> properties;
 	private Application sourceApplication;
+	private WhiteboardFeature whiteboardFeature;
 
 	public JerseyApplication(String applicationName) {
 		this.applicationName = applicationName;
@@ -89,7 +90,11 @@ public class JerseyApplication extends Application {
 		resutlSingletons.addAll(singletons.values());
 		resutlSingletons.addAll(sourceApplication.getSingletons());
 		if(!extensions.isEmpty()) {
-			resutlSingletons.add(new WhiteboardFeature(extensions));
+//			if(whiteboardFeature != null) {
+//				whiteboardFeature.dispose();
+//			}
+			whiteboardFeature = new WhiteboardFeature(extensions);
+			resutlSingletons.add(whiteboardFeature);
 		}
 		return Collections.unmodifiableSet(resutlSingletons);
 	}
@@ -107,27 +112,90 @@ public class JerseyApplication extends Application {
 	 * @param contentProvider the provider to register
 	 * @return <code>true</code>, if content was added
 	 */
+//	@SuppressWarnings({ "unchecked", "rawtypes" })
+//	public boolean addContent(JaxRsApplicationContentProvider contentProvider) {
+//		if (contentProvider == null) {
+//			if (log != null) {
+//				log.log(Level.WARNING, "A null service content provider was given to register as a JaxRs resource or extension");
+//			}
+//			return false;
+//		}
+//		
+//		String key = contentProvider.getId();
+//		contentProviders.put(key, contentProvider);
+//		if(contentProvider instanceof JaxRsExtensionProvider) {
+//			Class<?> extensionClass = contentProvider.getObjectClass();
+//			if (extensionClass == null) {
+//				contentProviders.remove(key);
+//				Object removed = extensions.remove(key);
+//				return removed != null;
+//			}
+//			JaxRsExtensionProvider result = extensions.put(key, (JaxRsExtensionProvider) contentProvider);
+//			return  result == null || !extensionClass.equals(result.getObjectClass());
+//		} else if (contentProvider.isSingleton()) {
+//			Class<?> resourceClass = contentProvider.getObjectClass();
+//			Object result = singletons.get(key);
+//			if(result == null || !result.getClass().equals(resourceClass)){
+//				Object providerObject = contentProvider.getProviderObject();
+//				/*
+//				 * Maybe we are in shutdown mode
+//				 */
+//				if (providerObject == null) {
+//					contentProviders.remove(key);
+//					Object removed = singletons.remove(key);
+//					return removed != null;
+//				}
+//				Object service = ((ServiceObjects<?>) providerObject).getService();
+//				if (service == null) {
+//					contentProviders.remove(key);
+//					Object removed = singletons.remove(key);
+//					return removed != null;
+//				}
+//				result = singletons.put(key, service);
+//				if(result != null) {
+//					((ServiceObjects) contentProvider.getProviderObject()).ungetService(result);
+//				}
+//				return true;
+//			}
+//			return false;
+//		} else {
+//			Class<?> resourceClass = contentProvider.getObjectClass();
+//			if (resourceClass == null) {
+//				contentProviders.remove(key);
+//				Object removed = classes.remove(key);
+//				return removed != null;
+//			}
+//			Object result = classes.put(key, resourceClass);
+//			return !resourceClass.equals(result) || result == null;
+//		}
+//		
+//	}
+
+	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public boolean addContent(JaxRsApplicationContentProvider contentProvider) {
+		
 		if (contentProvider == null) {
 			if (log != null) {
 				log.log(Level.WARNING, "A null service content provider was given to register as a JaxRs resource or extension");
 			}
 			return false;
 		}
-		
+		System.out.println("ADD CONTENT FOR " + contentProvider.getName());
 		String key = contentProvider.getId();
 		contentProviders.put(key, contentProvider);
-		if(contentProvider instanceof JaxRsExtensionProvider) {
-			Class<?> extensionClass = contentProvider.getObjectClass();
-			if (extensionClass == null) {
-				contentProviders.remove(key);
-				Object removed = extensions.remove(key);
-				return removed != null;
-			}
-			JaxRsExtensionProvider result = extensions.put(key, (JaxRsExtensionProvider) contentProvider);
-			return  result == null || !extensionClass.equals(result.getObjectClass());
-		} else if (contentProvider.isSingleton()) {
+//		if(contentProvider instanceof JaxRsExtensionProvider) {
+//			Class<?> extensionClass = contentProvider.getObjectClass();
+//			if (extensionClass == null) {
+//				contentProviders.remove(key);
+//				Object removed = extensions.remove(key);
+//				return removed != null;
+//			}
+//			JaxRsExtensionProvider result = extensions.put(key, (JaxRsExtensionProvider) contentProvider);
+//			return  result == null || !extensionClass.equals(result.getObjectClass());
+//		} 
+		if (contentProvider.isSingleton()) {
+			System.out.println("Added SINGLETON " + contentProvider.getId());
 			Class<?> resourceClass = contentProvider.getObjectClass();
 			Object result = singletons.get(key);
 			if(result == null || !result.getClass().equals(resourceClass)){
@@ -166,11 +234,13 @@ public class JerseyApplication extends Application {
 		
 	}
 
+	
 	/**
 	 * Removes a content from the application
 	 * @param contentProvider the provider of the contents to be removed
 	 * @return Return <code>true</code>, if the content was removed
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public boolean removeContent(JaxRsApplicationContentProvider contentProvider) {
 		if (contentProvider == null) {
 			if (log != null) {
@@ -181,11 +251,31 @@ public class JerseyApplication extends Application {
 		String key = contentProvider.getId();
 		if(contentProvider instanceof JaxRsExtensionProvider) {
 			synchronized (extensions) {
-				extensions.remove(key);
+				Object ext = extensions.remove(key);
+				if(contentProvider.isSingleton()) {
+					synchronized (singletons) {
+						Object obj = singletons.remove(key);
+						if(obj != null) {
+							log.info("UNREGISTERING SERVICE FOR EXTENSION " + contentProvider.getName() + " service " + obj);
+							((ServiceObjects) contentProvider.getProviderObject()).ungetService(obj);					
+						}				
+					}
+//					if(whiteboardFeature != null) {
+//						log.info("UNREGISTERING SERVICE FOR EXTENSION " + contentProvider.getName());
+//						whiteboardFeature.dispose();
+//						if(!extensions.isEmpty()) {
+//							whiteboardFeature = new WhiteboardFeature(extensions);
+//						}						
+//					}
+				}				
 			}
 		} else if (contentProvider.isSingleton()) {
 			synchronized (singletons) {
-				singletons.remove(key);
+				Object obj = singletons.remove(key);
+				if(obj != null) {
+					log.info("UNREGISTERING SERVICE FOR RESOURCE " + contentProvider.getName() + " service " + obj);
+					((ServiceObjects) contentProvider.getProviderObject()).ungetService(obj);					
+				}				
 			}
 		} else {
 			synchronized (classes) {
@@ -197,15 +287,17 @@ public class JerseyApplication extends Application {
 		}
 	}
 
-	/**
-	 * Cleans up all resources
-	 */
-	public void dispose() {
-		contentProviders.clear();
-		extensions.clear();
-		classes.clear();
-		singletons.clear();
-	}
+//	/**
+//	 * Cleans up all resources
+//	 */
+//	public void dispose() {
+//		contentProviders.clear();
+//		extensions.clear();
+//		classes.clear();
+//		singletons.clear();
+//		//readd static content from the sourceApplication
+//		// dispose and remove the whiteboard feature
+//	}
 
 	/**
 	 * Returns all content providers
