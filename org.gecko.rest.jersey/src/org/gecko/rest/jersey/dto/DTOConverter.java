@@ -287,10 +287,10 @@ public class DTOConverter {
 		ExtensionDTO dto = new JerseyExtensionDTO();
 		Class<?> clazz = provider.getObjectClass();
 		dto = toExtensionDTO(clazz, dto);
-				
-		String[] extTypes = new String[provider.getContracts().length];
-		for(int c = 0; c < provider.getContracts().length; c++) {
-			extTypes[c] = provider.getContracts()[c].getName();
+		Class<?>[] contracts = provider.getContracts() == null ? new Class<?>[0] : provider.getContracts();
+ 		String[] extTypes = new String[contracts.length];
+		for(int c = 0; c < contracts.length; c++) {
+			extTypes[c] = contracts[c].getName();
 		}
 		dto.extensionTypes = extTypes;
 		
@@ -459,7 +459,7 @@ public class DTOConverter {
 			}			
 			empty = false;
 		}
-		else if(resPath != null) {
+		else if(resPath != null && methodString != null) {
 			dto.path = resPath.value();
 			empty = false;
 		}
