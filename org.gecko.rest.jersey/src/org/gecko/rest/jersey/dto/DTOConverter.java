@@ -115,7 +115,7 @@ public class DTOConverter {
 		List<ResourceMethodInfoDTO> rmidtos = new ArrayList<>();
 		List<ExtensionDTO> edtos = new ArrayList<>();
 		
-//		Create the DTO for the static resources and extensions --> how should I know whether is a resource or an extension??
+//		Create the DTO for the static resources and extensions 
 		if(applicationProvider.getJaxRsApplication() instanceof JerseyApplication) {
 			Application sourceApp = ((JerseyApplication) applicationProvider.getJaxRsApplication()).getSourceApplication();
 			Set<Object> singletons = sourceApp.getSingletons();

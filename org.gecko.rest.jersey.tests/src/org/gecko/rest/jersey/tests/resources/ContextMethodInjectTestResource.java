@@ -24,16 +24,22 @@ import javax.ws.rs.core.MediaType;
  * @since Jun 15, 2020
  */
 @Path("whiteboard/context")
-public class ContextInjectTestResource {
+public class ContextMethodInjectTestResource {
 
 	public static final String	CUSTOM_HEADER	= "customHeader";
 
-	@Context
-	private HttpHeaders headers;
+//	@Context
+//	private HttpHeaders headers;
 
+//	@GET
+//	@Produces(MediaType.TEXT_PLAIN)
+//	public String headerReplay() {
+//		return headers.getHeaderString(CUSTOM_HEADER);
+//	}
+	
 	@GET
 	@Produces(MediaType.TEXT_PLAIN)
-	public String headerReplay() {
+	public String headerReplay(@Context HttpHeaders headers) {
 		return headers.getHeaderString(CUSTOM_HEADER);
 	}
 

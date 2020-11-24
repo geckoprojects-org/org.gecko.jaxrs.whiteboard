@@ -50,6 +50,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  * @author ilenia
  * @since Jun 9, 2020
  */
+@SuppressWarnings("deprecation")
 @RunWith(MockitoJUnitRunner.class)
 public class JaxRsWhiteboardDefaultAppTests extends AbstractOSGiTest{
 

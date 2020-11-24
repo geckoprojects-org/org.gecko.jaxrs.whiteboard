@@ -50,6 +50,7 @@ import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
  * @author ilenia
  * @since Jun 12, 2020
  */
+@SuppressWarnings("deprecation")
 @RunWith(MockitoJUnitRunner.class)
 public class SpecCapabilityTests extends AbstractOSGiTest{
 	

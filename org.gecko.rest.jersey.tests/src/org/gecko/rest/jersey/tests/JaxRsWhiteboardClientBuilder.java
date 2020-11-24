@@ -37,7 +37,6 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.cm.Configuration;
 import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
 import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
@@ -46,6 +45,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  * @author Mark Hoffmann
  * @since 12.10.2017
  */
+@SuppressWarnings("deprecation")
 @RunWith(MockitoJUnitRunner.class)
 public class JaxRsWhiteboardClientBuilder extends AbstractOSGiTest{
 
@@ -92,7 +92,7 @@ public class JaxRsWhiteboardClientBuilder extends AbstractOSGiTest{
 		
 		
 		
-		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
+		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
@@ -149,7 +149,7 @@ public class JaxRsWhiteboardClientBuilder extends AbstractOSGiTest{
 		System.out.println("Register resource for uri /hello under application customer");
 		ServiceRegistration<HelloResource> helloRegistration = context.registerService(HelloResource.class, new HelloResource(), helloProps);
 		f = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=Hello)");
-		Object service = getService(f, 3000l);
+		getService(f, 3000l);
 		
 		assertTrue(runtimeChecker.waitModify());
 		/*

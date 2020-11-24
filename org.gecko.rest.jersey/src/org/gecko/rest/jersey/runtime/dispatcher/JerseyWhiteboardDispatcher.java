@@ -463,9 +463,8 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 								}
 							}
 						}
-//						
-						unassignContent(Collections.singleton(remApp), remApp.getContentProviers());
 						
+						unassignContent(Collections.singleton(remApp), remApp.getContentProviers());						
 						whiteboard.unregisterApplication(remApp);
 					}
 				});

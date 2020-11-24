@@ -26,6 +26,7 @@ import javax.ws.rs.ext.Provider;
 import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.ServiceScope;
 
 /**
@@ -45,6 +46,13 @@ public class PrototypeExtension implements MessageBodyWriter<String>{
 	@Activate
 	public void activate() {
 		postFix = PROTOTYPE_POSTFIX;
+		System.out.println("Activated this " + this);
+	}
+	
+	@Modified
+	public void modify() {
+		postFix = PROTOTYPE_POSTFIX;
+		System.out.println("Modified this " + this);
 	}
 
 	@Override
@@ -57,6 +65,7 @@ public class PrototypeExtension implements MessageBodyWriter<String>{
 			MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream)
 					throws IOException, WebApplicationException {
 		String result = t + "_" + counter.incrementAndGet() + postFix;
+		System.out.println("Using this " + this);
 		entityStream.write(result.getBytes());
 		entityStream.flush();
 	}

@@ -26,6 +26,7 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -33,7 +34,9 @@ import javax.ws.rs.ext.WriterInterceptor;
 
 import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.gecko.rest.jersey.tests.resources.ContractedExtension;
+import org.gecko.rest.jersey.tests.resources.EchoResource;
 import org.gecko.rest.jersey.tests.resources.HelloResource;
+import org.gecko.rest.jersey.tests.resources.OSGiTextMimeTypeCodec;
 import org.gecko.rest.jersey.tests.resources.TestReadExtension;
 import org.gecko.rest.jersey.tests.resources.TestWriteExtension;
 import org.gecko.rest.jersey.tests.resources.TestWriterInterceptorException;
@@ -58,16 +61,17 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  * @author ilenia
  * @since Jun 9, 2020
  */
+@SuppressWarnings("deprecation")
 @RunWith(MockitoJUnitRunner.class)
 public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
-	
+
 	/*
 	 *  The server runs on localhost port 8185 using context path test: http://localhost:8185/test
 	 */	
 	int port = 8185;
 	String contextPath = "test";
 	String url = "http://localhost:" + port + "/" + contextPath;
-	
+
 	/**
 	 * Creates a new instance.
 	 * @param bundleContext
@@ -75,7 +79,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 	public JaxRsWhiteboardExtensionTests() {
 		super(FrameworkUtil.getBundle(JaxRsWhiteboardExtensionTests.class).getBundleContext());
 	}
-	
+
 	/* 
 	 * (non-Javadoc)
 	 * @see org.gecko.util.test.common.test.AbstractOSGiTest#doBefore()
@@ -91,7 +95,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 	@Override
 	public void doAfter() {		
 	}
-	
+
 	/**
 	 *  Checks that if an extension is not advertising any of the allowed interfaces
 	 *  it should not be registered and a RuntimeDTO should be created 
@@ -109,12 +113,12 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
-		
+
 		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
 		runtimeChecker.start();
-		
+
 		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);	
-		
+
 		assertTrue(runtimeChecker.waitCreate());
 
 		/*
@@ -125,15 +129,15 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
 		Application application = new Application(){};
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		registerServiceForCleanup(Application.class, application, appProps);
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Mount the extension ContractedExtension that will become available under:
 		 * http://localhost:8185/test/hello
@@ -142,28 +146,28 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, "true");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Contracted");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + 
-		JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
-		
+				JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
+
 		System.out.println("Register resource for uri /hello");
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		ContractedExtension extension = new ContractedExtension();
-		
-//		We need to register the extension NOT advertising that it is implementing MessageBodyWriter
+
+		//		We need to register the extension NOT advertising that it is implementing MessageBodyWriter
 		registerServiceForCleanup(extension, extensionProps, ContractedExtension.class.getName());
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		Thread.sleep(1000);
-		
+
 		RuntimeDTO runtimeDTO = getRuntimeDTO();
 		assertEquals(1, runtimeDTO.failedExtensionDTOs.length);
 		assertEquals("Contracted", runtimeDTO.failedExtensionDTOs[0].name);
 	}
-	
+
 	/**
 	 * Register an extension advertising one of the allowed interface and check that everything is 
 	 * registering fine 
@@ -174,7 +178,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 	 */
 	@Test
 	public void testExtensionContracts() throws IOException, InterruptedException, InvalidSyntaxException {
-		
+
 		/*
 		 * Initial setup for the REST runtime 
 		 */
@@ -182,12 +186,12 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
-		
+
 		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
 		runtimeChecker.start();
-		
+
 		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);	
-		
+
 		assertTrue(runtimeChecker.waitCreate());
 
 		/*
@@ -198,15 +202,15 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
 		Application application = new Application(){};
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		registerServiceForCleanup(Application.class, application, appProps);
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Mount the extension ContractedExtension that will become available under:
 		 * http://localhost:8185/test/hello
@@ -215,32 +219,32 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, "true");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Contracted");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + 
-		JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
-		
+				JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
+
 		System.out.println("Register resource for uri /hello");
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		ContractedExtension extension = new ContractedExtension();
-		
-//		We need to register the extension advertising which interfaces is implementing
+
+		//		We need to register the extension advertising which interfaces is implementing
 		registerServiceForCleanup(extension, extensionProps, MessageBodyReader.class.getName(), 
 				MessageBodyWriter.class.getName());
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		Thread.sleep(1000);
-		
+
 		RuntimeDTO runtimeDTO = getRuntimeDTO();
 		assertEquals(1, runtimeDTO.applicationDTOs.length);
 		assertEquals("customerApp", runtimeDTO.applicationDTOs[0].name);
 		assertEquals(1, runtimeDTO.applicationDTOs[0].extensionDTOs.length);
 		assertEquals("Contracted", runtimeDTO.applicationDTOs[0].extensionDTOs[0].name);
 	}
-	
-	
+
+
 	/**
 	 * Creates an app customerApp 
 	 * Creates 2 extensions (one implementing MBR and one MBW) to be added to the app
@@ -254,7 +258,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 	 */
 	@Test
 	public void testExtensionSelectOK() throws IOException, InterruptedException, InvalidSyntaxException {
-		
+
 		/*
 		 * Initial setup for the REST runtime 
 		 */
@@ -262,10 +266,10 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
-		
+
 		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
 		runtimeChecker.start();
-		
+
 		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);		
 		assertTrue(runtimeChecker.waitCreate());
 
@@ -277,15 +281,15 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
 		Application application = new Application(){};
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		registerServiceForCleanup(Application.class, application, appProps);
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Mount the extension TestReadExtension for application customerApp
 		 */
@@ -293,18 +297,18 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, "true");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "TestReadExtension");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		TestReadExtension extension = new TestReadExtension();
-		
-//		We need to register the extension advertising which interfaces is implementing
+
+		//		We need to register the extension advertising which interfaces is implementing
 		registerServiceForCleanup(extension, extensionProps, MessageBodyReader.class.getName());
-		
+
 		assertTrue(runtimeChecker.waitModify());		
-		
+
 		/*
 		 * Mount the extension TestWriteExtension for application customerApp
 		 */
@@ -313,18 +317,18 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "TestWriteExtension");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION_SELECT, "("+JaxrsWhiteboardConstants.JAX_RS_NAME + "=TestReadExtension)");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		TestWriteExtension extension2 = new TestWriteExtension();
-		
-//		We need to register the extension advertising which interfaces is implementing
+
+		//		We need to register the extension advertising which interfaces is implementing
 		registerServiceForCleanup(extension2, extensionProps, MessageBodyWriter.class.getName());
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Mount the resource HelloResource that will become available under:
 		 * http://localhost:8185/test/customer/hello
@@ -333,21 +337,21 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
-		
+
 		System.out.println("Register resource for uri /hello");
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.setModifyTimeout(15);
 		runtimeChecker.start();
-		
-		
+
+
 		registerServiceForCleanup(HelloResource.class, new HelloResource(), helloProps);
-		
+
 		assertTrue(runtimeChecker.waitModify());	
-		
+
 		Thread.sleep(2000);
-		
+
 		RuntimeDTO runtimeDTO = getRuntimeDTO();
 		assertEquals(0,runtimeDTO.failedExtensionDTOs.length);
 		assertEquals(0, runtimeDTO.failedResourceDTOs.length);
@@ -356,7 +360,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		assertEquals("customerApp", runtimeDTO.applicationDTOs[0].name);
 		assertEquals(2, runtimeDTO.applicationDTOs[0].extensionDTOs.length);
 		assertEquals(1, runtimeDTO.applicationDTOs[0].resourceDTOs.length);
-		
+
 		/*
 		 * Check if our RootResource is available under http://localhost:8185/test/customer/hello
 		 */
@@ -376,8 +380,8 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		assertTrue(result01.contains(TestReadExtension.READER_POSTFIX));
 		assertTrue(result01.contains(TestWriteExtension.WRITER_POSTFIX));
 	}
-	
-	
+
+
 	/**
 	 * Creates an app customerApp 
 	 * Creates 1 extension TestReadExtension which depends on a TestWriteExtension
@@ -391,7 +395,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 	 */
 	@Test
 	public void testWrongExtensionSelect() throws IOException, InterruptedException, InvalidSyntaxException {
-		
+
 		/*
 		 * Initial setup for the REST runtime 
 		 */
@@ -399,10 +403,10 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
-		
+
 		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
 		runtimeChecker.start();
-		
+
 		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);		
 		assertTrue(runtimeChecker.waitCreate());
 
@@ -414,15 +418,15 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
 		Application application = new Application(){};
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		registerServiceForCleanup(Application.class, application, appProps);
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Mount the extension TestReadExtension for application customerApp
 		 */
@@ -431,18 +435,18 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "TestReadExtension");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION_SELECT, "("+JaxrsWhiteboardConstants.JAX_RS_NAME + "=TestWriteExtension)");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		TestReadExtension extension = new TestReadExtension();
-		
-//		We need to register the extension advertising which interfaces is implementing
+
+		//		We need to register the extension advertising which interfaces is implementing
 		registerServiceForCleanup(extension, extensionProps, MessageBodyReader.class.getName());
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Mount the resource HelloResource that will become available under:
 		 * http://localhost:8185/test/customer/hello
@@ -451,19 +455,19 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
-		
+
 		System.out.println("Register resource for uri /hello");
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();		
-		
+
 		registerServiceForCleanup(HelloResource.class, new HelloResource(), helloProps);
-		
+
 		assertTrue(runtimeChecker.waitModify());
-			
+
 		Thread.sleep(2000);
-				
+
 		RuntimeDTO runtimeDTO = getRuntimeDTO();
 		assertEquals(1,runtimeDTO.failedExtensionDTOs.length);
 		assertEquals("TestReadExtension", runtimeDTO.failedExtensionDTOs[0].name);
@@ -474,7 +478,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		assertEquals("customerApp", runtimeDTO.applicationDTOs[0].name);
 		assertEquals(0, runtimeDTO.applicationDTOs[0].extensionDTOs.length);
 		assertEquals(1, runtimeDTO.applicationDTOs[0].resourceDTOs.length);
-		
+
 		/*
 		 * Check if our RootResource is available under http://localhost:8185/test/customer/hello
 		 */
@@ -489,11 +493,11 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		assertNotNull(response.getEntity());
 		String result01 = response.readEntity(String.class);
 		assertNotNull(result01);
-		
+
 		assertFalse(result01.contains(TestReadExtension.READER_POSTFIX));
 		assertFalse(result01.contains(TestWriteExtension.WRITER_POSTFIX));		
 	}
-	
+
 	/**
 	 * Creates an app customerApp 
 	 * Creates a Hello resource which depends on a TestWriteExtension
@@ -513,10 +517,10 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
-		
+
 		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
 		runtimeChecker.start();
-		
+
 		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);		
 		assertTrue(runtimeChecker.waitCreate());
 
@@ -528,15 +532,15 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
 		Application application = new Application(){};
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		registerServiceForCleanup(Application.class, application, appProps);
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Mount the resource HelloResource which requires a 
 		 * TestWriteExtension that we are NOT going to register
@@ -546,17 +550,17 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION_SELECT, "("+JaxrsWhiteboardConstants.JAX_RS_NAME + "=TestWriteExtension)");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
-		
+
 		System.out.println("Register resource for uri /hello");
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();		
-		
+
 		registerServiceForCleanup(HelloResource.class, new HelloResource(), helloProps);
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Check if our RootResource is available under http://localhost:8185/test/customer/hello
 		 */
@@ -568,7 +572,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		post = webTarget.request().buildPost(Entity.entity("test", "text/plain"));
 		Response response = post.invoke();
 		assertEquals(404, response.getStatus());
-		
+
 		RuntimeDTO runtimeDTO = getRuntimeDTO();
 		assertEquals(1, runtimeDTO.applicationDTOs.length);
 		assertEquals("customerApp", runtimeDTO.applicationDTOs[0].name);
@@ -576,8 +580,8 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		assertEquals("Hello", runtimeDTO.failedResourceDTOs[0].name);
 		assertEquals(0, runtimeDTO.failedExtensionDTOs.length);
 	}
-	
-	
+
+
 	/**
 	 * Creates an app customerApp 
 	 * The app will depend on TestReadExtension
@@ -592,7 +596,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 	 */
 	@Test
 	public void testAppWrongExtensionSelect() throws IOException, InterruptedException, InvalidSyntaxException {
-		
+
 		/*
 		 * Initial setup for the REST runtime 
 		 */
@@ -600,10 +604,10 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
-		
+
 		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
 		runtimeChecker.start();
-		
+
 		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);		
 		assertTrue(runtimeChecker.waitCreate());
 
@@ -617,15 +621,15 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION_SELECT, "("+
 				JaxrsWhiteboardConstants.JAX_RS_NAME + "=TestReadExtension)");
 		Application application = new Application(){};
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		registerServiceForCleanup(Application.class, application, appProps);
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Mount the extension TestReadExtension for application customerApp
 		 */
@@ -636,18 +640,18 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 				JaxrsWhiteboardConstants.JAX_RS_NAME + "=TestWriteExtension)");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + 
 				JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		TestReadExtension extension = new TestReadExtension();
-		
-//		We need to register the extension advertising which interfaces is implementing
+
+		//		We need to register the extension advertising which interfaces is implementing
 		registerServiceForCleanup(extension, extensionProps, MessageBodyReader.class.getName());
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Mount the resource HelloResource that should not be registered because
 		 * the TestReadExtension depends on the TestWriteExtension which is not there, 
@@ -659,17 +663,17 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + 
 				JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
-		
+
 		System.out.println("Register resource for uri /hello");
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();		
-		
+
 		registerServiceForCleanup(HelloResource.class, new HelloResource(), helloProps);
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Check if our RootResource is available under http://localhost:8185/test/customer/hello
 		 */
@@ -681,7 +685,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		post = webTarget.request().buildPost(Entity.entity("test", "text/plain"));
 		Response response = post.invoke();
 		assertEquals(404, response.getStatus());
-		
+
 		RuntimeDTO runtimeDTO = getRuntimeDTO();
 		assertEquals(1, runtimeDTO.failedApplicationDTOs.length);
 		assertEquals("customerApp", runtimeDTO.failedApplicationDTOs[0].name);
@@ -691,8 +695,8 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		assertEquals("TestReadExtension", runtimeDTO.failedExtensionDTOs[0].name);
 		assertEquals(0, runtimeDTO.applicationDTOs.length);
 	}
-	
-	
+
+
 	/**
 	 * Creates an app customerApp 
 	 * Creates 1 extension TestReadExtension which has the extension.select property sets to one of the app properties 
@@ -706,7 +710,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 	 */
 	@Test
 	public void testAppExtensionSelect() throws IOException, InterruptedException, InvalidSyntaxException {
-		
+
 		/*
 		 * Initial setup for the REST runtime 
 		 */
@@ -714,10 +718,10 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
-		
+
 		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
 		runtimeChecker.start();
-		
+
 		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);		
 		assertTrue(runtimeChecker.waitCreate());
 
@@ -729,15 +733,15 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
 		Application application = new Application(){};
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		registerServiceForCleanup(Application.class, application, appProps);
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Mount the extension TestReadExtension for application customerApp
 		 */
@@ -746,18 +750,18 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "TestReadExtension");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION_SELECT, "("+JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE + "=customer)");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		TestReadExtension extension = new TestReadExtension();
-		
-//		We need to register the extension advertising which interfaces is implementing
+
+		//		We need to register the extension advertising which interfaces is implementing
 		registerServiceForCleanup(extension, extensionProps, MessageBodyReader.class.getName());
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Mount the resource HelloResource 
 		 */
@@ -765,17 +769,17 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
-		
+
 		System.out.println("Register resource for uri /hello");
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();		
-		
+
 		registerServiceForCleanup(HelloResource.class, new HelloResource(), helloProps);
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Check if our RootResource is available under http://localhost:8185/test/customer/hello
 		 */
@@ -791,9 +795,9 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		String result01 = response.readEntity(String.class);
 		System.out.println(result01);
 		assertNotNull(result01);
-		
+
 		assertTrue(result01.contains(TestReadExtension.READER_POSTFIX));
-		
+
 		RuntimeDTO runtimeDTO = getRuntimeDTO();
 		assertEquals(1, runtimeDTO.applicationDTOs.length);
 		assertEquals("customerApp", runtimeDTO.applicationDTOs[0].name);
@@ -805,8 +809,8 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		assertEquals(0, runtimeDTO.failedExtensionDTOs.length);
 		assertEquals(0, runtimeDTO.failedResourceDTOs.length);
 	}
-	
-	
+
+
 	/**
 	 * Creates an app customerApp 
 	 * Creates 1 extension TestReadExtension
@@ -820,7 +824,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 	 */
 	@Test
 	public void testWBExtensionSelect() throws IOException, InterruptedException, InvalidSyntaxException {
-		
+
 		/*
 		 * Initial setup for the REST runtime 
 		 */
@@ -828,10 +832,10 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
-		
+
 		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
 		runtimeChecker.start();
-		
+
 		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);		
 		assertTrue(runtimeChecker.waitCreate());
 
@@ -843,15 +847,15 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
 		Application application = new Application(){};
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		registerServiceForCleanup(Application.class, application, appProps);
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Mount the extension TestReadExtension for application customerApp
 		 */
@@ -859,18 +863,18 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, "true");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "TestReadExtension");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		TestReadExtension extension = new TestReadExtension();
-		
-//		We need to register the extension advertising which interfaces is implementing
+
+		//		We need to register the extension advertising which interfaces is implementing
 		registerServiceForCleanup(extension, extensionProps, MessageBodyReader.class.getName());
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Mount the resource HelloResource 
 		 */
@@ -879,17 +883,17 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION_SELECT, "("+JerseyConstants.JERSEY_CONTEXT_PATH + "="+contextPath+")");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
-		
+
 		System.out.println("Register resource for uri /hello");
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();		
-		
+
 		registerServiceForCleanup(HelloResource.class, new HelloResource(), helloProps);
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Check if our RootResource is available under http://localhost:8185/test/customer/hello
 		 */
@@ -905,9 +909,9 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		String result01 = response.readEntity(String.class);
 		System.out.println(result01);
 		assertNotNull(result01);
-		
+
 		assertTrue(result01.contains(TestReadExtension.READER_POSTFIX));
-		
+
 		RuntimeDTO runtimeDTO = getRuntimeDTO();
 		assertEquals(1, runtimeDTO.applicationDTOs.length);
 		assertEquals("customerApp", runtimeDTO.applicationDTOs[0].name);
@@ -919,7 +923,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		assertEquals(0, runtimeDTO.failedExtensionDTOs.length);
 		assertEquals(0, runtimeDTO.failedResourceDTOs.length);
 	}
-	
+
 	/**
 	 * Creates an app customerApp 
 	 * Creates 1 extension TestReadExtension 
@@ -932,7 +936,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 	 */
 	@Test
 	public void testWrongWBExtensionSelect() throws IOException, InterruptedException, InvalidSyntaxException {
-		
+
 		/*
 		 * Initial setup for the REST runtime 
 		 */
@@ -940,10 +944,10 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
-		
+
 		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
 		runtimeChecker.start();
-		
+
 		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);		
 		assertTrue(runtimeChecker.waitCreate());
 
@@ -955,15 +959,15 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
 		Application application = new Application(){};
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		registerServiceForCleanup(Application.class, application, appProps);
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Mount the extension TestReadExtension for application customerApp
 		 */
@@ -971,18 +975,18 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, "true");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "TestReadExtension");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		TestReadExtension extension = new TestReadExtension();
-		
-//		We need to register the extension advertising which interfaces is implementing
+
+		//		We need to register the extension advertising which interfaces is implementing
 		registerServiceForCleanup(extension, extensionProps, MessageBodyReader.class.getName());
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Mount the resource HelloResource 
 		 */
@@ -991,17 +995,17 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION_SELECT, "("+JerseyConstants.JERSEY_CONTEXT_PATH + "=wrongPath)");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
-		
+
 		System.out.println("Register resource for uri /hello");
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();		
-		
+
 		registerServiceForCleanup(HelloResource.class, new HelloResource(), helloProps);
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Check if our RootResource is available under http://localhost:8185/test/customer/hello
 		 */
@@ -1013,7 +1017,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		post = webTarget.request().buildPost(Entity.entity("test", "text/plain"));
 		Response response = post.invoke();
 		assertEquals(404, response.getStatus());
-		
+
 		RuntimeDTO runtimeDTO = getRuntimeDTO();
 		assertEquals(1, runtimeDTO.applicationDTOs.length);
 		assertEquals("customerApp", runtimeDTO.applicationDTOs[0].name);
@@ -1024,9 +1028,9 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		assertEquals(0, runtimeDTO.failedExtensionDTOs.length);
 		assertEquals(1, runtimeDTO.failedResourceDTOs.length);
 		assertEquals("Hello", runtimeDTO.failedResourceDTOs[0].name);
-		}
-	
-	
+	}
+
+
 	/**
 	 * Register an app for the whiteboard
 	 * Register 2 extensions with the same name and different rank
@@ -1038,7 +1042,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 	 */
 	@Test
 	public void testExtensionSameName() throws IOException, InterruptedException, InvalidSyntaxException {
-		
+
 		/*
 		 * Initial setup for the REST runtime 
 		 */
@@ -1046,10 +1050,10 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
-		
+
 		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
 		runtimeChecker.start();
-		
+
 		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);		
 		assertTrue(runtimeChecker.waitCreate());
 
@@ -1061,15 +1065,15 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
 		Application application = new Application(){};
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		registerServiceForCleanup(Application.class, application, appProps);
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Mount the extension TestReadExtension for application customerApp
 		 */
@@ -1078,44 +1082,46 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "TestReadExtension");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
 		extensionProps.put(Constants.SERVICE_RANKING, 2);
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.setModifyTimeout(15);
 		runtimeChecker.start();
-		
+
 		TestReadExtension extension = new TestReadExtension();
-		
-//		We need to register the extension advertising which interfaces is implementing
+
+		//		We need to register the extension advertising which interfaces is implementing
 		registerServiceForCleanup(extension, extensionProps, MessageBodyReader.class.getName());
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
-//		Register another extension with the same name
+
+		//		Register another extension with the same name
 		extensionProps = new Hashtable<>();
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, "true");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "TestReadExtension");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=customerApp)");
 		extensionProps.put(Constants.SERVICE_RANKING, 200);
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.setModifyTimeout(20);
 		runtimeChecker.start();
-		
+
 		extension = new TestReadExtension();
-		
-//		We need to register the extension advertising which interfaces is implementing
+
+		//		We need to register the extension advertising which interfaces is implementing
 		registerServiceForCleanup(extension, extensionProps, MessageBodyReader.class.getName());
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
+		Thread.sleep(2000);
+
 		RuntimeDTO runtimeDTO = getRuntimeDTO();
 		assertEquals(1, runtimeDTO.failedExtensionDTOs.length);
 		assertEquals(DTOConstants.FAILURE_REASON_DUPLICATE_NAME, runtimeDTO.failedExtensionDTOs[0].failureReason);
-		
+
 	}
-	
+
 	/**
 	 * Creates an app which depends on an extension
 	 * Creates a resource for both our app and the .default
@@ -1129,7 +1135,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 	 */
 	@Test
 	public void testExtensionDependency() throws IOException, InterruptedException, InvalidSyntaxException {
-		
+
 		/*
 		 * Initial setup for the REST runtime 
 		 */
@@ -1137,44 +1143,44 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
-		
+
 		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
 		runtimeChecker.start();
-		
+
 		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);		
 		assertTrue(runtimeChecker.waitCreate());
 
-//		Register an app which requires an extension
+		//		Register an app which requires an extension
 		Dictionary<String, Object> appProps = new Hashtable<>();
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "customer");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "customerApp");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION_SELECT,
 				"(replacer-config=*)");
 		Application application = new Application(){};
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		registerServiceForCleanup(Application.class, application, appProps);		
 		assertTrue(runtimeChecker.waitModify());
-		
-//		Register a resource for both customerApp and .default
+
+		//		Register a resource for both customerApp and .default
 		Dictionary<String, Object> helloProps = new Hashtable<>();
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
 		helloProps.put(
 				JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
 				"(osgi.jaxrs.name=*)");		
-				
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();		
-		
+
 		registerServiceForCleanup(HelloResource.class, new HelloResource(), helloProps);
-		
+
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		/*
 		 * Check if our resource is available for the .default app but not for customerApp
 		 * so, it is only available on http://localhost:8185/test/hello
@@ -1187,7 +1193,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		post = webTarget.request().buildPost(Entity.entity("test", "text/plain"));
 		Response response = post.invoke();
 		assertEquals(200, response.getStatus());
-		
+
 		checkUrl = url + "/customer/hello";
 		post = null;
 		jerseyClient = ClientBuilder.newClient();
@@ -1195,8 +1201,8 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		post = webTarget.request().buildPost(Entity.entity("test", "text/plain"));
 		response = post.invoke();
 		assertEquals(404, response.getStatus());
-		
-//		Add the required extension
+
+		//		Add the required extension
 		Dictionary<String, Object> extensionProps = new Hashtable<>();
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, "true");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "TestReadExtension");
@@ -1204,19 +1210,19 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 				JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
 				"(osgi.jaxrs.name=*)");				
 		extensionProps.put("replacer-config", "fizz-buzz");
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.setModifyTimeout(15);
 		runtimeChecker.start();
-		
+
 		TestReadExtension extension = new TestReadExtension();
-		
-//		We need to register the extension advertising which interfaces is implementing
+
+		//		We need to register the extension advertising which interfaces is implementing
 		registerServiceForCleanup(extension, extensionProps, MessageBodyReader.class.getName());		
 		assertTrue(runtimeChecker.waitModify());
-		
-//		Check that now the resource is available for both the apps		
+
+		//		Check that now the resource is available for both the apps		
 		checkUrl = url + "/hello";
 		post = null;
 		jerseyClient = ClientBuilder.newClient();
@@ -1224,7 +1230,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		post = webTarget.request().buildPost(Entity.entity("test", "text/plain"));
 		response = post.invoke();
 		assertEquals(200, response.getStatus());
-		
+
 		checkUrl = url + "/customer/hello";
 		post = null;
 		jerseyClient = ClientBuilder.newClient();
@@ -1233,7 +1239,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		response = post.invoke();
 		assertEquals(200, response.getStatus());
 	}
-	
+
 	/**
 	 * Creates 2 apps different from .default
 	 * Creates 1 resource which is assignable to both apps plus the .default one
@@ -1247,7 +1253,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 	 */
 	@Test
 	public void testAppExtensionDependency() throws IOException, InterruptedException, InvalidSyntaxException {
-		
+
 		/*
 		 * Initial setup for the REST runtime 
 		 */
@@ -1255,56 +1261,56 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
-		
+
 		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
 		runtimeChecker.start();
-		
+
 		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);		
 		assertTrue(runtimeChecker.waitCreate());
 
-//		Register an app which requires an extension
+		//		Register an app which requires an extension
 		Dictionary<String, Object> appProps = new Hashtable<>();
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "app1");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "App1");
 		appProps.put("replacer-config", "fizz-buzz");
 		Application application = new Application(){};
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		registerServiceForCleanup(Application.class, application, appProps);		
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		appProps = new Hashtable<>();
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "app2");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "App2");
 		application = new Application(){};
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		registerServiceForCleanup(Application.class, application, appProps);		
 		assertTrue(runtimeChecker.waitModify());
-		
-		
-//		Register a resource for both apps and .default
+
+
+		//		Register a resource for both apps and .default
 		Dictionary<String, Object> helloProps = new Hashtable<>();
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
 		helloProps.put(
 				JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
 				"(osgi.jaxrs.name=*)");		
-				
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();		
-		
+
 		registerServiceForCleanup(HelloResource.class, new HelloResource(), helloProps);		
 		assertTrue(runtimeChecker.waitModify());
-		
-//		Verify that the resource is available for all the 3 apps (App1, App2 and .default)
+
+		//		Verify that the resource is available for all the 3 apps (App1, App2 and .default)
 		String checkUrl = url + "/hello";
 		Invocation post = null;
 		Client jerseyClient = ClientBuilder.newClient();
@@ -1312,7 +1318,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		post = webTarget.request().buildPost(Entity.entity("test", "text/plain"));
 		Response response = post.invoke();
 		assertEquals(200, response.getStatus());
-		
+
 		checkUrl = url + "/app1/hello";
 		post = null;
 		jerseyClient = ClientBuilder.newClient();
@@ -1320,7 +1326,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		post = webTarget.request().buildPost(Entity.entity("test", "text/plain"));
 		response = post.invoke();
 		assertEquals(200, response.getStatus());
-		
+
 		checkUrl = url + "/app2/hello";
 		post = null;
 		jerseyClient = ClientBuilder.newClient();
@@ -1328,8 +1334,8 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		post = webTarget.request().buildPost(Entity.entity("test", "text/plain"));
 		response = post.invoke();
 		assertEquals(200, response.getStatus());
-		
-//		Add an extension which requires a property satisfied only by App1
+
+		//		Add an extension which requires a property satisfied only by App1
 		Dictionary<String, Object> extensionProps = new Hashtable<>();
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, "true");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "TestWriteExtension");
@@ -1339,19 +1345,19 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		extensionProps.put(
 				JaxrsWhiteboardConstants.JAX_RS_EXTENSION_SELECT,
 				"(replacer-config=*)");
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.setModifyTimeout(15);
 		runtimeChecker.start();
-		
+
 		TestWriteExtension extension = new TestWriteExtension();
-		
-//		We need to register the extension advertising which interfaces is implementing
+
+		//		We need to register the extension advertising which interfaces is implementing
 		registerServiceForCleanup(extension, extensionProps, MessageBodyWriter.class.getName());		
 		assertTrue(runtimeChecker.waitModify());
-		
-//		Verify that the resource is still available for all 3 apps, but the response is different for the app with the extension
+
+		//		Verify that the resource is still available for all 3 apps, but the response is different for the app with the extension
 		checkUrl = url + "/app2/hello";
 		post = null;
 		jerseyClient = ClientBuilder.newClient();
@@ -1360,7 +1366,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		response = post.invoke();
 		assertEquals(200, response.getStatus());
 		assertFalse(response.readEntity(String.class).contains(TestWriteExtension.WRITER_POSTFIX));
-		
+
 		checkUrl = url + "/app1/hello";
 		post = null;
 		jerseyClient = ClientBuilder.newClient();
@@ -1369,7 +1375,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		response = post.invoke();
 		assertEquals(200, response.getStatus());
 		assertTrue(response.readEntity(String.class).contains(TestWriteExtension.WRITER_POSTFIX));
-		
+
 		checkUrl = url + "/hello";
 		post = null;
 		jerseyClient = ClientBuilder.newClient();
@@ -1379,65 +1385,66 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		assertEquals(200, response.getStatus());
 		assertFalse(response.readEntity(String.class).contains(TestWriteExtension.WRITER_POSTFIX));		
 	}
-	
+
 	@Test
 	public void testExtensionOrdering() throws IOException, InterruptedException, InvalidSyntaxException {
-		
+
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
-		
+
 		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
 		runtimeChecker.start();
-		
+
 		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);		
 		assertTrue(runtimeChecker.waitCreate());
-		
+
 		Dictionary<String, Object> appProps = new Hashtable<>();
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "app");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "App");
 		Application application = new Application(){};
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		registerServiceForCleanup(Application.class, application, appProps);		
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		Dictionary<String, Object> helloProps = new Hashtable<>();
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
 		helloProps.put(
 				JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
 				"(osgi.jaxrs.name=App)");		
-				
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();		
-		
+
 		registerServiceForCleanup(HelloResource.class, new HelloResource(), helloProps);		
 		assertTrue(runtimeChecker.waitModify());
 
 		Dictionary<String, Object> extensionProps = new Hashtable<>();
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Extension 1");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, "true");
+		extensionProps.put(Constants.SERVICE_RANKING, 100);
 		extensionProps.put(
 				JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
 				"(osgi.jaxrs.name=App)");	
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.setModifyTimeout(15);
 		runtimeChecker.start();
-		
+
 		TestWriterInterceptorException extension = new TestWriterInterceptorException("fizz", "fizzbuzz");
-		
-//		We need to register the extension advertising which interfaces is implementing
+
+		//		We need to register the extension advertising which interfaces is implementing
 		registerServiceForCleanup(extension, extensionProps, WriterInterceptor.class.getName());		
 		assertTrue(runtimeChecker.waitModify());	
-		
+
 		String checkUrl = url + "/app/replace";
 		Invocation post = null;
 		Client jerseyClient = ClientBuilder.newClient();
@@ -1447,25 +1454,30 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		assertEquals(200, response.getStatus());
 		String result = response.readEntity(String.class);
 		assertTrue(result.contains("fizzbuzz"));
-		
+
 		extensionProps = new Hashtable<>();
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Extension 2");
+		extensionProps.put(Constants.SERVICE_RANKING, 1);
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, "true");
+
+
 		extensionProps.put(
 				JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
 				"(osgi.jaxrs.name=App)");	
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.setModifyTimeout(15);
 		runtimeChecker.start();
-		
+
 		TestWriterInterceptorException extension2 = new TestWriterInterceptorException("buzz", "buzzfizz");
-		
-//		We need to register the extension advertising which interfaces is implementing
+
+		//		We need to register the extension advertising which interfaces is implementing
 		registerServiceForCleanup(extension2, extensionProps, WriterInterceptor.class.getName());		
 		assertTrue(runtimeChecker.waitModify());
-		
+
+		Thread.sleep(2000);
+
 		post = webTarget.request().buildPost(Entity.entity("fizz buzz", "text/plain"));
 		response = post.invoke();
 		assertEquals(200, response.getStatus());
@@ -1473,9 +1485,9 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		System.out.println(result);
 		assertTrue(result.contains("fizzbuzz"));
 		assertTrue(result.contains("buzzfizz"));
-		
+
 	}
-	
+
 	/**
 	 * Creates an extension which targets the whitebord
 	 * Verify that the extension is used
@@ -1488,49 +1500,49 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 	 */
 	@Test
 	public void testWhiteboardTarget() throws IOException, InterruptedException, InvalidSyntaxException {
-		
+
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
-		
+
 		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
 		runtimeChecker.start();
-		
+
 		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);		
 		assertTrue(runtimeChecker.waitCreate());
-		
+
 		Long runtimeId = (Long) getJaxRsRuntimeServiceRef().getProperty(Constants.SERVICE_ID);
-		
+
 		String selectFilter = "(service.id=" + runtimeId + ")";
 		String rejectFilter = "(!" + selectFilter + ")";
-		
+
 		Dictionary<String, Object> appProps = new Hashtable<>();
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "app");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "App");
 		Application application = new Application(){};
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		registerServiceForCleanup(Application.class, application, appProps);		
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		Dictionary<String, Object> helloProps = new Hashtable<>();
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
 		helloProps.put(
 				JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
 				"(osgi.jaxrs.name=App)");	
-				
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();		
-		
+
 		registerServiceForCleanup(HelloResource.class, new HelloResource(), helloProps);		
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		String checkUrl = url + "/app/replace";
 		Invocation post = null;
 		Client jerseyClient = ClientBuilder.newClient();
@@ -1540,7 +1552,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		assertEquals(200, response.getStatus());
 		String result = response.readEntity(String.class);
 		assertEquals("fizz", result);
-		
+
 		Dictionary<String, Object> extensionProps = new Hashtable<>();
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, "true");
 		extensionProps.put(
@@ -1549,44 +1561,44 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		extensionProps.put(
 				JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET,
 				selectFilter);	
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.setModifyTimeout(15);
 		runtimeChecker.start();
-		
+
 		TestWriterInterceptorException extension = new TestWriterInterceptorException("fizz", "fizzbuzz");
-		
-//		We need to register the extension advertising which interfaces is implementing
+
+		//		We need to register the extension advertising which interfaces is implementing
 		registerServiceForCleanup(extension, extensionProps, WriterInterceptor.class.getName());
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		post = webTarget.request().buildPost(Entity.entity("fizz", "text/plain"));
 		response = post.invoke();
 		assertEquals(200, response.getStatus());
 		result = response.readEntity(String.class);
 		assertEquals("fizzbuzz", result);
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.setModifyTimeout(15);
 		runtimeChecker.start();
-		
+
 		extensionProps.put(
 				JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET,
 				rejectFilter);			
 		updateServiceRegistration(extension, extensionProps);
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		Thread.sleep(2000);
-		
+
 		post = webTarget.request().buildPost(Entity.entity("fizz", "text/plain"));
 		response = post.invoke();
 		assertEquals(200, response.getStatus());
 		result = response.readEntity(String.class);
 		assertEquals("fizz", result);		
 	}
-	
+
 	/**
 	 * Creates an extension which targets the whitebord
 	 * Verify that the extension is used
@@ -1599,34 +1611,34 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 	 */
 	@Test
 	public void testDefaultAppWhiteboardTarget() throws IOException, InterruptedException, InvalidSyntaxException {
-		
+
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
-		
+
 		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
 		runtimeChecker.start();
-		
+
 		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);		
 		assertTrue(runtimeChecker.waitCreate());
-		
+
 		Long runtimeId = (Long) getJaxRsRuntimeServiceRef().getProperty(Constants.SERVICE_ID);
-		
+
 		String selectFilter = "(service.id=" + runtimeId + ")";
 		String rejectFilter = "(!" + selectFilter + ")";
-		
+
 		Dictionary<String, Object> helloProps = new Hashtable<>();
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
-				
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();		
-		
+
 		registerServiceForCleanup(HelloResource.class, new HelloResource(), helloProps);		
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		String checkUrl = url + "/replace";
 		Invocation post = null;
 		Client jerseyClient = ClientBuilder.newClient();
@@ -1637,43 +1649,43 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		String result = response.readEntity(String.class);
 		assertTrue(result.contains("fizz"));
 		assertFalse(result.contains("fizzbuzz"));
-		
+
 		Dictionary<String, Object> extensionProps = new Hashtable<>();
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, "true");
 		extensionProps.put(
 				JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET,
 				selectFilter);	
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.setModifyTimeout(15);
 		runtimeChecker.start();
-		
+
 		TestWriterInterceptorException extension = new TestWriterInterceptorException("fizz", "fizzbuzz");
-		
-//		We need to register the extension advertising which interfaces is implementing
+
+		//		We need to register the extension advertising which interfaces is implementing
 		registerServiceForCleanup(extension, extensionProps, WriterInterceptor.class.getName());
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		post = webTarget.request().buildPost(Entity.entity("fizz", "text/plain"));
 		response = post.invoke();
 		assertEquals(200, response.getStatus());
 		result = response.readEntity(String.class);
 		assertTrue(result.contains("fizzbuzz"));
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.setModifyTimeout(15);
 		runtimeChecker.start();
-		
+
 		extensionProps.put(
 				JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET,
 				rejectFilter);			
 		updateServiceRegistration(extension, extensionProps);
 		assertTrue(runtimeChecker.waitModify());
-		
+
 		Thread.sleep(2000);
-		
+
 		post = webTarget.request().buildPost(Entity.entity("fizz", "text/plain"));
 		response = post.invoke();
 		assertEquals(200, response.getStatus());
@@ -1681,30 +1693,30 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		assertTrue(result.contains("fizz"));
 		assertFalse(result.contains("fizzbuzz"));
 	}
-	
+
 	@Test
 	public void testRemoveSingletonExt() throws Exception {
-		
+
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
 		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
-		
+
 		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
 		runtimeChecker.start();
-		
+
 		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);		
 		assertTrue(runtimeChecker.waitCreate());
-		
+
 		Dictionary<String, Object> appProps = new Hashtable<>();
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "app");
 		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "App");
 		Application application = new Application(){};
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
-		
+
 		registerServiceForCleanup(Application.class, application, appProps);		
 		assertTrue(runtimeChecker.waitModify());
 
@@ -1714,34 +1726,88 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		extensionProps.put(
 				JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
 				"(osgi.jaxrs.name=App)");	
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.setModifyTimeout(15);
 		runtimeChecker.start();
-		
+
 		TestWriterInterceptorException extension = new TestWriterInterceptorException("fizz", "fizzbuzz");
-		
-//		We need to register the extension advertising which interfaces is implementing
+
+		//		We need to register the extension advertising which interfaces is implementing
 		registerServiceForCleanup(extension, extensionProps, WriterInterceptor.class.getName());		
 		assertTrue(runtimeChecker.waitModify());	
-		
+
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.setModifyTimeout(15);
 		runtimeChecker.start();
-		
+
 		unregisterService(application);
-		
+
 		assertTrue(runtimeChecker.waitModify());	
-		
+
+		Thread.sleep(2000);
+
 		ServiceChecker<WriterInterceptor> extChecker = createdCheckerTrackedForCleanUp(WriterInterceptor.class);
 		extChecker.start();
-		assertEquals(0, extChecker.getCurrentCreateCount(true));
-		
+		assertEquals(0, extChecker.getCurrentCreateCount(true));	
+
 	}
-	
-	
+
+	/**
+	 * Section 151.5 Register a JAX-RS MessageBodyReader and show that it
+	 * gets applied to the request
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testMessageBodyReaderExtension() throws Exception {
+		
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
+		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
+		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
+
+		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
+		runtimeChecker.start();
+
+		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);		
+		assertTrue(runtimeChecker.waitCreate());
+		
+		properties = new Hashtable<>();
+		properties.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, Boolean.TRUE);
+
+		registerServiceForCleanup(new EchoResource(), properties, EchoResource.class.getName());	
+
+
+		String checkURL = url + "/echo/body";
+		Invocation post = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(checkURL);
+		MediaType mt = new MediaType("osgi", "text", "UTF-8");
+		post = webTarget.request().buildPost(Entity.entity("fizz", mt.toString()));
+		Response response = post.invoke();
+		assertEquals(200, response.getStatus());
+		assertEquals("fizz", response.getEntity());
+
+
+
+		properties = new Hashtable<>();
+		properties.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION,
+				Boolean.TRUE);
+		registerServiceForCleanup(new OSGiTextMimeTypeCodec(), properties, MessageBodyReader.class.getName());	
+
+
+		assertTrue(runtimeChecker.waitModify());	
+
+		post = webTarget.request().buildPost(Entity.entity("fizz", mt.toString()));
+		response = post.invoke();
+		assertEquals(200, response.getStatus());
+		assertEquals("OSGi Read: fizz", response.getEntity());
+	}
+
+
 	private RuntimeDTO getRuntimeDTO() {
 		JaxrsServiceRuntime jaxRSRuntime = getJaxRsRuntimeService();
 		return jaxRSRuntime.getRuntimeDTO();
@@ -1751,7 +1817,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		JaxrsServiceRuntime jaxRSRuntime = getService(JaxrsServiceRuntime.class);
 		return jaxRSRuntime;
 	}
-	
+
 	private ServiceReference<JaxrsServiceRuntime> getJaxRsRuntimeServiceRef() {
 		ServiceReference<JaxrsServiceRuntime> jaxRSRuntime = getServiceReference(JaxrsServiceRuntime.class);
 		return jaxRSRuntime;

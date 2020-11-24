@@ -55,6 +55,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  * @author Mark Hoffmann
  * @since 12.10.2017
  */
+@SuppressWarnings("deprecation")
 @RunWith(MockitoJUnitRunner.class)
 public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 
@@ -472,7 +473,7 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		runtimeChecker.start();
 		
 		unregisterService(helloResource);
-		
+				
 		assertTrue(runtimeChecker.waitModify());
 		
 		System.out.println("Checking URL is not available anymore " + url + "/hello");

@@ -27,6 +27,7 @@ import org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvide
 import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
 import org.gecko.rest.jersey.runtime.application.feature.WhiteboardFeature;
 import org.osgi.framework.ServiceObjects;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
@@ -274,7 +275,18 @@ public class JerseyApplication extends Application {
 				Object obj = singletons.remove(key);
 				if(obj != null) {
 					log.info("UNREGISTERING SERVICE FOR RESOURCE " + contentProvider.getName() + " service " + obj);
-					((ServiceObjects) contentProvider.getProviderObject()).ungetService(obj);					
+					Object providerObj = contentProvider.getProviderObject();
+					if(providerObj instanceof ServiceObjects) {
+						ServiceObjects serviceObjs = (ServiceObjects) providerObj;
+						try {
+							serviceObjs.ungetService(obj);
+						} catch(IllegalArgumentException e) {
+							ServiceReference<?> ref = serviceObjs.getServiceReference();
+							System.out.println("Catched IAE ");
+						}
+						
+					}
+									
 				}				
 			}
 		} else {

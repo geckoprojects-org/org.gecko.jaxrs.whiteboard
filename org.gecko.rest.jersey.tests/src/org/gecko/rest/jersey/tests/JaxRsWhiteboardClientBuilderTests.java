@@ -65,6 +65,7 @@ import org.osgi.util.tracker.ServiceTracker;
  * @author Mark Hoffmann
  * @since 12.10.2017
  */
+@SuppressWarnings("deprecation")
 @RunWith(MockitoJUnitRunner.class)
 public class JaxRsWhiteboardClientBuilderTests extends AbstractOSGiTest{
 
@@ -272,7 +273,7 @@ public class JaxRsWhiteboardClientBuilderTests extends AbstractOSGiTest{
 		registerServiceForCleanup(HelloResource.class, res, helloProps);
 		
 		assertTrue(runtimeChecker.waitModify());
-
+		
 		try {
 			// Do another get
 			assertEquals("Hello_1_protoExtension",

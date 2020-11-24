@@ -38,6 +38,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  * @author Mark Hoffmann
  * @since 12.10.2017
  */
+@SuppressWarnings("deprecation")
 @RunWith(MockitoJUnitRunner.class)
 public class JaxRsWhiteboardChangeCountTest extends AbstractOSGiTest{
 

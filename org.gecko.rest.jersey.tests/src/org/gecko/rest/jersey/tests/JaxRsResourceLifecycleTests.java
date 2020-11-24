@@ -27,7 +27,8 @@ import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Response;
 
 import org.gecko.rest.jersey.provider.JerseyConstants;
-import org.gecko.rest.jersey.tests.resources.ContextInjectTestResource;
+import org.gecko.rest.jersey.tests.resources.ContextFieldInjectTestResource;
+import org.gecko.rest.jersey.tests.resources.ContextMethodInjectTestResource;
 import org.gecko.util.test.common.service.ServiceChecker;
 import org.gecko.util.test.common.test.AbstractOSGiTest;
 import org.junit.Test;
@@ -46,6 +47,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  * @author ilenia
  * @since Jun 15, 2020
  */
+@SuppressWarnings("deprecation")
 @RunWith(MockitoJUnitRunner.class)
 public class JaxRsResourceLifecycleTests extends AbstractOSGiTest{
 	
@@ -67,7 +69,7 @@ public class JaxRsResourceLifecycleTests extends AbstractOSGiTest{
 	
 	
 	@Test
-	public void testContextInject() throws IOException, InterruptedException, InvalidSyntaxException {
+	public void testMethodContextInject() throws IOException, InterruptedException, InvalidSyntaxException {
 	
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
@@ -101,13 +103,15 @@ public class JaxRsResourceLifecycleTests extends AbstractOSGiTest{
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.setModifyTimeout(15);
-		runtimeChecker.start();		
+		runtimeChecker.start();	
 		
-		registerServiceForCleanup(ContextInjectTestResource.class, new PrototypeServiceFactory() {
+		
+		
+		registerServiceForCleanup(ContextMethodInjectTestResource.class, new PrototypeServiceFactory() {
 
 			@Override
 			public Object getService(Bundle bundle, ServiceRegistration registration) {
-				return new ContextInjectTestResource();
+				return new ContextMethodInjectTestResource();
 			}
 
 			@Override
@@ -122,7 +126,7 @@ public class JaxRsResourceLifecycleTests extends AbstractOSGiTest{
 		Invocation post = null;
 		Client jerseyClient = ClientBuilder.newClient();
 		WebTarget webTarget = jerseyClient.target(checkUrl);
-		post = webTarget.request().header(ContextInjectTestResource.CUSTOM_HEADER, "test").buildGet();
+		post = webTarget.request().header(ContextMethodInjectTestResource.CUSTOM_HEADER, "test").buildGet();
 		Response response = post.invoke();
 		assertEquals(200, response.getStatus());
 		assertNotNull(response.getEntity());
@@ -132,7 +136,74 @@ public class JaxRsResourceLifecycleTests extends AbstractOSGiTest{
 	}
 	
 	@Test
-	public void testDefaultAppContextInject() throws IOException, InterruptedException, InvalidSyntaxException {
+	public void testFieldContextInject() throws IOException, InterruptedException, InvalidSyntaxException {
+	
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
+		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
+		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
+		
+		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
+		runtimeChecker.start();
+		
+		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);	
+		assertTrue(runtimeChecker.waitCreate());
+
+
+		Dictionary<String, Object> appProps = new Hashtable<>();
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "app");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "App");
+		Application application = new Application(){};
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		registerServiceForCleanup(Application.class, application, appProps);		
+		assertTrue(runtimeChecker.waitModify());
+		
+		Dictionary<String, Object> resProps = new Hashtable<>();
+		resProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		resProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Context Inject Res");
+		resProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=App)");
+				
+		runtimeChecker.stop();
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.setModifyTimeout(15);
+		runtimeChecker.start();	
+		
+		
+		
+		registerServiceForCleanup(ContextFieldInjectTestResource.class, new PrototypeServiceFactory() {
+
+			@Override
+			public Object getService(Bundle bundle, ServiceRegistration registration) {
+				return new ContextFieldInjectTestResource();
+			}
+
+			@Override
+			public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
+				// TODO Auto-generated method stub
+				
+			}
+		}, resProps);		
+		assertTrue(runtimeChecker.waitModify());	
+		
+		String checkUrl = url + "/app/whiteboard/context";
+		Invocation post = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(checkUrl);
+		post = webTarget.request().header(ContextFieldInjectTestResource.CUSTOM_HEADER, "test").buildGet();
+		Response response = post.invoke();
+		assertEquals(200, response.getStatus());
+		assertNotNull(response.getEntity());
+		String result = response.readEntity(String.class);
+		assertNotNull(result);
+		assertEquals("test", result);	
+	}
+	
+	@Test
+	public void testDefaultAppContextMethodInject() throws IOException, InterruptedException, InvalidSyntaxException {
 	
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
@@ -154,14 +225,54 @@ public class JaxRsResourceLifecycleTests extends AbstractOSGiTest{
 		runtimeChecker.setModifyTimeout(15);
 		runtimeChecker.start();		
 		
-		registerServiceForCleanup(ContextInjectTestResource.class, new ContextInjectTestResource(), resProps);		
+		registerServiceForCleanup(ContextMethodInjectTestResource.class, new ContextMethodInjectTestResource(), resProps);		
 		assertTrue(runtimeChecker.waitModify());	
 		
 		String checkUrl = url + "/whiteboard/context";
 		Invocation post = null;
 		Client jerseyClient = ClientBuilder.newClient();
 		WebTarget webTarget = jerseyClient.target(checkUrl);
-		post = webTarget.request().header(ContextInjectTestResource.CUSTOM_HEADER, "test").buildGet();
+		post = webTarget.request().header(ContextMethodInjectTestResource.CUSTOM_HEADER, "test").buildGet();
+		Response response = post.invoke();
+		assertEquals(200, response.getStatus());
+		assertNotNull(response.getEntity());
+		String result = response.readEntity(String.class);
+		assertNotNull(result);
+		assertEquals("test", result);	
+	}
+	
+	@Test
+	public void testDefaultAppContextFieldInject() throws IOException, InterruptedException, InvalidSyntaxException {
+	
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
+		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
+		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
+		
+		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
+		runtimeChecker.start();
+		
+		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);	
+		assertTrue(runtimeChecker.waitCreate());
+		
+		Dictionary<String, Object> resProps = new Hashtable<>();
+		resProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		resProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Context Inject Res");
+				
+		runtimeChecker.stop();
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.setModifyTimeout(15);
+		runtimeChecker.start();		
+		
+		registerServiceForCleanup(ContextFieldInjectTestResource.class, new ContextFieldInjectTestResource(), resProps);		
+		
+		assertTrue(runtimeChecker.waitModify());	
+		
+		String checkUrl = url + "/whiteboard/context";
+		Invocation post = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(checkUrl);
+		post = webTarget.request().header(ContextFieldInjectTestResource.CUSTOM_HEADER, "test").buildGet();
 		Response response = post.invoke();
 		assertEquals(200, response.getStatus());
 		assertNotNull(response.getEntity());

@@ -16,7 +16,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -26,11 +25,11 @@ import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.Response;
 
 import org.gecko.rest.jersey.provider.JerseyConstants;
-import org.gecko.rest.jersey.tests.applications.SimpleApplication;
-import org.gecko.rest.jersey.tests.resources.SessionManipulator;
+import org.gecko.rest.jersey.tests.applications.TestLegacySessionApplication;
 import org.gecko.util.test.common.service.ServiceChecker;
 import org.gecko.util.test.common.test.AbstractOSGiTest;
 import org.junit.Test;
@@ -45,6 +44,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  * @author ilenia
  * @since Jun 11, 2020
  */
+@SuppressWarnings("deprecation")
 @RunWith(MockitoJUnitRunner.class)
 public class ApplicationIsolationTests extends AbstractOSGiTest{
 	
@@ -89,10 +89,13 @@ public class ApplicationIsolationTests extends AbstractOSGiTest{
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
 		
+//		registerServiceForCleanup(Application.class,
+//				new SimpleApplication(
+//						Collections.singleton(SessionManipulator.class),
+//						Collections.emptySet()), appProps);
+		
 		registerServiceForCleanup(Application.class,
-				new SimpleApplication(
-						Collections.singleton(SessionManipulator.class),
-						Collections.emptySet()), appProps);
+				new TestLegacySessionApplication(), appProps);
 		
 		assertTrue(runtimeChecker.waitModify());
 		
@@ -105,10 +108,12 @@ public class ApplicationIsolationTests extends AbstractOSGiTest{
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
 		
+//		registerServiceForCleanup(Application.class,
+//				new SimpleApplication(
+//						Collections.singleton(SessionManipulator.class),
+//						Collections.emptySet()), appProps);
 		registerServiceForCleanup(Application.class,
-				new SimpleApplication(
-						Collections.singleton(SessionManipulator.class),
-						Collections.emptySet()), appProps);
+				new TestLegacySessionApplication(), appProps);
 		
 		assertTrue(runtimeChecker.waitModify());
 		
@@ -122,10 +127,9 @@ public class ApplicationIsolationTests extends AbstractOSGiTest{
 		req =  target1.request().buildPut(Entity.entity("fizzbuzz", "text/plain"));
 		Response response = req.invoke();
 		assertEquals(200, response.getStatus());
+		final Cookie sessionId = response.getCookies().get("JSESSIONID");
 		
-		
-		
-		req =  target1.request().buildGet();
+		req =  target1.request().cookie(sessionId).buildGet();
 		response = req.invoke();
 		assertEquals(200, response.getStatus());
 		assertNotNull(response.getEntity());

@@ -25,8 +25,11 @@ import org.gecko.rest.jersey.tests.resources.SessionManipulator;
  */
 public class TestLegacySessionApplication extends Application {
 	
+	SessionManipulator sessionManipulator = new SessionManipulator();
+	
 	@Override
 	public Set<Object> getSingletons() {
-		return Collections.singleton(new SessionManipulator());
+//		return Collections.singleton(new SessionManipulator());
+		return Collections.singleton(sessionManipulator);
 	}
 }
