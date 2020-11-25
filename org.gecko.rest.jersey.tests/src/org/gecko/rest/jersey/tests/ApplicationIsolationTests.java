@@ -89,11 +89,6 @@ public class ApplicationIsolationTests extends AbstractOSGiTest{
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
 		
-//		registerServiceForCleanup(Application.class,
-//				new SimpleApplication(
-//						Collections.singleton(SessionManipulator.class),
-//						Collections.emptySet()), appProps);
-		
 		registerServiceForCleanup(Application.class,
 				new TestLegacySessionApplication(), appProps);
 		
@@ -108,18 +103,12 @@ public class ApplicationIsolationTests extends AbstractOSGiTest{
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();
 		
-//		registerServiceForCleanup(Application.class,
-//				new SimpleApplication(
-//						Collections.singleton(SessionManipulator.class),
-//						Collections.emptySet()), appProps);
 		registerServiceForCleanup(Application.class,
 				new TestLegacySessionApplication(), appProps);
 		
-		assertTrue(runtimeChecker.waitModify());
+		assertTrue(runtimeChecker.waitModify());		
 		
-		
-		String urlApp1 = url + "/app1/whiteboard/session/fizz";
-		
+		String urlApp1 = url + "/app1/whiteboard/session/fizz";		
 
 		Invocation req = null;		
 		Client jerseyClient = ClientBuilder.newClient();
@@ -127,6 +116,8 @@ public class ApplicationIsolationTests extends AbstractOSGiTest{
 		req =  target1.request().buildPut(Entity.entity("fizzbuzz", "text/plain"));
 		Response response = req.invoke();
 		assertEquals(200, response.getStatus());
+		
+//		This is needed if we want to use the same session between different requests!!
 		final Cookie sessionId = response.getCookies().get("JSESSIONID");
 		
 		req =  target1.request().cookie(sessionId).buildGet();
@@ -136,21 +127,6 @@ public class ApplicationIsolationTests extends AbstractOSGiTest{
 		String result = response.readEntity(String.class);
 		assertNotNull(result);
 		assertEquals("fizzbuzz", result);
-		
-		
-//		String urlApp2 = url + "/app2/whiteboard/session/fizz";
-//		
-//		req = jerseyClient.target(urlApp2).request().buildPut(Entity.entity("buzz", "text/plain"));
-//		response = req.invoke();
-//		assertEquals(200, response.getStatus());		
-//		
-//		req = jerseyClient.target(urlApp2).request().buildGet();
-//		response = req.invoke();
-//		assertEquals(200, response.getStatus());
-//		assertNotNull(response.getEntity());
-//		result = response.readEntity(String.class);
-//		assertNotNull(result);
-//		assertEquals("buzz", result);
 	}
 	
 	/* 

@@ -649,7 +649,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 					whiteboard.registerApplication(currentDefaultProvider);
 					System.out.println("Registering default app " + currentDefaultProvider.getPath());
 					currentDefaultProvider.markUnchanged();
-				} else 	if (currentDefaultProvider != null &&  currentDefaultProvider.isChanged()) {
+				} else 	if (currentDefaultProvider != null && currentDefaultProvider.isChanged()) {
 					if (whiteboard.isRegistered(currentDefaultProvider)) {
 						System.out.println("Reloading default app " + currentDefaultProvider.getPath());
 						whiteboard.reloadApplication(currentDefaultProvider);

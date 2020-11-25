@@ -153,7 +153,8 @@ public class DispatcherHelperTest {
 		JaxRsApplicationProvider defaultProvider02 = createApplicationProvider(".default", Integer.valueOf(30), Long.valueOf(3));
 		providers.add(defaultProvider02);
 		providers.add(createApplicationProvider("test54", Integer.valueOf(40), Long.valueOf(4)));
-		providers.add(createApplicationProvider(".default", Integer.valueOf(50), Long.valueOf(5), true));
+		JaxRsApplicationProvider defaultProvider03 = createApplicationProvider(".default", Integer.valueOf(50), Long.valueOf(5), true);
+		providers.add(defaultProvider03);
 		
 		Set<JaxRsApplicationProvider> result = DispatcherHelper.getDefaultApplications(providers);
 		assertEquals(2, result.size());

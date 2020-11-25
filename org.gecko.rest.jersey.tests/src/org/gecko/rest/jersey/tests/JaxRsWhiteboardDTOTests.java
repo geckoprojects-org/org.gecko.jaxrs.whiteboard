@@ -668,6 +668,8 @@ public class JaxRsWhiteboardDTOTests extends AbstractOSGiTest {
 		
 		registerServiceForCleanup(HelloResource.class, new HelloResource(), resProps);		
 		assertTrue(runtimeChecker.waitModify());
+		
+		Thread.sleep(2000);
 				
 		RuntimeDTO runtimeDTO = getRuntimeDTO();
 		assertEquals(1, runtimeDTO.applicationDTOs.length);
@@ -724,7 +726,9 @@ public class JaxRsWhiteboardDTOTests extends AbstractOSGiTest {
 		
 		registerServiceForCleanup(HelloResource.class, new HelloResource(), resProps);		
 		assertTrue(runtimeChecker.waitModify());
-				
+			
+		Thread.sleep(2000);
+		
 		RuntimeDTO runtimeDTO = getRuntimeDTO();
 		assertEquals(1, runtimeDTO.applicationDTOs.length);
 		assertEquals(1, runtimeDTO.failedResourceDTOs.length);
@@ -780,6 +784,8 @@ public class JaxRsWhiteboardDTOTests extends AbstractOSGiTest {
 	
 		registerServiceForCleanup(HelloResource.class, new HelloResServiceFactory(()->null, (a,b)-> {}), resProps);		
 		assertTrue(runtimeChecker.waitModify());
+		
+		Thread.sleep(2000);
 				
 		RuntimeDTO runtimeDTO = getRuntimeDTO();
 		assertEquals(1, runtimeDTO.applicationDTOs.length);

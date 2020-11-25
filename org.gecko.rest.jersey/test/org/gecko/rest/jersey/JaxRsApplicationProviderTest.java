@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.ws.rs.core.Application;
+import javax.ws.rs.ext.MessageBodyReader;
 
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
@@ -380,7 +381,8 @@ public class JaxRsApplicationProviderTest {
 		contentProperties.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		JaxRsResourceProvider resource = new JerseyResourceProvider<Object>(serviceObject, contentProperties);
 		
-		assertFalse(provider.addResource(resource));
+//		assertFalse(provider.addResource(resource));
+		assertFalse(resource.canHandleApplication(provider));
 		assertFalse(provider.isChanged());
 		assertFalse(provider.removeResource(resource));
 		assertFalse(provider.isChanged());
@@ -390,7 +392,8 @@ public class JaxRsApplicationProviderTest {
 		contentProperties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
 		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(serviceObject, contentProperties);
 		
-		assertFalse(provider.addExtension(extension));
+//		assertFalse(provider.addExtension(extension));
+		assertFalse(extension.canHandleApplication(provider));
 		assertFalse(provider.isChanged());
 		assertFalse(provider.removeExtension(extension));
 		assertFalse(provider.isChanged());
@@ -446,7 +449,8 @@ public class JaxRsApplicationProviderTest {
 		contentProperties.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		JaxRsResourceProvider resource = new JerseyResourceProvider<Object>(serviceObject, contentProperties);
 		
-		assertFalse(provider.addResource(resource));
+		assertFalse(resource.canHandleApplication(provider));
+//		assertFalse(provider.addResource(resource));
 		assertFalse(provider.isChanged());
 		assertFalse(provider.removeResource(resource));
 		assertFalse(provider.isChanged());
@@ -456,7 +460,8 @@ public class JaxRsApplicationProviderTest {
 		contentProperties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
 		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(serviceObject, contentProperties);
 		
-		assertFalse(provider.addExtension(extension));
+		assertFalse(extension.canHandleApplication(provider));
+//		assertFalse(provider.addExtension(extension));
 		assertFalse(provider.isChanged());
 		assertFalse(provider.removeExtension(extension));
 		assertFalse(provider.isChanged());
@@ -500,7 +505,12 @@ public class JaxRsApplicationProviderTest {
 		when(serviceObject.getService()).thenReturn(new TestExtension());
 		contentProperties.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, "true");
 		contentProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "ext_one");
-		contentProperties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(serviceObject, contentProperties);
+		
+//		This should advertise one of the valid extension types to be considered an extension
+//		contentProperties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});		
+		contentProperties.put(Constants.OBJECTCLASS, new String[] {MessageBodyReader.class.getName()});		
+		
+		JaxRsExtensionProvider extension = new JerseyExtensionProvider<Object>(serviceObject, contentProperties);
 		
 		assertTrue(provider.addExtension(extension));
 		assertTrue(provider.isChanged());

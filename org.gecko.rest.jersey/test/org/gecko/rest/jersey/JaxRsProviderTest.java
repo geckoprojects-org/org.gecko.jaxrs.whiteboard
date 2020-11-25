@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.ws.rs.core.Application;
+import javax.ws.rs.ext.MessageBodyReader;
 
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
@@ -118,7 +119,10 @@ public class JaxRsProviderTest {
 	@Test
 	public void testNameExtension() {
 		Map<String, Object> properties = new HashMap<>();
-		properties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
+//		This should advertise one of the valid extension types to be considered an extension
+//		properties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
+		properties.put(Constants.OBJECTCLASS, new String[] {MessageBodyReader.class.getName()});		
+		
 		when(serviceObject.getService()).thenReturn(new TestExtension());
 		JaxRsExtensionProvider extProvider = new JerseyExtensionProvider<Object>(serviceObject, properties);
 		// generated name

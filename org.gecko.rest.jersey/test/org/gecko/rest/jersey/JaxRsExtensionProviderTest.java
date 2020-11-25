@@ -19,6 +19,8 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.ext.MessageBodyReader;
+
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
 import org.gecko.rest.jersey.resources.TestApplication;
@@ -81,7 +83,10 @@ public class JaxRsExtensionProviderTest {
 		
 		resourceProperties.clear();
 		resourceProperties.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, "true");
-		resourceProperties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
+		
+//		This should advertise one of the valid extension types to be considered an extension
+//		resourceProperties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
+		resourceProperties.put(Constants.OBJECTCLASS, new String[] {MessageBodyReader.class.getName()});
 		resourceProvider = new JerseyExtensionProvider<Object>(serviceObject, resourceProperties);
 		
 		resourceDto = resourceProvider.getExtensionDTO();

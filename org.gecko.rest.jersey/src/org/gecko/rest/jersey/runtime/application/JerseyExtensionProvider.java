@@ -62,10 +62,26 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 	
 	public JerseyExtensionProvider(ServiceObjects<T> serviceObjects, Map<String, Object> properties) {
 		super(serviceObjects, properties);
+		checkExtensionProperty(properties);
 		extractContracts(properties);
 		
 	}
 	
+	/**
+	 * If the ExtensionProvider does not advertise the property osgi.jaxrs.extension as true then it is not a 
+	 * valid extenstion
+	 * 
+	 * @param properties
+	 */
+	private void checkExtensionProperty(Map<String, Object> properties) {
+		if(!properties.containsKey(JaxrsWhiteboardConstants.JAX_RS_EXTENSION) || 
+				properties.get(JaxrsWhiteboardConstants.JAX_RS_EXTENSION).equals(false)) {
+			
+			updateStatus(DTOConstants.FAILURE_REASON_NOT_AN_EXTENSION_TYPE);
+		}
+		
+	}
+
 	private void extractContracts(Map<String, Object> properties) {
 		String[] objectClasses = (String[]) properties.get(Constants.OBJECTCLASS);
 		List<Class<?>> possibleContracts = new ArrayList<>(objectClasses.length);
@@ -92,7 +108,7 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 	 */
 	@Override
 	public boolean isExtension() {
-		return getProviderStatus() != INVALID;
+		return (getProviderStatus() != INVALID) && (getProviderStatus() != DTOConstants.FAILURE_REASON_NOT_AN_EXTENSION_TYPE) ;
 	}
 
 	/* 
