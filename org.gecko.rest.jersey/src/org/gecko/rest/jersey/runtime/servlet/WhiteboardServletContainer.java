@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.gecko.rest.jersey.helper.DestroyListener;
+import org.gecko.rest.jersey.runtime.common.ResourceConfigWrapper;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
@@ -35,6 +36,13 @@ public class WhiteboardServletContainer extends ServletContainer {
 
 	private DestroyListener destroyListener;
 
+	private ResourceConfigWrapper wrapper;
+
+	public WhiteboardServletContainer(ResourceConfigWrapper config, DestroyListener destroyListener) {
+		this(config.config, destroyListener);
+		this.wrapper = config;
+	}
+
 	public WhiteboardServletContainer(ResourceConfig config, DestroyListener destroyListener) {
 		super(config);
 		this.destroyListener = destroyListener;
@@ -45,12 +53,14 @@ public class WhiteboardServletContainer extends ServletContainer {
 	 */
 	@Override
 	public void init() throws ServletException {
+		
 		lock.writeLock().lock();
 		try {
 			super.init();
 			initialized.set(true);
 			if (config != null) {
-				super.reload(config);
+				this.reload(config);
+				wrapper.setInjectionManager(getApplicationHandler().getInjectionManager());
 				config = null;
 			}
 		} finally {
@@ -98,6 +108,21 @@ public class WhiteboardServletContainer extends ServletContainer {
 		super.destroy();
 		if(destroyListener != null) {
 			destroyListener.servletContainerDestroyed(this);
+		}
+	}
+
+	/**
+	 * @param config2
+	 */
+	public void reloadWrapper(ResourceConfigWrapper wrapper) {
+		config = wrapper.config;
+		this.wrapper = wrapper;
+		if (!initialized.get()) {
+			return;
+		}
+		reload(config);
+		if(getApplicationHandler() != null) {
+			wrapper.setInjectionManager(getApplicationHandler().getInjectionManager());
 		}
 	}
 }

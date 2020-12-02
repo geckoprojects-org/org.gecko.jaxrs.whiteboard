@@ -27,6 +27,7 @@ import org.gecko.rest.jersey.helper.JerseyHelper;
 import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
 import org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime;
+import org.gecko.rest.jersey.runtime.common.ResourceConfigWrapper;
 import org.gecko.rest.jersey.runtime.servlet.WhiteboardServletContainer;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
@@ -174,12 +175,44 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 
 			@Override
 			public Servlet getService(Bundle bundle, ServiceRegistration<Servlet> registration) {
-				ResourceConfig config = createResourceConfig(provider);
+				ResourceConfig config = createResourceConfig(provider).config;
 				ServletContainer container = new WhiteboardServletContainer(config, provider);
 				provider.addServletContainer(container);
 				return container;
 			}
 
+			@Override
+			public void ungetService(Bundle bundle, ServiceRegistration<Servlet> registration, Servlet service) {
+				provider.removeServletContainer((ServletContainer) service);
+			}
+			
+		}, props);
+		
+		applicationServletRegistrationMap.put(provider.getId(), serviceRegistration);
+	}
+
+	protected void doRegisterServletContainer(JaxRsApplicationProvider provider, String path) {
+		Dictionary<String, Object> props = new Hashtable<>();
+		props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, basePath + path);
+		String target = (String) context.getProperties().get(HttpWhiteboardConstants.HTTP_WHITEBOARD_TARGET);
+		if(target != null){
+			props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_TARGET, target);
+		}
+		String select = (String) context.getProperties().get(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT);
+		if(select != null){
+			props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT, select);
+		}
+		
+		ServiceRegistration<Servlet> serviceRegistration = context.getBundleContext().registerService(Servlet.class, new PrototypeServiceFactory<Servlet>() {
+			
+			@Override
+			public Servlet getService(Bundle bundle, ServiceRegistration<Servlet> registration) {
+				ResourceConfigWrapper configWrapper = createResourceConfig(provider);
+				ServletContainer container = new WhiteboardServletContainer(configWrapper, provider);
+				provider.addServletContainer(container);
+				return container;
+			}
+			
 			@Override
 			public void ungetService(Bundle bundle, ServiceRegistration<Servlet> registration, Servlet service) {
 				provider.removeServletContainer((ServletContainer) service);

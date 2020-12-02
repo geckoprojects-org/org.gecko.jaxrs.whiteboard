@@ -16,7 +16,7 @@ import java.util.Set;
 
 import org.gecko.rest.jersey.binder.PrototypeServiceBinder;
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvider;
-import org.glassfish.hk2.api.Factory;
+import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.osgi.framework.ServiceObjects;
 
 /**
@@ -26,12 +26,13 @@ import org.osgi.framework.ServiceObjects;
  * @author Mark Hoffmann
  * @since 12.07.2017
  */
-public class JerseyResourceInstanceFactory<T> implements Factory<T> {
+public class JerseyResourceInstanceFactory<T> implements InjectableFactory<T> {
 
 	private volatile Set<T> instanceCache = new HashSet<>();
 	private JaxRsApplicationContentProvider provider;
 	private ServiceObjects<T> serviceObjects;
-
+	private InjectionManager injectionManager;
+	
 	/**
 	 * Creates a new instance. A service reference will be cached lazily, on the first request
 	 * @param clazz the resource class
@@ -60,6 +61,12 @@ public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 				return null;
 			}
 			T instance = serviceObjects.getService();
+			if(instance == null) {
+				return null;
+			}
+			if(injectionManager != null) {
+				injectionManager.inject(instance);
+			}
 			synchronized (instanceCache) {
 				instanceCache.add(instance);
 			}
@@ -110,6 +117,15 @@ public class JerseyResourceInstanceFactory<T> implements Factory<T> {
 				throw new IllegalStateException("Error disposing instance " + instance, e);
 			}
 		}
+	}
+	
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.rest.jersey.factories.InjectableFactory#setInjectionManager(org.glassfish.jersey.internal.inject.InjectionManager)
+	 */
+	@Override
+	public void setInjectionManager(InjectionManager injectionManager) {
+		this.injectionManager = injectionManager;
 	}
 
 }

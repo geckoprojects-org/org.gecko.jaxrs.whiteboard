@@ -31,6 +31,7 @@ import javax.ws.rs.core.Application;
 
 import org.gecko.rest.jersey.binder.PrototypeServiceBinder;
 import org.gecko.rest.jersey.dto.DTOConverter;
+import org.gecko.rest.jersey.factories.InjectableFactory;
 import org.gecko.rest.jersey.factories.JerseyExtensionInstanceFactory;
 import org.gecko.rest.jersey.factories.JerseyResourceInstanceFactory;
 import org.gecko.rest.jersey.helper.JerseyHelper;
@@ -39,7 +40,7 @@ import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsResourceProvider;
 import org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
-import org.glassfish.hk2.api.Factory;
+import org.gecko.rest.jersey.runtime.servlet.WhiteboardServletContainer;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.osgi.framework.ServiceReference;
@@ -359,9 +360,10 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 			logger.log(Level.SEVERE, "There is already an application registered with name: " + applicationProvider.getId());
 			throw new IllegalStateException("There is already an application registered with name: " + applicationProvider.getId());
 		}
-		ResourceConfig config = createResourceConfig(applicationProvider);
+//		ResourceConfig config = createResourceConfig(applicationProvider);
+//		ResourceConfigWrapper config = createResourceConfig(applicationProvider);
 		String applicationPath = applicationProvider.getPath();
-		doRegisterServletContainer(applicationProvider, applicationPath, config);
+		doRegisterServletContainer(applicationProvider, applicationPath);
 		applicationContainerMap.put(applicationProvider.getId(), applicationProvider);
 		
 //		if(!applicationProvider.isDefault()) {
@@ -376,6 +378,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 * @param path to path to add it for
 	 */
 	protected abstract void doRegisterServletContainer(JaxRsApplicationProvider provider, String path, ResourceConfig config);
+	protected abstract void doRegisterServletContainer(JaxRsApplicationProvider provider, String path);
 
 	/* 
 	 * (non-Javadoc)
@@ -480,8 +483,9 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 				
 				copyList.forEach(servletContainer -> {
 					try{
-						ResourceConfig config = createResourceConfig(provider);
-						servletContainer.reload(config);
+						ResourceConfigWrapper config = createResourceConfig(provider);
+						
+						((WhiteboardServletContainer) servletContainer).reloadWrapper(config);
 					} catch(Exception e) {
 						//We cant't check if the surrounding container is started, so we have to do it this way
 						logger.log(Level.WARNING, "Jetty servlet context handler is not started yet", e);
@@ -542,15 +546,17 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 * Jersey factories for prototype scoped resource services and singletons separately
 	 * @param applicationProvider the JaxRs application application provider
 	 */
-	protected ResourceConfig createResourceConfig(JaxRsApplicationProvider applicationProvider) {
+	protected ResourceConfigWrapper createResourceConfig(JaxRsApplicationProvider applicationProvider) {
 		if (applicationProvider == null) {
 			logger.log(Level.WARNING, "Cannot create a resource configuration for null application provider");
 			return null;
 		}
 		Application application = applicationProvider.getJaxRsApplication();
 //		logger.log(Level.INFO, "Create configuration for application " + applicationProvider.getId() + " Singletons: " + application.getSingletons() + ", Classes: " + application.getClasses());
+		ResourceConfigWrapper wrapper = new ResourceConfigWrapper();
 		ResourceConfig config = ResourceConfig.forApplication(application);
-
+		wrapper.config = config;
+		
 		PrototypeServiceBinder resBinder = new PrototypeServiceBinder();
 		AtomicBoolean resRegistered = new AtomicBoolean(false);
 		
@@ -563,15 +569,19 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 			if (context == null) {
 				throw new IllegalStateException("Cannot create prototype factories without component context");
 			}
+			InjectableFactory<?> factory = null;
 			if(provider instanceof JaxRsResourceProvider) {
 				resRegistered.set(true);
-				Factory<?> factory = new JerseyResourceInstanceFactory<>(provider);
+				factory = new JerseyResourceInstanceFactory<>(provider);
 				resBinder.register(provider.getObjectClass(), factory);
 			}
 			else if(provider instanceof JaxRsExtensionProvider) {
 				extRegistered.set(true);
-				Factory<?> factory = new JerseyExtensionInstanceFactory<>(provider);
+				factory = new JerseyExtensionInstanceFactory<>(provider);
 				extBinder.register(provider.getObjectClass(), factory);
+			}
+			if(factory != null) {
+				wrapper.factories.add(factory);
 			}
 		});
 		if (resRegistered.get()) {
@@ -580,7 +590,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 		if(extRegistered.get()) {
 			config.register(extBinder);
 		}
-		return config;
+		return wrapper;
 	}
 
 	/**

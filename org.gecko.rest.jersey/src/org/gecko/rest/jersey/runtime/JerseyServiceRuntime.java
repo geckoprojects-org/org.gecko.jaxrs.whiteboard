@@ -35,6 +35,7 @@ import org.gecko.rest.jersey.jetty.JettyServerRunnable;
 import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
 import org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime;
+import org.gecko.rest.jersey.runtime.common.ResourceConfigWrapper;
 import org.gecko.rest.jersey.runtime.servlet.WhiteboardServletContainer;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
@@ -164,6 +165,26 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	@Override
 	protected void doRegisterServletContainer(JaxRsApplicationProvider applicationProvider, String path,
 			ResourceConfig config) {
+		WhiteboardServletContainer container = new WhiteboardServletContainer(config, applicationProvider);
+		if (!applicationProvider.getServletContainers().isEmpty()) {
+			throw new IllegalStateException("There is alread a ServletContainer registered for this application "
+					+ applicationProvider.getId());
+		}
+		applicationProvider.getServletContainers().add(container);
+		ServletHolder servlet = new ServletHolder(container);
+		contextHandler.addServlet(servlet, path);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#
+	 * doRegisterServletContainer(org.glassfish.jersey.servlet.ServletContainer,
+	 * org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider)
+	 */
+	@Override
+	protected void doRegisterServletContainer(JaxRsApplicationProvider applicationProvider, String path) {
+		ResourceConfigWrapper config = createResourceConfig(applicationProvider);
 		WhiteboardServletContainer container = new WhiteboardServletContainer(config, applicationProvider);
 		if (!applicationProvider.getServletContainers().isEmpty()) {
 			throw new IllegalStateException("There is alread a ServletContainer registered for this application "

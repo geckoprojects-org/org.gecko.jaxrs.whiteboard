@@ -14,13 +14,11 @@ package org.gecko.rest.jersey.runtime.common;
 import java.util.concurrent.ExecutorService;
 
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.SyncInvoker;
 import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.Response;
 
 import org.osgi.service.jaxrs.client.PromiseRxInvoker;
-import org.osgi.util.promise.Deferred;
 import org.osgi.util.promise.Promise;
 import org.osgi.util.promise.PromiseFactory;
 

@@ -13,7 +13,7 @@ package org.gecko.rest.jersey.factories;
 
 import org.gecko.rest.jersey.binder.PrototypeServiceBinder;
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvider;
-import org.glassfish.hk2.api.Factory;
+import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.osgi.framework.ServiceObjects;
 
 /**
@@ -23,12 +23,13 @@ import org.osgi.framework.ServiceObjects;
  * @author Mark Hoffmann
  * @since 12.07.2017
  */
-public class JerseyExtensionInstanceFactory<T> implements Factory<T> {
+public class JerseyExtensionInstanceFactory<T> implements InjectableFactory<T> {
 
 //	private volatile Set<T> instanceCache = new HashSet<>();
 	private volatile T instance;
 	private JaxRsApplicationContentProvider provider;
 	private ServiceObjects<T> serviceObjects;
+	private InjectionManager injectionManager;
 
 	/**
 	 * Creates a new instance. A service reference will be cached lazily, on the first request
@@ -58,6 +59,9 @@ public class JerseyExtensionInstanceFactory<T> implements Factory<T> {
 				return null;
 			}
 			T instance = serviceObjects.getService();
+			if(injectionManager != null) {
+				injectionManager.inject(instance);
+			}
 			synchronized (this.instance) {
 				this.instance = instance;
 			}
@@ -95,19 +99,15 @@ public class JerseyExtensionInstanceFactory<T> implements Factory<T> {
 	 * @param instance the instance to be released
 	 */
 	private void disposeInstance(T instance) {
-//		if (instance == null) {
-//			return;
-//		}
-//		if (instanceCache.remove(instance)) {
-//			try {
-//				serviceObjects.ungetService(instance);
-//			} catch (Exception e) {
-//				if (e instanceof IllegalStateException) {
-//					throw e;
-//				}
-//				throw new IllegalStateException("Error disposing instance " + instance, e);
-//			}
-//		}
+	}
+
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.rest.jersey.factories.InjectableFactory#setInjectionManager(org.glassfish.jersey.internal.inject.InjectionManager)
+	 */
+	@Override
+	public void setInjectionManager(InjectionManager injectionManager) {
+		this.injectionManager = injectionManager;
 	}
 
 }
