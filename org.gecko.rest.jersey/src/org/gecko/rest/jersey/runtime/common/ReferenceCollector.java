@@ -85,9 +85,6 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 					handleExtensionReferences(dispatcher, sre);
 				} else {
 					handleResourceReferences(dispatcher, sre);
-					for(String k : sre.getReference().getPropertyKeys()) {
-						System.out.println("Ref Property " + k + " " + sre.getReference().getProperty(k));
-					}					
 				}
 			});
 			
@@ -101,9 +98,6 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 			pushStream.window(batchDuration, sec -> sec).onError(e -> logger.log(Level.SEVERE, "Error adding new JaxRs Provider ", e)).forEach(sec -> {
 				sec.stream().filter(sre -> sre.isResource()).forEach(sre -> {
 					handleResourceReferences(dispatcher, sre);
-					for(String k : sre.getReference().getPropertyKeys()) {
-						System.out.println("Ref Property " + k + " " + sre.getReference().getProperty(k));
-					}
 				});
 				sec.stream().filter(sre -> sre.isExtension()).forEach(sre -> {
 					handleExtensionReferences(dispatcher, sre);
@@ -124,7 +118,7 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 		switch (sre.getType()) {
 		case ADD:
 		case MODIFY:
-			logger.info("Handle extension " + sre.getType() + " properties: " + properties);
+			logger.fine("Handle extension " + sre.getType() + " properties: " + properties);
 			ServiceObjects so = context.getServiceObjects(sre.getReference());
 			dispatcher.addExtension(so, properties);
 			break;
@@ -144,7 +138,7 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 		switch (sre.getType()) {
 		case ADD:
 		case MODIFY:
-			logger.info("Handle resource " + sre.getType() + " properties: " + properties);
+			logger.fine("Handle resource " + sre.getType() + " properties: " + properties);
 			ServiceObjects so = context.getServiceObjects(sre.getReference());
 			dispatcher.addResource(so, properties);
 			break;
@@ -172,21 +166,6 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 		dispatcherMap.clear();
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.osgi.util.tracker.ServiceTrackerCustomizer#addingService(org.osgi.framework.ServiceReference)
-	 */
-//	@Override
-//	public Object addingService(ServiceReference<Object> reference) {
-//		ServiceReferenceEvent event = new ServiceReferenceEvent(reference, Type.ADD);
-//		Object service = context.getService(reference);
-//		if(service == null) {
-//			return null;
-//		}
-//		source.publish(event);
-//		contentReferences.put(reference, event);
-//		return service;
-//	}
-	
 	@Override
 	public Object addingService(ServiceReference<Object> reference) {
 		ServiceReferenceEvent event = new ServiceReferenceEvent(reference, Type.ADD);
@@ -194,8 +173,7 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 		try {
 			service = context.getServiceObjects(reference);
 		} catch (Exception e) {
-			System.out.println("I am in the ServiceException!!");
-			logger.warning(e.getMessage());
+			logger.log(Level.SEVERE, "Cannot get service objects from reference: " + reference, e);
 		}
 		source.publish(event);
 		contentReferences.put(reference, event);
@@ -221,6 +199,5 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 		source.publish(event);
 		context.ungetService(reference);
 	}
-	
 	
 }

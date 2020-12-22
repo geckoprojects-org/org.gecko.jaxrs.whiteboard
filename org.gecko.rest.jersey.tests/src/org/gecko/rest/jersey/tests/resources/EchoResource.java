@@ -50,6 +50,7 @@ public class EchoResource {
 		MediaType mediaType = headers.getMediaType();
 		boolean returnOSGiText = mediaType.getType().equals("osgi")
 				&& mediaType.getSubtype().equals("text");
+		System.out.println("BODY IS OSGI TEXT " + returnOSGiText + ", body: " + body);
 		return Response.ok(body)
 				.type(returnOSGiText ? mediaType : MediaType.TEXT_PLAIN_TYPE)
 				.build();
@@ -65,15 +66,15 @@ public class EchoResource {
 				.build();
 	}
 
-	@GET
-	@Path("promise")
-	@Produces(MediaType.TEXT_PLAIN)
-	public void echoHeader(@Suspended AsyncResponse async,
-			@HeaderParam("echo") Promise<String> echo) {
-
-		echo.onSuccess(s -> async
-				.resume(Response.ok(echo.getValue()).type(MediaType.TEXT_PLAIN).build()));
-	}
+//	@GET
+//	@Path("promise")
+//	@Produces(MediaType.TEXT_PLAIN)
+//	public void echoHeader(@Suspended AsyncResponse async,
+//			@HeaderParam("echo") Promise<String> echo) {
+//
+//		echo.onSuccess(s -> async
+//				.resume(Response.ok(echo.getValue()).type(MediaType.TEXT_PLAIN).build()));
+//	}
 
 
 

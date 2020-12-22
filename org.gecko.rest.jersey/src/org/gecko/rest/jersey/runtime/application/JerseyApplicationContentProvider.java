@@ -103,34 +103,6 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 		return getProviderProperties();
 	}
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.eclipselabs.osgi.jersey.JaxRsResourceProvider#canHandleApplication(org.eclipselabs.osgi.jersey.JaxRsApplicationProvider)
-	 */
-//	@Override
-//	public boolean canHandleApplication(JaxRsApplicationProvider application) {
-//		if (applicationFilter != null) {
-//			try {
-//				boolean applicationMatch = applicationFilter.matches(application.getApplicationProperties());
-//				if (!applicationMatch) {
-//					logger.log(Level.FINE, "[" + getId() + "] The given application select filter does not match to this application " + application.getId() + " for this resource/extension: " + getId());
-//					return false;
-//				}
-//			} catch (Exception e) {
-//				logger.log(Level.WARNING, "The given application select filter causes an error: " + applicationFilter, e);
-//				return false;
-//			}
-//		} else {
-//			if (!application.isDefault()) {
-//				logger.log(Level.INFO, "[" + getId() + "] There is no application select filter defined, using default application");
-//				return false;
-//			} else {
-//				return canHandleDefaultApplication();
-//			}
-//		}
-//		return true;
-//	}
-	
 	@Override
 	public boolean canHandleApplication(JaxRsApplicationProvider application) {
 		if (applicationFilter != null) {
@@ -148,7 +120,7 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 			if (!application.isDefault()) {
 //				Check if app is a potential default app
 				if(".default".equals(application.getName()) || "/".equals(application.getPath()) || "/*".equals(application.getPath())) {
-					logger.info("Potential default app " + application.getName() + " can handle content");
+					logger.fine("Potential default app " + application.getName() + " can handle content");
 					return true;
 				}
 				logger.log(Level.INFO, "[" + getId() + "] There is no application select filter defined, using default application");

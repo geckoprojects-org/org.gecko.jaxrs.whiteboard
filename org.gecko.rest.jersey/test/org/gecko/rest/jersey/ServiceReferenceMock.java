@@ -15,11 +15,9 @@ import org.osgi.framework.ServiceReference;
  */
 public class ServiceReferenceMock<T> implements ServiceReference<T> {
 
-	private T service;
 	private Map<Object, Object> props;
 
 	public ServiceReferenceMock(T service, Map<Object, Object> props) {
-		this.service = service;
 		this.props = props;
 	}
 	

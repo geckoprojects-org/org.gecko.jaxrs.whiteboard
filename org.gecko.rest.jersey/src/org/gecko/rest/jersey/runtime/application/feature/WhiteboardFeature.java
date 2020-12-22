@@ -57,7 +57,6 @@ public class WhiteboardFeature implements Feature{
 	@SuppressWarnings("unchecked")
 	public void dispose() {
 		serviceObjTrackingMap.forEach((k,v) -> {
-			System.out.println("UNGETTING " + k);
 			v.ungetService(k);
 		});
 		serviceObjTrackingMap.clear();
@@ -67,7 +66,6 @@ public class WhiteboardFeature implements Feature{
 	@SuppressWarnings("unchecked")
 	public void dispose(Object serviceObject) {
 		if(serviceObjTrackingMap.containsKey(serviceObject)) {
-			System.out.println("UNGETTING SERVICE FOR EXTENSION ");
 			serviceObjTrackingMap.get(serviceObject).ungetService(serviceObject);
 			serviceObjTrackingMap.remove(serviceObject);
 		}

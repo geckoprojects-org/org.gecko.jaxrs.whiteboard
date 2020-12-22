@@ -173,44 +173,6 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		return Collections.unmodifiableSet(new HashSet<>(extensionProviderCache.values()));
 	}
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher#addApplication(javax.ws.rs.core.Application, java.util.Map)
-	 */
-//	@Override
-//	public void addApplication(Application application, Map<String, Object> properties) {
-//		JaxRsApplicationProvider provider = new JerseyApplicationProvider(application, properties);
-//		/*
-//		 * Section 151.6.1 The default application can be replaced, with another one using another base path
-//		 */
-//		if(provider.isDefault()) {
-//			defaultProvider = provider;
-//			currentDefaultProvider = provider;
-//			if(whiteboard != null) {
-//				whiteboard.registerApplication(currentDefaultProvider);
-//				currentDefaultProvider.markUnchanged();
-//			}
-//			return;
-//		} else if (provider.getName().equals(".default") && currentDefaultProvider != null) {
-//			Object providerBase = provider.getApplicationProperties().get(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE);
-//			Object currentBase = currentDefaultProvider.getApplicationProperties().get(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE);
-//			if (providerBase != null && !providerBase.equals(currentBase)) {
-//				currentDefaultProvider.updateApplicationBase((String) providerBase);
-//				if (whiteboard != null) {
-//					whiteboard.unregisterApplication(currentDefaultProvider);
-//					whiteboard.registerApplication(currentDefaultProvider);
-//					currentDefaultProvider.markUnchanged();
-//				}
-//			}
-//			return;
-//		}
-//		String key = provider.getId();
-//		if (!applicationProviderCache.containsKey(key)) {
-//			logger.info("Adding Application with id " + provider.getName());
-//			applicationProviderCache.put(key, provider);
-//			checkDispatch();
-//		}
-//	}
 	
 	@Override
 	public void addApplication(Application application, Map<String, Object> properties) {
@@ -245,9 +207,9 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		JaxRsApplicationProvider provider = new JerseyApplicationProvider(null, properties);
 		String key = provider.getId();
 		JaxRsApplicationProvider removed = applicationProviderCache.remove(key);
-		logger.info("Removing Application with name " + provider.getName());
+		logger.fine("Removing Application with name " + provider.getName());
 		if (removed != null) {
-			logger.info("RemovED Application with name " + provider.getName());
+			logger.info("Removed Application with name " + provider.getName());
 			removedApplications.add(removed);
 			checkDispatch();
 		} 
@@ -265,7 +227,6 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			return;
 		}
 		if(provider.getResourceDTO() instanceof FailedResourceDTO) {
-			System.out.println("Resource failed at the beginning " + key);
 			if(!failedResources.containsKey(provider.getId())) {
 				failedResources.put(provider.getId(), provider);
 			}			
@@ -316,7 +277,6 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		JaxRsExtensionProvider provider = new JerseyExtensionProvider<>(serviceObject, properties);
 		String key = provider.getId();
 		if(provider.getExtensionDTO() instanceof FailedExtensionDTO) {
-			System.out.println("Extension failed at the beginning " + key);
 			if(!failedExtensions.containsKey(provider.getId())) {
 				failedExtensions.put(provider.getId(), provider);
 			}			
@@ -352,7 +312,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		JaxRsExtensionProvider provider = new JerseyExtensionProvider<Object>(null, properties);
 		String key = provider.getId();
 		JaxRsExtensionProvider removed = extensionProviderCache.remove(key);
-		logger.info("Remove extension " + key + " name: " + provider.getName());
+		logger.fine("Remove extension " + key + " name: " + provider.getName());
 		if (removed != null) {
 			logger.info("Removed extension " + key + " name: " + provider.getName());
 			removedExtensions.add(removed);
@@ -387,7 +347,6 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			lock.tryLock(5, TimeUnit.SECONDS);
 			dispatching = false;
 			whiteboard.unregisterApplication(currentDefaultProvider);
-//			whiteboard.unregisterApplication(currentShadowed);
 			applicationProviderCache.values().forEach((app)->{
 				if (whiteboard.isRegistered(app)) {
 					whiteboard.unregisterApplication(app);
@@ -450,15 +409,11 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 						for(JaxRsApplicationContentProvider c : remApp.getContentProviers()) {
 							if(c instanceof JaxRsExtensionProvider) {								
 								if(extensionProviderCache.containsKey(c.getId())) {
-									System.out.println("Added Extension " + c.getName() + " to removed");
-									extensionProviderCache.remove(c.getId());
 									removedExtensions.add((JaxRsExtensionProvider)c);
 								}
 							}
 							if(c instanceof JaxRsResourceProvider && c.isSingleton()) {								
 								if(resourceProviderCache.containsKey(c.getId())) {
-									System.out.println("Added Resource " + c.getName() + " to removed");
-									resourceProviderCache.remove(c.getId());
 									removedResources.add((JaxRsResourceProvider)c);
 								}
 							}
@@ -484,11 +439,6 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 						filter((e)->e.canHandleWhiteboard(getWhiteboardProvider().getProperties())).
 						collect(Collectors.toSet());
 				
-				applicationCandidates.stream().forEach(a->{
-					if(a.getContentProviers().size() > 0) {
-						System.out.println("App " + a.getName() + " has already some providers");
-					}
-				});
 				
 //				Remove contents that are no longer valid for this whiteboard				
 				Set<JaxRsResourceProvider> noWBResources = resources.stream().
@@ -621,7 +571,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 				applications.forEach((app)->{
 					if (!finalApplicationCandidates.contains(app)) {
 						if (whiteboard.isRegistered(app)) {
-							logger.info("UNREGISTERING APP " + app.getId());
+							logger.info("Unregistering application " + app.getId());
 							whiteboard.unregisterApplication(app);
 						}
 						app.markUnchanged();
@@ -633,11 +583,11 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 					if (finalApplicationCandidates.contains(app)) {
 						if (whiteboard.isRegistered(app)) {			
 							if (app.isChanged()) {
-								logger.info("RELOADING APP " + app.getId());
+								logger.info("Re-loading application APP " + app.getId());
 								whiteboard.reloadApplication(app);
 							}
 						} else {
-							logger.info("REGISTERING APP " + app.getId());
+							logger.info("Registering application " + app.getId());
 							whiteboard.registerApplication(app);
 						}
 						app.markUnchanged();
@@ -647,11 +597,9 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 //				We register/reload the default application, if needed
 				if(!whiteboard.isRegistered(currentDefaultProvider)) {
 					whiteboard.registerApplication(currentDefaultProvider);
-					System.out.println("Registering default app " + currentDefaultProvider.getPath());
 					currentDefaultProvider.markUnchanged();
 				} else 	if (currentDefaultProvider != null && currentDefaultProvider.isChanged()) {
 					if (whiteboard.isRegistered(currentDefaultProvider)) {
-						System.out.println("Reloading default app " + currentDefaultProvider.getPath());
 						whiteboard.reloadApplication(currentDefaultProvider);
 					}
 					currentDefaultProvider.markUnchanged();
@@ -722,13 +670,13 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	 */
 	private Set<JaxRsApplicationProvider> checkPathProperty(Set<JaxRsApplicationProvider> applicationCandidates) {
 		
-		logger.info("App Candidates size BEFORE ordering " + applicationCandidates.size());
+		logger.fine("App Candidates size BEFORE ordering " + applicationCandidates.size());
 		
 		applicationCandidates = applicationCandidates.stream()
 				.sorted((a1, a2) -> a1.compareTo(a2))
 				.collect(Collectors.toCollection(LinkedHashSet::new));
 		
-		logger.info("App Candidates size AFTER ordering " + applicationCandidates.size());
+		logger.fine("App Candidates size AFTER ordering " + applicationCandidates.size());
 
 		
 		for(int i = 0; i < applicationCandidates.size(); i++) {
@@ -740,7 +688,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 					failedApplications.put(a2.getId(), a2);										
 					if(a2 instanceof JerseyApplicationProvider) {
 						JerseyApplicationProvider a = (JerseyApplicationProvider) a2;
-						logger.info("Failing DTO status for App " + a.getId());						
+						logger.fine("Failing DTO status for App " + a.getId());						
 						a.updateStatus(DTOConstants.FAILURE_REASON_SHADOWED_BY_OTHER_SERVICE);
 					}					
 				}
@@ -976,13 +924,13 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		allCandidates.addAll(resourceCandidates);
 		allCandidates.addAll(extensionCandidates);		
 		
-		logger.info("App Candidates BEFORE NAME SORT " + allCandidates.size());
+		logger.fine("App Candidates BEFORE NAME SORT " + allCandidates.size());
 		
 		allCandidates = allCandidates.stream()
 				.sorted((a1, a2) -> a1.compareTo(a2))
 				.collect(Collectors.toCollection(LinkedHashSet::new));
 		
-		logger.info("App Candidates AFTER NAME SORT " + allCandidates.size());
+		logger.fine("App Candidates AFTER NAME SORT " + allCandidates.size());
 			
 		Set<JaxRsProvider> failures = new HashSet<JaxRsProvider>();
 		for(int i = 0; i < allCandidates.size(); i++) {
@@ -996,7 +944,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 				}
 			}
 		}
-		logger.info("FAILURES AFTER NAME SORT " + failures.size());
+		logger.fine("Failures after name sort " + failures.size());
 		failures.stream().forEach(f-> {
 			
 			if(f instanceof JaxRsApplicationProvider) {
@@ -1054,69 +1002,6 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		});
 	}
 
-	/**
-	 * Assigns the given content to the given applications. If content does not match to an application,
-	 * it will be assigned to the default application
-	 * @param applications the applications
-	 * @param candidates the application candidates
-	 * @param content the content to assign
-	 */
-//	private void assignContent(Collection<JaxRsApplicationProvider> applications, Collection<JaxRsApplicationProvider> candidates,
-//			Collection<? extends JaxRsApplicationContentProvider> content) {
-//		// determine all content that match an application
-//		Set<JaxRsApplicationContentProvider> contentCandidates = content.
-//				stream().
-//				map(this::cloneContent).
-//				filter((c)->{
-//					AtomicBoolean matched = new AtomicBoolean(false);
-//					applications.forEach((app)->{
-//						if (candidates.contains(app) && 
-//								c != null &&
-//								c.canHandleApplication(app)) {
-//							boolean added = addContentToApplication(app, c);
-//							if (added) {
-//								logger.info("Added content " + c.getName() + " to application " + app.getName() + " " + c.getObjectClass());
-//							}
-//							if (!matched.get()) {
-//								matched.set(added);
-//							} 
-//						} else {
-//							if (removeContentFromApplication(app, c)) {
-//								logger.info("Removed content " + c.getName() + " from application " + app.getName());
-//							}
-//						}
-//					});
-//					return matched.get();
-//				}).collect(Collectors.toSet());
-//		
-//		
-//		/* 
-//		 * Add all other content to the default application or remove it, if the content fits to an other application now
-//		 * For that we have to use a comparator that compares the content provider by name
-//		 */
-//		Comparator<JaxRsApplicationContentProvider> comparator = JaxRsApplicationContentProvider.getComparator();
-//		final Set<JaxRsApplicationContentProvider> cc = new TreeSet<JaxRsApplicationContentProvider>(comparator);
-//		cc.addAll(contentCandidates);
-//		content.stream().
-//		map(this::cloneContent).forEach((c)->{
-//			if (cc.contains(c)) {
-//				if (c.canHandleApplication(currentDefaultProvider)) {
-//					if (addContentToApplication(currentDefaultProvider, c)) {
-//						logger.info("Added content candidate " + c.getName() + " to default application");
-//					}
-//				} else {
-//					if (removeContentFromApplication(currentDefaultProvider, c)) {
-//						logger.info("Removed content candidate " + c.getName() + " from default application");
-//					}
-//				}
-//			} else {
-//				if (addContentToApplication(currentDefaultProvider, c)) {
-//					logger.info("Added content " + c.getName() + " to default application " + currentDefaultProvider.getName() + " " + c.getObjectClass());
-//				} 
-//			}
-//		});
-//	}
-	
 	private Set<JaxRsApplicationContentProvider> assignContent(Collection<JaxRsApplicationProvider> applications, 
 			Collection<JaxRsApplicationProvider> candidates,
 			Collection<? extends JaxRsApplicationContentProvider> content) {
@@ -1135,7 +1020,6 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 								c.canHandleApplication(app)) {
 							boolean added = addContentToApplication(app, c);
 							if (added) {
-								System.out.println("Size contents " + app.getContentProviers().size());
 								logger.info("Added content " + c.getName() + " to application " + app.getName() + " " + c.getObjectClass());
 							}
 							if (!matched.get()) {
@@ -1162,19 +1046,17 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			if (cc.contains(c)) {
 				if (c.canHandleApplication(currentDefaultProvider)) {
 					if (addContentToApplication(currentDefaultProvider, c)) {
-						logger.info("Added content candidate " + c.getName() + " to default application");
-						System.out.println("Size default contents " + currentDefaultProvider.getContentProviers().size());
+						logger.fine("Added content candidate " + c.getName() + " to default application");
 					}
 				} else {
 					if (removeContentFromApplication(currentDefaultProvider, c)) {
-						logger.info("Removed content candidate " + c.getName() + " from default application");
+						logger.fine("Removed content candidate " + c.getName() + " from default application");
 					}
 				}
 			} else {
 				if(c.canHandleDefaultApplication(currentDefaultProvider)) {
 					if (addContentToApplication(currentDefaultProvider, c)) {
 						logger.info("Added content " + c.getName() + " to current default application " + currentDefaultProvider.getName() + " " + c.getObjectClass());
-						System.out.println("Size default contents " + currentDefaultProvider.getContentProviers().size());
 					} 				
 					else {
 						logger.info("Current default app cannot handle " + c.getName());
@@ -1222,7 +1104,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		if (content instanceof JaxRsExtensionProvider) {
 			return application.removeExtension((JaxRsExtensionProvider) content);
 		}
-		logger.warning("unhandled JaxRsApplicationContentProvider. coult not remove application " + application + " to content " + content);
+		logger.warning("unhandled JaxRsApplicationContentProvider. Can not remove application " + application + " for content " + content);
 
 		return false;
 	}
@@ -1244,36 +1126,6 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		return null;
 	}
 	
-	/**
-	 * Substitutes the current default provider with the provider from the parameter. If the parameter is <code>null</code>,
-	 * it is expected to reuse the original implicit default provider
-	 * @param newDefaultProvider the new provider or <code>null</code> 
-	 * @param shadowedProvider the shadow application provider
-	 */
-//	private void substituteDefaultApplication(Optional<JaxRsApplicationProvider> newDefaultProvider, Optional<JaxRsApplicationProvider> shadowedProvider) {
-//		/*
-//		 * We check, if an un-registration of the application is really necessary
-//		 */
-//		boolean unregisterNeeded = false;
-//		Long shadowSID = shadowedProvider.isPresent() ? shadowedProvider.get().getServiceId() : null;
-//		Long providerSID = newDefaultProvider.isPresent() ? newDefaultProvider.get().getServiceId() : null;
-//		Long currentSID = currentDefaultProvider != null ? currentDefaultProvider.getServiceId() : null;
-//		
-//		if (currentSID != null) {
-//			if (providerSID != null) {
-//				unregisterNeeded = providerSID != currentSID;
-//			} else {
-//				unregisterNeeded = true;
-//			}
-//		}
-//		if (whiteboard != null && 
-//				unregisterNeeded && 
-//				whiteboard.isRegistered(currentDefaultProvider)) {
-//			whiteboard.unregisterApplication(currentDefaultProvider);
-//		}
-//		currentDefaultProvider = newDefaultProvider.orElse(defaultProvider);
-//	}
-	
 	private void substituteDefaultApplication(Optional<JaxRsApplicationProvider> newDefaultProvider) {
 		/*
 		 * We check, if an un-registration of the application is really necessary
@@ -1293,10 +1145,10 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 				unregisterNeeded && 
 				whiteboard.isRegistered(currentDefaultProvider)) {
 			whiteboard.unregisterApplication(currentDefaultProvider);
-/*			
-* 			If the previous .default is unregistered is because it is shadowed by another app, 
-*			so we need to record this as a failure DTO
-*/		
+			/*			
+			 * If the previous .default is unregistered is because it is shadowed by another app, 
+			 * so we need to record this as a failure DTO
+			 */		
 			if(currentDefaultProvider instanceof JerseyApplicationProvider) {
 				JerseyApplicationProvider ap = (JerseyApplicationProvider) currentDefaultProvider;
 				ap.updateStatus(DTOConstants.FAILURE_REASON_SHADOWED_BY_OTHER_SERVICE);

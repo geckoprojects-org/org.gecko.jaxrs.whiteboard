@@ -69,8 +69,6 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  */
 public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntime, JaxRsWhiteboardProvider {
 
-	@Deprecated 
-	private volatile PrototypeServiceBinder binder;
 	private volatile RuntimeDTO runtimeDTO = new RuntimeDTO();
 	private volatile String name;
 	protected ComponentContext context;
@@ -82,7 +80,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	protected final List<FailedResourceDTO> failedResources = new LinkedList<>();
 	protected final List<FailedExtensionDTO> failedExtensions = new LinkedList<>();
 
-	private Logger logger = Logger.getLogger("o.e.o.j.serviceRuntime");
+	private Logger logger = Logger.getLogger("jaxRs.serviceRuntime");
 	private ServiceRegistration<JaxrsServiceRuntime> serviceRuntime;
 	private AtomicLong changeCount = new AtomicLong();
 
@@ -105,10 +103,6 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	public void initialize(ComponentContext context) throws ConfigurationException {
 		this.context = context;
 		updateProperties(context);
-		if (binder != null) {
-			binder.dispose();
-		}
-		binder = new PrototypeServiceBinder();
 		doInitialize(context);
 		
 	}
@@ -201,9 +195,6 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 			}
 		}
 		doTeardown();
-		if (binder != null) {
-			binder.dispose();
-		}
 	}
 
 	/**
@@ -211,42 +202,6 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 */
 	protected abstract void doTeardown();
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#updateRuntimeDTO(org.osgi.framework.ServiceReference)
-	 */
-//	public synchronized void updateRuntimeDTO(ServiceReference<?> serviceRef) {
-//		List<ApplicationDTO> appDTOList = new LinkedList<>();
-//		List<FailedApplicationDTO> fappDTOList = new LinkedList<>();
-//		applicationContainerMap.forEach((name, ap) -> {
-//			BaseApplicationDTO appDTO = ap.getApplicationDTO();
-//			if (appDTO instanceof ApplicationDTO) {
-//				ApplicationDTO curDTO = (ApplicationDTO) appDTO;
-//				if (curDTO.name.equals(".default")) {
-//					runtimeDTO.defaultApplication = curDTO;
-//				} else {
-//					appDTOList.add(curDTO);
-//				}
-//			} else if (appDTO instanceof FailedApplicationDTO) {
-//				fappDTOList.add((FailedApplicationDTO) appDTO);
-//			}
-//		});
-//		if (serviceRef != null) {
-//			ServiceReferenceDTO srDTO = DTOConverter.toServiceReferenceDTO(serviceRef);
-//			runtimeDTO.serviceDTO = srDTO;
-//			// the defaults application service id is the same, like this, because it comes
-//			// from here
-//			// runtimeDTO.defaultApplication.serviceId = srDTO.id;
-//		}
-//		runtimeDTO.applicationDTOs = appDTOList.toArray(new ApplicationDTO[appDTOList.size()]);
-//		runtimeDTO.failedApplicationDTOs = fappDTOList.toArray(new FailedApplicationDTO[fappDTOList.size()]);
-//
-//		// TODO: handle FailedExtensionDTO and FailedResourceDTO in RuntimeDTO
-//		runtimeDTO.failedExtensionDTOs = new FailedExtensionDTO[0];
-//		runtimeDTO.failedResourceDTOs = new FailedResourceDTO[0];
-//
-//	}
-	
 	public synchronized void updateRuntimeDTO(ServiceReference<?> serviceRef) {
 		
 		synchronized (runtimeDTO) {
@@ -324,32 +279,6 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 
 	}
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#registerApplication(org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider)
-	 */
-//	@Override
-//	public void registerApplication(JaxRsApplicationProvider applicationProvider) {
-//		if (applicationProvider == null) {
-//			logger.log(Level.WARNING, "Cannot register an null application provider");
-//			return;
-//		}
-//		if (applicationContainerMap.containsKey(applicationProvider.getId())) {
-//			logger.log(Level.SEVERE, "There is already an application registered with name: " + applicationProvider.getId());
-//			throw new IllegalStateException("There is already an application registered with name: " + applicationProvider.getId());
-//		}
-//		ResourceConfig config = createResourceConfig(applicationProvider);
-//		String applicationPath = applicationProvider.getPath();
-//		doRegisterServletContainer(applicationProvider, applicationPath, config);
-//		applicationContainerMap.put(applicationProvider.getId(), applicationProvider);
-//		
-//		if(!applicationProvider.isDefault()) {
-//			//registration of the default container does not warrant a servicechangecount 
-//			updateRuntimeProperties();
-//		}
-//	}
-	
-	
 	@Override
 	public void registerApplication(JaxRsApplicationProvider applicationProvider) {
 		if (applicationProvider == null) {
@@ -360,16 +289,10 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 			logger.log(Level.SEVERE, "There is already an application registered with name: " + applicationProvider.getId());
 			throw new IllegalStateException("There is already an application registered with name: " + applicationProvider.getId());
 		}
-//		ResourceConfig config = createResourceConfig(applicationProvider);
-//		ResourceConfigWrapper config = createResourceConfig(applicationProvider);
 		String applicationPath = applicationProvider.getPath();
 		doRegisterServletContainer(applicationProvider, applicationPath);
 		applicationContainerMap.put(applicationProvider.getId(), applicationProvider);
 		
-//		if(!applicationProvider.isDefault()) {
-//			//registration of the default container does not warrant a servicechangecount 
-//			updateRuntimeProperties();
-//		}
 	}
 
 	/**
@@ -378,30 +301,9 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 * @param path to path to add it for
 	 */
 	protected abstract void doRegisterServletContainer(JaxRsApplicationProvider provider, String path, ResourceConfig config);
+	
 	protected abstract void doRegisterServletContainer(JaxRsApplicationProvider provider, String path);
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#unregisterApplication(org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider)
-	 */
-//	@Override
-//	public void unregisterApplication(JaxRsApplicationProvider applicationProvider) {
-//		if (applicationProvider == null) {
-//			logger.log(Level.WARNING, "Cannot unregister an null application provider");
-//			return;
-//		}
-//		JaxRsApplicationProvider provider = null;
-//		synchronized (applicationContainerMap) {
-//			provider = applicationContainerMap.remove(applicationProvider.getId());
-//		}
-//		if (provider == null) {
-//			logger.log(Level.WARNING, "There is no application registered with the name: " + applicationProvider.getName());
-//			return;
-//		}
-//		doUnregisterApplication(provider);
-//		updateRuntimeProperties();
-//	}
-	
 	@Override
 	public void unregisterApplication(JaxRsApplicationProvider applicationProvider) {
 		if (applicationProvider == null) {
@@ -417,7 +319,6 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 			return;
 		}
 		doUnregisterApplication(provider);
-//		updateRuntimeProperties();
 	}
 
 	/**
@@ -426,43 +327,6 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 */
 	protected abstract void doUnregisterApplication(JaxRsApplicationProvider applicationProvider);
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#reloadApplication(org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider)
-	 */
-//	@Override
-//	public void reloadApplication(JaxRsApplicationProvider applicationProvider) {
-//		if (applicationProvider == null) {
-//			logger.log(Level.WARNING, "No application provider was given to be reloaded");
-//		}
-//		logger.log(Level.INFO, "Reload an application provider " + applicationProvider.getName());
-//		JaxRsApplicationProvider provider = applicationContainerMap.get(applicationProvider.getId());
-//		if (provider == null) {
-//			logger.log(Level.INFO, "No application provider was registered nothing to reload, registering instead for " + applicationProvider.getId());
-//			registerApplication(applicationProvider);
-//		} else {
-//			List<ServletContainer> servletContainers = provider.getServletContainers();
-//			if(!servletContainers.isEmpty()) {
-//				logger.log(Level.FINE, "Reload servlet container for application " + applicationProvider.getName());
-//
-//				List<ServletContainer> copyList = new ArrayList<>(servletContainers);
-//				
-//				copyList.forEach(servletContainer -> {
-//					try{
-//						ResourceConfig config = createResourceConfig(provider);
-//						servletContainer.reload(config);
-//					} catch(Exception e) {
-//						//We cant't check if the surrounding container is started, so we have to do it this way
-//						logger.log(Level.WARNING, "Jetty servlet context handler is not started yet", e);
-//					}
-//				});
-//			} else {
-//				logger.log(Level.INFO, "-- No servlet container is available to reload " + applicationProvider.getName());
-//			}
-//			updateRuntimeProperties();
-//		}
-//	}
-	
 	@Override
 	public void reloadApplication(JaxRsApplicationProvider applicationProvider) {
 		if (applicationProvider == null) {
@@ -552,7 +416,6 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 			return null;
 		}
 		Application application = applicationProvider.getJaxRsApplication();
-//		logger.log(Level.INFO, "Create configuration for application " + applicationProvider.getId() + " Singletons: " + application.getSingletons() + ", Classes: " + application.getClasses());
 		ResourceConfigWrapper wrapper = new ResourceConfigWrapper();
 		ResourceConfig config = ResourceConfig.forApplication(application);
 		wrapper.config = config;

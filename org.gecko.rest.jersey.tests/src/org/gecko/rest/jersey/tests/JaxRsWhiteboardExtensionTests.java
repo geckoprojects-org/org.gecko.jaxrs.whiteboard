@@ -40,6 +40,7 @@ import org.gecko.rest.jersey.tests.resources.OSGiTextMimeTypeCodec;
 import org.gecko.rest.jersey.tests.resources.TestReadExtension;
 import org.gecko.rest.jersey.tests.resources.TestWriteExtension;
 import org.gecko.rest.jersey.tests.resources.TestWriterInterceptorException;
+import org.gecko.rest.jersey.tests.resources.TestWriterInterceptorException2;
 import org.gecko.util.test.common.service.ServiceChecker;
 import org.gecko.util.test.common.test.AbstractOSGiTest;
 import org.junit.Test;
@@ -1470,7 +1471,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		runtimeChecker.setModifyTimeout(15);
 		runtimeChecker.start();
 
-		TestWriterInterceptorException extension2 = new TestWriterInterceptorException("buzz", "buzzfizz");
+		TestWriterInterceptorException2 extension2 = new TestWriterInterceptorException2("buzz", "buzzfizz");
 
 		//		We need to register the extension advertising which interfaces is implementing
 		registerServiceForCleanup(extension2, extensionProps, WriterInterceptor.class.getName());		
@@ -1749,9 +1750,10 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 
 		Thread.sleep(2000);
 
+		// extension must be still there
 		ServiceChecker<WriterInterceptor> extChecker = createdCheckerTrackedForCleanUp(WriterInterceptor.class);
 		extChecker.start();
-		assertEquals(0, extChecker.getCurrentCreateCount(true));	
+		assertEquals(1, extChecker.getCurrentCreateCount(true));	
 
 	}
 
@@ -1779,32 +1781,36 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		properties.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, Boolean.TRUE);
 
 		registerServiceForCleanup(new EchoResource(), properties, EchoResource.class.getName());	
-
-
+		assertTrue(runtimeChecker.waitModify());
 		String checkURL = url + "/echo/body";
 		Invocation post = null;
 		Client jerseyClient = ClientBuilder.newClient();
 		WebTarget webTarget = jerseyClient.target(checkURL);
-		MediaType mt = new MediaType("osgi", "text", "UTF-8");
-		post = webTarget.request().buildPost(Entity.entity("fizz", mt.toString()));
+		MediaType mt = new MediaType("text", "UTF-8");
+		post = webTarget.request().buildPost(Entity.text("fizz"));
 		Response response = post.invoke();
 		assertEquals(200, response.getStatus());
-		assertEquals("fizz", response.getEntity());
+		assertTrue(response.hasEntity());
+		assertEquals("fizz", response.readEntity(String.class));
 
 
 
 		properties = new Hashtable<>();
 		properties.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION,
 				Boolean.TRUE);
+		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "pte 2");
+		properties.put(Constants.SERVICE_RANKING, 100);
 		registerServiceForCleanup(new OSGiTextMimeTypeCodec(), properties, MessageBodyReader.class.getName());	
 
-
-		assertTrue(runtimeChecker.waitModify());	
-
+		Thread.sleep(500);
+			
+		mt = new MediaType("osgi", "text", "UTF-8");
 		post = webTarget.request().buildPost(Entity.entity("fizz", mt.toString()));
 		response = post.invoke();
 		assertEquals(200, response.getStatus());
-		assertEquals("OSGi Read: fizz", response.getEntity());
+		// we have a pte MessageBodyWriter that adds  '_1' to or provided content
+		String responseString = response.readEntity(String.class);
+		assertTrue(responseString.startsWith("OSGi Read: fizz_"));
 	}
 
 

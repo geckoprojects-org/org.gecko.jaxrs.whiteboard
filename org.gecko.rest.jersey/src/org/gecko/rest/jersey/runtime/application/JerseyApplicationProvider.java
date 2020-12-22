@@ -327,36 +327,6 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 		doValidateProperties(Collections.singletonMap(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, applicationBase));
 	}
 
-	/**
-	 * Returns <code>true</code>, if the application filter property handling is valid.
-	 * @param properties the resource/extension properties
-	 * @return <code>true</code>, if the handling is valid
-	 */
-//	private boolean isApplicationFilterValid(Map<String, Object> properties) {
-//		if (isDefault()) {
-//			logger.log(Level.WARNING, "There is no application select filter valid for the default application");
-//			return false;
-//		}
-//		String applicationFilter = (String) properties.get(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT);
-//		if (applicationFilter != null) {
-//			try {
-//				Filter filter = FrameworkUtil.createFilter(applicationFilter);
-//				boolean applicationMatch = filter.matches(getApplicationProperties());
-//				if (!applicationMatch) {
-//					logger.log(Level.WARNING, "The given application select filter does not math to this application for this resource/extension: " + getId());
-//					return false;
-//				}
-//			} catch (InvalidSyntaxException e) {
-//				logger.log(Level.WARNING, "The given application select filter is invalid: " + applicationFilter, e);
-//				return false;
-//			}
-//		} else {
-//			logger.log(Level.WARNING, "There is no application select filter");
-//			return false;
-//		}
-//		return true;
-//	}
-
 	/* 
 	 * (non-Javadoc)
 	 * @see org.gecko.rest.jersey.runtime.servlet.DestroyListener#servletContainerDestroyed(org.glassfish.jersey.servlet.ServletContainer)

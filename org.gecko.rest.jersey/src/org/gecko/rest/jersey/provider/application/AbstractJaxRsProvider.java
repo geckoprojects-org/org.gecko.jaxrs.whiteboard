@@ -46,14 +46,7 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 	private Filter whiteboardFilter;
 	private List<Filter> extensionFilters = new LinkedList<>();
 	private T providerObject;
-//	private ServiceObjects<T> serviceObjects;
 
-//	public AbstractJaxRsProvider(ServiceObjects<T> serviceObjects, Map<String, Object> properties) {
-//		this.properties = properties == null ? Collections.emptyMap() : properties;
-//		this.serviceObjects = serviceObjects;
-//		validateProperties();
-//	}
-	
 	public AbstractJaxRsProvider(T providerObject, Map<String, Object> properties) {
 		this.properties = properties == null ? Collections.emptyMap() : properties;
 		this.providerObject = providerObject;

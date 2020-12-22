@@ -63,7 +63,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	private volatile ServletContextHandler contextHandler;
 	private Integer port = JerseyConstants.WHITEBOARD_DEFAULT_PORT;
 	private String contextPath = JerseyConstants.WHITEBOARD_DEFAULT_CONTEXT_PATH;
-	private Logger logger = Logger.getLogger("o.e.o.j.serviceRuntime");
+	private Logger logger = Logger.getLogger("jaxRs.serviceRuntime");
 
 	/*
 	 * (non-Javadoc)
@@ -272,7 +272,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 			if(disableSessions == null || !Boolean.valueOf(disableSessions.toString())) {
 				contextHandler.setSessionHandler(new SessionHandler());
 			}
-			logger.info("Created white-board server context handler for context: " + contextPath);
+			logger.fine("Created white-board server context handler for context: " + contextPath);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Error starting JaxRs white-board because of an exception", e);
 		}
@@ -295,7 +295,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 				switch (jettyServerRunnable.getState()) {
 				case INIT:
 
-					logger.info("Started JaxRs white-board server for port: " + port + " and context: " + contextPath
+					logger.severe("Started JaxRs white-board server for port: " + port + " and context: " + contextPath
 							+ " took to long");
 					throw new IllegalStateException("Server Startup took too long");
 				case STARTED:

@@ -162,7 +162,6 @@ public class DTOConverter {
 						rmidtos.addAll(Arrays.asList(resDTO.resourceMethods));
 					}					
 				} else if (contentProvider instanceof JerseyExtensionProvider) {
-					System.out.println("Adding Extension DTO for APP " + applicationProvider.getName() + " with name " + contentProvider.getName());
 					edtos.add(toExtensionDTO((JerseyExtensionProvider<?>) contentProvider));
 				}
 			}
