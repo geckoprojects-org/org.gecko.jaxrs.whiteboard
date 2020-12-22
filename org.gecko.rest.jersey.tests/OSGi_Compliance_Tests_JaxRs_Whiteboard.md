@@ -14,7 +14,8 @@
   | `testApplicationProvidedExtensionDependency` |   YES   |                                                              |
   |     `testApplicationExtensionDependency`     |   YES   |                                                              |
   |         `testSimpleWhiteboardTarget`         |   YES   |                                                              |
-  |     `testApplicationIsolationContainer`      | **NO**  | Same session reused in OSGi tests </br> and always new session in ours ?? |
+  |     `testApplicationIsolationContainer`      | YES  |  
+|
   |           `testShadowDefaultPath`            | **NO**  |               Conflicts between test and Specs               |
   |         `testMoveDefaultApplication`         |   YES   |                                                              |
   |        `testApplicationServiceProps`         |   YES   |                                                              |
@@ -39,8 +40,8 @@
 
   |          Test Name          | Passed? |      Failure Reason       |
   | :-------------------------: | :-----: | :-----------------------: |
-  |  `testJaxRsClientService`   |  MAYBE  | Our equivalent test works |
-  | `testJaxRsPromiseRxInvoker` |  MAYBE  | Our equivalent test works |
+  |  `testJaxRsClientService`   |  YES  | Wrong return value in resource |
+  | `testJaxRsPromiseRxInvoker` |  NO  | Asynchronous processing not supported on Servlet 2.x container. |
 
 + **`ExtensionLifecylceTestCase`**
 
@@ -48,7 +49,7 @@
   | :------------------------------------: | :-----: | :----------------------------------------------------------: |
   |         `testSimpleExtension`          |   YES   |                                                              |
   |        `testNameBoundExtension`        |   YES   |                                                              |
-  |        `testExtensionOrdering`         | **NO**  | When two extensions are advertising the same </br> interface they are not properly registered |
+  |        `testExtensionOrdering`         | YES | It is not supported to register two extension instances of the same class type in Jersey |
   |    `testResourceRequiresExtension`     |   YES   |                                                              |
   |    `testExtensionRequiresExtension`    |   YES   |                                                              |
   |      `testSimpleWhiteboardTarget`      |   YES   |                                                              |
@@ -57,7 +58,7 @@
   |    `testReaderInterceptorExtension`    |  MAYBE  | Failing due to HK2 shut down due to EchoResource </br> check after update |
   | `testContainerRequestFilterExtension`  |  MAYBE  | Failing due to HK2 shut down due to EchoResource </br> check after update |
   | `testContainerResponseFilterExtension` |  MAYBE  | Failing due to HK2 shut down due to EchoResource </br> check after update |
-  |    `testMessageBodyReaderExtension`    |  MAYBE  | Failing due to HK2 shut down due to EchoResource </br> check after update |
+  |    `testMessageBodyReaderExtension`    |  YES  | Failed because of wrong entity handling |
   |    `testMessageBodyWriterExtension`    |  MAYBE  | Failing due to HK2 shut down due to EchoResource </br> check after update |
   | `testParamConverterProviderExtension`  |  MAYBE  | Failing due to HK2 shut down due to EchoResource </br> check after update |
   |     `testExceptionMapperExtension`     |   YES   |                                                              |
@@ -89,7 +90,7 @@
   | :-------------------------------------------: | :-----: | :------------------: |
   |         `testSimpleSingletonResource`         |   YES   |                      |
   |         `testSimplePrototypeResource`         |   YES   |                      |
-  |          `testContextFieldInjection`          | **NO**  | Check after updating |
+  |          `testContextFieldInjection`          | YES  | Fixed |
   |         `testAsyncPrototypeResource`          |   YES   |                      |
   |         `testSimpleWhiteboardTarget`          |   YES   |                      |
   | `testSingletonResourceWhenApplicationChanges` |   YES   |                      |
@@ -116,7 +117,7 @@
 
   
 
-57 tests
+63 tests
 
 9 to check after updating dependency
 

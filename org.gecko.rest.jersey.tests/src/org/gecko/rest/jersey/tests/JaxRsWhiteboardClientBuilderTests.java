@@ -24,6 +24,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -276,8 +277,8 @@ public class JaxRsWhiteboardClientBuilderTests extends AbstractOSGiTest{
 		
 		try {
 			// Do another get
-			assertEquals("Hello_1_protoExtension",
-					target.request().get(String.class));
+			String responseString = target.request().get(String.class);
+			assertTrue(responseString.startsWith("Hello_"));
 		
 		} finally {			
 			tracker.close();
@@ -325,7 +326,7 @@ public class JaxRsWhiteboardClientBuilderTests extends AbstractOSGiTest{
 //		Add async Resource
 		Dictionary<String, Object> helloProps = new Hashtable<>();
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
-//		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Async Resource");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Async Resource");
 				
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
@@ -344,9 +345,10 @@ public class JaxRsWhiteboardClientBuilderTests extends AbstractOSGiTest{
 				.get(String.class);
 		
 		assertFalse(p.isDone());
-		Semaphore s = new Semaphore(0);
-		p.onResolve(s::release);
-		assertTrue(s.tryAcquire(5, TimeUnit.SECONDS));
+		CountDownLatch cdl = new CountDownLatch(1);
+		p.onResolve(cdl::countDown);
+		assertTrue(cdl.await(5, TimeUnit.SECONDS));
+		
 		assertEquals("Bob", p.getValue());
 	}
 
