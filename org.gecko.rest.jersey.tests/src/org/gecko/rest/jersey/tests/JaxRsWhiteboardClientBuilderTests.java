@@ -25,7 +25,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -34,7 +33,6 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Application;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.sse.SseEventSource;
 
@@ -393,11 +391,12 @@ public class JaxRsWhiteboardClientBuilderTests extends AbstractOSGiTest{
 		properties = new Hashtable<>();
 		properties.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, Boolean.TRUE);
 		
-		registerServiceForCleanup(SseResource.class, new SseResource(MediaType.TEXT_PLAIN_TYPE), properties);
+		registerServiceForCleanup(SseResource.class, new SseResource(), properties);
 
 		assertTrue(runtimeChecker.waitModify());
 
 		try {
+			
 			ServiceTracker<SseEventSourceFactory,SseEventSourceFactory> sseTracker = new ServiceTracker<>(
 					getBundleContext(), SseEventSourceFactory.class, null);
 			sseTracker.open();
@@ -405,17 +404,26 @@ public class JaxRsWhiteboardClientBuilderTests extends AbstractOSGiTest{
 			assertNotNull(sseTracker.waitForService(2000));
 
 			AtomicReference<Throwable> ref = new AtomicReference<Throwable>();
+			
+			CountDownLatch latch = new CountDownLatch(1);
+
 			List<Integer> list = new CopyOnWriteArrayList<>();
-			Semaphore s = new Semaphore(0);
-
-			SseEventSource source = sseTracker.getService().newSource(target);
-
-			source.register(e -> list.add(e.readData(Integer.class)),
-					t -> ref.set(t), s::release);
-
+			final SseEventSource source = sseTracker.getService().newSource(target);
+			source.register(e->System.out.println(e.readData()), Throwable::printStackTrace, ()->{
+				System.out.println("CLOSE CLIENT");
+				source.close();
+				latch.countDown();
+			});
+			source.register(e -> {
+				list.add(e.readData(Integer.class));
+				if (list.size() == 10) {
+					latch.countDown();
+				}
+			}, t -> ref.set(t));
 			source.open();
 
-			assertTrue(s.tryAcquire(10, TimeUnit.SECONDS));
+			assertTrue(latch.await(10, TimeUnit.SECONDS));
+			source.close();
 
 			assertNull(ref.get());
 
