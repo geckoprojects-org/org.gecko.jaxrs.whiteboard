@@ -409,11 +409,6 @@ public class JaxRsWhiteboardClientBuilderTests extends AbstractOSGiTest{
 
 			List<Integer> list = new CopyOnWriteArrayList<>();
 			final SseEventSource source = sseTracker.getService().newSource(target);
-			source.register(e->System.out.println(e.readData()), Throwable::printStackTrace, ()->{
-				System.out.println("CLOSE CLIENT");
-				source.close();
-				latch.countDown();
-			});
 			source.register(e -> {
 				list.add(e.readData(Integer.class));
 				if (list.size() == 10) {
