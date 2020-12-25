@@ -96,10 +96,17 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 		// if port changed, both parts need to be restarted, no matter, if the context
 		// path has changed
 		if (portChanged || pathChanged) {
+			
+			applicationContainerMap.values().forEach(ap -> new ArrayList<ServletContainer>(ap.getServletContainers()).forEach(ap::removeServletContainer));
+			
 			stopContextHandler();
 			stopServer();
 			createServerAndContext();
 			startServer();
+			
+			applicationContainerMap.values().forEach(ap -> {
+				doRegisterServletContainer(ap, ap.getPath());
+			});
 		}
 	}
 

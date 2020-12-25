@@ -1868,7 +1868,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		assertEquals("fizz", response.readEntity(String.class));
 		assertEquals("true", response.getHeaderString("Access-Control-Allow-Credentials"));	
 		System.setProperty("sun.net.http.allowRestrictedHeaders", "false");
-		}
+	}
 
 
 	private RuntimeDTO getRuntimeDTO() {
