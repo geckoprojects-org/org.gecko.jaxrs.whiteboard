@@ -14,6 +14,7 @@ package org.gecko.rest.jersey.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -50,6 +51,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.cm.Configuration;
 import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
 import org.osgi.service.jaxrs.runtime.dto.RuntimeDTO;
@@ -1812,6 +1814,61 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		String responseString = response.readEntity(String.class);
 		assertTrue(responseString.startsWith("OSGi Read: fizz_"));
 	}
+
+	/**
+	 * Section 151.5 Register a JAX-RS MessageBodyReader and show that it
+	 * gets applied to the request
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testWebSecurityExtension() throws Exception {
+		System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
+		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
+		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
+		
+		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
+		runtimeChecker.start();
+		
+		Configuration whiteboardConfig = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);		
+		assertTrue(runtimeChecker.waitCreate());
+		
+		Dictionary<String, Object> resourceProperties = new Hashtable<>();
+		resourceProperties.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, Boolean.TRUE);
+		
+		registerServiceForCleanup(new EchoResource(), resourceProperties, EchoResource.class.getName());	
+		assertTrue(runtimeChecker.waitModify());
+		String checkURL = url + "/echo/body";
+		Invocation post = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		WebTarget webTarget = jerseyClient.target(checkURL);
+		post = webTarget.request().buildPost(Entity.text("fizz"));
+		Response response = post.invoke();
+		assertEquals(200, response.getStatus());
+		assertTrue(response.hasEntity());
+		assertEquals("fizz", response.readEntity(String.class));
+		assertNull(response.getHeaderString("Access-Control-Allow-Credentials"));
+		
+		
+		runtimeChecker.stop();
+		runtimeChecker.start();
+		
+		properties.put("websecurity", "false");
+		whiteboardConfig.update(properties);
+		
+		assertTrue(runtimeChecker.waitModify());
+		Thread.sleep(500);
+		
+		post = webTarget.request().header("Origin", "http://localhost").buildPost(Entity.text("fizz"));
+		response = post.invoke();
+		assertEquals(200, response.getStatus());
+		assertTrue(response.hasEntity());
+		assertEquals("fizz", response.readEntity(String.class));
+		assertEquals("true", response.getHeaderString("Access-Control-Allow-Credentials"));	
+		System.setProperty("sun.net.http.allowRestrictedHeaders", "false");
+		}
 
 
 	private RuntimeDTO getRuntimeDTO() {

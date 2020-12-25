@@ -174,7 +174,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	@Override
 	public void modified(ComponentContext context) throws ConfigurationException {
 		doModified(context);
-		applicationContainerMap.clear();
+//		applicationContainerMap.clear();
 		updateRuntimeProperties();
 	}
 	
