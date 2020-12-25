@@ -79,10 +79,9 @@ Require-Capability: osgi.implementation;filter:='(&(osgi.implementation=osgi.jax
 
 # Use Felix by default
 -runfw: org.apache.felix.framework;version='[6.0.3,6.0.3]'
--runvm: -ea
+-runvm: -ea 
 -runee: JavaSE-1.8
--runproperties: \
-	org.osgi.service.http.port=0
+-runproperties: org.osgi.service.http.port=0
 -resolve.effective: active;skip:='osgi.service'
 -privatepackage: \
 	org.gecko.rest.jersey.tests,\

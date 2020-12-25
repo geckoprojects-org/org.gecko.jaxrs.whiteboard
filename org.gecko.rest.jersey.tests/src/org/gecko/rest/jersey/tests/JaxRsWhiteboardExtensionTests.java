@@ -68,6 +68,14 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 @RunWith(MockitoJUnitRunner.class)
 public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 
+	/**
+	 * This is necessary for a {@link JaxRsWhiteboardExtensionTests#testWebSecurityExtension()} 
+	 * and must be set before the first request is made. No other way was working...
+	 */
+	static {
+		System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+	}
+	
 	/*
 	 *  The server runs on localhost port 8185 using context path test: http://localhost:8185/test
 	 */	
@@ -1823,7 +1831,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 	 */
 	@Test
 	public void testWebSecurityExtension() throws Exception {
-		System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+		//This for some reason only when this is the first test to run. The same header is thus also set in the companion bnd file
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
 		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
@@ -1867,7 +1875,6 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		assertTrue(response.hasEntity());
 		assertEquals("fizz", response.readEntity(String.class));
 		assertEquals("true", response.getHeaderString("Access-Control-Allow-Credentials"));	
-		System.setProperty("sun.net.http.allowRestrictedHeaders", "false");
 	}
 
 

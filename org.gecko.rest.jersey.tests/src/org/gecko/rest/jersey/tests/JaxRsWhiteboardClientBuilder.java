@@ -50,6 +50,14 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 public class JaxRsWhiteboardClientBuilder extends AbstractOSGiTest{
 
 	/**
+	 * This is necessary for a {@link JaxRsWhiteboardExtensionTests#testWebSecurityExtension()} 
+	 * and must be set before the first request is made. No other way was working...
+	 */
+	static {
+		System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+	}
+	
+	/**
 	 * Creates a new instance.
 	 * @param bundleContext
 	 */

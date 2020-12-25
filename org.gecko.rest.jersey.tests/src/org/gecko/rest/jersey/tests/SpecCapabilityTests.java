@@ -54,6 +54,14 @@ import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
 @RunWith(MockitoJUnitRunner.class)
 public class SpecCapabilityTests extends AbstractOSGiTest{
 	
+	/**
+	 * This is necessary for a {@link JaxRsWhiteboardExtensionTests#testWebSecurityExtension()} 
+	 * and must be set before the first request is made. No other way was working...
+	 */
+	static {
+		System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+	}
+	
 	/*
 	 *  The server runs on localhost port 8185 using context path test: http://localhost:8185/test
 	 */	

@@ -62,6 +62,14 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 @RunWith(MockitoJUnitRunner.class)
 public class JaxRsWhiteboardDTOTests extends AbstractOSGiTest {
 
+	/**
+	 * This is necessary for a {@link JaxRsWhiteboardExtensionTests#testWebSecurityExtension()} 
+	 * and must be set before the first request is made. No other way was working...
+	 */
+	static {
+		System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+	}
+	
 	BundleContext context = FrameworkUtil.getBundle(JaxRsWhiteboardDTOTests.class).getBundleContext();
 
 	/**
