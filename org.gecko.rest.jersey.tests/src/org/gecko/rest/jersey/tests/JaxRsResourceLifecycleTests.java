@@ -235,7 +235,7 @@ public class JaxRsResourceLifecycleTests extends AbstractOSGiTest{
 		
 		registerServiceForCleanup(ContextMethodInjectTestResource.class, new ContextMethodInjectTestResource(), resProps);		
 		assertTrue(runtimeChecker.waitModify());	
-		
+
 		String checkUrl = url + "/whiteboard/context";
 		Invocation post = null;
 		Client jerseyClient = ClientBuilder.newClient();

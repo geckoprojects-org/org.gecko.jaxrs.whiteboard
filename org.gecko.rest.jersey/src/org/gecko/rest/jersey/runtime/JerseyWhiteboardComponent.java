@@ -39,9 +39,6 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  * @author Mark Hoffmann
  * @since 11.10.2017
  */
-//@Capability(namespace = "osgi.contract", name = "JavaJAXRS", version = "2.1", attribute = {
-//		"uses:=\"javax.ws.rs,javax.ws.rs.sse,javax.ws.rs.core,javax.ws.rs.ext,javax.ws.rs.client,javax.ws.rs.container\"",
-//		"provider=jersey" })
 @Component(name="JaxRsWhiteboardComponent", immediate=true, configurationPolicy=ConfigurationPolicy.REQUIRE)
 public class JerseyWhiteboardComponent {
 
