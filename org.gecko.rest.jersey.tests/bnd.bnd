@@ -66,7 +66,6 @@ javac.target: 1.8
 	org.glassfish.jersey.containers.jersey-container-servlet;version='[2.32.0,2.32.1)',\
 	org.gecko.rest.jersey.sse;version=snapshot,\
 	jakarta.inject.jakarta.inject-api;version='[2.0.0,2.0.1)',\
-	com.sun.xml.bind.jaxb-impl;version='[2.3.3,2.3.4)',\
 	org.glassfish.jersey.media.jersey-media-jaxb;version='[2.32.0,2.32.1)'
 
 Bundle-Name: Jersey JaxRS Whiteboard integration test
