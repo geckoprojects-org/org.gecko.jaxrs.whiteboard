@@ -1,0 +1,12 @@
+javac.source: 1.8
+javac.target: 1.8
+
+Bundle-Name: Jersey JaxRS SSE Fragment
+Bundle-Description: Jersey OSGi JaxRs SSE Fragment
+Bundle-Version: 2.32.0.SNAPSHOT
+
+Fragment-Host: org.glassfish.jersey.media.jersey-media-sse
+
+Export-Package: org.glassfish.jersey.media.sse.internal;version='2.32'
+
+-buildpath: org.glassfish.jersey.media.jersey-media-sse;version='2.32'

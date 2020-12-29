@@ -14,6 +14,7 @@ package org.gecko.rest.jersey.binder;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.gecko.rest.jersey.factories.JerseyExtensionInstanceFactory;
 import org.gecko.rest.jersey.factories.JerseyResourceInstanceFactory;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.api.PerLookup;
@@ -72,6 +73,9 @@ public class PrototypeServiceBinder extends AbstractBinder {
 		factoryMap.forEach((k,v)->{
 			if (v instanceof JerseyResourceInstanceFactory<?>) {
 				((JerseyResourceInstanceFactory<?>)v).dispose();
+			}
+			else if (v instanceof JerseyExtensionInstanceFactory<?>) {
+				((JerseyExtensionInstanceFactory<?>)v).dispose();
 			}
 		});
 		factoryMap.clear();

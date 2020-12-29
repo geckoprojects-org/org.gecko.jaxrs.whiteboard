@@ -11,22 +11,24 @@
  */
 package org.gecko.rest.jersey.runtime.common;
 
-import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.RxInvokerProvider;
 
 import org.glassfish.jersey.client.JerseyClientBuilder;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ServiceScope;
-import org.osgi.service.component.propertytypes.ServiceDescription;
-import org.osgi.service.component.propertytypes.ServiceVendor;
+import org.osgi.service.jaxrs.client.PromiseRxInvoker;
+
 
 /**
  * A simple class to enable DS to pickup on the Jersey Client Builder
  * @author Juergen Albert
  * @since 27 Jul 2018
  */
-@Component(service = ClientBuilder.class, scope = ServiceScope.PROTOTYPE)
-@ServiceVendor("Gecko.io")
-@ServiceDescription("A Jersey specific ClientBuilder")
 public class ClientBuilderService extends JerseyClientBuilder {
+	
+	/**
+	 * Creates a new instance.
+	 */
+	public ClientBuilderService(RxInvokerProvider<PromiseRxInvoker> provider) {
+		register(provider);
+	}
 
 }

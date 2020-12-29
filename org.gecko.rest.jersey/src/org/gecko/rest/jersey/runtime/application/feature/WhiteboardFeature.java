@@ -29,6 +29,9 @@ public class WhiteboardFeature implements Feature{
 
 	Map<String, JaxRsExtensionProvider> extensions;
 	
+	@SuppressWarnings("rawtypes")
+	Map<Object, ServiceObjects> serviceObjTrackingMap = new HashMap<>();
+	
 	
 	public WhiteboardFeature(Map<String, JaxRsExtensionProvider> extensions) {
 		this.extensions = new HashMap<>(extensions);
@@ -41,11 +44,30 @@ public class WhiteboardFeature implements Feature{
 	public boolean configure(FeatureContext context) {
 		extensions.forEach((k, extension) -> {
 			Object serviceObject = ((ServiceObjects<?>) extension.getProviderObject()).getService();
+			serviceObjTrackingMap.put(serviceObject, (ServiceObjects<?>) extension.getProviderObject());
+			
 			if(extension.getContracts() != null) {
 				context.register(serviceObject, extension.getContracts());
 			}
 			context.register(serviceObject);
 		});
 		return true;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void dispose() {
+		serviceObjTrackingMap.forEach((k,v) -> {
+			v.ungetService(k);
+		});
+		serviceObjTrackingMap.clear();
+		extensions.clear();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void dispose(Object serviceObject) {
+		if(serviceObjTrackingMap.containsKey(serviceObject)) {
+			serviceObjTrackingMap.get(serviceObject).ungetService(serviceObject);
+			serviceObjTrackingMap.remove(serviceObject);
+		}
 	}
 }

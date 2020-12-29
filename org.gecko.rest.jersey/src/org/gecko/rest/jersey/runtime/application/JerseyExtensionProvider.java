@@ -62,10 +62,26 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 	
 	public JerseyExtensionProvider(ServiceObjects<T> serviceObjects, Map<String, Object> properties) {
 		super(serviceObjects, properties);
+		checkExtensionProperty(properties);
 		extractContracts(properties);
 		
 	}
 	
+	/**
+	 * If the ExtensionProvider does not advertise the property osgi.jaxrs.extension as true then it is not a 
+	 * valid extenstion
+	 * 
+	 * @param properties
+	 */
+	private void checkExtensionProperty(Map<String, Object> properties) {
+		if(!properties.containsKey(JaxrsWhiteboardConstants.JAX_RS_EXTENSION) || 
+				properties.get(JaxrsWhiteboardConstants.JAX_RS_EXTENSION).equals(false)) {
+			
+			updateStatus(DTOConstants.FAILURE_REASON_NOT_AN_EXTENSION_TYPE);
+		}
+		
+	}
+
 	private void extractContracts(Map<String, Object> properties) {
 		String[] objectClasses = (String[]) properties.get(Constants.OBJECTCLASS);
 		List<Class<?>> possibleContracts = new ArrayList<>(objectClasses.length);
@@ -74,13 +90,15 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 				try {
 					possibleContracts.add(Class.forName(objectClass));
 				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			} 
 		}
 		if(!possibleContracts.isEmpty()) {
 			contracts = possibleContracts.toArray(new Class[0]);
+		}
+		else {
+			updateStatus(DTOConstants.FAILURE_REASON_NOT_AN_EXTENSION_TYPE); //if possibleContracts is empty the extension should record a failure DTO
 		}
 	}
 
@@ -90,7 +108,7 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 	 */
 	@Override
 	public boolean isExtension() {
-		return getProviderStatus() != INVALID;
+		return (getProviderStatus() != INVALID) && (getProviderStatus() != DTOConstants.FAILURE_REASON_NOT_AN_EXTENSION_TYPE) ;
 	}
 
 	/* 
@@ -129,6 +147,15 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 	 */
 	protected String getJaxRsResourceConstant() {
 		return JaxrsWhiteboardConstants.JAX_RS_EXTENSION;
+	}
+	
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.rest.jersey.provider.application.AbstractJaxRsProvider#updateStatus(int)
+	 */
+	@Override
+	public void updateStatus(int newStatus) {
+		super.updateStatus(newStatus);
 	}
 
 }

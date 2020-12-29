@@ -31,11 +31,9 @@ import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsResourceProvider;
 import org.gecko.rest.jersey.runtime.common.DefaultApplication;
 import org.glassfish.jersey.servlet.ServletContainer;
-import org.osgi.framework.Filter;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.jaxrs.runtime.dto.BaseApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
+import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
 import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
@@ -286,14 +284,16 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 * @return <code>true</code>, if add was successful, otherwise <code>false</code>
 	 */
 	private boolean doAddContent(JaxRsApplicationContentProvider provider) {
-		boolean filterValid = provider.canHandleApplication(this);
+		if(getApplicationDTO() instanceof FailedApplicationDTO) {
+			return false;
+		}
+		boolean filterValid = true; 
 		if (filterValid) {
 			JerseyApplication ja = wrappedApplication;
 			boolean added = ja.addContent(provider);
 			if (!changed && added) {
 				changed = added;
 			}
-//			return added;
 		}
 		return filterValid;
 	}
@@ -327,36 +327,6 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 		doValidateProperties(Collections.singletonMap(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, applicationBase));
 	}
 
-	/**
-	 * Returns <code>true</code>, if the application filter property handling is valid.
-	 * @param properties the resource/extension properties
-	 * @return <code>true</code>, if the handling is valid
-	 */
-	private boolean isApplicationFilterValid(Map<String, Object> properties) {
-		if (isDefault()) {
-			logger.log(Level.WARNING, "There is no application select filter valid for the default application");
-			return false;
-		}
-		String applicationFilter = (String) properties.get(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT);
-		if (applicationFilter != null) {
-			try {
-				Filter filter = FrameworkUtil.createFilter(applicationFilter);
-				boolean applicationMatch = filter.matches(getApplicationProperties());
-				if (!applicationMatch) {
-					logger.log(Level.WARNING, "The given application select filter does not math to this application for this resource/extension: " + getId());
-					return false;
-				}
-			} catch (InvalidSyntaxException e) {
-				logger.log(Level.WARNING, "The given application select filter is invalid: " + applicationFilter, e);
-				return false;
-			}
-		} else {
-			logger.log(Level.WARNING, "There is no application select filter");
-			return false;
-		}
-		return true;
-	}
-
 	/* 
 	 * (non-Javadoc)
 	 * @see org.gecko.rest.jersey.runtime.servlet.DestroyListener#servletContainerDestroyed(org.glassfish.jersey.servlet.ServletContainer)
@@ -364,6 +334,15 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	@Override
 	public void servletContainerDestroyed(ServletContainer container) {
 		applicationContainers.remove(container);
+	}
+	
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.rest.jersey.provider.application.AbstractJaxRsProvider#updateStatus(int)
+	 */
+	@Override
+	public void updateStatus(int newStatus) {
+		super.updateStatus(newStatus);
 	}
 
 

@@ -13,7 +13,6 @@ package org.gecko.rest.jersey.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -38,8 +37,6 @@ import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.cm.Configuration;
-import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
 import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
@@ -48,9 +45,18 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  * @author Mark Hoffmann
  * @since 12.10.2017
  */
+@SuppressWarnings("deprecation")
 @RunWith(MockitoJUnitRunner.class)
 public class JaxRsWhiteboardClientBuilder extends AbstractOSGiTest{
 
+	/**
+	 * This is necessary for a {@link JaxRsWhiteboardExtensionTests#testWebSecurityExtension()} 
+	 * and must be set before the first request is made. No other way was working...
+	 */
+	static {
+		System.setProperty("sun.net.http.allowRestrictedHeaders", "true");
+	}
+	
 	/**
 	 * Creates a new instance.
 	 * @param bundleContext
@@ -94,7 +100,7 @@ public class JaxRsWhiteboardClientBuilder extends AbstractOSGiTest{
 		
 		
 		
-		Configuration configuration = createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
+		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
@@ -151,7 +157,7 @@ public class JaxRsWhiteboardClientBuilder extends AbstractOSGiTest{
 		System.out.println("Register resource for uri /hello under application customer");
 		ServiceRegistration<HelloResource> helloRegistration = context.registerService(HelloResource.class, new HelloResource(), helloProps);
 		f = FrameworkUtil.createFilter("(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=Hello)");
-		Object service = getService(f, 3000l);
+		getService(f, 3000l);
 		
 		assertTrue(runtimeChecker.waitModify());
 		/*

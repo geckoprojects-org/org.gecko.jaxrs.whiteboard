@@ -15,8 +15,8 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
-import java.util.logging.Logger;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.gecko.rest.jersey.helper.JerseyHelper;
 import org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher;
@@ -118,7 +118,7 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 		switch (sre.getType()) {
 		case ADD:
 		case MODIFY:
-			logger.info("Handle extension " + sre.getType() + " properties: " + properties);
+			logger.fine("Handle extension " + sre.getType() + " properties: " + properties);
 			ServiceObjects so = context.getServiceObjects(sre.getReference());
 			dispatcher.addExtension(so, properties);
 			break;
@@ -138,7 +138,7 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 		switch (sre.getType()) {
 		case ADD:
 		case MODIFY:
-			logger.info("Handle resource " + sre.getType() + " properties: " + properties);
+			logger.fine("Handle resource " + sre.getType() + " properties: " + properties);
 			ServiceObjects so = context.getServiceObjects(sre.getReference());
 			dispatcher.addResource(so, properties);
 			break;
@@ -166,15 +166,14 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 		dispatcherMap.clear();
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.osgi.util.tracker.ServiceTrackerCustomizer#addingService(org.osgi.framework.ServiceReference)
-	 */
 	@Override
 	public Object addingService(ServiceReference<Object> reference) {
 		ServiceReferenceEvent event = new ServiceReferenceEvent(reference, Type.ADD);
-		Object service = context.getService(reference);
-		if(service == null) {
-			return null;
+		Object service = null;
+		try {
+			service = context.getServiceObjects(reference);
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Cannot get service objects from reference: " + reference, e);
 		}
 		source.publish(event);
 		contentReferences.put(reference, event);
@@ -200,6 +199,5 @@ public class ReferenceCollector implements ServiceTrackerCustomizer<Object, Obje
 		source.publish(event);
 		context.ungetService(reference);
 	}
-	
 	
 }

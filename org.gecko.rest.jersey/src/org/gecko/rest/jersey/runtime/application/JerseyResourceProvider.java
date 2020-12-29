@@ -71,5 +71,14 @@ public class JerseyResourceProvider<T extends Object> extends JerseyApplicationC
 	protected String getJaxRsResourceConstant() {
 		return JaxrsWhiteboardConstants.JAX_RS_RESOURCE;
 	}
+	
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.rest.jersey.provider.application.AbstractJaxRsProvider#updateStatus(int)
+	 */
+	@Override
+	public void updateStatus(int newStatus) {
+		super.updateStatus(newStatus);
+	}
 
 }

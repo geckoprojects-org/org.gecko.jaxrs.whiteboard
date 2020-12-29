@@ -44,12 +44,24 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 	public JerseyApplicationContentProvider(ServiceObjects<T> serviceObjects, Map<String, Object> properties) {
 		super(serviceObjects, properties);
 		if(getProviderObject() != null) {
-			T service = getProviderObject().getService();
+			T service = null;
+			try {
+				service = getProviderObject().getService();
+			} catch(Exception e) {
+				logger.warning("Error getting the service " + e.getMessage());
+			}
+			
 			// this is called while a service gets unregistered, the ServiceObjects return null as a Service 
 			if(service != null) {
 				clazz = service.getClass();
 				getProviderObject().ungetService(service);
 			}
+			else {
+				updateStatus(DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE);
+			}
+		}
+		else {
+			updateStatus(DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE);
 		}
 	}
 
@@ -91,10 +103,6 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 		return getProviderProperties();
 	}
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.eclipselabs.osgi.jersey.JaxRsResourceProvider#canHandleApplication(org.eclipselabs.osgi.jersey.JaxRsApplicationProvider)
-	 */
 	@Override
 	public boolean canHandleApplication(JaxRsApplicationProvider application) {
 		if (applicationFilter != null) {
@@ -110,7 +118,12 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 			}
 		} else {
 			if (!application.isDefault()) {
-				logger.log(Level.FINE, "[" + getId() + "] There is no application select filter defined, using default application");
+//				Check if app is a potential default app
+				if(".default".equals(application.getName()) || "/".equals(application.getPath()) || "/*".equals(application.getPath())) {
+					logger.fine("Potential default app " + application.getName() + " can handle content");
+					return true;
+				}
+				logger.log(Level.INFO, "[" + getId() + "] There is no application select filter defined, using default application");
 				return false;
 			} else {
 				return canHandleDefaultApplication();
@@ -130,6 +143,23 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 		} else {
 			Map<String, Object> properties = Collections.singletonMap(JaxrsWhiteboardConstants.JAX_RS_NAME, ".default");
 			return applicationFilter.matches(properties);
+		}
+	}
+	
+	
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvider#canHandleDefaultApplication(org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider)
+	 */
+	@Override
+	public boolean canHandleDefaultApplication(JaxRsApplicationProvider application) {
+		if(application.isDefault()) {
+			return canHandleDefaultApplication();
+		}
+		if (applicationFilter == null) {
+			return true;
+		} else {
+			return applicationFilter.matches(application.getProviderProperties());
 		}
 	}
 

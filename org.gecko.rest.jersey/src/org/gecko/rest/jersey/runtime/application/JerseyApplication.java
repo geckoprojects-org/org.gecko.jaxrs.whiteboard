@@ -44,6 +44,7 @@ public class JerseyApplication extends Application {
 	private final Logger log = Logger.getLogger("jersey.application");
 	private Map<String, Object> properties;
 	private Application sourceApplication;
+	private WhiteboardFeature whiteboardFeature;
 
 	public JerseyApplication(String applicationName) {
 		this.applicationName = applicationName;
@@ -89,7 +90,8 @@ public class JerseyApplication extends Application {
 		resutlSingletons.addAll(singletons.values());
 		resutlSingletons.addAll(sourceApplication.getSingletons());
 		if(!extensions.isEmpty()) {
-			resutlSingletons.add(new WhiteboardFeature(extensions));
+			whiteboardFeature = new WhiteboardFeature(extensions);
+			resutlSingletons.add(whiteboardFeature);
 		}
 		return Collections.unmodifiableSet(resutlSingletons);
 	}
@@ -102,32 +104,18 @@ public class JerseyApplication extends Application {
 		return applicationName;
 	}
 
-	/**
-	 * Adds a content provider to the application
-	 * @param contentProvider the provider to register
-	 * @return <code>true</code>, if content was added
-	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public boolean addContent(JaxRsApplicationContentProvider contentProvider) {
+		
 		if (contentProvider == null) {
 			if (log != null) {
 				log.log(Level.WARNING, "A null service content provider was given to register as a JaxRs resource or extension");
 			}
 			return false;
 		}
-		
 		String key = contentProvider.getId();
 		contentProviders.put(key, contentProvider);
-		if(contentProvider instanceof JaxRsExtensionProvider) {
-			Class<?> extensionClass = contentProvider.getObjectClass();
-			if (extensionClass == null) {
-				contentProviders.remove(key);
-				Object removed = extensions.remove(key);
-				return removed != null;
-			}
-			JaxRsExtensionProvider result = extensions.put(key, (JaxRsExtensionProvider) contentProvider);
-			return  result == null || !extensionClass.equals(result.getObjectClass());
-		} else if (contentProvider.isSingleton()) {
+		if (contentProvider.isSingleton()) {
 			Class<?> resourceClass = contentProvider.getObjectClass();
 			Object result = singletons.get(key);
 			if(result == null || !result.getClass().equals(resourceClass)){
@@ -171,6 +159,7 @@ public class JerseyApplication extends Application {
 	 * @param contentProvider the provider of the contents to be removed
 	 * @return Return <code>true</code>, if the content was removed
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public boolean removeContent(JaxRsApplicationContentProvider contentProvider) {
 		if (contentProvider == null) {
 			if (log != null) {
@@ -182,10 +171,31 @@ public class JerseyApplication extends Application {
 		if(contentProvider instanceof JaxRsExtensionProvider) {
 			synchronized (extensions) {
 				extensions.remove(key);
+				if(contentProvider.isSingleton()) {
+					synchronized (singletons) {
+						Object obj = singletons.remove(key);
+						if(obj != null) {
+							log.fine("Unregistering service for extension " + contentProvider.getName() + " service " + obj);
+							((ServiceObjects) contentProvider.getProviderObject()).ungetService(obj);					
+						}				
+					}
+				}				
 			}
 		} else if (contentProvider.isSingleton()) {
 			synchronized (singletons) {
-				singletons.remove(key);
+				Object obj = singletons.remove(key);
+				if(obj != null) {
+					log.fine("Unregistering service for resource " + contentProvider.getName() + " service " + obj);
+					Object providerObj = contentProvider.getProviderObject();
+					if(providerObj instanceof ServiceObjects) {
+						ServiceObjects serviceObjs = (ServiceObjects) providerObj;
+						try {
+							serviceObjs.ungetService(obj);
+						} catch(IllegalArgumentException e) {
+							log.log(Level.SEVERE, "Cannot unget service for resource " + contentProvider.getName(), e);
+						}
+					}
+				}				
 			}
 		} else {
 			synchronized (classes) {
@@ -195,16 +205,6 @@ public class JerseyApplication extends Application {
 		synchronized (contentProviders) {
 			return contentProviders.remove(key) != null;
 		}
-	}
-
-	/**
-	 * Cleans up all resources
-	 */
-	public void dispose() {
-		contentProviders.clear();
-		extensions.clear();
-		classes.clear();
-		singletons.clear();
 	}
 
 	/**
@@ -221,7 +221,5 @@ public class JerseyApplication extends Application {
 	public Application getSourceApplication() {
 		return sourceApplication;
 	}
-	
-	
 	
 }

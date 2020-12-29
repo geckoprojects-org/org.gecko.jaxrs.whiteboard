@@ -1,7 +1,0 @@
-org.glassfish.hk2:hk2-api:2.5.0-b59
-org.glassfish.hk2:hk2-locator:2.5.0-b59
-org.glassfish.hk2:hk2-utils:2.5.0-b59
-org.glassfish.hk2:osgi-resource-locator:2.5.0-b42
-org.glassfish.hk2.external:aopalliance-repackaged:2.5.0-b59
-org.glassfish.hk2.external:javax.inject:2.5.0-b59
-org.javassist:javassist:3.22.0-GA

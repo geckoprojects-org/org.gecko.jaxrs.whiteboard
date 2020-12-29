@@ -21,12 +21,14 @@ import javax.ws.rs.core.Response;
 public class DtoTestResource {
 
 	@GET
+	@Produces(MediaType.WILDCARD)
 	@Path("dtoget")
 	public Response getTest() {
 		return Response.ok().build();
 	}
 
 	@POST
+	@Consumes(MediaType.WILDCARD)
 	@Path("dtopost")
 	public Response getTestPost(String body) {
 		return Response.ok().build();

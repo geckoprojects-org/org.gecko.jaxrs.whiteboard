@@ -80,8 +80,8 @@ public class JerseyWhiteboardComponent {
 	@Modified
 	public void modified(ComponentContext context) throws ConfigurationException {
 		updateProperties(context);
-		whiteboard.modified(context);
 		dispatcher.dispatch();
+		whiteboard.modified(context);
 	}
 
 	/**

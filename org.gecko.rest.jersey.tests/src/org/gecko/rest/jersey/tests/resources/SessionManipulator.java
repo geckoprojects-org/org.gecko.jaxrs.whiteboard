@@ -16,6 +16,7 @@
 package org.gecko.rest.jersey.tests.resources;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -31,16 +32,26 @@ public class SessionManipulator {
 	@GET
 	@Path("{name}")
 	@Produces(MediaType.TEXT_PLAIN)
-	public String getValue(@Context HttpServletRequest req,
+	public Response getValue(@Context HttpServletRequest req,
 			@PathParam("name") String name) {
-		return String.valueOf(req.getSession().getAttribute(name));
+		HttpSession session = req.getSession();
+		System.out.println("Session in GET " + (session == null ? "null" : session.getId())  + " this is " + this);
+//		String r = String.valueOf(req.getSession().getAttribute(name));
+		String r = String.valueOf(session.getAttribute(name));
+		System.out.println("Value of name in GET " + name);
+		System.out.println("Value of parameter in GET " + r);
+		return Response.ok(r).build();
 	}
 
 	@PUT
 	@Path("{name}")
-	public Response getValue(@Context HttpServletRequest req,
-			@PathParam("name") String name, String body) {
+	public Response setValue(@Context HttpServletRequest req,
+			@PathParam("name") String name, String body) {			
+		HttpSession session = req.getSession();
+		System.out.println("Session in PUT " + (session == null ? "null" : session.getId()) + " this is " + this);
 		req.getSession().setAttribute(name, body);
+		String r = String.valueOf(req.getAttribute(name));
+		System.out.println("Value of parameter in PUT " + r + "; key: " + name);
 		return Response.ok().build();
 	}
 

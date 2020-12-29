@@ -46,14 +46,7 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 	private Filter whiteboardFilter;
 	private List<Filter> extensionFilters = new LinkedList<>();
 	private T providerObject;
-//	private ServiceObjects<T> serviceObjects;
 
-//	public AbstractJaxRsProvider(ServiceObjects<T> serviceObjects, Map<String, Object> properties) {
-//		this.properties = properties == null ? Collections.emptyMap() : properties;
-//		this.serviceObjects = serviceObjects;
-//		validateProperties();
-//	}
-	
 	public AbstractJaxRsProvider(T providerObject, Map<String, Object> properties) {
 		this.properties = properties == null ? Collections.emptyMap() : properties;
 		this.providerObject = providerObject;
@@ -219,7 +212,8 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 	}
 
 	/**
-	 * Validates all properties which are usually the service properties. It starts with the name and serviceId and delegates to custom implementations
+	 * Validates all properties which are usually the service properties. 
+	 * It starts with the name and serviceId and delegates to custom implementations
 	 */
 	protected void validateProperties() {
 		updateStatus(NO_FAILURE);
@@ -311,7 +305,12 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 		r = getName().compareTo(o.getName());
 		if (r == 0) {
 			r = getServiceRank().compareTo(o.getServiceRank()) * -1;
-		}
+//			same rank -> sort by service id
+			if(r == 0) {
+				r = getServiceId().compareTo(o.getServiceId());
+			}
+			
+		}		
 		return r;
 	}
 

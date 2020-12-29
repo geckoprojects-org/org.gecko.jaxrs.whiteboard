@@ -1,10 +1,3 @@
-# This is the version of JUnit that will be used at build time and run time
-junit: org.apache.servicemix.bundles.junit;version="[4.11,5)"
-
-# This is the version of Mockito that will be used at build time and run time
-mockito: org.mockito.mockito-core;version="[1.9,2)",\
-  org.objenesis;version="[2.1,3)"
-
 # Discover and run all test cases annotated with the @RunWith annotation
 Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 
@@ -12,19 +5,20 @@ Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 -buildpath: \
 	${junit},\
 	${mockito},\
-	osgi.annotation;version=7.0.0,\
-	osgi.core;version=6.0,\
-	osgi.cmpn;version=7.0,\
-	org.gecko.util.test.common;version=1.3,\
-	javax.ws.rs-api,\
-	org.gecko.rest.jersey.api;version=latest,\
-	javax.servlet-api,\
-	org.gecko.rest.jersey.impl;version=latest
+	${geckotest},\
+	osgi.annotation;version='7.0',\
+	osgi.core;version='7.0',\
+	osgi.cmpn;version='7.0',\
+	org.gecko.rest.jersey;version=project,\
+	jakarta.ws.rs-api;version='2.1.6',\
+	org.apache.felix.http.servlet-api;version='1.1',\
+	org.gecko.util.test.common;version='1.3',\
+	jakarta.inject.jakarta.inject-api;version='2.0'
 	
 -runrequires: \
+	bnd.identity;id='org.gecko.rest.jersey',\
 	bnd.identity;id='org.gecko.rest.jersey.tests',\
-	bnd.identity;version='1.0.9.201812171404';id='org.gecko.rest.jersey.impl',\
-	bnd.identity;version='2.0.2.201812171404';id='org.gecko.rest.jersey.api'
+	bnd.identity;id='org.glassfish.jersey.inject.jersey-hk2'
 
 javac.source: 1.8
 javac.target: 1.8
@@ -32,47 +26,65 @@ javac.target: 1.8
 # We need JUnit and Mockito to resolve the test cases at runtime. 
 # Other runtime dependencies should be added as necessary
 -runbundles: \
-	javax.validation.api;version='[1.1.0,1.1.1)',\
 	org.apache.felix.http.servlet-api;version='[1.1.2,1.1.3)',\
 	org.apache.servicemix.bundles.junit;version='[4.12.0,4.12.1)',\
-	org.glassfish.jersey.bundles.jaxrs-ri;version='[2.26.0,2.26.1)',\
 	org.mockito.mockito-core;version='[1.10.19,1.10.20)',\
 	org.objenesis;version='[2.2.0,2.2.1)',\
 	org.gecko.rest.jersey.tests;version=snapshot,\
 	org.osgi.util.function;version='[1.1.0,1.1.1)',\
 	org.osgi.util.promise;version='[1.1.0,1.1.1)',\
 	org.osgi.util.pushstream;version='[1.0.0,1.0.1)',\
-	org.gecko.rest.jersey.api;version=snapshot,\
-	javassist;version='[3.22.0,3.22.1)',\
-	org.glassfish.hk2.external.aopalliance-repackaged;version='[2.5.0,2.5.1)',\
-	javax.annotation-api;version='[1.3.2,1.3.3)',\
-	org.apache.felix.configadmin;version='[1.9.6,1.9.7)',\
-	org.apache.felix.http.jetty;version='[4.0.6,4.0.7)',\
-	org.apache.felix.scr;version='[2.1.8,2.1.9)',\
-	org.gecko.osgi.hk2.repackaged;version='[2.5.1,2.5.2)',\
-	org.gecko.rest.jersey.impl;version=snapshot,\
-	org.gecko.util.test.common;version='[1.3.2,1.3.3)'
-Bundle-Version: 3.0.0.SNAPSHOT
-Bundle-Copyright: Data In Motion Consulting
-Bundle-License: Eclipse Public License v1.0
+	org.glassfish.hk2.external.aopalliance-repackaged;version='[2.6.1,2.6.2)',\
+	org.gecko.util.test.common;version='[1.3.2,1.3.3)',\
+	javassist;version='[3.27.0,3.27.1)',\
+	org.apache.felix.http.jetty;version='[4.1.2,4.1.3)',\
+	org.glassfish.hk2.api;version='[2.6.1,2.6.2)',\
+	org.glassfish.hk2.external.jakarta.inject;version='[2.6.1,2.6.2)',\
+	org.glassfish.hk2.utils;version='[2.6.1,2.6.2)',\
+	com.sun.activation.javax.activation;version='[1.2.0,1.2.1)',\
+	jakarta.activation-api;version='[1.2.1,1.2.2)',\
+	jakarta.annotation-api;version='[1.3.5,1.3.6)',\
+	jakarta.validation.jakarta.validation-api;version='[2.0.2,2.0.3)',\
+	jakarta.ws.rs-api;version='[2.1.6,2.1.7)',\
+	jakarta.xml.bind-api;version='[2.3.3,2.3.4)',\
+	org.apache.felix.configadmin;version='[1.9.18,1.9.19)',\
+	org.apache.felix.scr;version='[2.1.24,2.1.25)',\
+	org.glassfish.hk2.osgi-resource-locator;version='[1.0.3,1.0.4)',\
+	org.gecko.rest.jersey;version=snapshot,\
+	org.gecko.rest.jersey.sse;version=snapshot,\
+	jakarta.inject.jakarta.inject-api;version='[2.0.0,2.0.1)',\
+	com.sun.xml.bind.jaxb-impl;version='[2.3.3,2.3.4)',\
+	org.glassfish.hk2.locator;version='[2.6.1,2.6.2)',\
+	org.glassfish.jersey.containers.jersey-container-servlet;version='[2.32.0,2.32.1)',\
+	org.glassfish.jersey.containers.jersey-container-servlet-core;version='[2.32.0,2.32.1)',\
+	org.glassfish.jersey.core.jersey-client;version='[2.32.0,2.32.1)',\
+	org.glassfish.jersey.core.jersey-common;version='[2.32.0,2.32.1)',\
+	org.glassfish.jersey.core.jersey-server;version='[2.32.0,2.32.1)',\
+	org.glassfish.jersey.inject.jersey-hk2;version='[2.32.0,2.32.1)',\
+	org.glassfish.jersey.media.jersey-media-jaxb;version='[2.32.0,2.32.1)',\
+	org.glassfish.jersey.media.jersey-media-sse;version='[2.32.0,2.32.1)'
+
 Bundle-Name: Jersey JaxRS Whiteboard integration test
 Bundle-Description: Jersey OSGi JaxRs Whiteboard integration tests
-Bundle-Vendor: Data In Motion Consulting GmbH
-Private-Package: \
-	org.gecko.rest.jersey.tests.resources,\
-	org.gecko.rest.jersey.tests.customizer,\
-	org.gecko.rest.jersey.tests.applications
-Require-Capability: osgi.implementation;filter:='(&(osgi.implementation=osgi.jaxrs)(provider=jersey))'
+
+Require-Capability: osgi.implementation;filter:='(&(osgi.implementation=osgi.jaxrs)(provider=jersey)(jersey.version=2.32))'
 
 # Needed for Mockito's mocking to work
 -runsystempackages.objenesis: sun.misc,sun.reflect
 
 # Use Felix by default
--runfw: org.apache.felix.framework;
--runvm: -ea
+-runfw: org.apache.felix.framework;version='[6.0.3,6.0.3]'
+-runvm: -ea 
 -runee: JavaSE-1.8
-Export-Package: org.gecko.rest.jersey.tests.customizer
--runproperties: \
-	org.osgi.service.http.port=0
+-runproperties: org.osgi.service.http.port=0
 -resolve.effective: active;skip:='osgi.service'
--privatepackage: org.gecko.rest.jersey.tests
+-privatepackage: \
+	org.gecko.rest.jersey.tests,\
+	org.gecko.rest.jersey.tests.resources,\
+	org.gecko.rest.jersey.tests.customizer,\
+	org.gecko.rest.jersey.tests.applications,\
+	org.gecko.rest.jersey.tests.whiteboard,\
+	org.gecko.rest.jersey.tests.whiteboard.applications,\
+	org.gecko.rest.jersey.tests.whiteboard.customizer,\
+	org.gecko.rest.jersey.tests.whiteboard.resources
+-runblacklist: bnd.identity;id='org.gecko.osgi.hk2.repackaged'
