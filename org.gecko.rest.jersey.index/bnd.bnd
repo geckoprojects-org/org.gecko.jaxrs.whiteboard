@@ -28,4 +28,5 @@ Bundle-Description: Jersey OSGi JaxRs Whiteboard BOM Dependencies
 	jakarta.ws.rs-api;version='2.1.6',\
 	jakarta.xml.bind-api;version='2.3.3',\
 	org.glassfish.jersey.containers.jersey-container-servlet,\
-	org.gecko.rest.jersey.sse;version=latest
+	org.gecko.rest.jersey.sse;version=latest,\
+	com.sun.xml.bind.jaxb-impl;version='2.3'
