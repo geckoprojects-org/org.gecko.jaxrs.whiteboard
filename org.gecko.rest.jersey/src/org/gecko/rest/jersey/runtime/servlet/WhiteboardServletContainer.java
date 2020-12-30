@@ -4,6 +4,8 @@
 package org.gecko.rest.jersey.runtime.servlet;
 
 import java.io.IOException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -13,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.gecko.rest.jersey.helper.DestroyListener;
 import org.gecko.rest.jersey.runtime.common.ResourceConfigWrapper;
+import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
@@ -57,14 +60,41 @@ public class WhiteboardServletContainer extends ServletContainer {
 		lock.writeLock().lock();
 		try {
 			super.init();
+			// we have to wait until the injection manager is available on first start
+			Future<?> future = Executors.newSingleThreadExecutor().submit(()->{
+				ApplicationHandler handler = getApplicationHandler();
+				while(handler.getInjectionManager() == null) {
+					try {
+						Thread.sleep(10l);
+					} catch (InterruptedException e) {
+					}
+				}
+			});
+			future.get();
 			initialized.set(true);
 			if (config != null) {
 				this.reload(config);
 				wrapper.setInjectionManager(getApplicationHandler().getInjectionManager());
 				config = null;
 			}
+		} catch (Exception e) {
+			if (e instanceof ServletException) {
+				throw (ServletException)e;
+			} else {
+				throw new ServletException(e);
+			}
 		} finally {
 			lock.writeLock().unlock();
+		}
+	}
+	
+	protected void doInit() throws ServletException {
+		super.init();
+		initialized.set(true);
+		if (config != null) {
+			this.reload(config);
+			wrapper.setInjectionManager(getApplicationHandler().getInjectionManager());
+			config = null;
 		}
 	}
 
