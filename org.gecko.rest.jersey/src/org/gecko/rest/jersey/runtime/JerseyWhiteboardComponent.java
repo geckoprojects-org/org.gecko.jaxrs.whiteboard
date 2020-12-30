@@ -39,7 +39,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  * @author Mark Hoffmann
  * @since 11.10.2017
  */
-@Component(name="JaxRsWhiteboardComponent", immediate=true, configurationPolicy=ConfigurationPolicy.OPTIONAL)
+@Component(name="JaxRsWhiteboardComponent", immediate=true, configurationPolicy=ConfigurationPolicy.REQUIRE)
 public class JerseyWhiteboardComponent {
 
 	Logger logger = Logger.getLogger("o.e.o.j.runtimeComponent");
