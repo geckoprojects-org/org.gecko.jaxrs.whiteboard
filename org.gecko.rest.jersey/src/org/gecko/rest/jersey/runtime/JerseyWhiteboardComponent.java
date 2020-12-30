@@ -39,7 +39,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  * @author Mark Hoffmann
  * @since 11.10.2017
  */
-@Component(name="JaxRsWhiteboardComponent", immediate=true, configurationPolicy=ConfigurationPolicy.REQUIRE)
+@Component(name="JaxRsWhiteboardComponent", immediate=true, configurationPolicy=ConfigurationPolicy.OPTIONAL)
 public class JerseyWhiteboardComponent {
 
 	Logger logger = Logger.getLogger("o.e.o.j.runtimeComponent");
@@ -169,7 +169,7 @@ public class JerseyWhiteboardComponent {
 		}
 		name = JerseyHelper.getPropertyWithDefault(ctx, JaxrsWhiteboardConstants.JAX_RS_NAME, null);
 		if (name == null) {
-			name = JerseyHelper.getPropertyWithDefault(ctx, JerseyConstants.JERSEY_WHITEBOARD_NAME, null);
+			name = JerseyHelper.getPropertyWithDefault(ctx, JerseyConstants.JERSEY_WHITEBOARD_NAME, JerseyConstants.JERSEY_WHITEBOARD_NAME);
 			if (name == null) {
 				throw new ConfigurationException(JaxrsWhiteboardConstants.JAX_RS_NAME, "No name was defined for the whiteboard");
 			}

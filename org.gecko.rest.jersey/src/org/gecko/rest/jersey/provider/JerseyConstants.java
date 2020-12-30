@@ -26,9 +26,10 @@ public interface JerseyConstants {
 	public static final String JERSEY_STRICT_MODE = "jersey.jaxrs.whiteboard.strict";
 	public static final Object JERSEY_DISABLE_SESSION = "jersey.disable.sessions";
 	
-	public static final Integer WHITEBOARD_DEFAULT_PORT = Integer.valueOf(8080);
-	public static final String WHITEBOARD_DEFAULT_CONTEXT_PATH = "/";
+	public static final Integer WHITEBOARD_DEFAULT_PORT = Integer.valueOf(8181);
+	public static final String WHITEBOARD_DEFAULT_CONTEXT_PATH = "/rest";
 	public static final String WHITEBOARD_DEFAULT_HOST = "localhost";
 	public static final String WHITEBOARD_DEFAULT_SCHEMA = "http";
+	public static final String WHITEBOARD_DEFAULT_NAME = "Jersey REST";
 
 }

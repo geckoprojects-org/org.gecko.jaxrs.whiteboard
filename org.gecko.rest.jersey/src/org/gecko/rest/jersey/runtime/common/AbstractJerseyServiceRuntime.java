@@ -467,7 +467,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 		}
 		name = JerseyHelper.getPropertyWithDefault(ctx, JaxrsWhiteboardConstants.JAX_RS_NAME, null);
 		if (name == null) {
-			name = JerseyHelper.getPropertyWithDefault(ctx, JerseyConstants.JERSEY_WHITEBOARD_NAME, null);
+			name = JerseyHelper.getPropertyWithDefault(ctx, JerseyConstants.JERSEY_WHITEBOARD_NAME, JerseyConstants.JERSEY_WHITEBOARD_NAME);
 			if (name == null) {
 				throw new ConfigurationException(JaxrsWhiteboardConstants.JAX_RS_NAME, "No name was defined for the whiteboard");
 			}
