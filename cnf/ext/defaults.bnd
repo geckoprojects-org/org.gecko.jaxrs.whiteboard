@@ -5,7 +5,7 @@ javac.target: 1.8
 javac.debug:  on
 
 # Version of this JaxRs Whiteboard implementation
-whiteboard-version: 4.0.2.SNAPSHOT
+whiteboard-version: 4.0.0.SNAPSHOT
 
 #Set Git revision information in the manifests of built bundles
 #Git-Descriptor:           ${system-allow-fail;git describe --dirty --always}
@@ -49,7 +49,7 @@ mockito: org.mockito.mockito-core;version="[1.9,2)",\
 -pom: true
 -digest: sha256
 
--groupid: org.geckoprojects.jaxrs
+-groupid: org.geckoprojects.rest
 
 # Includes sources from bundle
 -sources: true
