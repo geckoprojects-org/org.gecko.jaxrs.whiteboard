@@ -5,7 +5,7 @@ javac.target: 1.8
 javac.debug:  on
 
 # Version of this JaxRs Whiteboard implementation
-whiteboard-version: 4.0.1.SNAPSHOT
+whiteboard-version: 4.0.2.SNAPSHOT
 
 #Set Git revision information in the manifests of built bundles
 #Git-Descriptor:           ${system-allow-fail;git describe --dirty --always}
