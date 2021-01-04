@@ -26,7 +26,7 @@ pipeline  {
             steps {
                 echo "I am building on ${env.BRANCH_NAME}"
                 updateGitlabCommitStatus name: 'Jenkins Build', state: 'pending'
-				sh "./gradlew clean build --info"
+				sh "./gradlew clean build --info --stacktrace -Dmaven.repo.local=${WORKSPACE}/.m2"
 				junit '**/generated/test-reports/**/*.xml'
 				updateGitlabCommitStatus name: 'Jenkins Build', state: 'success'
 		    }
@@ -39,7 +39,7 @@ pipeline  {
 	
                 echo "I am building on ${env.BRANCH_NAME}"
                 updateGitlabCommitStatus name: 'Release', state: 'pending'
-				sh "./gradlew clean build release -Drelease.dir=$JENKINS_HOME/repo.gecko/release/geckoREST/ -x test -x testOSGi --info"
+				sh "./gradlew clean build release -Drelease.dir=$JENKINS_HOME/repo.gecko/release/geckoREST/ -x test -x testOSGi --info --stacktrace -Dmaven.repo.local=${WORKSPACE}/.m2"
                 updateGitlabCommitStatus name: 'Release', state: 'success'
 		    }
 		}
@@ -50,7 +50,7 @@ pipeline  {
             steps  {
                 echo "I am building on ${env.JOB_NAME}"
                 updateGitlabCommitStatus name: 'Release', state: 'pending'
-				sh "./gradlew release --info"
+				sh "./gradlew release --info --stacktrace -Dmaven.repo.local=${WORKSPACE}/.m2"
 				sh "mkdir -p $JENKINS_HOME/repo.gecko/snapshot/geckoREST"
 				sh "rm -rf $JENKINS_HOME/repo.gecko/snapshot/geckoREST/*"
 				sh "cp -r cnf/release/* $JENKINS_HOME/repo.gecko/snapshot/geckoREST"
