@@ -157,3 +157,6 @@ org.eclipse.platform:org.eclipse.osgi:3.13.100
 com.sun.activation:javax.activation:1.2.0
 
 org.eclipse.jetty:jetty-server:9.4.34.v20201102
+
+org.bndtools:org.bndtools.templates.osgi:5.2.0
+org.bndtools:org.bndtools.templates.template:5.2.0
