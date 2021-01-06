@@ -1,0 +1,17 @@
+# Example Project Template
+# Make sure to edit the name, category and help document.
+
+Provide-Capability: \
+	org.bndtools.template;\
+		org.bndtools.template=workspace; \
+		engine=mustache; \
+		name=org.gecko.rest.bnd.workspace.template; \
+		category="Workspace Extensions"; \
+		dir=template; \
+		icon="${icondata}"; \
+		help=help.xml
+
+icondata: data:image/gif;base64,${base64;icon.gif}
+
+-resourceonly: true
+-includeresource: resources
