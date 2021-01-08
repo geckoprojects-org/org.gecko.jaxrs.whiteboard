@@ -1,0 +1,17 @@
+-buildpath:  \
+	osgi.annotation;version=7.0,\
+	osgi.core;version=7.0,\
+	osgi.cmpn;version=7.0,\
+	jakarta.ws.rs-api;version='2.1'
+
+# This is the version of JUnit that will be used at build time and run time
+junit: org.apache.servicemix.bundles.junit;version="[4.11,5)"
+
+-testpath: \
+	${junit}
+
+Bundle-Version: 1.0.0.SNAPSHOT
+Private-Package: {{basePackageName}}
+
+-includeresource: OSGI-INF/configurator/=configs/
+Require-Capability: osgi.extender;filter:='(osgi.extender=osgi.configurator)'

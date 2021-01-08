@@ -2,6 +2,7 @@ com.fasterxml.jackson.core:jackson-annotations:2.9.2
 com.fasterxml.jackson.core:jackson-core:2.9.2
 com.fasterxml.jackson.core:jackson-databind:2.9.2
 com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.2
+com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.9.2
 com.google.guava:guava:21.0
 com.google.guava:guava:22.0
 com.googlecode.json-simple:json-simple:1.1.1

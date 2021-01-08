@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.2.0" localization="OSGI-INF/l10n/org.gecko.bndtools.templates.emf.model">
+  <OCD id="org.gecko.bndtools.templates.emf.model" name="Gecko EMF Model Project Template" description="Gecko EMF Model Project Template">
+    <AD id="port" type="String" name="Whiteboard port" description="The port the HttpWhiteboard jetty will listen on" default="8082"/>
+    <AD id="whiteboardName" type="String" name="Whiteboard Name" description="The name of the JaxRs whiteboard" default="ExampleName"/>
+    <AD id="contextPath" type="String" name="Whiteboard Contextpath" description="The URL segment the Whiteboard will be available under" default="rest"/>
+  </OCD>
+</metatype:MetaData>
