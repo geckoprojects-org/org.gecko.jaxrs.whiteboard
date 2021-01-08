@@ -13,6 +13,8 @@ icondata: data:image/gif;base64,${base64;icon.gif}
 -resourceonly: true
 -includeresource: {resources}
 
+-dependson: org.gecko.rest.jersey.bom
+
 -include: ../org.gecko.rest.jersey.bom/required.bndrun
 
 -buildpath: ${-runbundles}
