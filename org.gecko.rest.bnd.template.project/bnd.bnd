@@ -1,0 +1,58 @@
+# Example Project Template
+# Make sure to edit the name, category and help document.
+
+Provide-Capability: \
+	org.bndtools.template;\
+		org.bndtools.template=project; \
+		engine=mustache; \
+		name=org.gecko.rest.bnd.template.project; \
+		category=Examples; \
+		dir=template; \
+		icon="${icondata}"; \
+		help=help.xml
+
+icondata: data:image/gif;base64,${base64;icon.gif}
+category: ccc/Gecko OSGi Standard Templates
+
+dataurl: data:image/gif;base64
+gecko-icon: ${dataurl},${base64;icons/gecko.ico}
+
+project-template-rest-no-config:\
+	org.bndtools.template; org.bndtools.template=project;\
+		name=Gecko Jaxrs Resource Example;\
+		category=${category};\
+		ranking:Double=1001;\
+		dir=templates/rest-no-config;\
+		icon="${gecko-icon}";\
+		help=rest-no-config.xml;\
+		engine=mustache
+
+project-template-rest-with-config:\
+	org.bndtools.template; org.bndtools.template=project;\
+		name=Gecko Jaxrs Resource Example with JaxrsRuntime config;\
+		category=${category};\
+		ranking:Double=1001;\
+		dir=templates/rest-with-config;\
+		icon="${gecko-icon}";\
+		help=rest-with-config.xml;\
+		engine=mustache;\
+		metaType=rest-with-config-metatype.xml
+
+project-template-rest-with-config-wb:\
+	org.bndtools.template; org.bndtools.template=project;\
+		name=Gecko Jaxrs Resource Example with JaxrsRuntime config based on a HttpWhiteboard;\
+		category=${category};\
+		ranking:Double=1001;\
+		dir=templates/rest-with-config-http-wb;\
+		icon="${gecko-icon}";\
+		help=rest-with-config-http-wb.xml;\
+		engine=mustache;\
+		metaType=rest-with-config-http-wb-metatype.xml
+
+Provide-Capability: \
+	${project-template-rest-no-config},\
+	${project-template-rest-with-config},\
+	${project-template-rest-with-config-wb}
+
+-resourceonly: true
+-includeresource: resources
