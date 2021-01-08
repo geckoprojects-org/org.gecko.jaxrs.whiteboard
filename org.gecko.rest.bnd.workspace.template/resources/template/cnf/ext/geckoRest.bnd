@@ -1,7 +1,0 @@
--plugin.{{pluginNamespace}}: \
-	aQute.bnd.repository.osgi.OSGiRepository;\
-		locations=https://devel.data-in-motion.biz/public/repository/gecko/release/geckoREST/index.xml;\
-		max.stale=-1;\
-		name={{RepoName}};\
-		cache=${build}/cache/{{RepoName}}
-		

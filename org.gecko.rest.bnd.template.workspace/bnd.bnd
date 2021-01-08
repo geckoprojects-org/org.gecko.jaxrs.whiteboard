@@ -1,6 +1,3 @@
-# Example Project Template
-# Make sure to edit the name, category and help document.
-
 Provide-Capability: \
 	org.bndtools.template;\
 		org.bndtools.template=workspace; \
@@ -14,4 +11,12 @@ Provide-Capability: \
 icondata: data:image/gif;base64,${base64;icon.gif}
 
 -resourceonly: true
--includeresource: resources
+-includeresource: {resources}
+
+-include: ../org.gecko.rest.jersey.bom/required.bndrun
+
+-buildpath: ${-runbundles}
+
+mavendeps: ${sjoin;\n; ${template;-maven-dependencies;${@}}}
+
+  
