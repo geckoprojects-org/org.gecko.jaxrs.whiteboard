@@ -6,7 +6,8 @@ Provide-Capability: \
 		category="Workspace Extensions"; \
 		dir=template; \
 		icon="${icondata}"; \
-		help=help.xml
+		help=help.xml;\
+		type=extension
 
 icondata: data:image/gif;base64,${base64;icon.gif}
 
