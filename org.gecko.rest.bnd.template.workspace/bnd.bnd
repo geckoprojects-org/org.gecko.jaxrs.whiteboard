@@ -2,7 +2,7 @@ Provide-Capability: \
 	org.bndtools.template;\
 		org.bndtools.template=workspace; \
 		engine=mustache; \
-		name=org.gecko.rest.bnd.workspace.template; \
+		name="GeckoRest Workspace dependencies and templates"; \
 		category="Workspace Extensions"; \
 		dir=template; \
 		icon="${icondata}"; \
