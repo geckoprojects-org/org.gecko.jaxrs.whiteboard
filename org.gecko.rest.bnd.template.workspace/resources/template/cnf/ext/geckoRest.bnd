@@ -1,8 +1,0 @@
--plugin.geckoRest: \
-	aQute.bnd.repository.maven.provider.MavenBndRepository; \
-		releaseUrl=https://repo.maven.apache.org/maven2/; \
-		snapshotUrl=https://devel.data-in-motion.biz/nexus/repository/dim-snapshot/;\
-		index=${.}/geckoRest.maven; \
-		name=GeckoRest;\
-		readOnly=true
-		

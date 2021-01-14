@@ -1,0 +1,16 @@
+-plugin.geckoEMF: \
+	aQute.bnd.repository.maven.pom.provider.BndPomRepository;\
+		releaseUrl			= "https://repo.maven.apache.org/maven2/,https://devel.data-in-motion.biz/nexus/repository/dim-release/"; \
+		snapshotUrl			= "https://devel.data-in-motion.biz/nexus/repository/dim-snapshot/";\
+		revision            = "${bomDeps}" ;\
+		transitive          = false;\
+		name=GeckoRest Workspace Extension
+
+-buildpath.emf = ${if;${-enable-rest};${rest.lib}}
+
+bomDeps: --copy content from geckoEMF.maven here--
+
+rest.lib: \
+	osgi.cmpn;version=latest,\
+	jakarta.ws.rs-api;version='2.1'
+		

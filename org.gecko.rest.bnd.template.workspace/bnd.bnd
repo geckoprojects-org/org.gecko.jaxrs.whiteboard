@@ -20,6 +20,6 @@ icondata: data:image/gif;base64,${base64;icon.gif}
 
 -buildpath: ${-runbundles}
 
-mavendeps: ${sjoin;\n; ${template;-maven-dependencies;${@}}}
+mavendeps: ${sjoin;,\\\n; ${template;-maven-dependencies;${@}}}
 
   
