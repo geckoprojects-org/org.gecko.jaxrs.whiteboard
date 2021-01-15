@@ -6,7 +6,7 @@
 		transitive          = false;\
 		name=GeckoRest Workspace Extension
 
--buildpath.emf = ${rest.lib}
+-buildpath.emf =${if;${-enable-rest};${rest.lib}}
 
 bomDeps: \
 	com.sun.activation:javax.activation:1.2.0,\
