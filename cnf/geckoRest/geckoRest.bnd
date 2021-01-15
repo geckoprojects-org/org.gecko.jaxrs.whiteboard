@@ -1,14 +1,14 @@
--plugin.geckoEMF: \
+-plugin.geckoRest: \
 	aQute.bnd.repository.maven.pom.provider.BndPomRepository;\
 		releaseUrl			= "https://repo.maven.apache.org/maven2/,https://devel.data-in-motion.biz/nexus/repository/dim-release/"; \
 		snapshotUrl			= "https://devel.data-in-motion.biz/nexus/repository/dim-snapshot/";\
-		revision            = "${bomDeps}" ;\
+		revision            = "${restBomDeps}" ;\
 		transitive          = false;\
 		name=GeckoRest Workspace Extension
 
--buildpath.emf =${if;${-enable-rest};${rest.lib}}
+-buildpath.rest: ${if;${-enable-rest};${rest.lib}}
 
-bomDeps: \
+restBomDeps: \
 	com.sun.activation:javax.activation:1.2.0,\
 	com.sun.xml.bind:jaxb-impl:2.3.3,\
 	jakarta.activation:jakarta.activation-api:1.2.1,\
