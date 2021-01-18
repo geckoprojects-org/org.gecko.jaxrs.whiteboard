@@ -8,6 +8,9 @@
 
 -buildpath.rest: ${if;${-enable-rest};${rest.lib}}
 
+# We need to set a default so we don't get warnings
+-enable-rest: false
+
 restBomDeps: \
 	com.sun.activation:javax.activation:1.2.0,\
 	com.sun.xml.bind:jaxb-impl:2.3.3,\
