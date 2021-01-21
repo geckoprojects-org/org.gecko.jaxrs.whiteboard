@@ -11,6 +11,8 @@
 # We need to set a default so we don't get warnings
 -enable-rest: false
 
+whiteboard-version: 4.0.5
+
 restBomDeps: \
 	com.sun.activation:javax.activation:1.2.0,\
 	com.sun.xml.bind:jaxb-impl:2.3.3,\
@@ -24,8 +26,8 @@ restBomDeps: \
 	org.apache.felix:org.apache.felix.http.jetty:4.1.2,\
 	org.apache.felix:org.apache.felix.http.servlet-api:1.1.2,\
 	org.apache.felix:org.apache.felix.scr:2.1.24,\
-	org.geckoprojects.rest:org.gecko.rest.jersey:4.0.4-SNAPSHOT,\
-	org.geckoprojects.rest:org.gecko.rest.jersey.sse:2.32.0-SNAPSHOT,\
+	org.geckoprojects.rest:org.gecko.rest.jersey:${whiteboard-version},\
+	org.geckoprojects.rest:org.gecko.rest.jersey.sse:${whiteboard-version},\
 	org.glassfish.hk2:hk2-api:2.6.1,\
 	org.glassfish.hk2.external:aopalliance-repackaged:2.6.1,\
 	org.glassfish.hk2:hk2-locator:2.6.1,\
@@ -42,10 +44,10 @@ restBomDeps: \
 	org.osgi:org.osgi.util.function:1.1.0,\
 	org.osgi:org.osgi.util.promise:1.1.0,\
 	org.osgi:org.osgi.util.pushstream:1.0.0,\
-	org.geckoprojects.rest:org.gecko.rest.bnd.template.project:4.0.5-SNAPSHOT,\
+	org.geckoprojects.rest:org.gecko.rest.bnd.template.project:${whiteboard-version},\
 	org.glassfish.hk2.external:jakarta.inject:2.6.1
 
 rest.lib: \
-	osgi.cmpn;version=latest,\
+	osgi.cmpn;version=7.0,\
 	jakarta.ws.rs-api;version='2.1'
 		
