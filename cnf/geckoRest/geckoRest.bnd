@@ -48,6 +48,7 @@ restBomDeps: \
 	org.glassfish.hk2.external:jakarta.inject:2.6.1
 
 rest.lib: \
+	osgi.annotation;version=7.0,\
 	osgi.cmpn;version=7.0,\
 	jakarta.ws.rs-api;version='2.1'
 		
