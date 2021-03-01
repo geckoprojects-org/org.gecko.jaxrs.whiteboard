@@ -897,9 +897,17 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
+		JaxrsServiceRuntime jaxRs = getService(JaxrsServiceRuntime.class);
+		
+		System.out.println(jaxRs.getRuntimeDTO());
+		
 		Filter resFilter = FrameworkUtil.createFilter("(osgi.jaxrs.name=ptr)");
 		Object ptrResource = getService(resFilter, 1000l);
 		assertNotNull(ptrResource);
+
+		Filter extFilter = FrameworkUtil.createFilter("(osgi.jaxrs.name=pte)");
+		Object ext = getService(extFilter, 1000l);
+		assertNotNull(ext);
 		
 		
 		CountDownLatch cdl = new CountDownLatch(1);

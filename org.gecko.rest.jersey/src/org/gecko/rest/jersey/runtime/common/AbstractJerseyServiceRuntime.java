@@ -32,7 +32,6 @@ import javax.ws.rs.core.Application;
 import org.gecko.rest.jersey.binder.PrototypeServiceBinder;
 import org.gecko.rest.jersey.dto.DTOConverter;
 import org.gecko.rest.jersey.factories.InjectableFactory;
-import org.gecko.rest.jersey.factories.JerseyExtensionInstanceFactory;
 import org.gecko.rest.jersey.factories.JerseyResourceInstanceFactory;
 import org.gecko.rest.jersey.helper.JerseyHelper;
 import org.gecko.rest.jersey.provider.JerseyConstants;
@@ -427,9 +426,6 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 		PrototypeServiceBinder resBinder = new PrototypeServiceBinder();
 		AtomicBoolean resRegistered = new AtomicBoolean(false);
 		
-		PrototypeServiceBinder extBinder = new PrototypeServiceBinder();
-		AtomicBoolean extRegistered = new AtomicBoolean(false);
-		
 		applicationProvider.getContentProviers().stream().sorted().forEach(provider -> {					
 			logger.info("Register prototype provider for classes " + provider.getObjectClass() + " in the application " + applicationProvider.getId());
 			logger.info("Register prototype provider for name " + provider.getName() + " id " + provider.getId() + " rank " + provider.getServiceRank());
@@ -442,20 +438,12 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 				factory = new JerseyResourceInstanceFactory<>(provider);
 				resBinder.register(provider.getObjectClass(), factory);
 			}
-			else if(provider instanceof JaxRsExtensionProvider) {
-				extRegistered.set(true);
-				factory = new JerseyExtensionInstanceFactory<>(provider);
-				extBinder.register(provider.getObjectClass(), factory);
-			}
 			if(factory != null) {
 				wrapper.factories.add(factory);
 			}
 		});
 		if (resRegistered.get()) {
 			config.register(resBinder);
-		}
-		if(extRegistered.get()) {
-			config.register(extBinder);
 		}
 		return wrapper;
 	}

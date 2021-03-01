@@ -48,8 +48,9 @@ public class WhiteboardFeature implements Feature{
 			
 			if(extension.getContracts() != null) {
 				context.register(serviceObject, extension.getContracts());
+			} else {
+				context.register(serviceObject);
 			}
-			context.register(serviceObject);
 		});
 		return true;
 	}
