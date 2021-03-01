@@ -40,6 +40,7 @@ import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsResourceProvider;
 import org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
+import org.gecko.rest.jersey.runtime.application.JerseyApplication;
 import org.gecko.rest.jersey.runtime.servlet.WhiteboardServletContainer;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
@@ -416,6 +417,9 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 			return null;
 		}
 		Application application = applicationProvider.getJaxRsApplication();
+		if(application instanceof JerseyApplication) {
+			((JerseyApplication) application).resetForReload();
+		}
 		ResourceConfigWrapper wrapper = new ResourceConfigWrapper();
 		ResourceConfig config = ResourceConfig.forApplication(application);
 		wrapper.config = config;
