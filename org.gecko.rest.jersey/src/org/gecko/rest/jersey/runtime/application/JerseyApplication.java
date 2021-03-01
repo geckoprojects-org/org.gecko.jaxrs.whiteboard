@@ -115,7 +115,16 @@ public class JerseyApplication extends Application {
 		}
 		String key = contentProvider.getId();
 		contentProviders.put(key, contentProvider);
-		if (contentProvider.isSingleton()) {
+		if(contentProvider instanceof JaxRsExtensionProvider) {
+			Class<?> extensionClass = contentProvider.getObjectClass();
+			if (extensionClass == null) {
+				contentProviders.remove(key);
+				Object removed = extensions.remove(key);
+				return removed != null;
+			}
+			JaxRsExtensionProvider result = extensions.put(key, (JaxRsExtensionProvider) contentProvider);
+			return  result == null || !extensionClass.equals(result.getObjectClass());
+		} else if (contentProvider.isSingleton()) {
 			Class<?> resourceClass = contentProvider.getObjectClass();
 			Object result = singletons.get(key);
 			if(result == null || !result.getClass().equals(resourceClass)){

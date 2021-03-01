@@ -870,7 +870,7 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 	 * @throws InterruptedException 
 	 * @throws InvalidSyntaxException 
 	 */
-//	@Test
+	@Test
 	public void testWhiteboardComponentDefaultPrototype() throws IOException, InterruptedException, InvalidSyntaxException {
 		/*
 		 *  The server runs on localhost port 8185 using context path test: http://localhost:8185/test
