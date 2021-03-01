@@ -89,6 +89,9 @@ public class JerseyApplication extends Application {
 		Set<Object> resutlSingletons = new HashSet<>();
 		resutlSingletons.addAll(singletons.values());
 		resutlSingletons.addAll(sourceApplication.getSingletons());
+		if(whiteboardFeature != null) {
+			whiteboardFeature.dispose();
+		}
 		if(!extensions.isEmpty()) {
 			whiteboardFeature = new WhiteboardFeature(extensions);
 			resutlSingletons.add(whiteboardFeature);
@@ -179,16 +182,13 @@ public class JerseyApplication extends Application {
 		String key = contentProvider.getId();
 		if(contentProvider instanceof JaxRsExtensionProvider) {
 			synchronized (extensions) {
-				extensions.remove(key);
-				if(contentProvider.isSingleton()) {
-					synchronized (singletons) {
-						Object obj = singletons.remove(key);
-						if(obj != null) {
-							log.fine("Unregistering service for extension " + contentProvider.getName() + " service " + obj);
-							((ServiceObjects) contentProvider.getProviderObject()).ungetService(obj);					
-						}				
+				JaxRsExtensionProvider ext = extensions.remove(key);
+				if(ext != null) {
+					if(whiteboardFeature != null) {
+						whiteboardFeature.dispose(ext);
 					}
-				}				
+				}
+				// We can ignore singletons here, because we don't consider them here. 
 			}
 		} else if (contentProvider.isSingleton()) {
 			synchronized (singletons) {
