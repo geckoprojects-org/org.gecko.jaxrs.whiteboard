@@ -32,7 +32,7 @@ public class WhiteboardServletContainer extends ServletContainer {
 	 */
 	private static final long serialVersionUID = 6509888299005723799L;
 
-	private ResourceConfig config = null;;
+	private ResourceConfig initialConfig = null;;
 
 	private AtomicBoolean initialized = new AtomicBoolean();
 	private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
@@ -41,13 +41,13 @@ public class WhiteboardServletContainer extends ServletContainer {
 
 	private ResourceConfigWrapper wrapper;
 
-	public WhiteboardServletContainer(ResourceConfigWrapper config, DestroyListener destroyListener) {
-		this(config.config, destroyListener);
-		this.wrapper = config;
+	public WhiteboardServletContainer(ResourceConfigWrapper configWrapper, DestroyListener destroyListener) {
+		this(configWrapper.config, destroyListener);
+		this.wrapper = configWrapper;
 	}
 
 	public WhiteboardServletContainer(ResourceConfig config, DestroyListener destroyListener) {
-		super(config);
+		initialConfig = config;
 		this.destroyListener = destroyListener;
 	}
 
@@ -72,10 +72,10 @@ public class WhiteboardServletContainer extends ServletContainer {
 			});
 			future.get();
 			initialized.set(true);
-			if (config != null) {
-				this.reload(config);
+			if (initialConfig != null) {
+				this.reload(initialConfig);
 				wrapper.setInjectionManager(getApplicationHandler().getInjectionManager());
-				config = null;
+				initialConfig = null;
 			}
 		} catch (Exception e) {
 			if (e instanceof ServletException) {
@@ -88,16 +88,6 @@ public class WhiteboardServletContainer extends ServletContainer {
 		}
 	}
 	
-	protected void doInit() throws ServletException {
-		super.init();
-		initialized.set(true);
-		if (config != null) {
-			this.reload(config);
-			wrapper.setInjectionManager(getApplicationHandler().getInjectionManager());
-			config = null;
-		}
-	}
-
 	/* (non-Javadoc)
 	 * @see org.glassfish.jersey.servlet.ServletContainer#reload(org.glassfish.jersey.server.ResourceConfig)
 	 */
@@ -108,7 +98,7 @@ public class WhiteboardServletContainer extends ServletContainer {
 			if (initialized.get()) {
 				super.reload(configuration);
 			} else {
-				config = configuration;
+				initialConfig = configuration;
 			}
 		} finally {
 			lock.writeLock().unlock();
@@ -145,12 +135,12 @@ public class WhiteboardServletContainer extends ServletContainer {
 	 * @param config2
 	 */
 	public void reloadWrapper(ResourceConfigWrapper wrapper) {
-		config = wrapper.config;
+		initialConfig = wrapper.config;
 		this.wrapper = wrapper;
 		if (!initialized.get()) {
 			return;
 		}
-		reload(config);
+		reload(initialConfig);
 		if(getApplicationHandler() != null) {
 			wrapper.setInjectionManager(getApplicationHandler().getInjectionManager());
 		}

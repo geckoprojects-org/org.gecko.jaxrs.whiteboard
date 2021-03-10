@@ -81,7 +81,6 @@ public class WhiteboardFeature implements Feature{
 			.ifPresent(e -> {
 				e.getValue().ungetService(e.getKey());
 				serviceObjTrackingMap.remove(e.getKey());
-				System.err.println("!!!!!!!!!!!!!!!!!!!!!! REMOVED !!!!!!!!!!!!!!!!!!!!");
 			} );
 		
 	}

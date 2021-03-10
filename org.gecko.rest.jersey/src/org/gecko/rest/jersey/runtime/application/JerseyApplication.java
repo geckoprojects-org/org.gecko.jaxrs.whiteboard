@@ -89,8 +89,10 @@ public class JerseyApplication extends Application {
 		Set<Object> resutlSingletons = new HashSet<>();
 		resutlSingletons.addAll(singletons.values());
 		resutlSingletons.addAll(sourceApplication.getSingletons());
-		if(!extensions.isEmpty() && whiteboardFeature == null) {
-			whiteboardFeature = new WhiteboardFeature(extensions);
+		if(!extensions.isEmpty()) {
+			if(whiteboardFeature == null) {
+				whiteboardFeature = new WhiteboardFeature(extensions);
+			}
 			resutlSingletons.add(whiteboardFeature);
 		}
 		return Collections.unmodifiableSet(resutlSingletons);
