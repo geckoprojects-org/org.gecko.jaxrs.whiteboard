@@ -90,12 +90,22 @@ public class JerseyApplication extends Application {
 		resutlSingletons.addAll(singletons.values());
 		resutlSingletons.addAll(sourceApplication.getSingletons());
 		if(!extensions.isEmpty()) {
-			whiteboardFeature = new WhiteboardFeature(extensions);
+			if(whiteboardFeature == null) {
+				whiteboardFeature = new WhiteboardFeature(extensions);
+			}
 			resutlSingletons.add(whiteboardFeature);
 		}
 		return Collections.unmodifiableSet(resutlSingletons);
 	}
 
+	
+	public void resetForReload() {
+		if(whiteboardFeature != null) {
+			whiteboardFeature.dispose();
+			whiteboardFeature = null;
+		} 
+	}
+	
 	/**
 	 * Returns the name of the whiteboard
 	 * @return the name of the whiteboard
@@ -115,7 +125,16 @@ public class JerseyApplication extends Application {
 		}
 		String key = contentProvider.getId();
 		contentProviders.put(key, contentProvider);
-		if (contentProvider.isSingleton()) {
+		if(contentProvider instanceof JaxRsExtensionProvider) {
+			Class<?> extensionClass = contentProvider.getObjectClass();
+			if (extensionClass == null) {
+				contentProviders.remove(key);
+				Object removed = extensions.remove(key);
+				return removed != null;
+			}
+			JaxRsExtensionProvider result = extensions.put(key, (JaxRsExtensionProvider) contentProvider);
+			return  result == null || !extensionClass.equals(result.getObjectClass());
+		} else if (contentProvider.isSingleton()) {
 			Class<?> resourceClass = contentProvider.getObjectClass();
 			Object result = singletons.get(key);
 			if(result == null || !result.getClass().equals(resourceClass)){
@@ -170,16 +189,13 @@ public class JerseyApplication extends Application {
 		String key = contentProvider.getId();
 		if(contentProvider instanceof JaxRsExtensionProvider) {
 			synchronized (extensions) {
-				extensions.remove(key);
-				if(contentProvider.isSingleton()) {
-					synchronized (singletons) {
-						Object obj = singletons.remove(key);
-						if(obj != null) {
-							log.fine("Unregistering service for extension " + contentProvider.getName() + " service " + obj);
-							((ServiceObjects) contentProvider.getProviderObject()).ungetService(obj);					
-						}				
+				JaxRsExtensionProvider ext = extensions.remove(key);
+				if(ext != null) {
+					if(whiteboardFeature != null) {
+						whiteboardFeature.dispose(ext);
 					}
-				}				
+				}
+				// We can ignore singletons here, because we don't consider them here. 
 			}
 		} else if (contentProvider.isSingleton()) {
 			synchronized (singletons) {

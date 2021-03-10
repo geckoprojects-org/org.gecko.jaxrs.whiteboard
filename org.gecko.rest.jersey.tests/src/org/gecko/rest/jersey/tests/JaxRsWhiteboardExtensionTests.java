@@ -1310,14 +1310,29 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		Dictionary<String, Object> helloProps = new Hashtable<>();
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
 		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello");
-		helloProps.put(
-				JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
-				"(osgi.jaxrs.name=*)");		
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
+				"(|(osgi.jaxrs.name=App1)(osgi.jaxrs.name=.default))");		
 
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
 		runtimeChecker.start();		
 
+		registerServiceForCleanup(HelloResource.class, new HelloResource(), helloProps);		
+		assertTrue(runtimeChecker.waitModify());
+
+		//		Register a resource for both apps and .default
+		helloProps = new Hashtable<>();
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Hello_Ext");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
+				"(osgi.jaxrs.name=App2)");
+		helloProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION_SELECT,
+				"(replacer-config=test)");
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();		
+		
 		registerServiceForCleanup(HelloResource.class, new HelloResource(), helloProps);		
 		assertTrue(runtimeChecker.waitModify());
 
@@ -1344,18 +1359,16 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		webTarget = jerseyClient.target(checkUrl);
 		post = webTarget.request().buildPost(Entity.entity("test", "text/plain"));
 		response = post.invoke();
-		assertEquals(200, response.getStatus());
+		assertEquals(404, response.getStatus());
 
 		//		Add an extension which requires a property satisfied only by App1
 		Dictionary<String, Object> extensionProps = new Hashtable<>();
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_EXTENSION, "true");
 		extensionProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "TestWriteExtension");
+		extensionProps.put("replacer-config", "test");
 		extensionProps.put(
 				JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT,
-				"(osgi.jaxrs.name=*)");				
-		extensionProps.put(
-				JaxrsWhiteboardConstants.JAX_RS_EXTENSION_SELECT,
-				"(replacer-config=*)");
+				"(osgi.jaxrs.name=App2)");				
 
 		runtimeChecker.stop();
 		runtimeChecker.setModifyCount(1);
@@ -1369,15 +1382,6 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		assertTrue(runtimeChecker.waitModify());
 
 		//		Verify that the resource is still available for all 3 apps, but the response is different for the app with the extension
-		checkUrl = url + "/app2/hello";
-		post = null;
-		jerseyClient = ClientBuilder.newClient();
-		webTarget = jerseyClient.target(checkUrl);
-		post = webTarget.request().buildPost(Entity.entity("test", "text/plain"));
-		response = post.invoke();
-		assertEquals(200, response.getStatus());
-		assertFalse(response.readEntity(String.class).contains(TestWriteExtension.WRITER_POSTFIX));
-
 		checkUrl = url + "/app1/hello";
 		post = null;
 		jerseyClient = ClientBuilder.newClient();
@@ -1385,7 +1389,7 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		post = webTarget.request().buildPost(Entity.entity("test", "text/plain"));
 		response = post.invoke();
 		assertEquals(200, response.getStatus());
-		assertTrue(response.readEntity(String.class).contains(TestWriteExtension.WRITER_POSTFIX));
+		assertFalse(response.readEntity(String.class).contains(TestWriteExtension.WRITER_POSTFIX));
 
 		checkUrl = url + "/hello";
 		post = null;
@@ -1395,6 +1399,15 @@ public class JaxRsWhiteboardExtensionTests extends AbstractOSGiTest{
 		response = post.invoke();
 		assertEquals(200, response.getStatus());
 		assertFalse(response.readEntity(String.class).contains(TestWriteExtension.WRITER_POSTFIX));		
+
+		checkUrl = url + "/app2/hello";
+		post = null;
+		jerseyClient = ClientBuilder.newClient();
+		webTarget = jerseyClient.target(checkUrl);
+		post = webTarget.request().buildPost(Entity.entity("test", "text/plain"));
+		response = post.invoke();
+		assertEquals(200, response.getStatus());
+		assertTrue(response.readEntity(String.class).contains(TestWriteExtension.WRITER_POSTFIX));
 	}
 
 	@Test

@@ -48,8 +48,9 @@ public class WhiteboardFeature implements Feature{
 			
 			if(extension.getContracts() != null) {
 				context.register(serviceObject, extension.getContracts());
+			} else {
+				context.register(serviceObject);
 			}
-			context.register(serviceObject);
 		});
 		return true;
 	}
@@ -63,11 +64,26 @@ public class WhiteboardFeature implements Feature{
 		extensions.clear();
 	}
 	
+//	@SuppressWarnings("unchecked")
+//	public void dispose(Object serviceObject) {
+//		if(serviceObjTrackingMap.containsKey(serviceObject)) {
+//			serviceObjTrackingMap.get(serviceObject).ungetService(serviceObject);
+//			serviceObjTrackingMap.remove(serviceObject);
+//		}
+//	}
+
 	@SuppressWarnings("unchecked")
-	public void dispose(Object serviceObject) {
-		if(serviceObjTrackingMap.containsKey(serviceObject)) {
-			serviceObjTrackingMap.get(serviceObject).ungetService(serviceObject);
-			serviceObjTrackingMap.remove(serviceObject);
-		}
+	public void dispose(JaxRsExtensionProvider extProvider) {
+		ServiceObjects<?> objexts = (ServiceObjects<?>) extProvider.getProviderObject();
+		serviceObjTrackingMap.entrySet().stream()
+			.filter(e -> e.getValue().equals(objexts))
+			.findFirst()
+			.ifPresent(e -> {
+				e.getValue().ungetService(e.getKey());
+				serviceObjTrackingMap.remove(e.getKey());
+			} );
+		
 	}
+	
+	
 }

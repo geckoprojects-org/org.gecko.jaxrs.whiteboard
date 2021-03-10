@@ -736,6 +736,7 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		Response response = get.invoke();
 		assertEquals(404, response.getStatus());
 		
+		
 		runtimeChecker.stop();
 		runtimeChecker.setModifyTimeout(5);
 		runtimeChecker.setModifyCount(1);
@@ -782,7 +783,6 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		get = webTarget.request().buildGet();
 		response = get.invoke();
 		assertEquals(404, response.getStatus());
-		
 	}
 	
 	/**
@@ -870,7 +870,7 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 	 * @throws InterruptedException 
 	 * @throws InvalidSyntaxException 
 	 */
-//	@Test
+	@Test
 	public void testWhiteboardComponentDefaultPrototype() throws IOException, InterruptedException, InvalidSyntaxException {
 		/*
 		 *  The server runs on localhost port 8185 using context path test: http://localhost:8185/test
@@ -897,9 +897,17 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		
 		assertTrue(runtimeChecker.waitCreate());
 		
+		JaxrsServiceRuntime jaxRs = getService(JaxrsServiceRuntime.class);
+		
+		System.out.println(jaxRs.getRuntimeDTO());
+		
 		Filter resFilter = FrameworkUtil.createFilter("(osgi.jaxrs.name=ptr)");
 		Object ptrResource = getService(resFilter, 1000l);
 		assertNotNull(ptrResource);
+
+		Filter extFilter = FrameworkUtil.createFilter("(osgi.jaxrs.name=pte)");
+		Object ext = getService(extFilter, 1000l);
+		assertNotNull(ext);
 		
 		
 		CountDownLatch cdl = new CountDownLatch(1);
@@ -925,10 +933,10 @@ public class JaxRsWhiteboardComponentTest extends AbstractOSGiTest{
 		
 		assertTrue(result01.startsWith(PrototypeResource.PROTOTYPE_PREFIX));
 		System.out.println(result01);
-		assertTrue(result01.contains(PrototypeResource.PROTOTYPE_POSTFIX));
 		assertTrue(result01.endsWith(PrototypeExtension.PROTOTYPE_POSTFIX));
 	}
 
+	
 	/**
 	 * Tests 
 	 * @throws IOException 

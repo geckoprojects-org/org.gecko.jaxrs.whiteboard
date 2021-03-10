@@ -17,17 +17,20 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
-import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.ServiceScope;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsExtension;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsName;
 
 /**
  * Sample rest resource as prototype
@@ -35,8 +38,11 @@ import org.osgi.service.component.annotations.ServiceScope;
  * @since 21.10.2017
  */
 @Provider
-@Component(service= MessageBodyWriter.class, scope=ServiceScope.PROTOTYPE, property= {"osgi.jaxrs.name=pte", 
-		"osgi.jaxrs.extension=true", Constants.OBJECTCLASS +"=javax.ws.rs.ext.MessageBodyWriter"})
+@JaxrsExtension
+@JaxrsName("pte")
+@Component(scope=ServiceScope.PROTOTYPE)
+@Produces(MediaType.WILDCARD)
+@Consumes(MediaType.WILDCARD)
 public class PrototypeExtension implements MessageBodyWriter<String>{
 
 	public static final String PROTOTYPE_POSTFIX = "_protoExtension";
