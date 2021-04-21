@@ -28,6 +28,7 @@ import javax.ws.rs.core.Response;
 
 import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.gecko.rest.jersey.tests.resources.ContextFieldInjectTestResource;
+import org.gecko.rest.jersey.tests.resources.ContextInjectResource;
 import org.gecko.rest.jersey.tests.resources.ContextMethodInjectTestResource;
 import org.gecko.util.test.common.service.ServiceChecker;
 import org.gecko.util.test.common.test.AbstractOSGiTest;
@@ -208,6 +209,98 @@ public class JaxRsResourceLifecycleTests extends AbstractOSGiTest{
 		String result = response.readEntity(String.class);
 		assertNotNull(result);
 		assertEquals("test", result);	
+	}
+
+	@Test
+	public void testContextInject() throws IOException, InterruptedException, InvalidSyntaxException {
+		
+		Dictionary<String, Object> properties = new Hashtable<>();
+		properties.put(JerseyConstants.JERSEY_WHITEBOARD_NAME, "test_wb");
+		properties.put(JerseyConstants.JERSEY_PORT, Integer.valueOf(port));
+		properties.put(JerseyConstants.JERSEY_CONTEXT_PATH, contextPath);
+		
+		ServiceChecker<JaxrsServiceRuntime> runtimeChecker = createdCheckerTrackedForCleanUp(JaxrsServiceRuntime.class);
+		runtimeChecker.start();
+		
+		createConfigForCleanup("JaxRsWhiteboardComponent", "?", properties);	
+		assertTrue(runtimeChecker.waitCreate());
+		
+		
+		Dictionary<String, Object> appProps = new Hashtable<>();
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "app");
+		appProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "App");
+		Application application = new Application(){};
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.start();
+		
+		registerServiceForCleanup(Application.class, application, appProps);		
+		assertTrue(runtimeChecker.waitModify());
+		
+		Dictionary<String, Object> resProps = new Hashtable<>();
+		resProps.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		resProps.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Context Inject Res");
+		resProps.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=App)");
+		
+		runtimeChecker.stop();
+		runtimeChecker.setModifyCount(1);
+		runtimeChecker.setModifyTimeout(15);
+		runtimeChecker.start();	
+		
+		
+		
+		registerServiceForCleanup(ContextInjectResource.class, new PrototypeServiceFactory() {
+			
+			@Override
+			public Object getService(Bundle bundle, ServiceRegistration registration) {
+				return new ContextInjectResource();
+			}
+			
+			@Override
+			public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
+				// TODO Auto-generated method stub
+				
+			}
+		}, resProps);		
+		assertTrue(runtimeChecker.waitModify());	
+		
+		Invocation get = null;
+		Client jerseyClient = ClientBuilder.newClient();
+		Response response = jerseyClient.target(url + "/app/context/inject/servletContext").request().buildGet().invoke();
+		assertEquals(200, response.getStatus());
+		assertNotNull(response.getEntity());
+		String result = response.readEntity(String.class);
+		assertNotNull(result);
+		assertEquals("servletContext", result);	
+
+		response = jerseyClient.target(url + "/app/context/inject/servletConfig").request().buildGet().invoke();
+		assertEquals(200, response.getStatus());
+		assertNotNull(response.getEntity());
+		result = response.readEntity(String.class);
+		assertNotNull(result);
+		assertEquals("servletConfig", result);	
+
+		response = jerseyClient.target(url + "/app/context/inject/httpServletRequest").request().buildGet().invoke();
+		assertEquals(200, response.getStatus());
+		assertNotNull(response.getEntity());
+		result = response.readEntity(String.class);
+		assertNotNull(result);
+		assertEquals("httpServletRequest", result);	
+
+		response = jerseyClient.target(url + "/app/context/inject/httpServletResponse").request().buildGet().invoke();
+		assertEquals(200, response.getStatus());
+		assertNotNull(response.getEntity());
+		result = response.readEntity(String.class);
+		assertNotNull(result);
+		assertEquals("httpServletResponse", result);	
+
+		response = jerseyClient.target(url + "/app/context/inject/application").request().buildGet().invoke();
+		assertEquals(200, response.getStatus());
+		assertNotNull(response.getEntity());
+		result = response.readEntity(String.class);
+		assertNotNull(result);
+		assertEquals("application", result);	
 	}
 	
 	@Test
