@@ -51,4 +51,4 @@
 	osgi.identity;filter:='(osgi.identity=org.apache.felix.gogo.command)',\
 	bnd.identity;id='org.gecko.rest.jersey.multipart'
 -runfw: org.apache.felix.framework;version='[6.0.3,6.0.3]'
--runee: JavaSE-11
+-runee: JavaSE-1.8

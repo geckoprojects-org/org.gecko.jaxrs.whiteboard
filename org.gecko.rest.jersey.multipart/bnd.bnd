@@ -13,8 +13,5 @@ mockito: org.mockito.mockito-core;version="[1.9,2)",\
 	${junit},\
 	${mockito}
 
-javac.source: 11
-javac.target: 11
-
 Bundle-Version: 0.0.0.${tstamp}
 Private-Package: org.gecko.rest.jersey.multipart
