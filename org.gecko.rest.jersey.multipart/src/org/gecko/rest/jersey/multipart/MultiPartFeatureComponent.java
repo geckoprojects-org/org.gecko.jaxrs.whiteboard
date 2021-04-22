@@ -1,5 +1,7 @@
 package org.gecko.rest.jersey.multipart;
 
+import java.util.logging.Logger;
+
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
@@ -16,11 +18,13 @@ import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsWhiteboardTarget;
 @JaxrsApplicationSelect("(!(disableMultipart=true))")
 @JaxrsWhiteboardTarget("(!(disableMultipart=true))")
 public class MultiPartFeatureComponent implements Feature{
+	
+	private Logger logger = Logger.getLogger(MultiPartFeatureComponent.class.getName()); 
 
 	@Override
 	public boolean configure(FeatureContext context) {
 		context.register(MultiPartFeature.class);
-		System.out.println("Registering MultiPartFeature!");
+		logger.info("Registering MultiPartFeature!");
 		return true;
 	}
 }
