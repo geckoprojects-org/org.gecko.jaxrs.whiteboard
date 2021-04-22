@@ -13,5 +13,4 @@ mockito: org.mockito.mockito-core;version="[1.9,2)",\
 	${junit},\
 	${mockito}
 
-Bundle-Version: 0.0.0.${tstamp}
 Private-Package: org.gecko.rest.jersey.multipart
