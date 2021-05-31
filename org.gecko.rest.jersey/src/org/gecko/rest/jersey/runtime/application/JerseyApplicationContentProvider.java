@@ -51,10 +51,17 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 				logger.warning("Error getting the service " + e.getMessage());
 			}
 			
-			// this is called while a service gets unregistered, the ServiceObjects return null as a Service 
+			// if this is called while a service gets unregistered, the ServiceObjects returns null as a Service 
 			if(service != null) {
 				clazz = service.getClass();
-				getProviderObject().ungetService(service);
+				try {
+					//For some reason we had some exeplainable situation when this has produced an 
+					//IllegalArgumentException which should be impossible according to the javadoc and they way 
+					//we retrieve the object. 
+					getProviderObject().ungetService(service);
+				} catch (Throwable e) {
+					updateStatus(DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE);
+				}
 			}
 			else {
 				updateStatus(DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE);

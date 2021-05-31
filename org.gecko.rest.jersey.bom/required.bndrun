@@ -37,9 +37,9 @@
 	org.osgi.util.promise;version='[1.1.0,1.1.1)',\
 	org.osgi.util.pushstream;version='[1.0.0,1.0.1)',\
 	org.glassfish.hk2.external.jakarta.inject;version='[2.6.1,2.6.2)',\
-	org.gecko.rest.bnd.template.project;version='[4.0.7,4.0.8)',\
-	org.gecko.rest.jersey;version='[4.0.7,4.0.8)',\
-	org.gecko.rest.jersey.multipart;version=snapshot,\
-	org.gecko.rest.jersey.sse;version='[4.0.7,4.0.8)',\
 	org.glassfish.jersey.media.jersey-media-multipart;version='[2.32.0,2.32.1)',\
-	org.jvnet.mimepull;version='[1.9.14,1.9.15)'
+	org.jvnet.mimepull;version='[1.9.14,1.9.15)',\
+	org.gecko.rest.bnd.template.project;version='[4.0.8,4.0.9)',\
+	org.gecko.rest.jersey;version='[4.0.8,4.0.9)',\
+	org.gecko.rest.jersey.multipart;version='[4.0.8,4.0.9)',\
+	org.gecko.rest.jersey.sse;version='[4.0.8,4.0.9)'
