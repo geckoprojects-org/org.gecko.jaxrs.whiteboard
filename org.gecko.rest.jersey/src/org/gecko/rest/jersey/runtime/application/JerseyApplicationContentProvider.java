@@ -43,10 +43,11 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 
 	public JerseyApplicationContentProvider(ServiceObjects<T> serviceObjects, Map<String, Object> properties) {
 		super(serviceObjects, properties);
-		if(getProviderObject() != null) {
+		serviceObjects = getProviderObject();
+		if(serviceObjects != null) {
 			T service = null;
 			try {
-				service = getProviderObject().getService();
+				service = serviceObjects.getService();
 			} catch(Exception e) {
 				logger.warning("Error getting the service " + e.getMessage());
 			}
@@ -55,10 +56,10 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 			if(service != null) {
 				clazz = service.getClass();
 				try {
-					//For some reason we had some exeplainable situation when this has produced an 
+					//For some reason we had some explainable situation when this has produced an 
 					//IllegalArgumentException which should be impossible according to the javadoc and they way 
 					//we retrieve the object. 
-					getProviderObject().ungetService(service);
+					serviceObjects.ungetService(service);
 				} catch (Throwable e) {
 					updateStatus(DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE);
 				}
