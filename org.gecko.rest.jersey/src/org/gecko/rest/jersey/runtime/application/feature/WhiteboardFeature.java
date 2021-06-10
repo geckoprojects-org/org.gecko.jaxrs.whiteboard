@@ -58,7 +58,11 @@ public class WhiteboardFeature implements Feature{
 	@SuppressWarnings("unchecked")
 	public void dispose() {
 		serviceObjTrackingMap.forEach((k,v) -> {
-			v.ungetService(k);
+			try {
+				v.ungetService(k);
+			} catch (IllegalArgumentException e) {
+				// we can ignore this. Will be thrown by felix if it 
+			}
 		});
 		serviceObjTrackingMap.clear();
 		extensions.clear();

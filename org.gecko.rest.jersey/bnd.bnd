@@ -14,7 +14,8 @@ mockito: org.mockito.mockito-core;version="[1.9,2)",\
 	org.glassfish.jersey.core.jersey-common;version='2.32',\
 	org.glassfish.jersey.containers.jersey-container-servlet-core;version='2.32',\
 	org.glassfish.jersey.core.jersey-client;version='2.32',\
-	org.glassfish.jersey.core.jersey-server;version='2.32'
+	org.glassfish.jersey.core.jersey-server;version='2.32',\
+	org.apache.felix.framework
 	
 -testpath: \
 	${junit},\

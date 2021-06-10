@@ -11,7 +11,7 @@
 # We need to set a default so we don't get warnings
 -enable-rest: false
 
-whiteboard-version: 4.0.9
+whiteboard-version: 4.0.0
 
 restBomDeps: \
 	com.sun.activation:javax.activation:1.2.0,\
