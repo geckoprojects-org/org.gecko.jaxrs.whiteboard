@@ -6,6 +6,6 @@ Bundle-Description: Jersey OSGi JaxRs SSE Fragment
 
 Fragment-Host: org.glassfish.jersey.media.jersey-media-sse
 
-Export-Package: org.glassfish.jersey.media.sse.internal;version='2.32'
+Export-Package: org.glassfish.jersey.media.sse.internal;version='2.35'
 
--buildpath: org.glassfish.jersey.media.jersey-media-sse;version='2.32'
+-buildpath: org.glassfish.jersey.media.jersey-media-sse;version='2.35'
