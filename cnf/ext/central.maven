@@ -30,7 +30,16 @@ org.apache.felix:org.apache.felix.healthcheck.generalchecks:2.0.6
 org.apache.felix:org.apache.felix.healthcheck.webconsoleplugin:2.0.2
 org.apache.felix:org.apache.felix.http.base:4.2.0
 org.apache.felix:org.apache.felix.http.bridge:4.2.0
-org.apache.felix:org.apache.felix.http.jetty:4.2.0
+org.apache.felix:org.apache.felix.http.jetty:jar:light:4.2.0
+org.eclipse.jetty:jetty-server:jar:9.4.46.v20220331
+org.eclipse.jetty:jetty-http:jar:9.4.46.v20220331
+org.eclipse.jetty:jetty-util:jar:9.4.46.v20220331
+org.eclipse.jetty:jetty-util-ajax:9.4.46.v20220331
+org.eclipse.jetty:jetty-io:jar:9.4.46.v20220331
+org.eclipse.jetty:jetty-servlet:jar:9.4.46.v20220331
+org.eclipse.jetty:jetty-security:9.4.46.v20220331
+
+
 org.apache.felix:org.apache.felix.http.servlet-api:1.2.0
 org.apache.felix:org.apache.felix.http.sslfilter:1.2.6
 org.apache.felix:org.apache.felix.http.whiteboard:4.0.0
@@ -43,7 +52,7 @@ org.apache.felix:org.apache.felix.metatype:1.2.4
 org.apache.felix:org.apache.felix.prefs:1.1.0
 org.apache.felix:org.apache.felix.resolver:2.0.2
 org.apache.felix:org.apache.felix.rootcause:0.1.0
-org.apache.felix:org.apache.felix.scr:2.1.28
+org.apache.felix:org.apache.felix.scr:2.2.0
 org.apache.felix:org.apache.felix.systemready:0.4.2
 org.apache.felix:org.apache.felix.useradmin:1.0.4
 org.apache.felix:org.apache.felix.useradmin.filestore:1.0.2
@@ -61,7 +70,6 @@ org.apache.servicemix.bundles:org.apache.servicemix.bundles.junit:4.12_1
 
 org.emfjson:emfjson-jackson:1.1.0
 org.hamcrest:hamcrest-core:1.3
-org.mockito:mockito-core:1.10.19
 org.mongodb:mongo-java-driver:3.4.2
 org.objenesis:objenesis:2.2
 
@@ -124,12 +132,96 @@ org.glassfish.jersey.security:oauth1-client:2.35
 org.glassfish.jersey.security:oauth2-client:2.35
 org.glassfish.jersey.inject:jersey-hk2:2.35
 
-org.osgi:osgi.annotation:7.0.0
-org.osgi:osgi.cmpn:7.0.0
-org.osgi:osgi.core:7.0.0
-org.osgi:org.osgi.util.pushstream:1.0.0
+org.osgi:osgi.annotation:8.0.0
+org.osgi:osgi.core:8.0.0
+org.osgi:org.osgi.service.component.annotations:jar:1.5.0
+org.osgi:org.osgi.util.pushstream:jar:1.0.2
+
+
+### OSGi Annotations
+#dependencies.osgi.r8.annotation: \
+org.osgi:org.osgi.annotation.bundle:1.0.0
+org.osgi:org.osgi.annotation.versioning:1.0.0
+
+### OSGi Core
+#dependencies.osgi.r8.core: \
+org.osgi:org.osgi.framework:1.10.0
+org.osgi:org.osgi.dto:1.1.1
+org.osgi:org.osgi.namespace.contract:1.0.0
+org.osgi:org.osgi.namespace.extender:1.0.1
+org.osgi:org.osgi.namespace.implementation:1.0.0
+org.osgi:org.osgi.namespace.service:1.0.0
+org.osgi:org.osgi.namespace.unresolvable:1.0.0
+org.osgi:org.osgi.resource:1.0.1
+org.osgi:org.osgi.service.resolver:1.1.1
+org.osgi:org.osgi.service.startlevel:1.1.1
+org.osgi:org.osgi.util.tracker:1.5.3
+
+### OSGi Compeniom
+#dependencies.osgi.r8.cmpn: \
+org.osgi:osgi.cmpn:8.0.0
+org.osgi:org.osgi.service.application:1.1.0
+org.osgi:org.osgi.service.blueprint:1.0.2
+org.osgi:org.osgi.service.clusterinfo:1.0.0
+org.osgi:org.osgi.service.cm:1.6.0
+org.osgi:org.osgi.service.component:1.5.0
+org.osgi:org.osgi.service.component.annotations:1.4.0
+org.osgi:org.osgi.service.condition:1.0.0
+org.osgi:org.osgi.service.condpermadmin:1.1.1
+org.osgi:org.osgi.service.configurator:1.0.0
+org.osgi:org.osgi.service.coordinator:1.0.2
+org.osgi:org.osgi.service.dal:1.0.1
+org.osgi:org.osgi.service.dal.functions:1.0.0
+org.osgi:org.osgi.service.deploymentadmin:1.1.0
+org.osgi:org.osgi.service.device:1.1.0
+org.osgi:org.osgi.service.dmt:2.0.2
+org.osgi:org.osgi.service.enocean:1.0.0
+org.osgi:org.osgi.service.event:1.4.0
+org.osgi:org.osgi.service.http:1.2.1
+org.osgi:org.osgi.service.http.whiteboard:1.1.0
+org.osgi:org.osgi.service.io:1.0.0
+org.osgi:org.osgi.service.jaxrs:1.0.0
+org.osgi:org.osgi.service.jdbc:1.0.0
+org.osgi:org.osgi.service.jndi:1.0.0
+org.osgi:org.osgi.service.log:1.4.0
+org.osgi:org.osgi.service.metatype:1.4.0
+org.osgi:org.osgi.service.metatype.annotations:1.4.0
+org.osgi:org.osgi.service.monitor:1.0.0
+org.osgi:org.osgi.service.networkadapter:1.0.0
+org.osgi:org.osgi.service.packageadmin:1.2.1
+org.osgi:org.osgi.service.permissionadmin:1.2.1
+org.osgi:org.osgi.service.prefs:1.1.1
+org.osgi:org.osgi.service.provisioning:1.2.0
+org.osgi:org.osgi.service.remoteserviceadmin:1.1.0
+org.osgi:org.osgi.service.repository:1.1.0
+org.osgi:org.osgi.service.resourcemonitoring:1.0.0
+org.osgi:org.osgi.service.rest:1.0.0
+org.osgi:org.osgi.service.serial:1.0.0
+org.osgi:org.osgi.service.serviceloader:1.0.0
+org.osgi:org.osgi.service.tr069todmt:1.0.1
+org.osgi:org.osgi.service.transaction.control:1.0.0
+org.osgi:org.osgi.service.upnp:1.2.0
+org.osgi:org.osgi.service.url:1.0.1\
+org.osgi:org.osgi.service.usbinfo:1.0.0
+org.osgi:org.osgi.service.useradmin:1.1.0
+org.osgi:org.osgi.service.wireadmin:1.0.1
+org.osgi:org.osgi.service.zigbee:1.0.0
+org.osgi:org.osgi.util.converter:1.0.8
 org.osgi:org.osgi.util.function:1.1.0
-org.osgi:org.osgi.util.promise:1.1.0
+org.osgi:org.osgi.util.measurement:1.0.2
+org.osgi:org.osgi.util.position:1.0.1
+org.osgi:org.osgi.util.promise:1.1.1
+org.osgi:org.osgi.util.pushstream:1.0.1
+org.osgi:org.osgi.util.xml:1.0.1
+
+### OSGi Enterprise
+#dependencies.osgi.r8.enterprise: \
+org.osgi:org.osgi.jmx:1.1.0
+org.osgi:org.osgi.service.async:1.0.0
+org.osgi:org.osgi.service.cdi:1.0.0
+org.osgi:org.osgi.service.jpa:1.1.0
+org.osgi:org.osgi.service.subsystem:1.1.0
+
 
 org.locationtech.spatial4j:spatial4j:0.6
 
@@ -153,7 +245,6 @@ net.minidev:asm:1.0.2
 net.minidev:json-smart:2.3
 org.apache.commons:commons-collections4:4.1
 org.apache.commons:commons-lang3:3.7
-org.ow2.asm:asm:5.0.4
 org.pac4j:pac4j-core:3.0.0
 org.pac4j:pac4j-oidc:3.0.0
 
@@ -180,7 +271,7 @@ org.eclipse.platform:org.eclipse.osgi:3.13.100
 
 com.sun.activation:javax.activation:1.2.0
 
-org.eclipse.jetty:jetty-server:9.4.34.v20201102
+#org.eclipse.jetty:jetty-server:9.4.34.v20201102
 
 org.bndtools:org.bndtools.templates.osgi:5.2.0
 org.bndtools:org.bndtools.templates.template:5.2.0
@@ -229,8 +320,8 @@ org.apache.johnzon:johnzon-core:jar:1.2.14
 org.apache.geronimo.specs:geronimo-json_1.1_spec:jar:1.5
 
 org.apache.aries.spifly:org.apache.aries.spifly.dynamic.bundle:1.3.2
-org.ow2.asm:asm:jar:9.0
-org.ow2.asm:asm-commons:jar:9.0
-org.ow2.asm:asm-util:jar:9.0
-org.ow2.asm:asm-tree:jar:9.0
-org.ow2.asm:asm-analysis:jar:9.0
+org.ow2.asm:asm:jar:9.3
+org.ow2.asm:asm-commons:jar:9.3
+org.ow2.asm:asm-util:jar:9.3
+org.ow2.asm:asm-tree:jar:9.3
+org.ow2.asm:asm-analysis:jar:9.3

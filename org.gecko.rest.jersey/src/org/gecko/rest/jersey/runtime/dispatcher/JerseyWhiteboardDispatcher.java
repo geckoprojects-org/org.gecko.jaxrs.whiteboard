@@ -103,6 +103,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	private AtomicBoolean lockedChange = new AtomicBoolean();
 	private boolean batchMode = false;
 
+
 	public JerseyWhiteboardDispatcher() {
 	}
 
@@ -334,10 +335,8 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		doDispatch();
 	}
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher#deactivate()
-	 */
+
+
 	@Override
 	public void deactivate() {
 		if (!isDispatching()) {
@@ -1183,4 +1182,8 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 	public boolean getBatchMode() {
 		return batchMode;
 	}
+	
+
+
+	
 }

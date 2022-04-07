@@ -62,4 +62,14 @@ public class ServiceReferenceMock<T> implements ServiceReference<T> {
 		return null;
 	}
 
+	/* 
+	 * (non-Javadoc)
+	 * @see org.osgi.framework.ServiceReference#adapt(java.lang.Class)
+	 */
+	@Override
+	public <A> A adapt(Class<A> type) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

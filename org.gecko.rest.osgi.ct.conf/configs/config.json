@@ -6,5 +6,5 @@
     "jersey.port": 8185,
 	"jersey.jaxrs.whiteboard.name" : "test_wb",
 	"jersey.context.path" : "test" 
-	}
+   }
 }

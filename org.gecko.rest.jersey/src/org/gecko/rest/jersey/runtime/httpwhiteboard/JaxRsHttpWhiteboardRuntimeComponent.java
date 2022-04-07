@@ -11,13 +11,21 @@
  */
 package org.gecko.rest.jersey.runtime.httpwhiteboard;
 
+import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
+import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
+import static org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants.JAX_RS_RESOURCE;
+
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.ws.rs.core.Application;
 
 import org.gecko.rest.jersey.runtime.JerseyWhiteboardComponent;
-import org.gecko.rest.jersey.runtime.common.ReferenceCollector;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceObjects;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.component.AnyService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -27,6 +35,7 @@ import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * This component handles the lifecycle of a {@link JaxRSServiceRuntime}
@@ -36,14 +45,13 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 @Component(name="JaxRsHttpWhiteboardRuntimeComponent", immediate=true, configurationPolicy=ConfigurationPolicy.REQUIRE)
 public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardComponent{
 
-//	private static Logger logger = Logger.getLogger("o.e.o.j.JaxRsHttpWhiteboardRuntimeComponent");
+	private static Logger logger = Logger.getLogger("o.e.o.j.JaxRsHttpWhiteboardRuntimeComponent");
+	private BundleContext bundleContext;
 
-	@Reference(cardinality = ReferenceCardinality.MANDATORY)
-	private ReferenceCollector collector;
-	
+
 	/**
 	 * Called on component activation
-	 * @param context the component context
+	 * @param componentContext the component context
 	 * @throws ConfigurationException 
 	 */
 	/* (non-Javadoc)
@@ -51,15 +59,15 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 	 */
 	@Activate
 	@Override
-	public void activate(final ComponentContext context) throws ConfigurationException {
-		updateProperties(context);
+	public void activate(final ComponentContext componentContext) throws ConfigurationException {
+	 bundleContext=	componentContext.getBundleContext();
+		updateProperties(componentContext);
 		if (whiteboard != null) {
 			whiteboard.teardown();;
 		}
 		whiteboard = new HTTPWhiteboardBasedJerseyServiceRuntime();
-		whiteboard.initialize(context);
+		whiteboard.initialize(componentContext);
 		dispatcher.setWhiteboardProvider(whiteboard);
-		collector.connect(dispatcher);
 		dispatcher.dispatch();
 		whiteboard.startup();
 	}
@@ -83,7 +91,6 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 	@Deactivate
 	public void deactivate(ComponentContext context) {
 		if (dispatcher != null) {
-			collector.disconnect(dispatcher);
 			dispatcher.deactivate();
 		}
 		if (whiteboard != null) {
@@ -97,7 +104,7 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 	 * @param application the application to add
 	 * @param properties the service properties
 	 */
-	@Reference(name="defaultApplication", cardinality=ReferenceCardinality.AT_LEAST_ONE, policy=ReferencePolicy.DYNAMIC, unbind="removeDefaultApplication", updated = "modifedDefaultApplication", target="(osgi.jaxrs.name=.default)")
+	@Reference(name="defaultApplication", cardinality=ReferenceCardinality.AT_LEAST_ONE, policy=ReferencePolicy.DYNAMIC, unbind="unbindDefaultApplication", updated = "modifedDefaultApplication", target="(&(osgi.jaxrs.application.base=*)(osgi.jaxrs.name=.default))")
 	public void addDefaultApplication(Application application, Map<String, Object> properties) {
 		dispatcher.addApplication(application, properties);
 	}
@@ -117,7 +124,7 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 	 * @param application the application to remove
 	 * @param properties the service properties
 	 */
-	public void removeDefaultApplication(Application application, Map<String, Object> properties) {
+	public void unbindDefaultApplication(Application application, Map<String, Object> properties) {
 		dispatcher.removeApplication(application, properties);
 	}
 	
@@ -126,11 +133,11 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 	 * @param application the application to add
 	 * @param properties the service properties
 	 */
-	@Reference(name="application", cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="removeApplication", updated = "modifedApplication")
-	public void addApplication(Application application, Map<String, Object> properties) {
+	@Reference(name="application", service=Application.class,cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="unbindApplication", updated = "modifedApplication", target="(&(osgi.jaxrs.application.base=*)(!(osgi.jaxrs.name=.default)))")
+	public void bindApplication(Application application, Map<String, Object> properties) {
 		dispatcher.addApplication(application, properties);
 	}
-
+	
 	/**
 	 * Adds a new application
 	 * @param application the application to add
@@ -140,13 +147,46 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 		dispatcher.removeApplication(application, properties);
 		dispatcher.addApplication(application, properties);
 	}
-
+	
 	/**
 	 * Removes a application 
 	 * @param application the application to remove
 	 * @param properties the service properties
 	 */
-	public void removeApplication(Application application, Map<String, Object> properties) {
-		super.removeApplication(application, properties);
+	public void unbindApplication(Application application, Map<String, Object> properties) {
+		dispatcher.removeApplication(application, properties);
+	}
+
+	@Reference(service = AnyService.class, target = "(" + JaxrsWhiteboardConstants.JAX_RS_EXTENSION
+			+ "=true)", cardinality = MULTIPLE, policy = DYNAMIC)
+	public void bindJaxRsExtension(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
+
+		unbindJaxRsExtension(jaxRsExtensionSR,properties);
+	}
+
+	public void updatedJaxRsExtension(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
+		logger.fine("Handle extension " + jaxRsExtensionSR + " properties: " + properties);
+		ServiceObjects<?> so = bundleContext.getServiceObjects(jaxRsExtensionSR);
+		dispatcher.addExtension(so, properties);
+
+	}
+	public void unbindJaxRsExtension(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
+		dispatcher.removeExtension(properties);
+	}
+	
+	@Reference(service = AnyService.class, target = "(" + JAX_RS_RESOURCE
+			+ "=true)", cardinality = MULTIPLE, policy = DYNAMIC)
+	public void bindJaxRsResource(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
+		updatedJaxRsResource(jaxRsExtensionSR,properties);
+	}
+
+	public void updatedJaxRsResource(ServiceReference<Object> jaxRsResourceSR, Map<String, Object> properties) {
+		logger.fine("Handle resource " + jaxRsResourceSR + " properties: " + properties);
+		ServiceObjects<?> so = bundleContext.getServiceObjects(jaxRsResourceSR);
+		dispatcher.addResource(so, properties);
+
+	}
+	public void unbindJaxRsResource(ServiceReference<Object> jaxRsResourceSR, Map<String, Object> properties) {
+		dispatcher.removeResource(properties);
 	}
 }
