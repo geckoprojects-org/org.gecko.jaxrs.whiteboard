@@ -26,7 +26,6 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.Application;
 
 import org.gecko.rest.jersey.helper.JerseyHelper;
-import org.gecko.rest.jersey.provider.JaxRsConstants;
 import org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher;
 import org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
 import org.gecko.rest.jersey.runtime.dispatcher.JerseyWhiteboardDispatcher;
@@ -126,7 +125,7 @@ public class JerseyWhiteboardComponent {
 	 * @param application the application to add
 	 * @param properties the service properties
 	 */
-	public void modifedDefaultApplication(Application application, Map<String, Object> properties) {
+	public void updatedDefaultApplication(Application application, Map<String, Object> properties) {
 		dispatcher.removeApplication(application, properties);
 		dispatcher.addApplication(application, properties);
 	}
@@ -156,7 +155,7 @@ public class JerseyWhiteboardComponent {
 	 * @param application the application to add
 	 * @param properties the service properties
 	 */
-	public void modifedApplication(Application application, Map<String, Object> properties) {
+	public void updatedApplication(Application application, Map<String, Object> properties) {
 		dispatcher.removeApplication(application, properties);
 		dispatcher.addApplication(application, properties);
 	}
@@ -174,7 +173,7 @@ public class JerseyWhiteboardComponent {
 			+ "=true)", cardinality = MULTIPLE, policy = DYNAMIC)
 	public void bindJaxRsExtension(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
 
-		unbindJaxRsExtension(jaxRsExtensionSR, properties);
+		updatedJaxRsExtension(jaxRsExtensionSR, properties);
 	}
 
 	public void updatedJaxRsExtension(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {

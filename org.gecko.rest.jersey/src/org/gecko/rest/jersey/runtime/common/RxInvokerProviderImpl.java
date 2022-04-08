@@ -24,7 +24,7 @@ import org.osgi.service.jaxrs.client.PromiseRxInvoker;
  * @author ilenia
  * @since Jun 12, 2020
  */
-@Component
+@Component()
 public class RxInvokerProviderImpl implements RxInvokerProvider<PromiseRxInvoker> {
 	
 	/* 

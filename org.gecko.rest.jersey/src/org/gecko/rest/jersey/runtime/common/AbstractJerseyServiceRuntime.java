@@ -11,6 +11,10 @@
  */
 package org.gecko.rest.jersey.runtime.common;
 
+import static org.osgi.framework.Constants.SERVICE_CHANGECOUNT;
+import static org.osgi.service.jaxrs.runtime.JaxrsServiceRuntimeConstants.JAX_RS_SERVICE_ENDPOINT;
+import static org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants.JAX_RS_NAME;
+
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -42,6 +46,7 @@ import org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
 import org.gecko.rest.jersey.runtime.application.JerseyApplication;
 import org.gecko.rest.jersey.runtime.servlet.WhiteboardServletContainer;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
@@ -49,7 +54,6 @@ import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
-import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntimeConstants;
 import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.BaseApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.BaseDTO;
@@ -60,7 +64,6 @@ import org.osgi.service.jaxrs.runtime.dto.FailedResourceDTO;
 import org.osgi.service.jaxrs.runtime.dto.ResourceDTO;
 import org.osgi.service.jaxrs.runtime.dto.ResourceMethodInfoDTO;
 import org.osgi.service.jaxrs.runtime.dto.RuntimeDTO;
-import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * Implementation of the {@link JaxRSServiceRuntime} for a Jersey implementation
@@ -81,7 +84,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	protected final List<FailedExtensionDTO> failedExtensions = new LinkedList<>();
 
 	private Logger logger = Logger.getLogger("jaxRs.serviceRuntime");
-	private ServiceRegistration<JaxrsServiceRuntime> serviceRuntime;
+	private ServiceRegistration<JaxrsServiceRuntime> regJaxrsServiceRuntime;
 	private AtomicLong changeCount = new AtomicLong();
 
 	/* 
@@ -114,17 +117,18 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	@Override
 	public void startup() {
 		doStartup();
-		Dictionary<String, Object> properties = getRuntimeProperties();
+		Dictionary<String, Object> properties = getRuntimePropertiesWithNewChangeCount();
 		String[] service = new String[] {JaxrsServiceRuntime.class.getName(), JaxRsWhiteboardProvider.class.getName()};
 		try {
-			synchronized (runtimeDTO) {
-				serviceRuntime = (ServiceRegistration<JaxrsServiceRuntime>) context.getBundleContext().registerService(service, this, properties);
-				updateRuntimeDTO(serviceRuntime.getReference());
-			}
+
+			regJaxrsServiceRuntime = (ServiceRegistration<JaxrsServiceRuntime>) context.getBundleContext()
+					.registerService(service, this, properties);
+			updateRuntimeDtoAndChangeCount();
+
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Error starting JaxRsRuntimeService ", e);
-			if (serviceRuntime != null) {
-				serviceRuntime.unregister();
+			if (regJaxrsServiceRuntime != null) {
+				regJaxrsServiceRuntime.unregister();
 			}
 		} 
 	}
@@ -133,27 +137,38 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 * Merges all available properties and adds a fitting changecount
 	 * @return the properties that can be assigned to the changecount
 	 */
-	private Dictionary<String, Object> getRuntimeProperties() {
+	private Dictionary<String, Object> getRuntimePropertiesWithNewChangeCount() {
 		Dictionary<String, Object> properties = new Hashtable<>();
 		getProperties().entrySet().forEach(e -> properties.put(e.getKey(), e.getValue()));
-		properties.put(JaxrsServiceRuntimeConstants.JAX_RS_SERVICE_ENDPOINT, getURLs(context));
-		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, name);
-		properties.put("service.changecount", changeCount.incrementAndGet());
+		properties.put(JAX_RS_SERVICE_ENDPOINT, getURLs(context));
+		properties.put(JAX_RS_NAME, name);
+		properties.put(SERVICE_CHANGECOUNT, changeCount.incrementAndGet());
 		return properties;
 	}
 	
 	/**
 	 * Updates the properties and the changecount of the registered Runtime
 	 */
-	protected void updateRuntimeProperties() {
-		if (serviceRuntime != null) {
-			Dictionary<String, Object> properties = getRuntimeProperties();
-			serviceRuntime.setProperties(properties);
-			if (serviceRuntime.getReference() != null) {
-				synchronized (runtimeDTO) {
-					updateRuntimeDTO(serviceRuntime.getReference());
-				}
-			}
+	private void updateRuntimeDtoAndChangeCount() {
+					updateRuntimeDTO();
+			//151.2.1 The JAX-RS Service Runtime Service 
+			/*
+			 * Whenever the DTOs available from the JAX-RS Service Runtime service change,
+			 * the value of this property will increase.
+			 * 
+			 * This allows interested parties to be notified of changes to the DTOs by
+			 * observing Service Events of type MODIFIED for the JaxrsServiceRuntime
+			 * service. See org.osgi.framework.Constants.SERVICE_CHANGECOUNT in
+			 */
+			updateChangeCount();
+		
+	}
+
+
+	private void updateChangeCount() {
+		Dictionary<String, Object> properties = getRuntimePropertiesWithNewChangeCount();
+		if(regJaxrsServiceRuntime!=null) {
+			regJaxrsServiceRuntime.setProperties(properties);
 		}
 	}
 
@@ -175,7 +190,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	public void modified(ComponentContext context) throws ConfigurationException {
 		doModified(context);
 //		applicationContainerMap.clear();
-		updateRuntimeProperties();
+		updateRuntimeDtoAndChangeCount();
 	}
 	
 	protected abstract void doModified(ComponentContext context) throws ConfigurationException ;
@@ -185,9 +200,9 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#teardown()
 	 */
 	public void teardown() {
-		if (serviceRuntime != null) {
+		if (regJaxrsServiceRuntime != null) {
 			try {
-				serviceRuntime.unregister();
+				regJaxrsServiceRuntime.unregister();
 			} catch (IllegalStateException ise) {
 				logger.log(Level.SEVERE, "JaxRsRuntime was already unregistered", ise);
 			} catch (Exception ise) {
@@ -202,9 +217,8 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 */
 	protected abstract void doTeardown();
 
-	public synchronized void updateRuntimeDTO(ServiceReference<?> serviceRef) {
-		
-		synchronized (runtimeDTO) {
+	private synchronized void updateRuntimeDTO() {
+			synchronized (runtimeDTO) {
 			List<ApplicationDTO> appDTOList = new LinkedList<>();
 			
 			applicationContainerMap.forEach((name, ap) -> {
@@ -219,12 +233,15 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 				} 	
 			});
 			
-			if (serviceRef != null) {
-				ServiceReferenceDTO srDTO = DTOConverter.toServiceReferenceDTO(serviceRef);
-				runtimeDTO.serviceDTO = srDTO;
-				// the defaults application service id is the same, like this, because it comes
-				// from here
-				// runtimeDTO.defaultApplication.serviceId = srDTO.id;
+			if (regJaxrsServiceRuntime != null) {
+				ServiceReference<?> serviceRef = regJaxrsServiceRuntime.getReference();
+				if (serviceRef != null) {
+					ServiceReferenceDTO srDTO = DTOConverter.toServiceReferenceDTO(serviceRef);
+					runtimeDTO.serviceDTO = srDTO;
+					// the defaults application service id is the same, like this, because it comes
+					// from here
+					// runtimeDTO.defaultApplication.serviceId = srDTO.id;
+				}
 			}
 			runtimeDTO.applicationDTOs = appDTOList.toArray(new ApplicationDTO[appDTOList.size()]);		
 			
@@ -236,11 +253,17 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 			runtimeDTO.failedApplicationDTOs = failedApplications.toArray(new FailedApplicationDTO[failedApplications.size()]);
 			runtimeDTO.failedExtensionDTOs = failedExtensions.toArray(new FailedExtensionDTO[failedExtensions.size()]); 
 			runtimeDTO.failedResourceDTOs = failedResources.toArray(new FailedResourceDTO[failedResources.size()]); 
-		}				
+		}
+
 	}
 	
+
+
 	private void setExtResourceForNameBinding(ApplicationDTO[] apps) {
-		for(ApplicationDTO aDTO : apps) {				
+		for(ApplicationDTO aDTO : apps) {
+			if(aDTO==null) {
+				continue;
+			}
 			Map<String, Set<ResourceDTO>> extResNameBind = new HashMap<>();
 			for(ResourceDTO rDTO : aDTO.resourceDTOs) {
 				for(ResourceMethodInfoDTO mDTO : rDTO.resourceMethods) {
@@ -270,14 +293,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 		}
 	}
 
-	/* 
-	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#updateRuntimeDTO(org.osgi.service.jaxrs.runtime.dto.RuntimeDTO)
-	 */
-	@Override
-	public void updateRuntimeDTO(RuntimeDTO runtimeDTO) {
 
-	}
 
 	@Override
 	public void registerApplication(JaxRsApplicationProvider applicationProvider) {
@@ -292,7 +308,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 		String applicationPath = applicationProvider.getPath();
 		doRegisterServletContainer(applicationProvider, applicationPath);
 		applicationContainerMap.put(applicationProvider.getId(), applicationProvider);
-		
+		updateRuntimeDtoAndChangeCount();
 	}
 
 	/**
@@ -319,6 +335,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 			return;
 		}
 		doUnregisterApplication(provider);
+		updateRuntimeDtoAndChangeCount();
 	}
 
 	/**
@@ -340,9 +357,11 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 		} else {
 			applicationContainerMap.put(applicationProvider.getId(), applicationProvider);
 			List<ServletContainer> servletContainers = provider.getServletContainers();
-			if(!servletContainers.isEmpty()) {
+			if(servletContainers.isEmpty()) {
+				logger.log(Level.INFO, "-- No servlet container is available to reload " + applicationProvider.getName());
+			} else {
 				logger.log(Level.FINE, "Reload servlet container for application " + applicationProvider.getName());
-
+				
 				List<ServletContainer> copyList = new ArrayList<>(servletContainers);
 				
 				copyList.forEach(servletContainer -> {
@@ -355,10 +374,9 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 						logger.log(Level.WARNING, "Jetty servlet context handler is not started yet", e);
 					}
 				});
-			} else {
-				logger.log(Level.INFO, "-- No servlet container is available to reload " + applicationProvider.getName());
 			}
-//			updateRuntimeProperties();
+			//App Properties could be changed
+			updateRuntimeDtoAndChangeCount();
 		}
 	}
 	
@@ -390,11 +408,12 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	@Override
 	public Map<String, Object> getProperties() {
 		Map<String, Object> properties = new HashMap<>();
+		
 		Enumeration<String> keys = context.getProperties().keys();
-		if (serviceRuntime != null) {
-			String[] runtimeKeys = serviceRuntime.getReference().getPropertyKeys();
+		if (regJaxrsServiceRuntime != null) {
+			String[] runtimeKeys = regJaxrsServiceRuntime.getReference().getPropertyKeys();
 			for (String k : runtimeKeys) {
-				properties.put(k, serviceRuntime.getReference().getProperty(k));
+				properties.put(k, regJaxrsServiceRuntime.getReference().getProperty(k));
 			}
 		}
 		while(keys.hasMoreElements()) {
@@ -421,7 +440,10 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 		}
 		ResourceConfigWrapper wrapper = new ResourceConfigWrapper();
 		ResourceConfig config = ResourceConfig.forApplication(application);
-		wrapper.config = config;
+		final Map<String, Object> properties = new HashMap<String, Object>(config.getProperties());
+		properties.put(ServerProperties.RESOURCE_VALIDATION_IGNORE_ERRORS, Boolean.TRUE);
+		config.setProperties(properties);
+        wrapper.config = config;
 		
 		PrototypeServiceBinder resBinder = new PrototypeServiceBinder();
 		AtomicBoolean resRegistered = new AtomicBoolean(false);
@@ -455,16 +477,17 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 */
 	protected void updateProperties(ComponentContext ctx) throws ConfigurationException {
 		if (ctx == null) {
-			throw new ConfigurationException(JaxrsServiceRuntimeConstants.JAX_RS_SERVICE_ENDPOINT, "No component context is availble to get properties from");
+			throw new ConfigurationException(JAX_RS_SERVICE_ENDPOINT, "No component context is availble to get properties from");
 		}
-		name = JerseyHelper.getPropertyWithDefault(ctx, JaxrsWhiteboardConstants.JAX_RS_NAME, null);
+		name = JerseyHelper.getPropertyWithDefault(ctx, JAX_RS_NAME, null);
 		if (name == null) {
 			name = JerseyHelper.getPropertyWithDefault(ctx, JerseyConstants.JERSEY_WHITEBOARD_NAME, JerseyConstants.JERSEY_WHITEBOARD_NAME);
 			if (name == null) {
-				throw new ConfigurationException(JaxrsWhiteboardConstants.JAX_RS_NAME, "No name was defined for the whiteboard");
+				throw new ConfigurationException(JAX_RS_NAME, "No name was defined for the whiteboard");
 			}
 		}
 		doUpdateProperties(ctx);
+		updateRuntimeDtoAndChangeCount();
 	}
 
 	/**
@@ -513,6 +536,6 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 			}
 		});
 
-		updateRuntimeProperties();
+		updateRuntimeDtoAndChangeCount();
 	}
 }

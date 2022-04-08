@@ -11,12 +11,13 @@
  */
 package org.gecko.rest.jersey.runtime.dispatcher;
 
+import static java.util.function.Predicate.not;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -431,25 +432,17 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 				Set<JaxRsApplicationProvider> applicationCandidates = applications.stream().
 						filter((app)->app.canHandleWhiteboard(getWhiteboardProvider().getProperties())).
 						collect(Collectors.toSet());
-				Set<JaxRsResourceProvider> resourceCandidates = resources.stream().
-						filter((r)->r.canHandleWhiteboard(getWhiteboardProvider().getProperties())).
-						collect(Collectors.toSet());
-				Set<JaxRsExtensionProvider> extensionCandidates = extensions.stream().
-						filter((e)->e.canHandleWhiteboard(getWhiteboardProvider().getProperties())).
-						collect(Collectors.toSet());
+				
+				Map<Boolean, Set<JaxRsResourceProvider>> resourceCandidatesMap = resources.stream().collect(Collectors
+						.partitioningBy((r) -> r.canHandleWhiteboard(getWhiteboardProvider().getProperties()),Collectors.toUnmodifiableSet()));
+
+				Map<Boolean, Set<JaxRsExtensionProvider>> extensionCandidatesMap = extensions.stream().collect(Collectors
+						.partitioningBy((e) -> e.canHandleWhiteboard(getWhiteboardProvider().getProperties()),Collectors.toUnmodifiableSet()));
 				
 				
-//				Remove contents that are no longer valid for this whiteboard				
-				Set<JaxRsResourceProvider> noWBResources = resources.stream().
-						filter((r)->!r.canHandleWhiteboard(getWhiteboardProvider().getProperties())).
-						collect(Collectors.toSet());
 				
-				Set<JaxRsExtensionProvider> noWBExtensions = extensions.stream().
-						filter((e)->!e.canHandleWhiteboard(getWhiteboardProvider().getProperties())).
-						collect(Collectors.toSet());
-				
-				unassignContent(applicationCandidates, noWBResources);
-				unassignContent(applicationCandidates, noWBExtensions);		
+				unassignContent(applicationCandidates, resourceCandidatesMap.get(Boolean.FALSE));
+				unassignContent(applicationCandidates, extensionCandidatesMap.get(Boolean.FALSE));		
 								
 				/*
 				 * Go over all applications and filter application with same path (shadowed) ordered by service rank (highest first)
@@ -461,36 +454,36 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 				applicationCandidates = checkPathProperty(applicationCandidates);		
 						
 //				Check the osgi.jaxrs.name property and filter out services with same name and lower rank
-				Set<JaxRsProvider> candidates = checkNameProperty(applicationCandidates, resourceCandidates, extensionCandidates);
+				Set<JaxRsProvider> candidates = checkNameProperty(applicationCandidates, resourceCandidatesMap.get(Boolean.TRUE), extensionCandidatesMap.get(Boolean.TRUE));
 				applicationCandidates = candidates.stream()
-						.filter(c -> c instanceof JaxRsApplicationProvider)
-						.map(c -> (JaxRsApplicationProvider) c)
-						.collect(Collectors.toCollection(LinkedHashSet::new));
+						.filter(JaxRsApplicationProvider.class::isInstance)
+						.map(JaxRsApplicationProvider.class::cast)
+						.collect(Collectors.toUnmodifiableSet());
 				
-				resourceCandidates = candidates.stream()
-						.filter(c -> c instanceof JaxRsResourceProvider)
-						.map(c -> (JaxRsResourceProvider) c)
-						.collect(Collectors.toCollection(LinkedHashSet::new));
+				Set<JaxRsResourceProvider> resourceCandidates = candidates.stream()
+						.filter(JaxRsResourceProvider.class::isInstance)
+						.map(JaxRsResourceProvider.class::cast)
+						.collect(Collectors.toUnmodifiableSet());
 				
-				extensionCandidates = candidates.stream()
-						.filter(c -> c instanceof JaxRsExtensionProvider)
-						.map(c -> (JaxRsExtensionProvider) c)
-						.collect(Collectors.toCollection(LinkedHashSet::new));			
+				Set<JaxRsExtensionProvider> extensionCandidates = candidates.stream()
+						.filter(JaxRsExtensionProvider.class::isInstance)
+						.map(JaxRsExtensionProvider.class::cast)
+						.collect(Collectors.toUnmodifiableSet());			
 				
 				
 //				Assign extension to apps and report a failure DTO for those extensions which have not been assigned to any app
 				Set<JaxRsApplicationContentProvider> noMatchingExt = 
 						assignContent(applications, applicationCandidates, extensionCandidates);
 				
-				noMatchingExt.stream().forEach(e -> {
-					if(e instanceof JerseyExtensionProvider) {
-						JerseyExtensionProvider<?> p = (JerseyExtensionProvider<?>) e;
-						p.updateStatus(DTOConstants.FAILURE_REASON_REQUIRED_APPLICATION_UNAVAILABLE);
-						if(!failedExtensions.containsKey(p.getId())) {
-							failedExtensions.put(p.getId(), p);
-						}
-					}
-				});
+				noMatchingExt.stream().filter(JerseyExtensionProvider.class::isInstance)
+						.map(JerseyExtensionProvider.class::cast).forEach(p -> {
+
+							p.updateStatus(DTOConstants.FAILURE_REASON_REQUIRED_APPLICATION_UNAVAILABLE);
+							if (!failedExtensions.containsKey(p.getId())) {
+								failedExtensions.put(p.getId(), p);
+							}
+
+						});
 				
 				
 //				check for osgi.jaxrs.extension.select properties in apps and extensions
@@ -513,9 +506,11 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 				Set<JaxRsApplicationProvider> defaultApplications = DispatcherHelper.getDefaultApplications(applicationCandidates);
 				final Optional<JaxRsApplicationProvider> defaultApplication = defaultApplications.stream().findFirst();
 				
+				if(defaultApplication.isPresent()) {
+				
 				defaultApplications
 					.stream()
-					.filter(app->defaultApplication.isPresent() && !app.equals(defaultApplication.get()))
+					.skip(1)// the default app
 					.forEach(a-> {
 						if(a instanceof JerseyApplicationProvider) {
 							((JerseyApplicationProvider) a).updateStatus(DTOConstants.FAILURE_REASON_SHADOWED_BY_OTHER_SERVICE);
@@ -524,10 +519,11 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 							failedApplications.put(a.getId(), a);
 						}
 					});
+				} 
 				
 //				Filter out from the application list the default ones which have been added to the failed list
 				applicationCandidates = applicationCandidates.stream().filter(a -> !failedApplications.containsKey(a.getId()))
-						.collect(Collectors.toCollection(LinkedHashSet::new));	
+						.collect(Collectors.toUnmodifiableSet());	
 				
 				substituteDefaultApplication(defaultApplication);
 				
@@ -562,7 +558,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 				
 //				Remove the default app from the app candidates, because it will be registered in a separate step
 				applicationCandidates = applicationCandidates.stream().filter(a-> !a.getId().equals(currentDefaultProvider.getId()))
-						.collect(Collectors.toCollection(LinkedHashSet::new));
+						.collect(Collectors.toUnmodifiableSet());
 
 				Set<JaxRsApplicationProvider> finalApplicationCandidates = applicationCandidates;					
 				
@@ -633,24 +629,15 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			Map<String, JaxRsResourceProvider> failedResources,
 			Map<String, JaxRsExtensionProvider> failedExtensions) {
 
-		failedApplications.values().forEach(a-> {
-			if(a instanceof JerseyApplicationProvider) {
-				((JerseyApplicationProvider)a).updateStatus(JaxRsConstants.NO_FAILURE);
-			}
-		});
+		failedApplications.values().stream().filter(JerseyApplicationProvider.class::isInstance)
+		.map(JerseyApplicationProvider.class::cast).forEach(a -> a.updateStatus(JaxRsConstants.NO_FAILURE));
 		
-		failedResources.values().forEach(a-> {
-			if(a instanceof JerseyResourceProvider) {
-				((JerseyResourceProvider<?>)a).updateStatus(JaxRsConstants.NO_FAILURE);
-			}
-		});
+		failedResources.values().stream().filter(JerseyResourceProvider.class::isInstance)
+		.map(JerseyResourceProvider.class::cast).forEach(a -> a.updateStatus(JaxRsConstants.NO_FAILURE));
 		
-		failedExtensions.values().forEach(a-> {
-			if(a instanceof JerseyExtensionProvider) {
-				((JerseyExtensionProvider<?>)a).updateStatus(JaxRsConstants.NO_FAILURE);
-			}
-		});
-		
+		failedExtensions.values().stream().filter(JerseyExtensionProvider.class::isInstance)
+		.map(JerseyExtensionProvider.class::cast).forEach(a -> a.updateStatus(JaxRsConstants.NO_FAILURE));
+
 		failedApplications.clear();
 		failedResources.clear();
 		failedExtensions.clear();		
@@ -673,7 +660,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		
 		applicationCandidates = applicationCandidates.stream()
 				.sorted((a1, a2) -> a1.compareTo(a2))
-				.collect(Collectors.toCollection(LinkedHashSet::new));
+				.collect(Collectors.toUnmodifiableSet());
 		
 		logger.fine("App Candidates size AFTER ordering " + applicationCandidates.size());
 
@@ -713,14 +700,14 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			
 //			get the extensions which have been added to this app
 			List<JaxRsExtensionProvider> extensions = contents.stream()
-					.filter(c -> c instanceof JaxRsExtensionProvider)
-					.map(c -> (JaxRsExtensionProvider) c)
+					.filter(JaxRsExtensionProvider.class::isInstance)
+					.map(JaxRsExtensionProvider.class::cast)
 					.collect(Collectors.toList());
 			
 //			get the resources which have been added to this app
 			List<JaxRsResourceProvider> resources = contents.stream()
-					.filter(c -> c instanceof JaxRsResourceProvider)
-					.map(c -> (JaxRsResourceProvider) c)
+					.filter(JaxRsResourceProvider.class::isInstance)
+					.map(JaxRsResourceProvider.class::cast)
 					.collect(Collectors.toList());
 			
 			for(JaxRsResourceProvider res : resources) {
@@ -926,10 +913,9 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		logger.fine("App Candidates BEFORE NAME SORT " + allCandidates.size());
 		
 		allCandidates = allCandidates.stream()
-				.sorted((a1, a2) -> a1.compareTo(a2))
-				.collect(Collectors.toCollection(LinkedHashSet::new));
+				.sorted(Comparator.naturalOrder())
+				.collect(Collectors.toUnmodifiableSet());
 		
-		logger.fine("App Candidates AFTER NAME SORT " + allCandidates.size());
 			
 		Set<JaxRsProvider> failures = new HashSet<JaxRsProvider>();
 		for(int i = 0; i < allCandidates.size(); i++) {
@@ -976,7 +962,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			}			
 		});
 		
-		return allCandidates.stream().filter(c -> !failures.contains(c)).collect(Collectors.toSet());		
+		return allCandidates.stream().filter(not(failures::contains)).collect(Collectors.toSet());	
 	}
 	
 	
@@ -1045,7 +1031,6 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 			if (cc.contains(c)) {
 				if (c.canHandleApplication(currentDefaultProvider)) {
 					if (addContentToApplication(currentDefaultProvider, c)) {
-						logger.fine("Added content candidate " + c.getName() + " to default application");
 					}
 				} else {
 					if (removeContentFromApplication(currentDefaultProvider, c)) {

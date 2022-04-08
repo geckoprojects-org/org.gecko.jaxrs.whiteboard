@@ -13,7 +13,7 @@ package org.gecko.rest.jersey.helper;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,10 +36,11 @@ public class DispatcherHelper {
 		if (applications == null) {
 			return Collections.emptySet();
 		}
+		
 		Set<JaxRsApplicationProvider> resultSet = applications.stream()
 				.filter(app->(".default".equals(app.getName()) || "/*".equals(app.getPath())) && !app.isDefault())
-				.sorted((a1, a2) -> a1.compareTo(a2))
-				.collect(Collectors.toCollection(LinkedHashSet::new));
+				.sorted(Comparator.naturalOrder())
+				.collect(Collectors.toUnmodifiableSet());
 		return resultSet;
 	}
 

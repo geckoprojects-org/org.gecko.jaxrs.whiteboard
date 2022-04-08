@@ -19,7 +19,7 @@ import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsExtension;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsName;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsWhiteboardTarget;
 
-@Component(name = "WebsecurityFilter", scope = ServiceScope.PROTOTYPE)
+@Component(name = "WebsecurityFilter", scope = ServiceScope.PROTOTYPE, enabled = false)
 @JaxrsExtension
 @JaxrsName("WebsecurityFilter")
 @JaxrsWhiteboardTarget("(websecurity=false)")

@@ -11,7 +11,10 @@
  */
 package org.gecko.rest.jersey.provider.application;
 
+import static java.util.Objects.isNull;
+
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +46,7 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 	private Long serviceId;
 	private Integer serviceRank;
 	private int status = NO_FAILURE;
-	private Filter whiteboardFilter;
+	private Filter whiteboardTargetFilter;
 	private List<Filter> extensionFilters = new LinkedList<>();
 	private T providerObject;
 
@@ -130,11 +133,11 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 		 * Spec table 151.2: osgi.jaxrs.whiteboard.target: ... If this property is not specified,
 		 * all JaxRs Whiteboards can handle this service
 		 */
-		if (whiteboardFilter == null) {
+		if (whiteboardTargetFilter == null) {
 			return true;
 		}
-		runtimeProperties = runtimeProperties == null ? Collections.emptyMap() : runtimeProperties;
-		boolean match = whiteboardFilter.matches(runtimeProperties);
+		runtimeProperties = isNull(runtimeProperties)   ? Collections.emptyMap() : runtimeProperties;
+		boolean match = whiteboardTargetFilter.matches(runtimeProperties);
 
 		return match;
 	}
@@ -188,8 +191,10 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 	 */
 	protected String getProviderId() {
 		Long serviceId = getServiceId();
-		String id = serviceId != null ? "sid_" + serviceId : "." + UUID.randomUUID().toString();
-		return id;
+		if (isNull(serviceId)) {
+			return "." + UUID.randomUUID().toString();
+		}
+		return "sid_" + serviceId;
 	}
 
 	/**
@@ -235,7 +240,7 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 		String filter = (String) properties.get(JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET);
 		if (filter != null) {
 			try {
-				whiteboardFilter = FrameworkUtil.createFilter(filter);
+				whiteboardTargetFilter = FrameworkUtil.createFilter(filter);
 			} catch (InvalidSyntaxException e) {
 				logger.log(Level.SEVERE, "The given whiteboard target filter is invalid: " + filter);
 				updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
@@ -301,8 +306,9 @@ public abstract class AbstractJaxRsProvider<T> implements JaxRsProvider, JaxRsCo
 		if (r == 0) {
 			return r;
 		}
+		
 		// same name -> sort descending by service rank
-		r = getName().compareTo(o.getName());
+		//r = getName().compareTo(o.getName());
 		if (r == 0) {
 			r = getServiceRank().compareTo(o.getServiceRank()) * -1;
 //			same rank -> sort by service id

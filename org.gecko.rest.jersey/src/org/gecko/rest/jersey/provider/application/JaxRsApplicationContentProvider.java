@@ -28,10 +28,6 @@ public interface JaxRsApplicationContentProvider extends JaxRsProvider, JaxRsCon
 	
 	static class ContentProviderComparator implements Comparator<JaxRsApplicationContentProvider> {
 
-		/* 
-		 * (non-Javadoc)
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 */
 		@Override
 		public int compare(JaxRsApplicationContentProvider o1, JaxRsApplicationContentProvider o2) {
 			if (o1 == null || o2 == null) {
@@ -41,13 +37,13 @@ public interface JaxRsApplicationContentProvider extends JaxRsProvider, JaxRsCon
 		}
 		
 	}
-	
+	static final ContentProviderComparator CONTENT_PROVIDER_COMPARATOR=	new ContentProviderComparator();
 	/**
 	 * Creates the comparator instance
 	 * @return the comparator instance
 	 */
 	public static ContentProviderComparator getComparator() {
-		return new ContentProviderComparator();
+		return CONTENT_PROVIDER_COMPARATOR;
 	}
 	
 	/**

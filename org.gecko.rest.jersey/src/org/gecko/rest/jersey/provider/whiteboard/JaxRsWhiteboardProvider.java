@@ -94,16 +94,7 @@ public interface JaxRsWhiteboardProvider {
 	 */
 	public boolean isRegistered(JaxRsApplicationProvider provider);
 	
-	/**
-	 * Update the runtime dto
-	 * @param serviceRef the service reference of the {@link JaxRSServiceRuntime}
-	 */
-	public void updateRuntimeDTO(ServiceReference<?> serviceRef);
-	
-	/**
-	 * Updates the runtime DTO with a given runtimeDTO
-	 * @param runtimeDTO the {@link RuntimeDTO} with the current information
-	 */
-	public void updateRuntimeDTO(RuntimeDTO runtimeDTO);
+
+
 
 }

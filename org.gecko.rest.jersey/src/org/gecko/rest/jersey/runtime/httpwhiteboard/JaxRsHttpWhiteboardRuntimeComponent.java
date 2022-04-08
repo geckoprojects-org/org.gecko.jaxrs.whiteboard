@@ -114,7 +114,7 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 	 * @param application the application to add
 	 * @param properties the service properties
 	 */
-	public void modifedDefaultApplication(Application application, Map<String, Object> properties) {
+	public void updatedDefaultApplication(Application application, Map<String, Object> properties) {
 		dispatcher.removeApplication(application, properties);
 		dispatcher.addApplication(application, properties);
 	}
@@ -143,7 +143,7 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 	 * @param application the application to add
 	 * @param properties the service properties
 	 */
-	public void modifedApplication(Application application, Map<String, Object> properties) {
+	public void updatedApplication(Application application, Map<String, Object> properties) {
 		dispatcher.removeApplication(application, properties);
 		dispatcher.addApplication(application, properties);
 	}

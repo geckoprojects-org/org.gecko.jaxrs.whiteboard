@@ -120,8 +120,10 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 		int status = getProviderStatus();
 		if (status == NO_FAILURE) {
 			return DTOConverter.toExtensionDTO(this);
+		} else if (status == INVALID) {
+			return DTOConverter.toFailedExtensionDTO(this, DTOConstants.FAILURE_REASON_NOT_AN_EXTENSION_TYPE);
 		} else {
-			return DTOConverter.toFailedExtensionDTO(this, status == INVALID ? DTOConstants.FAILURE_REASON_NOT_AN_EXTENSION_TYPE : status);
+			return DTOConverter.toFailedExtensionDTO(this, status);
 		}
 	}
 	
