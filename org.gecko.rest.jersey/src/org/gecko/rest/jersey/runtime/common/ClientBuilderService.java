@@ -11,10 +11,13 @@
  */
 package org.gecko.rest.jersey.runtime.common;
 
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.RxInvokerProvider;
 
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.osgi.service.jaxrs.client.PromiseRxInvoker;
+
+import aQute.bnd.annotation.spi.ServiceProvider;
 
 
 /**
@@ -22,6 +25,7 @@ import org.osgi.service.jaxrs.client.PromiseRxInvoker;
  * @author Juergen Albert
  * @since 27 Jul 2018
  */
+@ServiceProvider(value = ClientBuilder.class)
 public class ClientBuilderService extends JerseyClientBuilder {
 	
 	/**

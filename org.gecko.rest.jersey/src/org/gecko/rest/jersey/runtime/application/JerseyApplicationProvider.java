@@ -289,8 +289,8 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 		}
 		boolean filterValid = true; 
 		if (filterValid) {
-			JerseyApplication ja = wrappedApplication;
-			boolean added = ja.addContent(provider);
+			JerseyApplication jerseyApplication = wrappedApplication;
+			boolean added = jerseyApplication.addContent(provider);
 			if (!changed && added) {
 				changed = added;
 			}

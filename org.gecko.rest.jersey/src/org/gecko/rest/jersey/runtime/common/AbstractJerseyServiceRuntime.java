@@ -170,6 +170,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 		if(regJaxrsServiceRuntime!=null) {
 			regJaxrsServiceRuntime.setProperties(properties);
 		}
+
 	}
 
 	/**

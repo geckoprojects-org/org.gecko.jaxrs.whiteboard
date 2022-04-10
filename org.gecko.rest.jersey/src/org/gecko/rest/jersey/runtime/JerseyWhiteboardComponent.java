@@ -47,8 +47,10 @@ import org.osgi.service.component.annotations.Reference;
  * @since 11.10.2017
  */
 
-@Component(name = "JaxRsWhiteboardComponent", immediate = true, property = { "jersey.port:Integer=8185",
-		"jersey.jaxrs.whiteboard.name=test_wb", "jersey.context.path=test" })
+@Component(name = "JaxRsWhiteboardComponent", immediate = true
+, property = { "jersey.port:Integer=8185",
+		"jersey.jaxrs.whiteboard.name=test_wb", "jersey.context.path=test" }
+)
 public class JerseyWhiteboardComponent {
 
 	Logger logger = Logger.getLogger("o.e.o.j.runtimeComponent");

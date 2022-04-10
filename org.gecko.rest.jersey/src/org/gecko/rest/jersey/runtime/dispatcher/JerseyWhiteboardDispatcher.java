@@ -761,8 +761,8 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 //			get the extensions which have been added to this app
 			Collection<JaxRsApplicationContentProvider> contents = app.getContentProviers();
 			List<JaxRsExtensionProvider> extensions = contents.stream()
-					.filter(c -> c instanceof JaxRsExtensionProvider)
-					.map(c -> (JaxRsExtensionProvider) c)
+					.filter(JaxRsExtensionProvider.class::isInstance)
+					.map(JaxRsExtensionProvider.class::cast)
 					.collect(Collectors.toList());
 			
 //			check if the app itself requires some ext. If so, check if they are among the contents.

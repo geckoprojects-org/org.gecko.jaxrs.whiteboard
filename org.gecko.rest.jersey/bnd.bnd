@@ -2,9 +2,6 @@
 
   
 -buildpath: \
-	osgi.annotation;version='8.0',\
-	osgi.core;version='8.0',\
-	jakarta.ws.rs-api;version='2.1',\
 	org.apache.felix.http.servlet-api;version='1.1',\
 	org.glassfish.hk2.api;version='2.6.1',\
 	org.glassfish.jersey.core.jersey-common;version='2.32',\
@@ -24,7 +21,11 @@
 	org.eclipse.jetty.util,\
 	org.eclipse.jetty.servlet,\
 	org.osgi.service.http.whiteboard,\
-	org.osgi.test.cases.jaxrs
+	org.osgi.test.cases.jaxrs,\
+	org.osgi.annotation.versioning,\
+	org.osgi.annotation.bundle,\
+	org.apache.geronimo.specs.geronimo-jaxrs_2.1_spec,\
+	biz.aQute.bnd.annotation
 
 -testpath: ${junit},\
 	org.mockito.mockito-core,\
@@ -54,7 +55,8 @@ Provide-Capability: \
 	osgi.contract; osgi.contract=JavaJAXRS; version:List<Version>="2.1,2";provider=jersey;jersey.version:Version="2.35";uses:="javax.ws.rs, javax.ws.rs.core, javax.ws.rs.sse, javax.ws.rs.ext, javax.ws.rs.client, javax.ws.rs.container",\
 	osgi.service;objectClass:List<String>="org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime";uses:="org.osgi.service.jaxrs.runtime,org.osgi.service.jaxrs.runtime.dto",\
 	osgi.service;objectClass:List<String>="javax.ws.rs.client.ClientBuilder";uses:="javax.ws.rs.client,org.osgi.service.jaxrs.client";service.scope="prototype",\
-	osgi.service;objectClass:List<String>="org.osgi.service.jaxrs.client.SseEventSourceFactory";uses:="org.osgi.service.jaxrs.client"
+	osgi.service;objectClass:List<String>="org.osgi.service.jaxrs.client.SseEventSourceFactory";uses:="org.osgi.service.jaxrs.client",\
+	osgi.serviceloader;osgi.serviceloader="javax.ws.rs.sse.SseEventSource.Builder";register:="org.gecko.rest.jersey.runtime.common.SSESourceBuilderService
 
 -privatepackage: \
 	org.gecko.rest.jersey.provider.application,\
