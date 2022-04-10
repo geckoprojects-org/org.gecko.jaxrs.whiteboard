@@ -30,7 +30,7 @@ public class SseEventSourceFactoryImpl implements SseEventSourceFactory {
 	 */
 	@Override
 	public Builder newBuilder(WebTarget target) {		
-		return SseEventSource.target(target);
+		return new SseSourceBuilderService().target(target);
 	}
 
 	/* 
@@ -39,7 +39,7 @@ public class SseEventSourceFactoryImpl implements SseEventSourceFactory {
 	 */
 	@Override
 	public SseEventSource newSource(WebTarget target) {
-		return SseEventSource.target(target).build();
+		return newBuilder(target).build();
 	}
 
 }
