@@ -6,7 +6,7 @@ mockito: org.mockito.mockito-core;version="[1.9,2)",\
 	org.glassfish.jersey.media.jersey-media-multipart,\
 	org.osgi.service.jaxrs,\
 	org.osgi.service.component.annotations,\
-	org.apache.geronimo.specs.geronimo-jaxrs_2.1_spec
+	jakarta.ws.rs-api
 
 
 Private-Package: org.gecko.rest.jersey.multipart

@@ -15,19 +15,15 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.RxInvokerProvider;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.PrototypeServiceFactory;
-import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.jaxrs.client.PromiseRxInvoker;
 import org.osgi.service.jaxrs.client.SseEventSourceFactory;
 
 /**
@@ -35,20 +31,18 @@ import org.osgi.service.jaxrs.client.SseEventSourceFactory;
  * @author ilenia
  * @since Jun 11, 2020
  */
-@Component(immediate = true, service = ClientBuilderComponent.class)
+@Component
 public class ClientBuilderComponent {
 
 	private ServiceRegistration<ClientBuilder> registerClientBuilderService;
 	private ServiceRegistration<SseEventSourceFactory> registerSseService;
-	@Reference
-	private RxInvokerProvider<PromiseRxInvoker> rxInvokerProvider;
 
 	@Activate
 	public void activate(BundleContext ctx) {
 
 		Dictionary<String, Object> properties = new Hashtable<>();
 		properties.put(Constants.SERVICE_VENDOR, "Gecko.io");
-		properties.put(Constants.SERVICE_SCOPE, Constants.SCOPE_PROTOTYPE);
+		properties.put(Constants.SERVICE_RANKING, Integer.valueOf(1000));
 		properties.put(Constants.SERVICE_DESCRIPTION, "A Jersey specific ClientBuilder");
 
 		registerClientBuilderService = ctx.registerService(ClientBuilder.class, new PrototypeServiceFactory<ClientBuilder>() {
@@ -58,7 +52,7 @@ public class ClientBuilderComponent {
 			 */
 			@Override
 			public ClientBuilder getService(Bundle bundle, ServiceRegistration<ClientBuilder> registration) {
-				ClientBuilderService clientBuilder = new ClientBuilderService(rxInvokerProvider);
+				ClientBuilderService clientBuilder = new ClientBuilderService();
 				return clientBuilder;
 			}
 
@@ -73,7 +67,7 @@ public class ClientBuilderComponent {
 		properties.put(Constants.SERVICE_VENDOR, "Gecko.io");
 		properties.put(Constants.SERVICE_DESCRIPTION, "An Implementation of the SseEventSourceFactory");
 
-		registerSseService = ctx.registerService(SseEventSourceFactory.class, new ServiceFactory<SseEventSourceFactory>() {
+		registerSseService = ctx.registerService(SseEventSourceFactory.class, new PrototypeServiceFactory<SseEventSourceFactory>() {
 			/* 
 			 * (non-Javadoc)
 			 * @see org.osgi.framework.PrototypeServiceFactory#getService(org.osgi.framework.Bundle, org.osgi.framework.ServiceRegistration)

@@ -442,7 +442,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 		ResourceConfigWrapper wrapper = new ResourceConfigWrapper();
 		ResourceConfig config = ResourceConfig.forApplication(application);
 		final Map<String, Object> properties = new HashMap<String, Object>(config.getProperties());
-//		properties.put(ServerProperties.RESOURCE_VALIDATION_IGNORE_ERRORS, Boolean.TRUE);
+		properties.put(ServerProperties.RESOURCE_VALIDATION_IGNORE_ERRORS, Boolean.TRUE);
 		config.setProperties(properties);
         wrapper.config = config;
 		

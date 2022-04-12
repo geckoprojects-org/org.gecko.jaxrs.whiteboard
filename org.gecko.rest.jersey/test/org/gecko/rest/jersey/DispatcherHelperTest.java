@@ -88,7 +88,7 @@ public class DispatcherHelperTest {
 		providers.add(defaultProvider);
 		providers.add(createApplicationProvider("test54", Integer.valueOf(40), Long.valueOf(3)));
 		
-		Set<JaxRsApplicationProvider> result = DispatcherHelper.getDefaultApplications(providers);
+		List<JaxRsApplicationProvider> result = DispatcherHelper.getDefaultApplications(providers);
 		assertEquals(1, result.size());
 		Optional<JaxRsApplicationProvider> first = result.stream().findFirst();
 		assertTrue(first.isPresent());
@@ -117,7 +117,7 @@ public class DispatcherHelperTest {
 		providers.add(defaultProvider02);
 		providers.add(createApplicationProvider("test54", Integer.valueOf(40), Long.valueOf(4)));
 		
-		Set<JaxRsApplicationProvider> result = DispatcherHelper.getDefaultApplications(providers);
+		List<JaxRsApplicationProvider> result = DispatcherHelper.getDefaultApplications(providers);
 		assertEquals(2, result.size());
 		int cnt = 0;
 		for (JaxRsApplicationProvider p : result) {
@@ -156,7 +156,7 @@ public class DispatcherHelperTest {
 		JaxRsApplicationProvider defaultProvider03 = createApplicationProvider(".default", Integer.valueOf(50), Long.valueOf(5), true);
 		providers.add(defaultProvider03);
 		
-		Set<JaxRsApplicationProvider> result = DispatcherHelper.getDefaultApplications(providers);
+		List<JaxRsApplicationProvider> result = DispatcherHelper.getDefaultApplications(providers);
 		assertEquals(2, result.size());
 		int cnt = 0;
 		for (JaxRsApplicationProvider p : result) {

@@ -162,6 +162,8 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 	protected void doRegisterServletContainer(JaxRsApplicationProvider provider, String path, ResourceConfig config) {
 		Dictionary<String, Object> props = new Hashtable<>();
 		props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, basePath + path);
+		props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_ASYNC_SUPPORTED, Boolean.TRUE);
+		props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED, Boolean.TRUE);
 		String target = (String) context.getProperties().get(HttpWhiteboardConstants.HTTP_WHITEBOARD_TARGET);
 		if(target != null){
 			props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_TARGET, target);
@@ -194,6 +196,8 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 	protected void doRegisterServletContainer(JaxRsApplicationProvider provider, String path) {
 		Dictionary<String, Object> props = new Hashtable<>();
 		props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, basePath + path);
+		props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_FILTER_ASYNC_SUPPORTED, Boolean.TRUE);
+		props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED, Boolean.TRUE);
 		String target = (String) context.getProperties().get(HttpWhiteboardConstants.HTTP_WHITEBOARD_TARGET);
 		if(target != null){
 			props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_TARGET, target);

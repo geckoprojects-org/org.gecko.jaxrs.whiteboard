@@ -11,6 +11,7 @@
  */
 package org.gecko.rest.jersey.provider.application;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -61,19 +62,19 @@ public interface JaxRsWhiteboardDispatcher {
 	 * Returns all applications or an empty set
 	 * @return all applications or an empty set
 	 */
-	public Set<JaxRsApplicationProvider> getApplications();
+	public List<JaxRsApplicationProvider> getApplications();
 	
 	/**
 	 * Returns all resources or an empty set
 	 * @return all resources or an empty set
 	 */
-	public Set<JaxRsResourceProvider> getResources();
+	public List<JaxRsResourceProvider> getResources();
 	
 	/**
 	 * Returns all extensions or an empty set
 	 * @return all extensions or an empty set
 	 */
-	public Set<JaxRsExtensionProvider> getExtensions();
+	public List<JaxRsExtensionProvider> getExtensions();
 	
 	/**
 	 * Adds an application

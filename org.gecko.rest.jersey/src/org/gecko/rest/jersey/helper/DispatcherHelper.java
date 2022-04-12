@@ -14,6 +14,7 @@ package org.gecko.rest.jersey.helper;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -32,15 +33,15 @@ public class DispatcherHelper {
 	 * @param applications the {@link Collection} of applications
 	 * @return a {@link Set} of application or an empty {@link Set}
 	 */
-	public static Set<JaxRsApplicationProvider> getDefaultApplications(Collection<JaxRsApplicationProvider> applications) {
+	public static List<JaxRsApplicationProvider> getDefaultApplications(Collection<JaxRsApplicationProvider> applications) {
 		if (applications == null) {
-			return Collections.emptySet();
+			return Collections.emptyList();
 		}
 		
-		Set<JaxRsApplicationProvider> resultSet = applications.stream()
+		List<JaxRsApplicationProvider> resultSet = applications.stream()
 				.filter(app->(".default".equals(app.getName()) || "/*".equals(app.getPath())) && !app.isDefault())
 				.sorted(Comparator.naturalOrder())
-				.collect(Collectors.toUnmodifiableSet());
+				.collect(Collectors.toUnmodifiableList());
 		return resultSet;
 	}
 

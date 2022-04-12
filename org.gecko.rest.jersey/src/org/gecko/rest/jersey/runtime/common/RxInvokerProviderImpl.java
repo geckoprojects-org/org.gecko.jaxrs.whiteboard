@@ -16,7 +16,6 @@ import java.util.concurrent.ExecutorService;
 import javax.ws.rs.client.RxInvokerProvider;
 import javax.ws.rs.client.SyncInvoker;
 
-import org.osgi.service.component.annotations.Component;
 import org.osgi.service.jaxrs.client.PromiseRxInvoker;
 
 /**
@@ -24,7 +23,6 @@ import org.osgi.service.jaxrs.client.PromiseRxInvoker;
  * @author ilenia
  * @since Jun 12, 2020
  */
-@Component(service = RxInvokerProvider.class)
 public class RxInvokerProviderImpl implements RxInvokerProvider<PromiseRxInvoker> {
 	
 	/* 
