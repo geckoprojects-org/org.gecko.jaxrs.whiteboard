@@ -13,11 +13,16 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.gecko.rest.jersey.binder.PromiseResponseHandlerBinder;
 import org.gecko.rest.jersey.helper.DestroyListener;
 import org.gecko.rest.jersey.runtime.common.ResourceConfigWrapper;
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.hk2.api.ServiceLocatorFactory;
+import org.glassfish.hk2.utilities.ServiceLocatorUtilities;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
+import org.glassfish.jersey.servlet.ServletProperties;
 
 /**
  * As Wrapper for the {@link ServletContainer} that locks the Servlet while its configuration is reloaded.
@@ -40,6 +45,8 @@ public class WhiteboardServletContainer extends ServletContainer {
 	private DestroyListener destroyListener;
 
 	private ResourceConfigWrapper wrapper;
+	
+	private final ServiceLocator locator;
 
 	public WhiteboardServletContainer(ResourceConfigWrapper configWrapper, DestroyListener destroyListener) {
 		this(configWrapper.config, destroyListener);
@@ -49,6 +56,11 @@ public class WhiteboardServletContainer extends ServletContainer {
 	public WhiteboardServletContainer(ResourceConfig config, DestroyListener destroyListener) {
 		initialConfig = config;
 		this.destroyListener = destroyListener;
+		
+		// Ensure that promise types can be returned by resource methods
+		locator = ServiceLocatorFactory.getInstance()
+			.create("GeckoJerseyWhiteboard-" + System.identityHashCode(this));
+		ServiceLocatorUtilities.bind(locator, new PromiseResponseHandlerBinder());
 	}
 
 	/* (non-Javadoc)
@@ -58,6 +70,9 @@ public class WhiteboardServletContainer extends ServletContainer {
 	public void init() throws ServletException {
 		
 		lock.writeLock().lock();
+		
+		getServletContext().setAttribute(ServletProperties.SERVICE_LOCATOR, locator);
+		
 		try {
 			super.init();
 			// we have to wait until the injection manager is available on first start
@@ -129,6 +144,7 @@ public class WhiteboardServletContainer extends ServletContainer {
 		if(destroyListener != null) {
 			destroyListener.servletContainerDestroyed(this);
 		}
+		locator.shutdown();
 	}
 
 	/**
