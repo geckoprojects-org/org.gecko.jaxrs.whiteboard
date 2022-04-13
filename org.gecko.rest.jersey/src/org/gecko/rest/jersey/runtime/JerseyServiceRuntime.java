@@ -179,6 +179,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 		}
 		applicationProvider.getServletContainers().add(container);
 		ServletHolder servlet = new ServletHolder(container);
+		servlet.setAsyncSupported(true);
 		contextHandler.addServlet(servlet, path);
 	}
 
@@ -199,6 +200,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 		}
 		applicationProvider.getServletContainers().add(container);
 		ServletHolder servlet = new ServletHolder(container);
+		servlet.setAsyncSupported(true);
 		contextHandler.addServlet(servlet, path);
 	}
 
