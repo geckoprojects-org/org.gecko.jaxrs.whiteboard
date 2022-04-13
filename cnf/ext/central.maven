@@ -159,7 +159,7 @@ org.osgi:org.osgi.util.tracker:1.5.3
 
 ### OSGi Compeniom
 #dependencies.osgi.r8.cmpn: \
-org.osgi:osgi.cmpn:8.0.0
+#org.osgi:osgi.cmpn:8.0.0
 org.osgi:org.osgi.service.application:1.1.0
 org.osgi:org.osgi.service.blueprint:1.0.2
 org.osgi:org.osgi.service.clusterinfo:1.0.0
@@ -201,7 +201,7 @@ org.osgi:org.osgi.service.serviceloader:1.0.0
 org.osgi:org.osgi.service.tr069todmt:1.0.1
 org.osgi:org.osgi.service.transaction.control:1.0.0
 org.osgi:org.osgi.service.upnp:1.2.0
-org.osgi:org.osgi.service.url:1.0.1\
+org.osgi:org.osgi.service.url:1.0.1
 org.osgi:org.osgi.service.usbinfo:1.0.0
 org.osgi:org.osgi.service.useradmin:1.1.0
 org.osgi:org.osgi.service.wireadmin:1.0.1

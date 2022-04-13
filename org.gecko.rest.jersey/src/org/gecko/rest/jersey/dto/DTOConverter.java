@@ -365,7 +365,7 @@ public class DTOConverter {
 //	}
 	
 	public static <T> ResourceMethodInfoDTO[] getResourceMethodInfoDTOs(Class<T> clazz) {
-		Method[] methods = clazz.getDeclaredMethods();
+		Method[] methods = clazz.getMethods();
 		List<ResourceMethodInfoDTO> dtos = new ArrayList<>(methods.length);
 		Path resPath = clazz.getAnnotation(Path.class);
 		for (Method method : methods) {
