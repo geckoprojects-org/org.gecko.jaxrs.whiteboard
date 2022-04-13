@@ -8,7 +8,6 @@ Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 	org.gecko.rest.jersey;version=project,\
 	org.apache.felix.http.servlet-api;version='1.1',\
 	org.gecko.util.test.common;version='1.3',\
-	jakarta.inject.jakarta.inject-api;version='2.0',\
 	org.apache.geronimo.specs.geronimo-jaxrs_2.1_spec,\
 	org.osgi.framework,\
 	org.osgi.service.jaxrs,\
@@ -18,7 +17,8 @@ Test-Cases: ${classes;CONCRETE;ANNOTATED;org.junit.runner.RunWith}
 	org.osgi.service.http.whiteboard,\
 	org.osgi.service.component.annotations,\
 	org.osgi.annotation.versioning,\
-	org.mockito.mockito-core
+	org.mockito.mockito-core,\
+	jakarta.inject.jakarta.inject-api
 	
 -runrequires: \
 	bnd.identity;id='org.gecko.rest.jersey',\

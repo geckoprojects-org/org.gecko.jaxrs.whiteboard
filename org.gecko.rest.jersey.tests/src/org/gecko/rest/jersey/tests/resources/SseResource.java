@@ -20,7 +20,7 @@ import javax.ws.rs.sse.OutboundSseEvent;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
 
-import jakarta.inject.Singleton;
+import javax.inject.Singleton;
 
 /**
  * 

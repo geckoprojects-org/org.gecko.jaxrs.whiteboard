@@ -26,7 +26,8 @@
 	org.osgi.annotation.bundle,\
 	org.apache.geronimo.specs.geronimo-jaxrs_2.1_spec,\
 	biz.aQute.bnd.annotation,\
-	org.gecko.rest.jersey.sse;version=latest
+	org.gecko.rest.jersey.sse;version=latest,\
+	jakarta.inject.jakarta.inject-api
 
 -testpath: ${junit},\
 	org.mockito.mockito-core,\
