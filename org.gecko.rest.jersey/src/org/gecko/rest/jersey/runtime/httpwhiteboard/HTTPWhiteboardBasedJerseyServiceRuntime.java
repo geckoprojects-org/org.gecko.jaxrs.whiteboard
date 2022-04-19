@@ -159,7 +159,7 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#doRegisterServletContainer(org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider, java.lang.String, org.glassfish.jersey.server.ResourceConfig)
 	 */
 	@Override
-	protected void doRegisterServletContainer(JaxRsApplicationProvider provider, String path, ResourceConfig config) {
+	protected void doRegisterServletContext(JaxRsApplicationProvider provider, String path, ResourceConfig config) {
 		Dictionary<String, Object> props = new Hashtable<>();
 		props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, basePath + path);
 		props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED, Boolean.TRUE);
@@ -193,7 +193,7 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 		applicationServletRegistrationMap.put(provider.getId(), serviceRegistration);
 	}
 
-	protected void doRegisterServletContainer(JaxRsApplicationProvider provider, String path) {
+	protected void doRegisterServletContext(JaxRsApplicationProvider provider, String path) {
 		Dictionary<String, Object> props = new Hashtable<>();
 		props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, basePath + path);
 		props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED, Boolean.TRUE);

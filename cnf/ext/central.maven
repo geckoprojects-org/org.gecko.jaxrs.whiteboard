@@ -328,4 +328,9 @@ org.ow2.asm:asm-tree:jar:9.3
 org.ow2.asm:asm-analysis:jar:9.3
 
 biz.aQute.bnd:biz.aQute.bnd.annotation:jar:6.2.0
-
+org.geckoprojects.bnd:org.gecko.bnd.dimc.library:1.1.1
+org.geckoprojects.bnd:org.gecko.bnd.osgitest.library:1.1.1
+org.geckoprojects.bnd:org.gecko.bnd.jacoco.library:1.1.1
+org.apache.httpcomponents:httpcore-osgi:4.4.15
+org.apache.httpcomponents:httpclient-osgi:4.5.13
+commons-logging:commons-logging:1.2

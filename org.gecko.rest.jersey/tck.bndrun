@@ -35,7 +35,6 @@
 -runbundles: \
 	assertj-core;version='[3.22.0,3.22.1)',\
 	biz.aQute.gogo.commands.provider;version='[1.8.0,1.8.1)',\
-	ch.qos.logback.classic;version='[1.2.3,1.2.4)',\
 	ch.qos.logback.core;version='[1.2.3,1.2.4)',\
 	com.sun.activation.javax.activation;version='[1.2.0,1.2.1)',\
 	com.sun.xml.bind.jaxb-impl;version='[2.3.3,2.3.4)',\
@@ -65,7 +64,6 @@
 	org.apache.servicemix.bundles.junit;version='[4.13.2,4.13.3)',\
 	org.glassfish.hk2.api;version='[2.6.1,2.6.2)',\
 	org.glassfish.hk2.external.aopalliance-repackaged;version='[2.6.1,2.6.2)',\
-	org.glassfish.hk2.external.jakarta.inject;version='[2.6.1,2.6.2)',\
 	org.glassfish.hk2.osgi-resource-locator;version='[1.0.3,1.0.4)',\
 	org.glassfish.hk2.utils;version='[2.6.1,2.6.2)',\
 	org.glassfish.jersey.containers.jersey-container-servlet;version='[2.35.0,2.35.1)',\
@@ -99,4 +97,7 @@
 	org.gecko.rest.jersey.sse;version=snapshot,\
 	org.gecko.rest.osgi.ct.conf;version=snapshot,\
 	org.apache.geronimo.specs.geronimo-jaxrs_2.1_spec;version='[1.1.0,1.1.1)',\
-	org.glassfish.hk2.locator;version='[2.6.1,2.6.2)'
+	org.glassfish.hk2.locator;version='[2.6.1,2.6.2)',\
+	jakarta.inject.jakarta.inject-api;version='[1.0.5,1.0.6)',\
+	org.apache.commons.logging;version='[1.2.0,1.2.1)',\
+	slf4j.jcl;version='[1.7.25,1.7.26)'

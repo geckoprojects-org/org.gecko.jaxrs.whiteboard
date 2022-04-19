@@ -1,34 +1,19 @@
-/**
- * Copyright (c) 2012 - 2018 Data In Motion and others.
- * All rights reserved. 
- * 
- * This program and the accompanying materials are made available under the terms of the 
- * Eclipse Public License v1.0 which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors:
- *     Data In Motion - initial API and implementation
- */
 package org.gecko.rest.jersey.runtime;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletException;
-
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.servlet.ServletMapping;
 import org.gecko.rest.jersey.helper.JaxRsHelper;
 import org.gecko.rest.jersey.helper.JerseyHelper;
 import org.gecko.rest.jersey.jetty.JettyServerRunnable;
@@ -60,10 +45,11 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 		INIT, STARTED, STOPPED, EXCEPTION
 	}
 	private volatile Server jettyServer;
-	private volatile ServletContextHandler contextHandler;
 	private Integer port = JerseyConstants.WHITEBOARD_DEFAULT_PORT;
 	private String contextPath = JerseyConstants.WHITEBOARD_DEFAULT_CONTEXT_PATH;
 	private Logger logger = Logger.getLogger("jaxRs.serviceRuntime");
+	private final Map<String, ServletContextHandler> handlerMap = new HashMap<>();
+	private final HandlerList handlers = new HandlerList();
 
 	/*
 	 * (non-Javadoc)
@@ -99,13 +85,13 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 			
 			applicationContainerMap.values().forEach(ap -> new ArrayList<ServletContainer>(ap.getServletContainers()).forEach(ap::removeServletContainer));
 			
-			stopContextHandler();
+			stopContextHandlers();
 			stopServer();
 			createServerAndContext();
 			startServer();
 			
 			applicationContainerMap.values().forEach(ap -> {
-				doRegisterServletContainer(ap, ap.getPath());
+				doRegisterServletContext(ap, ap.getPath());
 			});
 		}
 	}
@@ -130,7 +116,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	 */
 	@Override
 	protected void doTeardown() {
-		stopContextHandler();
+		stopContextHandlers();
 		stopServer();
 	}
 
@@ -170,7 +156,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	 * org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider)
 	 */
 	@Override
-	protected void doRegisterServletContainer(JaxRsApplicationProvider applicationProvider, String path,
+	protected void doRegisterServletContext(JaxRsApplicationProvider applicationProvider, String path,
 			ResourceConfig config) {
 		WhiteboardServletContainer container = new WhiteboardServletContainer(config, applicationProvider);
 		if (!applicationProvider.getServletContainers().isEmpty()) {
@@ -180,7 +166,18 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 		applicationProvider.getServletContainers().add(container);
 		ServletHolder servlet = new ServletHolder(container);
 		servlet.setAsyncSupported(true);
-		contextHandler.addServlet(servlet, path);
+		ServletContextHandler handler = createContext(path);
+		handler.addServlet(servlet, "/");
+		if (applicationProvider.isDefault()) {
+			handlers.addHandler(handler);
+		} else {
+			handlers.prependHandler(handler);
+		}
+		try {
+			handler.start();
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Cannot start server context handler for context: " + path, e);
+		}
 	}
 
 	/*
@@ -191,55 +188,36 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	 * org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider)
 	 */
 	@Override
-	protected void doRegisterServletContainer(JaxRsApplicationProvider applicationProvider, String path) {
+	protected void doRegisterServletContext(JaxRsApplicationProvider applicationProvider, String path) {
 		ResourceConfigWrapper config = createResourceConfig(applicationProvider);
 		WhiteboardServletContainer container = new WhiteboardServletContainer(config, applicationProvider);
 		if (!applicationProvider.getServletContainers().isEmpty()) {
-			throw new IllegalStateException("There is alread a ServletContainer registered for this application "
+			throw new IllegalStateException("There is already a ServletContainer registered for this application "
 					+ applicationProvider.getId());
 		}
 		applicationProvider.getServletContainers().add(container);
 		ServletHolder servlet = new ServletHolder(container);
 		servlet.setAsyncSupported(true);
-		contextHandler.addServlet(servlet, path);
+		ServletContextHandler handler = createContext(path);
+//		HelloWorld s = new HelloWorld(path);
+//		ServletHolder sh = new ServletHolder(s);
+//		handler.addServlet(sh, "/bla");
+		handler.addServlet(servlet, "/*");
+		if (applicationProvider.isDefault()) {
+			handlers.addHandler(handler);
+		} else {
+			handlers.prependHandler(handler);
+		}
+		try {
+			handler.start();
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Cannot start server context handler for context: " + path, e);
+		}
 	}
 
 	@Override
 	protected void doUnregisterApplication(JaxRsApplicationProvider applicationProvider) {
-		List<ServletContainer> servletContainers = applicationProvider.getServletContainers();
-		if (!servletContainers.isEmpty()) {
-			ServletContainer container = servletContainers.remove(0);
-			if (container != null && contextHandler != null) {
-				ServletHandler handler = contextHandler.getServletHandler();
-				List<ServletHolder> servlets = new ArrayList<ServletHolder>();
-				Set<String> names = new HashSet<String>();
-				for (ServletHolder holder : handler.getServlets()) {
-					/* If it is the class we want to remove, then just keep track of its name */
-					try {
-						if (container.equals(holder.getServlet())) {
-							names.add(holder.getName());
-						} else /* We keep it */ {
-							servlets.add(holder);
-						}
-					} catch (ServletException e) {
-						logger.log(Level.SEVERE,
-								"Error unregistering servlets from holder with name: " + holder.getName());
-					}
-				}
-
-				List<ServletMapping> mappings = new ArrayList<ServletMapping>();
-				for (ServletMapping mapping : handler.getServletMappings()) {
-					/* Only keep the mappings that didn't point to one of the servlets we removed */
-					if (!names.contains(mapping.getServletName())) {
-						mappings.add(mapping);
-					}
-				}
-
-				/* Set the new configuration for the mappings and the servlets */
-				handler.setServletMappings(mappings.toArray(new ServletMapping[0]));
-				handler.setServlets(servlets.toArray(new ServletHolder[0]));
-			}
-		}
+		removeContextHandler(applicationProvider.getPath());
 	}
 
 	/*
@@ -262,6 +240,62 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 			contextPath = uri.getPath();
 		}
 	}
+	
+	private String getContextPath(String path) {
+		String thisPath = path;
+		thisPath = thisPath.replace("/*", "");
+		thisPath = thisPath.endsWith("/") ? thisPath.substring(0, thisPath.length() -1) : thisPath;
+		thisPath = thisPath.startsWith("/") ? thisPath.substring(1) : thisPath;
+		String ctx = contextPath;
+		ctx = ctx.endsWith("/") ? ctx.substring(0, ctx.length() -1) : ctx;
+		if (!thisPath.isEmpty()) {
+			ctx = ctx + "/" + thisPath;
+		}
+		return ctx;
+	}
+	
+	private ServletContextHandler createContext(String path) {
+		ServletContextHandler contextHandler = new ServletContextHandler();
+		String ctxPath = getContextPath(path);
+		Object disableSessions = context.getProperties().get(JerseyConstants.JERSEY_DISABLE_SESSION);
+		if(disableSessions == null || !Boolean.valueOf(disableSessions.toString())) {
+			contextHandler.setSessionHandler(new SessionHandler());
+		}
+		contextHandler.setServer(jettyServer);
+		contextHandler.setContextPath(ctxPath);
+		if (!handlerMap.containsKey(path)) {
+			handlerMap.put(path, contextHandler);
+		}
+		logger.fine("Created white-board server context handler for context: " + path);
+		return contextHandler;
+	}
+
+	/**
+	 * Stopps the Jetty context handler for the given context path;
+	 */
+	private void removeContextHandler(String path) {
+		ServletContextHandler handler = handlerMap.remove(path);
+		if (handler == null) {
+			logger.log(Level.WARNING, "Try to stop Jetty context handler for path " + path + ", but there is none");
+			return;
+		}
+		if (handler.isStopped()) {
+			logger.log(Level.WARNING, "Try to stop Jetty context handler for path " + path + ", but it was already stopped");
+			return;
+		}
+		try {
+			handlers.removeHandler(handler);
+			handler.stop();
+			handler.destroy();
+			handler = null;
+		} catch (Exception e) {
+			logger.log(Level.SEVERE, "Error stopping Jetty context handler for path " + path, e);
+		}
+	}
+	
+	private void stopContextHandlers() {
+		handlerMap.keySet().forEach(this::removeContextHandler);
+	}
 
 	/**
 	 * Creates the Jetty server and initializes the current context handler
@@ -271,17 +305,11 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 			if (jettyServer != null && !jettyServer.isStopped()) {
 				logger.log(Level.WARNING,
 						"Stopping JaxRs white-board server on startup, but it wasn't exepected to run");
-				stopContextHandler();
+				stopContextHandlers();
 				stopServer();
 			}
 			jettyServer = new Server(port);
-
-			contextHandler = new ServletContextHandler(jettyServer, contextPath);
-			Object disableSessions = context.getProperties().get(JerseyConstants.JERSEY_DISABLE_SESSION);
-			if(disableSessions == null || !Boolean.valueOf(disableSessions.toString())) {
-				contextHandler.setSessionHandler(new SessionHandler());
-			}
-			logger.fine("Created white-board server context handler for context: " + contextPath);
+			jettyServer.setHandler(handlers);
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Error starting JaxRs white-board because of an exception", e);
 		}
@@ -291,7 +319,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	 * Starts the Jetty server
 	 */
 	private void startServer() {
-		if (jettyServer != null && contextHandler != null && !jettyServer.isRunning()) {
+		if (jettyServer != null && !jettyServer.isRunning()) {
 
 			JettyServerRunnable jettyServerRunnable = new JettyServerRunnable(jettyServer, port);
 
@@ -347,31 +375,6 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 			jettyServer = null;
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Error stopping Jetty server", e);
-		}
-	}
-
-	/**
-	 * Stopps the Jetty context handler;
-	 */
-	private void stopContextHandler() {
-		if (contextHandler == null) {
-			logger.log(Level.WARNING, "Try to stop Jetty context handler, but there is none");
-			return;
-		}
-		if (contextHandler.isStopped()) {
-			logger.log(Level.WARNING, "Try to stop Jetty context handler, but it was already stopped");
-			return;
-		}
-		try {
-			contextHandler.stop();
-//			for (ServletHolder servletHolder : contextHandler.getServletHandler().getServlets()) {
-//				servletHolder.doStop();	
-////				servletHolder.getServlet().destroy();
-//			}
-			contextHandler.destroy();
-			contextHandler = null;
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Error stopping Jetty context handler", e);
 		}
 	}
 

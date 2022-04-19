@@ -24,7 +24,7 @@ public class MultiPartFeatureComponent implements Feature{
 	@Override
 	public boolean configure(FeatureContext context) {
 		context.register(MultiPartFeature.class);
-		logger.info("Registering MultiPartFeature!");
+		logger.fine("Registering MultiPartFeature!");
 		return true;
 	}
 }

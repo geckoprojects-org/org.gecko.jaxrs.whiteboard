@@ -84,6 +84,9 @@ junit: org.apache.servicemix.bundles.junit;version="[4.11,5)"
 
 -resolve.effective: active;skip:='osgi.service'
 
+-library: \
+	geckoOSGi-Test
+
 # > Java 8 runtime
 #modules: --add-opens=java.base/jdk.internal.loader=ALL-UNNAMED, --add-opens=java.base/java.lang=ALL-UNNAMED, --add-opens=java.base/java.net=ALL-UNNAMED, --add-opens=java.base/java.security=ALL-UNNAMED
 #-runvm.default: ${if;${isempty;${system_allow_fail;java --list-modules}};;${modules}}

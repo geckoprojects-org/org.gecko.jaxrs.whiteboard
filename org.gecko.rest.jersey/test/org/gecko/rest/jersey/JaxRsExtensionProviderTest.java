@@ -30,7 +30,7 @@ import org.gecko.rest.jersey.runtime.application.JerseyExtensionProvider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jaxrs.runtime.dto.BaseApplicationDTO;

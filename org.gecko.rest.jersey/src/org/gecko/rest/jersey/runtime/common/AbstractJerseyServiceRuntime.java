@@ -307,7 +307,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 			throw new IllegalStateException("There is already an application registered with name: " + applicationProvider.getId());
 		}
 		String applicationPath = applicationProvider.getPath();
-		doRegisterServletContainer(applicationProvider, applicationPath);
+		doRegisterServletContext(applicationProvider, applicationPath);
 		applicationContainerMap.put(applicationProvider.getId(), applicationProvider);
 		updateRuntimeDtoAndChangeCount();
 	}
@@ -317,9 +317,9 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 * @param container the container servlet to add
 	 * @param path to path to add it for
 	 */
-	protected abstract void doRegisterServletContainer(JaxRsApplicationProvider provider, String path, ResourceConfig config);
+	protected abstract void doRegisterServletContext(JaxRsApplicationProvider provider, String path, ResourceConfig config);
 	
-	protected abstract void doRegisterServletContainer(JaxRsApplicationProvider provider, String path);
+	protected abstract void doRegisterServletContext(JaxRsApplicationProvider provider, String path);
 
 	@Override
 	public void unregisterApplication(JaxRsApplicationProvider applicationProvider) {
