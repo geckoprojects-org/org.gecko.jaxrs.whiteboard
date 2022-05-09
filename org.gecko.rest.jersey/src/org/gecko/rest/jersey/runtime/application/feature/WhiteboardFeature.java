@@ -18,7 +18,8 @@ import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
 import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
-import org.osgi.framework.ServiceObjects;
+import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider.JaxRsExtension;
+import org.glassfish.jersey.InjectionManagerProvider;
 
 /**
  * A {@link Feature} implementation registering all extensions as singleton and according to there provided contracts. 
@@ -29,8 +30,7 @@ public class WhiteboardFeature implements Feature{
 
 	Map<String, JaxRsExtensionProvider> extensions;
 	
-	@SuppressWarnings("rawtypes")
-	Map<Object, ServiceObjects> serviceObjTrackingMap = new HashMap<>();
+	Map<JaxRsExtensionProvider, JaxRsExtension> extensionInstanceTrackingMap = new HashMap<>();
 	
 	
 	public WhiteboardFeature(Map<String, JaxRsExtensionProvider> extensions) {
@@ -43,51 +43,33 @@ public class WhiteboardFeature implements Feature{
 	@Override
 	public boolean configure(FeatureContext context) {
 		extensions.forEach((k, extension) -> {
-			Object serviceObject = ((ServiceObjects<?>) extension.getProviderObject()).getService();
-			serviceObjTrackingMap.put(serviceObject, (ServiceObjects<?>) extension.getProviderObject());
 			
-			if(extension.getContracts() != null) {
-				context.register(serviceObject, extension.getContracts());
-			} else {
-				context.register(serviceObject);
-			}
+			JaxRsExtension je = extension.getExtension(InjectionManagerProvider.getInjectionManager(context));
+			
+			extensionInstanceTrackingMap.put(extension, je);
+			
+			context.register(je.getExtensionObject(), je.getContractPriorities());
 		});
 		return true;
 	}
 	
-	@SuppressWarnings("unchecked")
 	public void dispose() {
-		serviceObjTrackingMap.forEach((k,v) -> {
+		extensionInstanceTrackingMap.forEach((k,v) -> {
 			try {
-				v.ungetService(k);
+				v.dispose();
 			} catch (IllegalArgumentException e) {
 				// we can ignore this. Will be thrown by felix if it 
 			}
 		});
-		serviceObjTrackingMap.clear();
+		extensionInstanceTrackingMap.clear();
 		extensions.clear();
 	}
-	
-//	@SuppressWarnings("unchecked")
-//	public void dispose(Object serviceObject) {
-//		if(serviceObjTrackingMap.containsKey(serviceObject)) {
-//			serviceObjTrackingMap.get(serviceObject).ungetService(serviceObject);
-//			serviceObjTrackingMap.remove(serviceObject);
-//		}
-//	}
 
-	@SuppressWarnings("unchecked")
 	public void dispose(JaxRsExtensionProvider extProvider) {
-		ServiceObjects<?> objexts = (ServiceObjects<?>) extProvider.getProviderObject();
-		serviceObjTrackingMap.entrySet().stream()
-			.filter(e -> e.getValue().equals(objexts))
-			.findFirst()
-			.ifPresent(e -> {
-				e.getValue().ungetService(e.getKey());
-				serviceObjTrackingMap.remove(e.getKey());
-			} );
+		JaxRsExtension je = extensionInstanceTrackingMap.remove(extProvider);
 		
+		if(je != null) {
+			je.dispose();
+		}
 	}
-	
-	
 }

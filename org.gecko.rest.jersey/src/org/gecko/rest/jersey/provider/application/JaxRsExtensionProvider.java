@@ -11,6 +11,9 @@
  */
 package org.gecko.rest.jersey.provider.application;
 
+import java.util.Map;
+
+import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.osgi.service.jaxrs.runtime.dto.BaseExtensionDTO;
 
 /**
@@ -39,4 +42,32 @@ public interface JaxRsExtensionProvider extends JaxRsApplicationContentProvider 
 	 * @return the Array of Classes
 	 */
 	public Class<?>[] getContracts();
+	
+	/**
+	 * Returns an Extension instance suitable for binding into an application. This extension must be
+	 * disposed once it is finished with
+	 * @param injectionManager 
+	 * @return the extension
+	 */
+	public JaxRsExtension getExtension(InjectionManager injectionManager);
+	
+	public interface JaxRsExtension {
+		
+		/**
+		 * Returns the contract priorities for this extension. The keys will match the values returned by
+		 * {@link JaxRsExtensionProvider#getContracts()}
+		 * @return the Contract priorities
+		 */
+		public Map<Class<?>, Integer> getContractPriorities();
+		
+		/**
+		 * Get the extension object
+		 */
+		public Object getExtensionObject();
+		
+		/**
+		 * Release the extension object
+		 */
+		public void dispose();
+	}
 }
