@@ -27,7 +27,8 @@
 	org.apache.geronimo.specs.geronimo-jaxrs_2.1_spec,\
 	biz.aQute.bnd.annotation,\
 	org.gecko.rest.jersey.sse;version=latest,\
-	jakarta.inject.jakarta.inject-api
+	jakarta.inject.jakarta.inject-api,\
+	org.objectweb.asm;version='9.3'
 
 -testpath: ${junit},\
 	org.mockito.mockito-core,\
@@ -70,6 +71,7 @@ Provide-Capability: \
 	org.gecko.rest.jersey.dto,\
 	org.gecko.rest.jersey.factories,\
 	org.gecko.rest.jersey.jetty,\
+	org.gecko.rest.jersey.proxy,\
 	org.gecko.rest.jersey.runtime,\
 	org.gecko.rest.jersey.runtime.application,\
 	org.gecko.rest.jersey.runtime.application.feature,\

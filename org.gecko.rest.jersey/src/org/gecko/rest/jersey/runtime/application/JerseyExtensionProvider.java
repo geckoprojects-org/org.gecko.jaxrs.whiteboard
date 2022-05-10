@@ -11,11 +11,16 @@
  */
 package org.gecko.rest.jersey.runtime.application;
 
+import static java.util.stream.Collectors.toMap;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
@@ -30,8 +35,11 @@ import javax.ws.rs.ext.WriterInterceptor;
 
 import org.gecko.rest.jersey.dto.DTOConverter;
 import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
+import org.gecko.rest.jersey.proxy.ExtensionProxyFactory;
+import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceObjects;
+import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.service.jaxrs.runtime.dto.BaseExtensionDTO;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
 import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
@@ -59,6 +67,8 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 	});
 	
 	private Class<?>[] contracts = null;
+	
+	private ClassLoader proxyClassLoader = null;
 	
 	public JerseyExtensionProvider(ServiceObjects<T> serviceObjects, Map<String, Object> properties) {
 		super(serviceObjects, properties);
@@ -160,4 +170,99 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 		super.updateStatus(newStatus);
 	}
 
+	@Override
+	public JaxRsExtension getExtension(InjectionManager injectionManager) {
+		T service = getProviderObject().getService();
+		injectionManager.inject(service);
+		return new JerseyExtension(service);
+	}
+	
+	public class JerseyExtension implements JaxRsExtension {
+		
+		private T delegate;
+		
+		/**
+		 * Creates a new instance.
+		 * @param delegate
+		 */
+		public JerseyExtension(T delegate) {
+			this.delegate = delegate;
+		}
+
+		/**
+		 * 
+		 */
+		public Map<Class<?>, Integer> getContractPriorities() {
+			Integer priority = Arrays.stream(delegate.getClass().getAnnotations())
+				.filter(a -> a.annotationType().getName().equals("javax.annotation.Priority"))
+				.findFirst()
+				.map(a -> {
+					try {
+						return (Integer) a.getClass().getMethod("value").invoke(a);
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
+				}).orElse(Priorities.USER);
+			
+			return Arrays.stream(contracts).collect(toMap(Function.identity(), c -> priority));
+		}
+		
+		/**
+		 * Get the extension object
+		 */
+		public Object getExtensionObject() {
+			if(proxyClassLoader == null) {
+				proxyClassLoader = new ClassLoader(
+						getProviderObject().getServiceReference().getBundle()
+						.adapt(BundleWiring.class).getClassLoader()) {
+
+							/* 
+							 * (non-Javadoc)
+							 * @see java.lang.ClassLoader#findClass(java.lang.String)
+							 */
+							@Override
+							protected Class<?> findClass(String name) throws ClassNotFoundException {
+								byte[] b = ExtensionProxyFactory.generateClass(name, getDelegate(), Arrays.asList(contracts));
+								return defineClass(name, b, 0, b.length, delegate.getClass().getProtectionDomain());
+							}
+					
+					
+				};
+			}
+			String simpleName = ExtensionProxyFactory.getSimpleName(getServiceRank(), getServiceId());
+			
+			try {
+				Class<?> clz = proxyClassLoader.loadClass("org.gecko.rest.jersey.proxy." + simpleName);
+				return clz.getConstructor(Supplier.class).newInstance((Supplier<?>)this::getDelegate);
+				
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		private Object getDelegate() {
+			Object toReturn;
+			synchronized (this) {
+				toReturn = delegate;
+			}
+			if(toReturn == null) {
+				throw new IllegalStateException("The target extension " + getName() + " has been disposed");
+			}
+			return toReturn;
+		}
+
+		/**
+		 * Release the provider object
+		 */
+		public void dispose() {
+			T toRelease;
+			synchronized (this) {
+				toRelease = delegate;
+				delegate = null;
+			}
+			if(toRelease != null) {
+				getProviderObject().ungetService(toRelease);
+			}
+		}
+	}
 }
