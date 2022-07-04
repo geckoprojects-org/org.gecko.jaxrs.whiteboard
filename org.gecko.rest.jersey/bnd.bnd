@@ -79,3 +79,6 @@ Provide-Capability: \
 	org.gecko.rest.jersey.runtime.dispatcher,\
 	org.gecko.rest.jersey.runtime.httpwhiteboard,\
 	org.gecko.rest.jersey.runtime.servlet
+Import-Package: \
+	org.eclipse.jetty.*;version='[9.4,11)';'resolution:'=optional,\
+	*

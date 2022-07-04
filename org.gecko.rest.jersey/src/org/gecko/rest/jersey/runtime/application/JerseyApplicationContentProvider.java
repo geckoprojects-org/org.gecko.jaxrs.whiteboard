@@ -125,6 +125,9 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 				return false;
 			}
 		} else {
+			if (application.isShadowDefault()) {
+				return false;
+			}
 			if (!application.isDefault()) {
 //				Check if app is a potential default app
 				if(".default".equals(application.getName()) || "/".equals(application.getPath()) || "/*".equals(application.getPath())) {
@@ -163,6 +166,9 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 	public boolean canHandleDefaultApplication(JaxRsApplicationProvider application) {
 		if(application.isDefault()) {
 			return canHandleDefaultApplication();
+		}
+		if (application.isShadowDefault()) {
+			return false;
 		}
 		if (applicationFilter == null) {
 			return true;

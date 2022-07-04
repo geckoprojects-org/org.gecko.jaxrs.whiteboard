@@ -283,8 +283,6 @@ org.jvnet.mimepull:mimepull:1.9.14
 org.osgi:org.osgi.test.junit5:1.0.0
 org.osgi:org.osgi.test.junit5.cm:1.0.0
 org.osgi:org.osgi.test.common:1.0.0
-org.osgi:org.osgi.test.assertj.framework:1.0.0
-org.osgi:org.osgi.test.assertj.promise:1.0.0
 
 # This is the version of JUnit that will be used at build time and runtime
 #dependencies.junit5: \
@@ -303,9 +301,6 @@ org.mockito:mockito-core:3.6.0
 org.mockito:mockito-junit-jupiter:3.6.0
 
 #dependencies.assertj: \
-org.assertj:assertj-core:3.22.0
-net.bytebuddy:byte-buddy:1.10.19
-net.bytebuddy:byte-buddy-agent:1.10.19
 org.opentest4j:opentest4j:1.2.0
 org.hamcrest:hamcrest:2.2
 org.junit.vintage:junit-vintage-engine:jar:5.7.2
@@ -334,3 +329,8 @@ org.geckoprojects.bnd:org.gecko.bnd.jacoco.library:1.1.1
 org.apache.httpcomponents:httpcore-osgi:4.4.15
 org.apache.httpcomponents:httpclient-osgi:4.5.13
 commons-logging:commons-logging:1.2
+org.assertj:assertj-core:3.23.1
+org.osgi:org.osgi.test.assertj.framework:1.1.0
+org.osgi:org.osgi.test.assertj.promise:1.1.0
+net.bytebuddy:byte-buddy:1.12.12
+net.bytebuddy:byte-buddy-agent:1.12.12

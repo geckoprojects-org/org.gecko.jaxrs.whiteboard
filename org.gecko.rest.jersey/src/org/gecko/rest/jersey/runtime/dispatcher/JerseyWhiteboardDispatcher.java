@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -558,7 +559,7 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 				}		
 				
 //				Remove the default app from the app candidates, because it will be registered in a separate step
-				applicationCandidates = applicationCandidates.stream().filter(a-> !a.getId().equals(currentDefaultProvider.getId()))
+				applicationCandidates = applicationCandidates.stream().filter(a-> !a.getId().equals(defaultProvider.getId()))
 						.collect(Collectors.toUnmodifiableList());
 
 				List<JaxRsApplicationProvider> finalApplicationCandidates = applicationCandidates;					

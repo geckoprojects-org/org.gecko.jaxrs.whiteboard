@@ -142,6 +142,15 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	public boolean isDefault() {
 		return getProviderObject() instanceof DefaultApplication;
 	}
+	
+	/* 
+	 * (non-Javadoc)
+	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider#isShadowDefault()
+	 */
+	@Override
+	public boolean isShadowDefault() {
+		return "/".equals(applicationBase) && !isDefault();
+	}
 
 	/* 
 	 * (non-Javadoc)

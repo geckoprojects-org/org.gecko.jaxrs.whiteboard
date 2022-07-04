@@ -86,6 +86,12 @@ public interface JaxRsApplicationProvider extends JaxRsProvider, JaxRsConstants,
 	public boolean isDefault();
 	
 	/**
+	 * Returns <code>true</code>, if the application provider is shadowing the default application.
+	 * @return <code>true</code>, if the application provider is shadowing the default application, otherwise <code>false</code>
+	 */
+	public boolean isShadowDefault();
+	
+	/**
 	 * Returns <code>true</code>, if the application is empty and doesn't have a resource or extension
 	 * @return <code>true</code>, if the application is empty and doesn't have a resource or extension
 	 */
