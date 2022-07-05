@@ -15,12 +15,12 @@ import static java.util.stream.Collectors.toMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
@@ -190,7 +190,8 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 		}
 
 		/**
-		 * 
+		 * Return the map with contract priorities. If the Priority annotation is not
+		 * used, an empty map will be returned. 
 		 */
 		public Map<Class<?>, Integer> getContractPriorities() {
 			Integer priority = Arrays.stream(delegate.getClass().getAnnotations())
@@ -202,8 +203,10 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 					} catch (Exception e) {
 						throw new RuntimeException(e);
 					}
-				}).orElse(Priorities.USER);
-			
+				}).orElse(null);
+			if (priority == null) {
+				return Collections.emptyMap();
+			}
 			return Arrays.stream(contracts).collect(toMap(Function.identity(), c -> priority));
 		}
 		

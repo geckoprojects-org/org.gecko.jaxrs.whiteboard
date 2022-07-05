@@ -29,7 +29,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -197,7 +196,10 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 		String key = provider.getId();
 		if (!applicationProviderCache.containsKey(key)) {
 			logger.info("Adding Application with id " + provider.getName());
-			applicationProviderCache.put(key, provider);
+			JaxRsApplicationProvider oldApp = applicationProviderCache.put(key, provider);
+			if (oldApp != null && !oldApp.equals(provider)) {
+				removedApplications.add(oldApp);
+			}
 			checkDispatch();
 		}
 	}
@@ -244,15 +246,16 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 					reset(failedApplications, failedResources, failedExtensions);
 				}
 			}
-		}
-		else if (!resourceProviderCache.containsKey(key)) {
+		} else if (!resourceProviderCache.containsKey(key)) {
 			logger.info("Added resource " + key + " name: " + provider.getName());
 			resourceProviderCache.put(key, provider);
 			checkDispatch();
-		}
-		else {
+		} else {
 //			This is the case in which the resource service properties have been modified
-			resourceProviderCache.put(key, provider);
+			JaxRsResourceProvider oldProvider = resourceProviderCache.put(key, provider);
+			if (oldProvider != null && !oldProvider.equals(provider)) {
+				removedResources.add(oldProvider);
+			}
 			checkDispatch();
 		}
 	}
@@ -294,15 +297,16 @@ public class JerseyWhiteboardDispatcher implements JaxRsWhiteboardDispatcher {
 					reset(failedApplications, failedResources, failedExtensions);
 				}
 			}
-		}
-		else if (!extensionProviderCache.containsKey(key)) {
+		} else if (!extensionProviderCache.containsKey(key)) {
 			logger.info("Added extension " + key + " name: " + provider.getName());
 			extensionProviderCache.put(key, provider);
 			checkDispatch();
-		}
-		else {
+		} else {
 //			This is the case in which the extension service properties have been modified
-			extensionProviderCache.put(key, provider);
+			JaxRsExtensionProvider oldProvider = extensionProviderCache.put(key, provider);
+			if (oldProvider != null && !oldProvider.equals(provider)) {
+				removedExtensions.add(oldProvider);
+			}
 			checkDispatch();
 		}
 	}

@@ -11,14 +11,20 @@
  */
 package org.gecko.rest.jersey.runtime.application.feature;
 
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
+import javax.ws.rs.Priorities;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
 import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider.JaxRsExtension;
+import org.gecko.rest.jersey.provider.application.JaxRsProvider;
 import org.glassfish.jersey.InjectionManagerProvider;
 
 /**
@@ -27,6 +33,22 @@ import org.glassfish.jersey.InjectionManagerProvider;
  * @since 16.01.2018
  */
 public class WhiteboardFeature implements Feature{
+	
+	public static Comparator<Map.Entry<String, JaxRsExtensionProvider>> PROVIDER_COMPARATOR = new Comparator<Map.Entry<String, JaxRsExtensionProvider>>() {
+		/* 
+		 * (non-Javadoc)
+		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+		 */
+		@Override
+		public int compare(Map.Entry<String, JaxRsExtensionProvider> e1, Map.Entry<String, JaxRsExtensionProvider> e2) {
+			JaxRsProvider p1 = e1.getValue();
+			JaxRsProvider p2 = e2.getValue();
+			if (p1.getServiceRank() == p2.getServiceRank()) {
+				return p1.getServiceId().compareTo(p2.getServiceId());
+			}
+			return p2.getServiceRank().compareTo(p1.getServiceRank());
+		}
+	};
 
 	Map<String, JaxRsExtensionProvider> extensions;
 	
@@ -34,7 +56,7 @@ public class WhiteboardFeature implements Feature{
 	
 	
 	public WhiteboardFeature(Map<String, JaxRsExtensionProvider> extensions) {
-		this.extensions = new HashMap<>(extensions);
+		this.extensions = extensions.entrySet().stream().sorted(PROVIDER_COMPARATOR).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue)->oldValue, LinkedHashMap::new));
 	}
 
 	/* (non-Javadoc)
@@ -42,13 +64,18 @@ public class WhiteboardFeature implements Feature{
 	 */
 	@Override
 	public boolean configure(FeatureContext context) {
+		AtomicInteger priority = new AtomicInteger(Priorities.USER + 1000);
 		extensions.forEach((k, extension) -> {
 			
 			JaxRsExtension je = extension.getExtension(InjectionManagerProvider.getInjectionManager(context));
 			
 			extensionInstanceTrackingMap.put(extension, je);
-			
-			context.register(je.getExtensionObject(), je.getContractPriorities());
+			Map<Class<?>,Integer> contractPriorities = je.getContractPriorities();
+			if (contractPriorities.isEmpty()) {
+				context.register(je.getExtensionObject(), priority.getAndIncrement());
+			} else {
+				context.register(je.getExtensionObject(), je.getContractPriorities());
+			}
 		});
 		return true;
 	}
