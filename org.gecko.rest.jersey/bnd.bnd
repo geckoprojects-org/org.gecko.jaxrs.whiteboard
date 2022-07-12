@@ -21,7 +21,7 @@
 	org.eclipse.jetty.util,\
 	org.eclipse.jetty.servlet,\
 	org.osgi.service.http.whiteboard,\
-	org.osgi.test.cases.jaxrs,\
+	org.osgi.test.cases.jaxrs;version=latest,\
 	org.osgi.annotation.versioning,\
 	org.osgi.annotation.bundle,\
 	org.apache.geronimo.specs.geronimo-jaxrs_2.1_spec,\

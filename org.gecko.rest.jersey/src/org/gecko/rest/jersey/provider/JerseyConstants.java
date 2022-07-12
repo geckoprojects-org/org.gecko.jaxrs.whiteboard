@@ -11,6 +11,8 @@
  */
 package org.gecko.rest.jersey.provider;
 
+import org.osgi.service.condition.Condition;
+
 /**
  * Interface for constants used in Jersey
  * @author Mark Hoffmann
@@ -18,6 +20,8 @@ package org.gecko.rest.jersey.provider;
  */
 public interface JerseyConstants {
 	
+	public static final String JERSEY_RUNTIME = "jersey.runtime";
+	public static final String JERSEY_RUNTIME_CONDITION = "(" + Condition.CONDITION_ID + "=" + JerseyConstants.JERSEY_RUNTIME + ")";
 	public static final String JERSEY_SCHEMA = "jersey.schema";
 	public static final String JERSEY_HOST = "jersey.host";
 	public static final String JERSEY_PORT = "jersey.port";

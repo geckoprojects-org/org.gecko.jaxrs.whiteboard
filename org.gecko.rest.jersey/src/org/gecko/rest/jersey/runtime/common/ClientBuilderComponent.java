@@ -17,6 +17,7 @@ import java.util.Hashtable;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.RxInvokerProvider;
 
+import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -27,6 +28,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.condition.Condition;
 import org.osgi.service.jaxrs.client.PromiseRxInvoker;
 import org.osgi.service.jaxrs.client.SseEventSourceFactory;
 
@@ -35,7 +37,7 @@ import org.osgi.service.jaxrs.client.SseEventSourceFactory;
  * @author ilenia
  * @since Jun 11, 2020
  */
-@Component(immediate = true, service = ClientBuilderComponent.class)
+@Component(immediate = true, service = ClientBuilderComponent.class, reference = @Reference(name = "runtimeCondition", service = Condition.class , target = JerseyConstants.JERSEY_RUNTIME_CONDITION))
 public class ClientBuilderComponent {
 
 	private ServiceRegistration<ClientBuilder> registerClientBuilderService;

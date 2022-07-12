@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.Application;
 
 import org.gecko.rest.jersey.helper.JerseyHelper;
+import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher;
 import org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
 import org.gecko.rest.jersey.runtime.dispatcher.JerseyWhiteboardDispatcher;
@@ -40,6 +41,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.condition.Condition;
 
 /**
  * A configurable component, that establishes a whiteboard
@@ -49,7 +51,7 @@ import org.osgi.service.component.annotations.Reference;
 
 @Component(name = "JaxRsWhiteboardComponent", immediate = true
 , property = { "jersey.port:Integer=8185",
-		"jersey.jaxrs.whiteboard.name=test_wb", "jersey.context.path=test" }
+		"jersey.jaxrs.whiteboard.name=test_wb", "jersey.context.path=test" }, reference = @Reference(name = "runtimeCondition", service = Condition.class , target = JerseyConstants.JERSEY_RUNTIME_CONDITION)
 )
 public class JerseyWhiteboardComponent {
 

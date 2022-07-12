@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.core.Application;
 
+import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.gecko.rest.jersey.runtime.JerseyWhiteboardComponent;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceObjects;
@@ -35,6 +36,7 @@ import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.condition.Condition;
 import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
@@ -42,7 +44,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  * @author Mark Hoffmann
  * @since 30.07.2017
  */
-@Component(name="JaxRsHttpWhiteboardRuntimeComponent", immediate=true, configurationPolicy=ConfigurationPolicy.REQUIRE)
+@Component(name="JaxRsHttpWhiteboardRuntimeComponent", immediate=true, configurationPolicy=ConfigurationPolicy.REQUIRE, reference = @Reference(name = "runtimeCondition", service = Condition.class , target = JerseyConstants.JERSEY_RUNTIME_CONDITION))
 public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardComponent{
 
 	private static Logger logger = Logger.getLogger("o.e.o.j.JaxRsHttpWhiteboardRuntimeComponent");
