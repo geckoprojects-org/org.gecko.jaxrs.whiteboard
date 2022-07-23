@@ -37,7 +37,12 @@ import org.osgi.service.jaxrs.client.SseEventSourceFactory;
  * @author ilenia
  * @since Jun 11, 2020
  */
-@Component(immediate = true, service = ClientBuilderComponent.class, reference = @Reference(name = "runtimeCondition", service = Condition.class , target = JerseyConstants.JERSEY_RUNTIME_CONDITION))
+@Component(immediate = true, 
+	service = ClientBuilderComponent.class, 
+	reference = @Reference(name = "runtimeCondition", 
+		service = Condition.class , 
+		target = JerseyConstants.JERSEY_RUNTIME_CONDITION)
+)
 public class ClientBuilderComponent {
 
 	private ServiceRegistration<ClientBuilder> registerClientBuilderService;

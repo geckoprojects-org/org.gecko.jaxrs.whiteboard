@@ -1,9 +1,0 @@
-Bundle-Name: Jersey JaxRS Whiteboard BOM
-Bundle-Description: Jersey OSGi JaxRs Whiteboard BOM Dependencies
-
--diffignore: */pom.properties
-
--include: required.bndrun
-
--buildpath: ${-runbundles}
-
