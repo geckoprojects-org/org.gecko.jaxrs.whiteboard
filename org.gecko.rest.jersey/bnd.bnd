@@ -1,43 +1,40 @@
-# This is the version of Mockito that will be used at build time and run time
-
-  
 -buildpath: \
-	org.apache.felix.http.servlet-api;version='1.1',\
-	org.glassfish.hk2.api;version='2.6.1',\
-	org.glassfish.jersey.core.jersey-common;version='2.32',\
-	org.glassfish.jersey.containers.jersey-container-servlet-core;version='2.32',\
-	org.glassfish.jersey.core.jersey-client;version='2.32',\
-	org.glassfish.jersey.core.jersey-server;version='2.32',\
-	org.apache.felix.framework,\
-	org.osgi.service.component.annotations,\
-	org.osgi.util.pushstream,\
-	org.osgi.service.jaxrs,\
-	org.osgi.util.function,\
-	org.osgi.util.promise,\
-	org.osgi.service.component,\
-	org.osgi.namespace.implementation,\
-	org.osgi.service.cm,\
-	org.eclipse.jetty.server,\
-	org.eclipse.jetty.util,\
-	org.eclipse.jetty.servlet,\
-	org.osgi.service.http.whiteboard,\
-	org.osgi.test.cases.jaxrs;version=latest,\
-	org.osgi.annotation.versioning,\
-	org.osgi.annotation.bundle,\
+	org.apache.felix.http.servlet-api;version='1.2',\
+	org.glassfish.jersey.containers.jersey-container-servlet-core;version=latest,\
+	org.glassfish.jersey.core.jersey-common;version=latest,\
+	org.glassfish.jersey.core.jersey-client;version=latest,\
+	org.glassfish.jersey.core.jersey-server;version=latest,\
+	org.glassfish.hk2.api;version=latest,\
+	biz.aQute.bnd.annotation;version=latest,\
+	org.osgi.annotation.versioning;version=latest,\
+	org.osgi.annotation.bundle;version=latest,\
+	org.osgi.namespace.implementation;version=latest,\
+	org.osgi.framework;version=latest,\
+	org.osgi.dto;version=latest,\
+	org.osgi.resource;version=latest,\
+	org.osgi.service.cm;version=latest,\
+	org.osgi.service.component.annotations;version=latest,\
+	org.osgi.service.component;version=latest,\
+	org.osgi.service.condition;version=latest,\
+	org.osgi.service.http.whiteboard;version=latest,\
+	org.osgi.service.jaxrs;version=latest,\
+	org.osgi.util.pushstream;version=latest,\
+	org.osgi.util.function;version=latest,\
+	org.osgi.util.promise;version=latest,\
+	jakarta.inject.jakarta.inject-api;version=latest,\
 	org.apache.geronimo.specs.geronimo-jaxrs_2.1_spec,\
-	biz.aQute.bnd.annotation,\
-	org.gecko.rest.jersey.sse;version=latest,\
-	jakarta.inject.jakarta.inject-api,\
-	org.objectweb.asm;version='9.3'
+	org.eclipse.jetty.server;version=latest,\
+	org.eclipse.jetty.util;version=latest,\
+	org.eclipse.jetty.servlet;version=latest,\
+	org.objectweb.asm;version=latest,\
+	org.gecko.rest.jersey.sse;version=snapshot
+	
+-testpath: \
+	${junit5},\
+	${mockito}
 
--testpath: ${junit},\
-	org.mockito.mockito-core,\
-	net.bytebuddy.byte-buddy,\
-	org.objenesis
-
-
-Bundle-Name: Jersey JaxRS Whiteboard
-Bundle-Description: Jersey OSGi JaxRs Whiteboard implementation
+Bundle-Name: Gecko JaxRS Whiteboard
+Bundle-Description: Gecko Jersey OSGi JaxRs Whiteboard implementation
 
 Export-Package: org.osgi.service.jaxrs.*
 	
@@ -77,6 +74,7 @@ Provide-Capability: \
 	org.gecko.rest.jersey.runtime.dispatcher,\
 	org.gecko.rest.jersey.runtime.httpwhiteboard,\
 	org.gecko.rest.jersey.runtime.servlet
+	
 Import-Package: \
 	org.eclipse.jetty.*;version='[9.4,11)',\
 	*

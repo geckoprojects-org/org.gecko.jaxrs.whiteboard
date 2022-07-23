@@ -1,2 +1,70 @@
-## Place your settings in ext/.
-cnf: ${workspace}/cnf
+# We include setups for
+#	OSGi-Test Support - gecko-osgitest
+#	DIMC Github-Configuration - gecko-dimc
+#	Jacoco Support - gecko-jacoco
+-library: \
+	geckoOSGi-Test,\
+	geckoDIMC,\
+	geckoJacoco
+
+# Needed because we enabled library 'gecko-dimc' 	
+github-project: org.gecko.jaxrs.whiteboard
+base-version: 5.0.0.SNAPSHOT 
+
+# Maven Central Group-Id
+-groupid: org.geckoprojects.emf.utils
+
+# No simultanious release - We only release new version to Maven Central
+#releaseNotNeeded: ${findproviders;osgi.identity;(&(osgi.identity=${bsn})(version=${version}));REPOS}
+
+# If release not needed is empty, no Bundle has been found and for maven we do a release to the remote Repo. If not, we only do a release to the local .m2 Repo
+#-maven-release.local: ${if;${def;releaseNotNeeded};local;remote}
+
+javac.source: 11
+javac.target: 11
+
+-require-bnd "(version>=6.3.1)"
+
+# Configure Repositories
+-plugin.1.Central: \
+	aQute.bnd.repository.maven.provider.MavenBndRepository; \
+		releaseUrl=https://repo.maven.apache.org/maven2/; \
+		index=${.}/central.maven; \
+		readOnly=true; \
+		name="Maven Central"
+-plugin.2.CentralSnapshot: \
+	aQute.bnd.repository.maven.provider.MavenBndRepository;\
+		snapshotUrl=https://oss.sonatype.org/content/repositories/snapshots/;\
+		releaseUrl=https://oss.sonatype.org/service/local/staging/deploy/maven2/;\
+		index=${.}/sonatype.maven;\
+		name='Sonatype'
+		
+-plugin.5.Local: \
+	aQute.bnd.deployer.repository.LocalIndexedRepo; \
+		name = Local; \
+		pretty = true; \
+		local = ${build}/local
+
+# Always use contracts
+-contract: *
+
+# Set Git revision information in the manifests of built bundles
+#Git-Descriptor:           ${system-allow-fail;git describe --dirty --always}
+#Git-SHA:                  ${system-allow-fail;git rev-list -1 HEAD}
+
+# JUnit
+junit5: \
+	org.opentest4j;version=latest,\
+	junit-jupiter-api;version=latest,\
+	junit-jupiter-engine;version=latest,\
+	junit-jupiter-params;version=latest,\
+	junit-platform-runner;version=latest,\
+	junit-platform-engine;version=latest,\
+	junit-platform-commons;version=latest,\
+	junit-platform-launcher;version=latest
+mockito: \
+	org.mockito.mockito-core;version=latest,\
+	org.mockito.junit-jupiter;version=latest,\
+	net.bytebuddy.byte-buddy;version=latest,\
+	org.objenesis;version=latest
+  

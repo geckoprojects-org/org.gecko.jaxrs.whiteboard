@@ -1,8 +1,0 @@
--plugin.Release: \
-	aQute.bnd.deployer.repository.LocalIndexedRepo; \
-		name = Release; \
-		pretty = true; \
-		local = ${release.dir}
-				
-#We have to substitude the -SNAPSHOT with an empty String for releases				
--snapshot: 

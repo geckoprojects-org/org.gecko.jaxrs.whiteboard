@@ -16,6 +16,7 @@ package org.gecko.rest.jersey.helper;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -57,7 +58,7 @@ public class DispatcherHelper {
 		Set<JaxRsApplicationProvider> resultSet = applications.stream()
 				.filter(app->(".default".equals(app.getName()) || "/*".equals(app.getPath())) && !app.isDefault())
 				.sorted(PROVIDER_COMPARATOR)
-				.collect(Collectors.toUnmodifiableSet());
+				.collect(Collectors.toCollection(LinkedHashSet::new));
 		return resultSet;
 	}
 

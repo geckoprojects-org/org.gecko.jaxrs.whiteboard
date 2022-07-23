@@ -11,10 +11,10 @@
  */
 package org.gecko.rest.jersey;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
@@ -32,8 +32,11 @@ import org.gecko.rest.jersey.resources.TestLegacyApplication;
 import org.gecko.rest.jersey.resources.TestResource;
 import org.gecko.rest.jersey.runtime.common.DefaultApplication;
 import org.gecko.rest.jersey.runtime.dispatcher.JerseyWhiteboardDispatcher;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceObjects;
@@ -44,10 +47,10 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  * @author Mark Hoffmann
  * @since 12.10.2017
  */
-//@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class JaxRsWhiteboardDispatcherTest {
 
-	//@Mock
+	@Mock
 	private JaxRsWhiteboardProvider whiteboard;
 
 	//@Mock

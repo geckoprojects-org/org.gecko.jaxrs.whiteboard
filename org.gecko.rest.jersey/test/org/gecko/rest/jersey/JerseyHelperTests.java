@@ -11,7 +11,8 @@
  */
 package org.gecko.rest.jersey;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +22,7 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 
 import org.gecko.rest.jersey.helper.JerseyHelper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * 

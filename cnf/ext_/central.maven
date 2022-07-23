@@ -256,9 +256,9 @@ com.fasterxml.jackson.jaxrs:jackson-jaxrs-xml-provider:2.9.7
 com.fasterxml.jackson.jaxrs:jackson-jaxrs-yaml-provider:2.9.7
 com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.7
 org.codehaus.woodstox:stax2-api:jar:3.1.4
-com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.9.7
 com.fasterxml.jackson.core:jackson-core:2.9.7
 com.fasterxml.jackson.core:jackson-databind:2.9.7
+com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.9.7
 com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.9.7
 io.swagger.core.v3:swagger-jaxrs2:2.0.5
 io.swagger.core.v3:swagger-integration:jar:2.0.5

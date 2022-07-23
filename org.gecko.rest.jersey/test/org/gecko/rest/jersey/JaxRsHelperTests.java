@@ -11,10 +11,11 @@
  */
 package org.gecko.rest.jersey;
 
-import static org.junit.Assert.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.gecko.rest.jersey.helper.JaxRsHelper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * 

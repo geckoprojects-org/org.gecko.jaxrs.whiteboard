@@ -1,11 +1,21 @@
-javac.source: 1.8
-javac.target: 1.8
+javac.source: 11
+javac.target: 11
 
 Bundle-Name: Jersey JaxRS SSE Fragment
 Bundle-Description: Jersey OSGi JaxRs SSE Fragment
+Bundle-Version: 2.36.0
 
 Fragment-Host: org.glassfish.jersey.media.jersey-media-sse
 
-Export-Package: org.glassfish.jersey.media.sse.internal;version='2.35'
+Export-Package: \
+	org.glassfish.jersey.media.sse.internal,\
+	org.glassfish.jersey.media.sse
 
--buildpath: org.glassfish.jersey.media.jersey-media-sse;version='2.35'
+-buildpath: \
+	org.glassfish.jersey.media.jersey-media-sse;version=latest,\
+	org.glassfish.jersey.core.jersey-client;version=latest,\
+	org.glassfish.jersey.core.jersey-common;version=latest,\
+	org.glassfish.jersey.core.jersey-server;version=latest,\
+	jakarta.inject.jakarta.inject-api;version=latest,\
+	jakarta.annotation-api;version=latest,\
+	org.apache.geronimo.specs.geronimo-jaxrs_2.1_spec

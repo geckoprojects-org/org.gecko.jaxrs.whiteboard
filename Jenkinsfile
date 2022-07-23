@@ -1,63 +1,47 @@
 pipeline  {
-	agent any
-	
-	tools {
-        jdk 'OpenJDK8'
+    agent any
+
+    tools {
+        jdk 'OpenJDK11'
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '5'))
-      	gitLabConnection('gitlab.com')
-      	gitlabBuilds(builds: ['Jenkins Build', 'Release', 'Post-Build'])
+        skipDefaultCheckout()
     }
-    triggers {
-        gitlab(triggerOnPush: true, triggerOnMergeRequest: true, branchFilterType: 'All')
-    }
-	post {
-      failure {
-        updateGitlabCommitStatus name: 'Post-Build', state: 'failed'
-      }
-      success {
-        updateGitlabCommitStatus name: 'Post-Build', state: 'success'
-      }
-    }
-	
+
     stages {
-        stage('Build') {
+    	stage('Clean Workspace') {
             steps {
-                echo "I am building on ${env.BRANCH_NAME}"
-                updateGitlabCommitStatus name: 'Jenkins Build', state: 'pending'
-				sh "./gradlew clean build --info --stacktrace -Dmaven.repo.local=${WORKSPACE}/.m2"
-				junit '**/generated/test-reports/**/*.xml'
-				updateGitlabCommitStatus name: 'Jenkins Build', state: 'success'
-		    }
-		}
-        stage('Master branch release') {
+                // Cleanup before starting the stage
+                cleanWs()
+            }
+        }
+    	stage('Checkout') {
+            steps {
+                // Checkout the repository
+                checkout scm 
+            }
+        }
+        stage('Main branch release') {
             when { 
-            	branch 'master' 
+                branch 'main' 
             }
             steps {
-	
                 echo "I am building on ${env.BRANCH_NAME}"
-                updateGitlabCommitStatus name: 'Release', state: 'pending'
-				sh "./gradlew clean build release -Drelease.dir=$JENKINS_HOME/repo.gecko/release/geckoREST/ -x test -x testOSGi --info --stacktrace -Dmaven.repo.local=${WORKSPACE}/.m2"
-                updateGitlabCommitStatus name: 'Release', state: 'success'
-		    }
-		}
+                sh "./gradlew clean build release -Drelease.dir=$JENKINS_HOME/repo.gecko/release/org.gecko.jaxrs.whiteboard --info --stacktrace -Dmaven.repo.local=${WORKSPACE}/.m2"
+            }
+        }
         stage('Snapshot branch release') {
             when { 
-            	branch 'develop'
+                branch 'snapshot'
             }
             steps  {
                 echo "I am building on ${env.JOB_NAME}"
-                updateGitlabCommitStatus name: 'Release', state: 'pending'
-				sh "./gradlew release --info --stacktrace -Dmaven.repo.local=${WORKSPACE}/.m2"
-				sh "mkdir -p $JENKINS_HOME/repo.gecko/snapshot/geckoREST"
-				sh "rm -rf $JENKINS_HOME/repo.gecko/snapshot/geckoREST/*"
-				sh "cp -r cnf/release/* $JENKINS_HOME/repo.gecko/snapshot/geckoREST"
-                updateGitlabCommitStatus name: 'Release', state: 'success'
-		    }
-		}
-		
+                sh "./gradlew clean release --info --stacktrace -x testOSGi -Dmaven.repo.local=${WORKSPACE}/.m2"
+                sh "mkdir -p $JENKINS_HOME/repo.gecko/snapshot/org.gecko.jaxrs.whiteboard"
+                sh "rm -rf $JENKINS_HOME/repo.gecko/snapshot/org.gecko.jaxrs.whiteboard/*"
+                sh "cp -r cnf/release/* $JENKINS_HOME/repo.gecko/snapshot/org.gecko.jaxrs.whiteboard"
+            }
+        }
     }
-
 }
