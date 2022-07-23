@@ -39,9 +39,7 @@
 Bundle-Name: Jersey JaxRS Whiteboard
 Bundle-Description: Jersey OSGi JaxRs Whiteboard implementation
 
-Export-Package: \
-	org.osgi.service.jaxrs.*,\
-	org.gecko.rest.jersey.provider
+Export-Package: org.osgi.service.jaxrs.*
 	
 Require-Capability: \
 	osgi.implementation;filter:='(osgi.implementation=osgi.http)',\
