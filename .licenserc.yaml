@@ -36,6 +36,7 @@ header:
     - '.github/**'
     - '.gitignore'
     - 'cnf/**'
+    - 'build/**'
     - 'gradle/**'
     - 'org.gecko.rest.bnd.template.project/**'
     - 'org.gecko.rest.bnd.template.workspace/**'
