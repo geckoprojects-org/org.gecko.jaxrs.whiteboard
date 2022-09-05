@@ -1,0 +1,9 @@
+-buildpath:  \
+	osgi.annotation;version=latest,\
+	osgi.core;version=latest,\
+	osgi.cmpn;version=latest
+
+-library: enableJersey
+
+Bundle-Version: 1.0.0.SNAPSHOT
+Private-Package: {{basePackageName}}

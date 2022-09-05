@@ -10,9 +10,10 @@
 # Needed because we enabled library 'gecko-dimc' 	
 github-project: org.gecko.jaxrs.whiteboard
 base-version: 5.0.0.SNAPSHOT 
+mvn-base-version: ${versionmask;===s;${base-version}}
 
 # Maven Central Group-Id
--groupid: org.geckoprojects.emf.utils
+-groupid: org.geckoprojects.jaxrs
 
 # No simultanious release - We only release new version to Maven Central
 #releaseNotNeeded: ${findproviders;osgi.identity;(&(osgi.identity=${bsn})(version=${version}));REPOS}
