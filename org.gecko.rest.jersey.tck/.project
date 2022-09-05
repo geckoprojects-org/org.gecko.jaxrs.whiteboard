@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.gecko.rest.osgi.ct.conf</name>
+	<name>org.gecko.rest.jersey.tck</name>
 	<comment></comment>
 	<projects>
 	</projects>

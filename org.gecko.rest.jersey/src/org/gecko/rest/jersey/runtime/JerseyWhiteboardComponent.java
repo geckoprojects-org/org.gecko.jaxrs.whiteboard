@@ -40,6 +40,7 @@ import org.osgi.service.component.AnyService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
@@ -51,9 +52,10 @@ import org.osgi.service.condition.Condition;
  * @since 11.10.2017
  */
 
-@Component(name = "JaxRsWhiteboardComponent", immediate = true
-, property = { "jersey.port:Integer=8185",
-		"jersey.jaxrs.whiteboard.name=test_wb", "jersey.context.path=test" }, reference = @Reference(name = "runtimeCondition", service = Condition.class , target = JerseyConstants.JERSEY_RUNTIME_CONDITION)
+@Component(name = "JaxRsWhiteboardComponent", 
+	reference = @Reference(name = "runtimeCondition", service = Condition.class , target = JerseyConstants.JERSEY_RUNTIME_CONDITION),
+	configurationPolicy = ConfigurationPolicy.REQUIRE
+
 )
 public class JerseyWhiteboardComponent {
 

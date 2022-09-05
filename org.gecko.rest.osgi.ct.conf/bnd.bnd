@@ -1,7 +1,0 @@
-javac.source: 11
-javac.target: 11
-
--includeresource: OSGI-INF/configurator/config.json=configs/config.json
-Require-Capability: osgi.extender;filter:='(osgi.extender=osgi.configurator)'
-Bundle-Name: OSGi JaxRs CT Configuration
-Bundle-Description: Configuration to run the OSGi JaxRs Whiteboard TCK

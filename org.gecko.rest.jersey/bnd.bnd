@@ -23,10 +23,8 @@
 	org.osgi.util.promise;version=latest,\
 	jakarta.inject.jakarta.inject-api;version=latest,\
 	org.apache.geronimo.specs.geronimo-jaxrs_2.1_spec,\
-	org.eclipse.jetty.server;version=latest,\
-	org.eclipse.jetty.util;version=latest,\
-	org.eclipse.jetty.servlet;version=latest,\
 	org.objectweb.asm;version=latest,\
+	org.apache.felix.http.jetty;version=latest,\
 	org.gecko.rest.jersey.sse;version=snapshot
 	
 -testpath: \
@@ -41,16 +39,16 @@ Export-Package: org.osgi.service.jaxrs.*
 Require-Capability: \
 	osgi.implementation;filter:='(osgi.implementation=osgi.http)',\
 	osgi.identity;filter:='(osgi.identity=org.gecko.rest.jersey.sse)',\
-	osgi.identity;filter:='(&(osgi.identity=com.sun.xml.bind.jaxb-impl)(version=2.3.3))',\
-	osgi.identity;filter:='(&(osgi.identity=org.glassfish.jersey.inject.jersey-hk2)(version=2.35))',\
-	osgi.identity;filter:='(&(osgi.identity=org.glassfish.jersey.containers.jersey-container-servlet)(version=2.35))',\
-	osgi.identity;filter:='(&(osgi.identity=org.glassfish.jersey.media.jersey-media-jaxb)(version=2.35))',\
-	osgi.identity;filter:='(&(osgi.identity=org.glassfish.jersey.media.jersey-media-sse)(version=2.35))',\
+	osgi.identity;filter:='(&(osgi.identity=com.sun.xml.bind.jaxb-impl)(version>=2.3.6))',\
+	osgi.identity;filter:='(&(osgi.identity=org.glassfish.jersey.inject.jersey-hk2)(version>=2.36))',\
+	osgi.identity;filter:='(&(osgi.identity=org.glassfish.jersey.containers.jersey-container-servlet)(version>=2.36))',\
+	osgi.identity;filter:='(&(osgi.identity=org.glassfish.jersey.media.jersey-media-jaxb)(version>=2.36))',\
+	osgi.identity;filter:='(&(osgi.identity=org.glassfish.jersey.media.jersey-media-sse)(version>=2.36))',\
 	osgi.identity;filter:='(&(osgi.identity=jakarta.validation.jakarta.validation-api)(version>=2.0))',\
 	osgi.identity;filter:='(&(osgi.identity=jakarta.activation-api))'
 
 Provide-Capability: \
-	osgi.contract; osgi.contract=JavaJAXRS; version:List<Version>="2.1,2";provider=jersey;jersey.version:Version="2.35";uses:="javax.ws.rs, javax.ws.rs.core, javax.ws.rs.sse, javax.ws.rs.ext, javax.ws.rs.client, javax.ws.rs.container",\
+	osgi.contract; osgi.contract=JavaJAXRS; version:List<Version>="2.1,2";provider=jersey;jersey.version:Version="2.36";uses:="javax.ws.rs, javax.ws.rs.core, javax.ws.rs.sse, javax.ws.rs.ext, javax.ws.rs.client, javax.ws.rs.container",\
 	osgi.service;objectClass:List<String>="org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime";uses:="org.osgi.service.jaxrs.runtime,org.osgi.service.jaxrs.runtime.dto",\
 	osgi.service;objectClass:List<String>="javax.ws.rs.client.ClientBuilder";uses:="javax.ws.rs.client,org.osgi.service.jaxrs.client";service.scope="prototype",\
 	osgi.service;objectClass:List<String>="org.osgi.service.jaxrs.client.SseEventSourceFactory";uses:="org.osgi.service.jaxrs.client",\

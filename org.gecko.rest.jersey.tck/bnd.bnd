@@ -1,0 +1,9 @@
+Test-Cases: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.annotation.Testable;CONCRETE}
+
+-dependson: \
+	org.gecko.rest.jersey
+	
+-buildpath: org.osgi.test.cases.jaxrs;version=latest
+
+-includeresource: OSGI-INF/configurator/config.json=configs/config.json
+Require-Capability: osgi.extender;filter:='(osgi.extender=osgi.configurator)'

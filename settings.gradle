@@ -18,4 +18,4 @@ pluginManagement {
 plugins {
   id 'biz.aQute.bnd.workspace'
 }
-rootProject.name = "jaxrs.whiteboard"
+rootProject.name = "org.gecko.jaxrs.whiteboard"
