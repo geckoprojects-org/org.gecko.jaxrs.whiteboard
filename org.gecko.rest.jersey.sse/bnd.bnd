@@ -3,7 +3,6 @@ javac.target: 11
 
 Bundle-Name: Jersey JaxRS SSE Fragment
 Bundle-Description: Jersey OSGi JaxRs SSE Fragment
-Bundle-Version: 2.36.0
 
 Fragment-Host: org.glassfish.jersey.media.jersey-media-sse
 
