@@ -36,9 +36,9 @@ import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 public class DemoResource {
 
 	@GET
-	@Path("/hello")
+	@Path("/hello-no-config")
 	public String hello() {
-		return "hello World";
+		return "Hello World (without config)!";
 	}
 
 }

@@ -1,4 +1,3 @@
 <form>
-	<p>Creates a bundle providing a example JaxrsResource and a config for a JaxrsRuntime.
-	The config.json can be found in the config folder. The port 8080 and context path is demo.</p>
+	<p>Creates a bundle providing a example JaxRSResource without any configuration.</p>
 </form>

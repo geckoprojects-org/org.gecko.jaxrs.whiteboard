@@ -20,3 +20,7 @@
 
 -runblacklist: \
 	bnd.identity;id='org.osgi.service.cm'
+
+# Avoid To have the default Jetty run at port 8080	
+-runproperties: \
+	org.osgi.service.http.port=-1

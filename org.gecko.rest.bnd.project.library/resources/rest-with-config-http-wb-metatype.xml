@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.2.0" localization="OSGI-INF/l10n/org.gecko.bndtools.templates.emf.model">
-  <OCD id="org.gecko.bndtools.templates.emf.model" name="Gecko EMF Model Project Template" description="Gecko EMF Model Project Template">
-    <AD id="port" type="String" name="Whiteboard port" description="The port the HttpWhiteboard will listen on" default="8082"/>
-    <AD id="host" type="String" name="Whiteboard IP" description="The IP The http whiteboard will listen on. 0.0.0.0 means listen to all." default="0.0.0.0"/>
-    <AD id="httpWhiteboardName" type="String" name="HttpWhiteboard Name" description="The name of the Httpwhiteboard" default="Http"/>
-    <AD id="httpWhiteboarContextPath" type="String" name="HttpWhiteboard Contextpath" description="The URL segment the HttpWhiteboard will be available under" default="/"/>
-    <AD id="httpWhiteboardId" type="String" name="HttpWhiteboards ID" description="An ID for the HttpWhiteboard. Avoid whitespaces!" default="httpId"/>
+  <OCD id="org.gecko.rest.project-with-http-whiteboard" name="Gecko JaxRS Resource Project Template with HTTP Whiteboard configuration" description="Gecko JaxRs Whiteboard Resource with HTTP Whiteboard configuration project template">
+    <AD id="host" type="String" name="HTTP Whiteboard  Server Host" description="he hostname where the HTTP Whiteboard will run." default="localhost"/>
+    <AD id="port" type="String" name="HTTP Whiteboard port" description="The port the HTTP Whiteboard will listen on" default="8082"/>
+    <AD id="httpWhiteboardName" type="String" name="HTTP Whiteboard Name" description="The name of the HTTP Whiteboard" default="HTTPWB"/>
+    <AD id="httpWhiteboarContextPath" type="String" name="HTTP Whiteboard context path" description="The context URL segment, the HTTP Whiteboard will be available under" default="/"/>
+    <AD id="httpWhiteboardId" type="String" name="HTTP Whiteboards ID" description="An ID for the HTTP Whiteboard. Avoid whitespaces!" default="httpId"/>
 
-    <AD id="jaxRsWhiteboardName" type="String" name="JaxRsWhiteboard Name" description="The name of the JaxRsWhiteboard" default="JaxRs"/>
-    <AD id="jaxRsContextPath" type="String" name="JaxRsWhiteboard Contextpath" description="The URL segment the JaxRsWhiteboard will be available under." default="rest"/>
-    <AD id="jaxrsWhiteboardId" type="String" name="JaxRsWhiteboards ID" description="An ID for the HttpWhiteboard. Avoid whitespaces!" default="jaxRsId"/>
+    <AD id="jaxRsWhiteboardName" type="String" name="JaxRS Whiteboard Name" description="The name of the JaxRS Whiteboard" default="JaxRs"/>
+    <AD id="jaxRsContextPath" type="String" name="JaxRS Whiteboard context path" description="The URL segment the JaxRsWhiteboard will be available under. It comes after the HTTP Whiteboard context path" default="rest"/>
+    <AD id="jaxrsWhiteboardId" type="String" name="JaxRS Whiteboards ID" description="An ID for the JaxRS Whiteboard. Avoid whitespaces!" default="jaxRsId"/>
   </OCD>
 </metatype:MetaData>

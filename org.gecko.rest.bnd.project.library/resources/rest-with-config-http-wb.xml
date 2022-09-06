@@ -1,3 +1,3 @@
 <form>
-	<p>Creates a bundle providing a example JaxrsResource and a config for a JaxrsRuntime based on a Apache Felix HttpWhiteboard.</p>
+	<p>Creates a bundle providing a example JaxRSResource and a configuration for a JaxRSRuntime based on a OSGi HTTP Whiteboard. Here we use the Apache Felix Jetty.</p>
 </form>

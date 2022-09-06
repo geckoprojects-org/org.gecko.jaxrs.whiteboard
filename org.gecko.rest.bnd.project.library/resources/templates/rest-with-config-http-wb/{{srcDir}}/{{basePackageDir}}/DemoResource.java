@@ -29,17 +29,21 @@ import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
  * @since 1.0
  */
 @RequireHttpWhiteboard
-@RequireJaxrsWhiteboard;
+@RequireJaxrsWhiteboard
 @JaxrsResource
-@JaxrsName("demo")
+@JaxrsName("demo-http-whiteboard")
 @Component(service = DemoResource.class, enabled = true, scope = ServiceScope.PROTOTYPE)
 @Path("/")
 public class DemoResource {
 
+	/**
+	 * Please check http://{{host}}:{{port}}{{httpWhiteboarContextPath}}{{jaxRsContextPath}}/hello-http-whiteboard
+	 * @return
+	 */
 	@GET
-	@Path("/hello")
+	@Path("/hello-http-whiteboard")
 	public String hello() {
-		return "hello World";
+		return "Hello World (via HTTP Whiteboard)!";
 	}
 
 }

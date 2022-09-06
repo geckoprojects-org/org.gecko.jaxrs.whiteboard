@@ -24,20 +24,23 @@ import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 /**
  * This is a Demo Resource for a Jaxrs Whiteboard 
- * 
  * @since 1.0
  */
 @RequireJaxrsWhiteboard
 @JaxrsResource
-@JaxrsName("demo")
+@JaxrsName("demo-no-config")
 @Component(service = DemoResource.class, enabled = true, scope = ServiceScope.PROTOTYPE)
 @Path("/")
 public class DemoResource {
 
+	/**
+	 * Please check http://{{host}}:{{port}}/{{contextPath}}/hello
+	 * @return
+	 */
 	@GET
 	@Path("/hello")
 	public String hello() {
-		return "hello World";
+		return "Hello World!";
 	}
 
 }
