@@ -6,26 +6,25 @@ https://docs.osgi.org/specification/osgi.cmpn/7.0.0/service.jaxrs.html
 
 https://eclipse-ee4j.github.io/jersey/
 
-This implementation is currently not compliance tested, but we work on it to get it compliant.
+This implementation is **compliant** on respect to the OSGi JaxRs Whiteboard specifications.
 
-We use Jersey 2.32 together with HK2 2.6.1. To use it you will need the following bundles:
+We use Jersey 2.36 together with HK2 2.6.2. To use it you will need the following bundles:
 
 * **org.gecko.rest.jersey** - The whiteboard implementation
-* **org.gecko.rest.jersey.sse** - A fragement for the use of server sent events
-* **org.gecko.rest.jersey.bom** - A bill of material index
+* **org.gecko.rest.jersey.config** - The whiteboard implementation default configuration, when you want to use it
+* **org.gecko.rest.jersey.sse** - A fragment for the use of server sent events
 
 You will find the Release and Snapshot artifacts at Maven Central, respectively at https://oss.sonatype.org.
 
 ```
 <dependency>
   <groupId>org.geckoprojects.jaxrs</groupId>
-  <artifactId>org.gecko.rest.jersey.bom</artifactId>
+  <artifactId>org.gecko.rest.jersey</artifactId>
   <version>${version}</version>
-  <type>pom</type>
 </dependency>
 <dependency>
   <groupId>org.geckoprojects.jaxrs</groupId>
-  <artifactId>org.gecko.rest.jersey</artifactId>
+  <artifactId>org.gecko.rest.jersey.config</artifactId>
   <version>${version}</version>
 </dependency>
 <dependency>
@@ -35,11 +34,21 @@ You will find the Release and Snapshot artifacts at Maven Central, respectively 
 </dependency>
 ```
 
+For those, who use Gradle:
+
+```
+org.geckoprojects.jaxrs:org.gecko.rest.jersey:${version}
+org.geckoprojects.jaxrs:org.gecko.rest.jersey.config:${version}
+org.geckoprojects.jaxrs:org.gecko.rest.jersey.sse:${version}
+```
+
 ## Setup
 
 The default whiteboard uses the Felix Jetty bundle. It starts the server with the default application under 
 
 http://localhost:8181/rest
+
+For this you also need the *org.gecko.rest.jersey.config* fragment in addition to the *org.gecko.rest.jersey* bundle
 
 You can change these setting by using the OSGi Configurator or the Configuration Admin like this:
 
@@ -76,7 +85,7 @@ public class DemoResource {
 	@GET
 	@Path("/hello")
 	public String hello() {
-		return "hello World";
+		return "Hello World!";
 	}
 
 }
