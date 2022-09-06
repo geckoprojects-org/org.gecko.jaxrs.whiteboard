@@ -48,8 +48,14 @@ project-template-rest-with-config-wb:\
 		help=rest-with-config-http-wb.xml;\
 		engine=mustache;\
 		metaType=rest-with-config-http-wb-metatype.xml
+		
+gecko-project:\
+    bnd.library;\
+        bnd.library     		= enableJersey; \
+        path            		= library
 
 Provide-Capability: \
+	${gecko-project},\
 	${project-template-rest-no-config},\
 	${project-template-rest-with-config},\
 	${project-template-rest-with-config-wb}

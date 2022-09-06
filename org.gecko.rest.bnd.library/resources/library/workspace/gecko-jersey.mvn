@@ -1,4 +1,7 @@
 org.geckoprojects.jaxrs:org.gecko.rest.bnd.project.library:${mvn-base-version}
+org.geckoprojects.jaxrs:org.gecko.rest.jersey:${mvn-base-version}
+org.geckoprojects.jaxrs:org.gecko.rest.jersey.sse:${mvn-base-version}
+org.geckoprojects.jaxrs:org.gecko.rest.jersey.multipart:${mvn-base-version}
 
 # Jakarta EE API
 jakarta.xml.ws:jakarta.xml.ws-api:2.3.3

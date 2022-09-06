@@ -8,17 +8,9 @@ Bundle-Description: Jersey Dependencies for the Gecko JaxRS Whiteboard
 	{library/workspace/gecko-jersey.mvn=resources/library/workspace/gecko-jersey.mvn}
 
 Provide-Capability: \
-	${gecko-base},\
-	${gecko-project}
+	${gecko-base}
 
 gecko-base:\
     bnd.library;\
         bnd.library     		= geckoJersey; \
         path            		= library/workspace
-
-gecko-project:\
-    bnd.library;\
-        bnd.library     		= enableJersey; \
-        path            		= library/project
-
-icondata: data:image/gif;base64,${base64;icons/gecko.ico}

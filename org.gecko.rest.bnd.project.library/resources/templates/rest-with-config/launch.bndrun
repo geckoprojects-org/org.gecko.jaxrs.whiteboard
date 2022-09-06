@@ -1,0 +1,20 @@
+-runfw: org.apache.felix.framework;version='[7.0.5,7.0.5]'
+
+-runee: JavaSE-11
+
+-runsystemcapabilities: ${native_capability}
+
+-resolve.effective: active;skip:="osgi.service"
+
+-runtrace: true
+
+-library: enableJersey
+
+-runrequires: \
+	bnd.identity;id='{{projectName}}',\
+
+-runbundles.project: \
+	{{projectName}};version=snapshot
+
+-runblacklist: \
+	bnd.identity;id='org.osgi.service.cm'
