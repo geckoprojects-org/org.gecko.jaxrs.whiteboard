@@ -69,7 +69,7 @@ This would run the server at
 
 http://localhost:8080/demo
 
-Please note, that the Felix Jetty implementation runs the OSGi HTTP Servifce by default at port 8080. It may come to an conflict, with the port in this JaxRs server configuration. Therefore you may use the system property `org.osgi.service.http.port=0` to deactivate the HTTP Service.
+Please note, that the Felix Jetty implementation runs the OSGi HTTP Servifce by default at port 8080. It may come to an conflict, with the port in this JaxRs server configuration. Therefore you may use the system property `org.osgi.service.http.port=-1` to deactivate the HTTP Service.
 
 ## Example 
 
@@ -91,20 +91,27 @@ public class DemoResource {
 }
 ```
 
-The the **RequireJaxrsWhiteboard** annotation, you define the dependency to the implementation. In our case Jersey. You need the Whiteboard dependencies in you workspace. Everything you need is defined in the BOM. 
+With the **RequireJaxrsWhiteboard** annotation, you define the dependency to the implementation. In our case Jersey. You need the Whiteboard dependencies in you workspace. 
 
-When using bndtools you can simply define a Maven-BOM repository in your workspace:
+## Gradle Library Support
 
+When adding the JaxRs Library to you dependencies:
 ```
--plugin.jerseyrest:\
-	aQute.bnd.repository.maven.pom.provider.BndPomRepository;\
-        name="Gecko REST";\
-        releaseUrls=https://repo.maven.apache.org/maven2/;\
-        snapshotUrls=https://oss.sonatype.org/content/repositories/snapshots/;\
-        revision="org.geckoprojects.jaxrs:org.gecko.rest.jersey.index:${version}"
+org.geckoprojects.jaxrs:org.gecko.rest.bnd.library:${version}
 ```
+you can simply but the instruction `-library: geckoJersey` and you will find a repository in you bnd workspace after reloading the workspace.
 
-To resolve the JaxRs and Whiteboard annotation dependencies from the resource above you just need the following API bundles on the projects build path:
+It brings you all dependencies, you need to run Jersey. In addition to that it also brings a dependency to:
+```
+org.geckoprojects.jaxrs:org.gecko.rest.bnd.project.library:${version}
+```
+This library adds support for *bndrun* files. Calling the instruction `-library: enableJersey` within a *bndrun* adds all Jersey and JaxRs Whiteboard dependencies ti the *runbundles*
 
-* **javax.ws.rs-api**
-* **osgi.cmpn**
+If you use the library instruction within a *bnd.bnd* file, it adds the JaxRs API to the buildpath.
+
+Furthermore this dependency brings three bndtools project templates:
+1. JaxRs Resource with default configuration
+2. JaxRs Resource with Jetty Runtime an a corresponding configuration file
+3. JaxRs Resource with a configuration for the use with the OSGI HTTP Whiteboard
+
+All these projects can be imported using the bndtools project wizard.
