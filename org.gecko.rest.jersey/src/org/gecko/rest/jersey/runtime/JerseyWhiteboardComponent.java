@@ -32,7 +32,6 @@ import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher;
 import org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
 import org.gecko.rest.jersey.runtime.dispatcher.JerseyWhiteboardDispatcher;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
@@ -66,8 +65,6 @@ public class JerseyWhiteboardComponent {
 	protected JaxRsWhiteboardDispatcher dispatcher= new JerseyWhiteboardDispatcher();
 	
 	protected volatile JaxRsWhiteboardProvider whiteboard;
-	private BundleContext bundleContext;
-
 	
 	/**
 	 * Called on component activation
@@ -76,11 +73,10 @@ public class JerseyWhiteboardComponent {
 	 */
 	@Activate
 	public void activate(ComponentContext componentContext) throws ConfigurationException {
-		bundleContext= componentContext.getBundleContext();
 		updateProperties(componentContext);
 		
 		if (whiteboard != null) {
-			whiteboard.teardown();;
+			whiteboard.teardown();
 		}
 		whiteboard = new JerseyServiceRuntime();
 		// activate and start server
@@ -186,7 +182,7 @@ public class JerseyWhiteboardComponent {
 
 	public void updatedJaxRsExtension(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
 		logger.fine("Handle extension " + jaxRsExtensionSR + " properties: " + properties);
-		ServiceObjects<?> so = bundleContext.getServiceObjects(jaxRsExtensionSR);
+		ServiceObjects<?> so = getServiceObjects(jaxRsExtensionSR);
 		dispatcher.addExtension(so, properties);
 
 	}
@@ -198,13 +194,12 @@ public class JerseyWhiteboardComponent {
 	@Reference(service = AnyService.class, target = "(" + JAX_RS_RESOURCE
 			+ "=true)", cardinality = MULTIPLE, policy = DYNAMIC)
 	public void bindJaxRsResource(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
-
 		updatedJaxRsResource(jaxRsExtensionSR, properties);
 	}
 
 	public void updatedJaxRsResource(ServiceReference<Object> jaxRsResourceSR, Map<String, Object> properties) {
 		logger.fine("Handle resource " + jaxRsResourceSR + " properties: " + properties);
-		ServiceObjects<?> so = bundleContext.getServiceObjects(jaxRsResourceSR);
+		ServiceObjects<?> so = getServiceObjects(jaxRsResourceSR);
 		dispatcher.addResource(so, properties);
 
 	}
@@ -229,5 +224,9 @@ public class JerseyWhiteboardComponent {
 			}
 		}
 	}
-
+	
+	private ServiceObjects<?> getServiceObjects(ServiceReference<?> reference) {
+		return reference.getBundle().getBundleContext().getServiceObjects(reference);
+	}
+	
 }
