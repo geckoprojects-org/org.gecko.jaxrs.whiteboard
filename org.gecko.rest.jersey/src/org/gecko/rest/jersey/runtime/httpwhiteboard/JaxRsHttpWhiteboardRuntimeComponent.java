@@ -24,7 +24,6 @@ import javax.ws.rs.core.Application;
 
 import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.gecko.rest.jersey.runtime.JerseyWhiteboardComponent;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
@@ -50,7 +49,6 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardComponent{
 
 	private static Logger logger = Logger.getLogger("o.e.o.j.JaxRsHttpWhiteboardRuntimeComponent");
-	private BundleContext bundleContext;
 
 
 	/**
@@ -64,7 +62,6 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 	@Activate
 	@Override
 	public void activate(final ComponentContext componentContext) throws ConfigurationException {
-	 bundleContext=	componentContext.getBundleContext();
 		updateProperties(componentContext);
 		if (whiteboard != null) {
 			whiteboard.teardown();;
@@ -102,7 +99,7 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 			whiteboard = null;
 		}
 	}
-	
+
 	/**
 	 * Adds a new default application
 	 * @param application the application to add
@@ -131,7 +128,7 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 	public void unbindDefaultApplication(Application application, Map<String, Object> properties) {
 		dispatcher.removeApplication(application, properties);
 	}
-	
+
 	/**
 	 * Adds a new application
 	 * @param application the application to add
@@ -141,7 +138,7 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 	public void bindApplication(Application application, Map<String, Object> properties) {
 		dispatcher.addApplication(application, properties);
 	}
-	
+
 	/**
 	 * Adds a new application
 	 * @param application the application to add
@@ -151,7 +148,7 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 		dispatcher.removeApplication(application, properties);
 		dispatcher.addApplication(application, properties);
 	}
-	
+
 	/**
 	 * Removes a application 
 	 * @param application the application to remove
@@ -164,20 +161,19 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 	@Reference(service = AnyService.class, target = "(" + JaxrsWhiteboardConstants.JAX_RS_EXTENSION
 			+ "=true)", cardinality = MULTIPLE, policy = DYNAMIC)
 	public void bindJaxRsExtension(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
-
 		unbindJaxRsExtension(jaxRsExtensionSR,properties);
 	}
 
 	public void updatedJaxRsExtension(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
 		logger.fine("Handle extension " + jaxRsExtensionSR + " properties: " + properties);
-		ServiceObjects<?> so = bundleContext.getServiceObjects(jaxRsExtensionSR);
+		ServiceObjects<?> so = getServiceObjects(jaxRsExtensionSR);
 		dispatcher.addExtension(so, properties);
 
 	}
 	public void unbindJaxRsExtension(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
 		dispatcher.removeExtension(properties);
 	}
-	
+
 	@Reference(service = AnyService.class, target = "(" + JAX_RS_RESOURCE
 			+ "=true)", cardinality = MULTIPLE, policy = DYNAMIC)
 	public void bindJaxRsResource(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
@@ -186,7 +182,7 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 
 	public void updatedJaxRsResource(ServiceReference<Object> jaxRsResourceSR, Map<String, Object> properties) {
 		logger.fine("Handle resource " + jaxRsResourceSR + " properties: " + properties);
-		ServiceObjects<?> so = bundleContext.getServiceObjects(jaxRsResourceSR);
+		ServiceObjects<?> so = getServiceObjects(jaxRsResourceSR);
 		dispatcher.addResource(so, properties);
 
 	}

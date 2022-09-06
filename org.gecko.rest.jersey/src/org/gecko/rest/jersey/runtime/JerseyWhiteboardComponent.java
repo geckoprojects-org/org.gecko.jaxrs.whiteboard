@@ -225,7 +225,7 @@ public class JerseyWhiteboardComponent {
 		}
 	}
 	
-	private ServiceObjects<?> getServiceObjects(ServiceReference<?> reference) {
+	protected ServiceObjects<?> getServiceObjects(ServiceReference<?> reference) {
 		return reference.getBundle().getBundleContext().getServiceObjects(reference);
 	}
 	
