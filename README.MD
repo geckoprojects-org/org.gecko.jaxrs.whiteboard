@@ -1,14 +1,14 @@
-# Gecko.io JaxRs Whiteboard Implementation
+# Gecko.io Jakartars Whiteboard Implementation
 
-This is a OSGi JaxRs Whiteboard Implementation based on Eclipse Jersey.
+This is a OSGi Jakartars Whiteboard Implementation based on Eclipse Jersey.
 
 https://docs.osgi.org/specification/osgi.cmpn/7.0.0/service.jaxrs.html
 
 https://eclipse-ee4j.github.io/jersey/
 
-This implementation is **compliant** on respect to the OSGi JaxRs Whiteboard specifications.
+This implementation is **compliant** on respect to the OSGi Jakartars Whiteboard specifications.
 
-We use Jersey 2.36 together with HK2 2.6.2. To use it you will need the following bundles:
+We use Jersey 3.0.8 together with HK2 3.0.3. To use it you will need the following bundles:
 
 * **org.gecko.rest.jersey** - The whiteboard implementation
 * **org.gecko.rest.jersey.config** - The whiteboard implementation default configuration, when you want to use it
@@ -18,17 +18,17 @@ You will find the Release and Snapshot artifacts at Maven Central, respectively 
 
 ```
 <dependency>
-  <groupId>org.geckoprojects.jaxrs</groupId>
+  <groupId>org.geckoprojects.jakartars</groupId>
   <artifactId>org.gecko.rest.jersey</artifactId>
   <version>${version}</version>
 </dependency>
 <dependency>
-  <groupId>org.geckoprojects.jaxrs</groupId>
+  <groupId>org.geckoprojects.jakartars</groupId>
   <artifactId>org.gecko.rest.jersey.config</artifactId>
   <version>${version}</version>
 </dependency>
 <dependency>
-  <groupId>org.geckoprojects.jaxrs</groupId>
+  <groupId>org.geckoprojects.jakartars</groupId>
   <artifactId>org.gecko.rest.jersey.sse</artifactId>
   <version>${version}</version>
 </dependency>
@@ -37,9 +37,9 @@ You will find the Release and Snapshot artifacts at Maven Central, respectively 
 For those, who use Gradle:
 
 ```
-org.geckoprojects.jaxrs:org.gecko.rest.jersey:${version}
-org.geckoprojects.jaxrs:org.gecko.rest.jersey.config:${version}
-org.geckoprojects.jaxrs:org.gecko.rest.jersey.sse:${version}
+org.geckoprojects.jakartars:org.gecko.rest.jersey:${version}
+org.geckoprojects.jakartars:org.gecko.rest.jersey.config:${version}
+org.geckoprojects.jakartars:org.gecko.rest.jersey.sse:${version}
 ```
 
 ## Setup
@@ -59,7 +59,7 @@ You can change these setting by using the OSGi Configurator or the Configuration
 	"JaxRsWhiteboardComponent": 
   	{
 	    "jersey.port": 8080,
-		"jersey.jaxrs.whiteboard.name" : "demo",
+		"jersey.jakartars.whiteboard.name" : "demo",
 		"jersey.context.path" : "demo" 
 	}
 }
@@ -69,15 +69,15 @@ This would run the server at
 
 http://localhost:8080/demo
 
-Please note, that the Felix Jetty implementation runs the OSGi HTTP Servifce by default at port 8080. It may come to an conflict, with the port in this JaxRs server configuration. Therefore you may use the system property `org.osgi.service.http.port=-1` to deactivate the HTTP Service.
+Please note, that the Felix Jetty implementation runs the OSGi HTTP Service by default at port 8080. It may come to an conflict, with the port in this JaxRs server configuration. Therefore you may use the system property `org.osgi.service.http.port=-1` to deactivate the HTTP Service.
 
 ## Example 
 
 When using the JaxRs Whiteboard, you register you REST resources and extensions as a service. There are some useful Meta-Annotations, that create component properties for you.
 ```java
-@RequireJaxrsWhiteboard
-@JaxrsResource
-@JaxrsName("demo")
+@RequireJakartarsWhiteboard
+@JakartarsResource
+@JakartarsName("demo")
 @Component(service = DemoResource.class, scope = ServiceScope.PROTOTYPE)
 @Path("/")
 public class DemoResource {
@@ -91,27 +91,27 @@ public class DemoResource {
 }
 ```
 
-With the **RequireJaxrsWhiteboard** annotation, you define the dependency to the implementation. In our case Jersey. You need the Whiteboard dependencies in you workspace. 
+With the **RequireJakartarsWhiteboard** annotation, you define the dependency to the implementation. In our case Jersey. You need the Whiteboard dependencies in you workspace. 
 
 ## Gradle Library Support
 
-When adding the JaxRs Library to you dependencies:
+When adding the Jakartars Library to you dependencies:
 ```
-org.geckoprojects.jaxrs:org.gecko.rest.bnd.library:${version}
+org.geckoprojects.jakartars:org.gecko.rest.bnd.library:${version}
 ```
 you can simply but the instruction `-library: geckoJersey` and you will find a repository in you bnd workspace after reloading the workspace.
 
 It brings you all dependencies, you need to run Jersey. In addition to that it also brings a dependency to:
 ```
-org.geckoprojects.jaxrs:org.gecko.rest.bnd.project.library:${version}
+org.geckoprojects.jakartars:org.gecko.rest.bnd.project.library:${version}
 ```
 This library adds support for *bndrun* files. Calling the instruction `-library: enableJersey` within a *bndrun* adds all Jersey and JaxRs Whiteboard dependencies ti the *runbundles*
 
 If you use the library instruction within a *bnd.bnd* file, it adds the JaxRs API to the buildpath.
 
 Furthermore this dependency brings three bndtools project templates:
-1. JaxRs Resource with default configuration
-2. JaxRs Resource with Jetty Runtime an a corresponding configuration file
-3. JaxRs Resource with a configuration for the use with the OSGI HTTP Whiteboard
+1. Jakartars Resource with default configuration
+2. Jakartars Resource with Jetty Runtime an a corresponding configuration file
+3. Jakartars Resource with a configuration for the use with the OSGI Servlet Whiteboard
 
 All these projects can be imported using the bndtools project wizard.
