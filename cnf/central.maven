@@ -11,6 +11,18 @@ org.geckoprojects.bnd:org.gecko.bnd.jacoco.library:1.1.1
 org.osgi:org.osgi.annotation.bundle:1.0.0
 org.osgi:org.osgi.annotation.versioning:1.0.0
 
+### Jetty
+org.eclipse.jetty:jetty-server:11.0.12
+org.eclipse.jetty:jetty-servlet:11.0.12
+org.eclipse.jetty:jetty-http:11.0.12
+org.eclipse.jetty:jetty-util:11.0.12
+org.eclipse.jetty:jetty-xml:11.0.12
+org.eclipse.jetty:jetty-plus:11.0.12
+#org.eclipse.jetty:jetty-continuation:11.0.12
+org.eclipse.jetty:jetty-annotations:11.0.12
+org.eclipse.jetty:jetty-security:11.0.12
+org.eclipse.jetty:jetty-io:11.0.12
+
 ### OSGi Core
 org.osgi:org.osgi.dto:1.1.1
 org.osgi:org.osgi.namespace.contract:1.0.0

@@ -160,7 +160,7 @@ public class JakartarsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCom
 
 	@Reference(service = AnyService.class, target = "(" + JakartarsWhiteboardConstants.JAKARTA_RS_EXTENSION	+ "=true)", cardinality = MULTIPLE, policy = DYNAMIC)
 	public void bindJakartarsExtension(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
-		unbindJakartarsRsExtension(jakartarsExtensionSR,properties);
+		unbindJakartarsExtension(jakartarsExtensionSR,properties);
 	}
 
 	public void updatedJakartarsExtension(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
@@ -169,7 +169,7 @@ public class JakartarsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCom
 		dispatcher.addExtension(so, properties);
 
 	}
-	public void unbindJakartarsRsExtension(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
+	public void unbindJakartarsExtension(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
 		dispatcher.removeExtension(properties);
 	}
 

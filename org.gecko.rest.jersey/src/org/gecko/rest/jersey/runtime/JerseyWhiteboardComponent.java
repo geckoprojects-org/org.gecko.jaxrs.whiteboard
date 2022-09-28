@@ -188,7 +188,7 @@ public class JerseyWhiteboardComponent {
 
 	}
 
-	public void unbindJakartarsRsExtension(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
+	public void unbindJakartarsExtension(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
 		dispatcher.removeExtension(properties);
 	}
 

@@ -19,7 +19,6 @@ import java.util.logging.Logger;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.component.LifeCycle;
-import org.eclipse.jetty.util.component.LifeCycle.Listener;
 import org.gecko.rest.jersey.runtime.JerseyServiceRuntime;
 
 /**
@@ -59,33 +58,32 @@ public class JettyServerRunnable implements Runnable {
 			logger.info("Started Jersey server at port " + port + " successfully try http://localhost:" + port);
 
 			// why here? awaitStart.countDown();
-			server.addLifeCycleListener(new Listener() {
-
+			server.addEventListener(new LifeCycle.Listener() {
 				@Override
 				public void lifeCycleStopping(LifeCycle lifeCycle) {
 					logger.info("lifeCycleStopping");
 				}
-
+				
 				@Override
 				public void lifeCycleStopped(LifeCycle lifeCycle) {
 					state = JerseyServiceRuntime.State.STARTED;
 					logger.info("lifeCycleStopped");
-
+					
 				}
-
+				
 				@Override
 				public void lifeCycleStarting(LifeCycle lifeCycle) {
 					logger.info("lifeCycleStarting");
 				}
-
+				
 				@Override
 				public void lifeCycleStarted(LifeCycle lifeCycle) {
 					logger.info("lifeCycleStarted");
 					state = JerseyServiceRuntime.State.STARTED;
 					awaitStart.countDown();
-
+					
 				}
-
+				
 				@Override
 				public void lifeCycleFailure(LifeCycle lifeCycle, Throwable throwable) {
 					logger.info("lifeCycleFailure");
