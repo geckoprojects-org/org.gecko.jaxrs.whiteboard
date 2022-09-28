@@ -8,14 +8,11 @@
 
 -runtrace: true
 
-# enabled the runbundles for the Jersey dependencies
--library: enableJersey
-
 -runrequires: \
 	bnd.identity;id='{{projectName}}',\
 
 # we need to run our project
--runbundles.project: \
+-runbundles: \
 	{{projectName}};version=snapshot
 
 -runblacklist: \

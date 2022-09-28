@@ -8,15 +8,11 @@
 
 -runtrace: true
 
-# enabled the runbundles for the Jersey dependencies
-# This sets -runbundles.jersey: ${jersey.deps}  
--library: enableJersey
-
 -runrequires: \
 	bnd.identity;id='{{projectName}}',\
 
 # we need to run our project
--runbundles.project: \
+-runbundles: \
 	org.gecko.rest.jersey.config;version=latest,\
 	{{projectName}};version=snapshot
 
