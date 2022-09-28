@@ -43,10 +43,10 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.http.context.ServletContextHelper;
-import org.osgi.service.http.runtime.HttpServiceRuntime;
-import org.osgi.service.http.runtime.HttpServiceRuntimeConstants;
-import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
+import org.osgi.service.servlet.context.ServletContextHelper;
+import org.osgi.service.servlet.runtime.HttpServiceRuntime;
+import org.osgi.service.servlet.runtime.HttpServiceRuntimeConstants;
+import org.osgi.service.servlet.whiteboard.HttpWhiteboardConstants;
 
 /**
  * Implementation of the {@link JakartarsServiceRuntime} for a Jersey implementation

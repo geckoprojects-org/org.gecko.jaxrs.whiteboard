@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<repository xmlns="http://www.osgi.org/xmlns/repository/v1.0.0" name="Local" increment="1664352817173">
+<repository xmlns="http://www.osgi.org/xmlns/repository/v1.0.0" name="Local" increment="1664362862465">
   <resource>
     <capability namespace="osgi.identity">
       <attribute name="license" value="Apache-2.0;description=&quot;This program and the accompanying materials are made available under the terms of the Apache License, Version 2.0.&quot;;link=&quot;https://opensource.org/licenses/Apache-2.0&quot;"/>
@@ -153,6 +153,105 @@
     <requirement namespace="osgi.wiring.package">
       <directive name="filter" value="(&amp;(osgi.wiring.package=org.osgi.service.jakartars.whiteboard)(version&gt;=2.0.0)(!(version&gt;=3.0.0)))"/>
       <attribute name="osgi.wiring.package" value="org.osgi.service.jakartars.whiteboard"/>
+    </requirement>
+    <requirement namespace="osgi.ee">
+      <directive name="filter" value="(&amp;(osgi.ee=JavaSE/compact1)(version=1.8))"/>
+    </requirement>
+  </resource>
+  <resource>
+    <capability namespace="osgi.identity">
+      <attribute name="license" value="Apache-2.0;description=&quot;This program and the accompanying materials are made available under the terms of the Apache License, Version 2.0.&quot;;link=&quot;https://opensource.org/licenses/Apache-2.0&quot;"/>
+      <attribute name="copyright" value="Copyright (c) Contributors to the Eclipse Foundation"/>
+      <attribute name="osgi.identity" value="org.osgi.service.servlet.whiteboard"/>
+      <attribute name="documentation" value="https://docs.osgi.org/"/>
+      <attribute name="description" value="OSGi Companion Code for org.osgi.service.servlet.whiteboard Version 2.0.0"/>
+      <attribute name="type" value="osgi.bundle"/>
+      <attribute name="version" value="2.0.0.202209281100-SNAPSHOT" type="Version"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="jakarta.servlet.http,org.osgi.framework"/>
+      <attribute name="bundle-symbolic-name" value="org.osgi.service.servlet.whiteboard"/>
+      <attribute name="bundle-version" value="2.0.0.202209281100-SNAPSHOT" type="Version"/>
+      <attribute name="version" value="2.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.osgi.service.servlet.context"/>
+      <attribute name="bnd.hashes" value="32119832,-1923478059" type="List&lt;Long&gt;"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="org.osgi.service.servlet.runtime.dto"/>
+      <attribute name="bundle-symbolic-name" value="org.osgi.service.servlet.whiteboard"/>
+      <attribute name="bundle-version" value="2.0.0.202209281100-SNAPSHOT" type="Version"/>
+      <attribute name="version" value="2.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.osgi.service.servlet.runtime"/>
+      <attribute name="bnd.hashes" value="55483947,-1897933980,-1923478059" type="List&lt;Long&gt;"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="org.osgi.dto,org.osgi.framework.dto"/>
+      <attribute name="bundle-symbolic-name" value="org.osgi.service.servlet.whiteboard"/>
+      <attribute name="bundle-version" value="2.0.0.202209281100-SNAPSHOT" type="Version"/>
+      <attribute name="version" value="2.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.osgi.service.servlet.runtime.dto"/>
+      <attribute name="bnd.hashes" value="-484412629,-1490342320,-390944312,-301496667,-1484020886,2037830638,-1454816269,1935433300,-14384392,1156948375,1122568999,-1290190741,985082352,-912752414,-1392588079,1463609095,-323953227,356856186,-1923478059" type="List&lt;Long&gt;"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="jakarta.servlet"/>
+      <attribute name="bundle-symbolic-name" value="org.osgi.service.servlet.whiteboard"/>
+      <attribute name="bundle-version" value="2.0.0.202209281100-SNAPSHOT" type="Version"/>
+      <attribute name="version" value="2.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.osgi.service.servlet.whiteboard"/>
+      <attribute name="bnd.hashes" value="1123970986,-720095889,-1923478059" type="List&lt;Long&gt;"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <attribute name="bundle-symbolic-name" value="org.osgi.service.servlet.whiteboard"/>
+      <attribute name="bundle-version" value="2.0.0.202209281100-SNAPSHOT" type="Version"/>
+      <attribute name="version" value="2.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.osgi.service.servlet.whiteboard.annotations"/>
+      <attribute name="bnd.hashes" value="-946112598,-1923478059" type="List&lt;Long&gt;"/>
+    </capability>
+    <capability namespace="osgi.wiring.package">
+      <directive name="uses" value="jakarta.servlet"/>
+      <attribute name="bundle-symbolic-name" value="org.osgi.service.servlet.whiteboard"/>
+      <attribute name="bundle-version" value="2.0.0.202209281100-SNAPSHOT" type="Version"/>
+      <attribute name="version" value="2.0.0" type="Version"/>
+      <attribute name="osgi.wiring.package" value="org.osgi.service.servlet.whiteboard.propertytypes"/>
+      <attribute name="bnd.hashes" value="1391128266,1469010022,-1778692625,590487940,-864212184,70818259,-1016966326,-1448902520,2088775417,401550931,-750588654,208913719,-1326623444,690473483,-1215796208,934390038,-1923478059" type="List&lt;Long&gt;"/>
+    </capability>
+    <capability namespace="osgi.wiring.bundle">
+      <attribute name="bundle-version" value="2.0.0.202209281100-SNAPSHOT" type="Version"/>
+      <attribute name="osgi.wiring.bundle" value="org.osgi.service.servlet.whiteboard"/>
+    </capability>
+    <capability namespace="osgi.wiring.host">
+      <attribute name="bundle-version" value="2.0.0.202209281100-SNAPSHOT" type="Version"/>
+      <attribute name="osgi.wiring.host" value="org.osgi.service.servlet.whiteboard"/>
+    </capability>
+    <capability namespace="osgi.content">
+      <attribute name="size" value="98446" type="Long"/>
+      <attribute name="url" value="org.osgi.service.servlet.whiteboard/org.osgi.service.servlet.whiteboard-2.0.0.jar"/>
+      <attribute name="mime" value="application/vnd.osgi.bundle"/>
+      <attribute name="osgi.content" value="4806A6F487305A6E6E7CCB415346B5636112E8CE79DBCE880B2AD241A54D1671"/>
+    </capability>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(&amp;(osgi.wiring.package=jakarta.servlet)(version&gt;=5.0.0)(!(version&gt;=6.0.0)))"/>
+      <attribute name="osgi.wiring.package" value="jakarta.servlet"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(&amp;(osgi.wiring.package=jakarta.servlet.http)(version&gt;=5.0.0)(!(version&gt;=6.0.0)))"/>
+      <attribute name="osgi.wiring.package" value="jakarta.servlet.http"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(&amp;(osgi.wiring.package=org.osgi.dto)(version&gt;=1.0.0)(!(version&gt;=2.0.0)))"/>
+      <attribute name="osgi.wiring.package" value="org.osgi.dto"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(&amp;(osgi.wiring.package=org.osgi.framework)(version&gt;=1.8.0)(!(version&gt;=2.0.0)))"/>
+      <attribute name="osgi.wiring.package" value="org.osgi.framework"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(&amp;(osgi.wiring.package=org.osgi.framework.dto)(version&gt;=1.8.0)(!(version&gt;=2.0.0)))"/>
+      <attribute name="osgi.wiring.package" value="org.osgi.framework.dto"/>
+    </requirement>
+    <requirement namespace="osgi.wiring.package">
+      <directive name="filter" value="(&amp;(osgi.wiring.package=org.osgi.service.servlet.runtime.dto)(version&gt;=2.0.0)(!(version&gt;=3.0.0)))"/>
+      <attribute name="osgi.wiring.package" value="org.osgi.service.servlet.runtime.dto"/>
     </requirement>
     <requirement namespace="osgi.ee">
       <directive name="filter" value="(&amp;(osgi.ee=JavaSE/compact1)(version=1.8))"/>

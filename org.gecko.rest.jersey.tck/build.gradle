@@ -1,6 +1,6 @@
 
-def resolveTask = tasks.named("resolve.tck") {
-	outputBndrun = layout.buildDirectory.file("tck.bndrun")
+def resolveTask = tasks.named("resolve.tck_jakarta") {
+	outputBndrun = layout.buildDirectory.file("tck_jakarta.bndrun")
 }
 
 tasks.named("testOSGi") {
