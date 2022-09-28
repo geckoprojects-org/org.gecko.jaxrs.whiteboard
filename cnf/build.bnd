@@ -13,7 +13,7 @@ base-version: 6.0.0.SNAPSHOT
 mvn-base-version: ${versionmask;===s;${base-version}}
 
 # Maven Central Group-Id
--groupid: org.geckoprojects.jaxrs
+-groupid: org.geckoprojects.jakartars
 
 # No simultanious release - We only release new version to Maven Central
 #releaseNotNeeded: ${findproviders;osgi.identity;(&(osgi.identity=${bsn})(version=${version}));REPOS}
