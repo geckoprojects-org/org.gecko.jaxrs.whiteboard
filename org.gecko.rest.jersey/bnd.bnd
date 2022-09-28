@@ -17,13 +17,13 @@
 	org.osgi.service.component;version=latest,\
 	org.osgi.service.condition;version=latest,\
 	org.osgi.service.http.whiteboard;version=latest,\
-	org.osgi.service.jaxrs;version=latest,\
+	org.osgi.service.jakartars;version=latest,\
 	org.osgi.util.pushstream;version=latest,\
 	org.osgi.util.function;version=latest,\
 	org.osgi.util.promise;version='1.2',\
 	jakarta.inject.jakarta.inject-api;version=latest,\
-	org.apache.geronimo.specs.geronimo-jaxrs_2.1_spec,\
 	org.objectweb.asm;version=latest,\
+	jakarta.ws.rs-api;version=latest,\
 	org.apache.felix.http.jetty;version=latest,\
 	org.gecko.rest.jersey.sse;version=snapshot
 	

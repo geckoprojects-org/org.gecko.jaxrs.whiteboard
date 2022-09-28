@@ -13,7 +13,7 @@
  */
 package org.gecko.rest.jersey.dto;
 
-import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
+import org.osgi.service.jakartars.runtime.dto.ApplicationDTO;
 
 /**
  * Implementation of {@link ApplicationDTO}

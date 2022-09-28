@@ -23,28 +23,28 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.container.DynamicFeature;
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.ParamConverterProvider;
-import javax.ws.rs.ext.ReaderInterceptor;
-import javax.ws.rs.ext.WriterInterceptor;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.container.DynamicFeature;
+import jakarta.ws.rs.core.Feature;
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.ParamConverterProvider;
+import jakarta.ws.rs.ext.ReaderInterceptor;
+import jakarta.ws.rs.ext.WriterInterceptor;
 
 import org.gecko.rest.jersey.dto.DTOConverter;
-import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider;
 import org.gecko.rest.jersey.proxy.ExtensionProxyFactory;
 import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.framework.wiring.BundleWiring;
-import org.osgi.service.jaxrs.runtime.dto.BaseExtensionDTO;
-import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
-import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
+import org.osgi.service.jakartars.runtime.dto.BaseExtensionDTO;
+import org.osgi.service.jakartars.runtime.dto.DTOConstants;
+import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 /**
  * A wrapper class for a JaxRs extensions 
@@ -52,7 +52,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  * @param <T>
  * @since 09.10.2017
  */
-public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider<T> implements JaxRsExtensionProvider {
+public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider<T> implements JakartarsExtensionProvider {
 
 	private static final List<String> POSSIBLE_INTERFACES = Arrays.asList(new String[] {
 		ContainerRequestFilter.class.getName(),
@@ -86,8 +86,8 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 	 * @param properties
 	 */
 	private void checkExtensionProperty(Map<String, Object> properties) {
-		if(!properties.containsKey(JaxrsWhiteboardConstants.JAX_RS_EXTENSION) || 
-				properties.get(JaxrsWhiteboardConstants.JAX_RS_EXTENSION).equals(false)) {
+		if(!properties.containsKey(JakartarsWhiteboardConstants.JAKARTA_RS_EXTENSION) || 
+				properties.get(JakartarsWhiteboardConstants.JAKARTA_RS_EXTENSION).equals(false)) {
 			
 			updateStatus(DTOConstants.FAILURE_REASON_NOT_AN_EXTENSION_TYPE);
 		}
@@ -160,7 +160,7 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 	 * @return the {@link JaxRSWhiteboardConstants} for this resource type
 	 */
 	protected String getJaxRsResourceConstant() {
-		return JaxrsWhiteboardConstants.JAX_RS_EXTENSION;
+		return JakartarsWhiteboardConstants.JAKARTA_RS_EXTENSION;
 	}
 	
 	/* 

@@ -25,11 +25,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 
-import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
-import org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher;
-import org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsWhiteboardDispatcher;
+import org.gecko.rest.jersey.provider.whiteboard.JakartarsWhiteboardProvider;
 import org.gecko.rest.jersey.resources.TestLegacyApplication;
 import org.gecko.rest.jersey.resources.TestResource;
 import org.gecko.rest.jersey.runtime.common.DefaultApplication;
@@ -42,7 +42,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceObjects;
-import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
+import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 /**
  * Tests the whiteboard dispatcher
@@ -53,14 +53,14 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 public class JaxRsWhiteboardDispatcherTest {
 
 	@Mock
-	private JaxRsWhiteboardProvider whiteboard;
+	private JakartarsWhiteboardProvider whiteboard;
 
 	//@Mock
 	private ServiceObjects<Object> serviceObject;
 	
 	//@Before
 	public void before() {
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(true);
+		when(whiteboard.isRegistered(Mockito.any(JakartarsApplicationProvider.class))).thenReturn(true);
 	}
 	
 	/**
@@ -68,7 +68,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	//@Test(expected=IllegalStateException.class)
 	public void testDispatcherNotReady() {
-		JaxRsWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
+		JakartarsWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
 		assertFalse(dispatcher.isDispatching());
 		dispatcher.dispatch();
 		assertFalse(dispatcher.isDispatching());
@@ -83,14 +83,14 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	//@Test
 	public void testDispatcherReady() {
-		JaxRsWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
+		JakartarsWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
 		
 		Map<String, Object> defaultProperties = new HashMap<>();
-		defaultProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, ".default");
-		defaultProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "/");
+		defaultProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, ".default");
+		defaultProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE, "/");
 		dispatcher.addApplication(new DefaultApplication(), defaultProperties);
 		
 		dispatcher.dispatch();
@@ -109,7 +109,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	//@Test
 	public void testDispatcherLegacyApplicationAdd() {
-		JaxRsWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
+		JakartarsWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -128,7 +128,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * 4. Deactivate application no name: false
 		 * 5. Deactivate test - application: true
 		 */
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(true, false, false, false, false, true);
+		when(whiteboard.isRegistered(Mockito.any(JakartarsApplicationProvider.class))).thenReturn(true, false, false, false, false, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -150,7 +150,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).unregisterApplication(Mockito.any());
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE, "test");
 		assertEquals(1, dispatcher.getApplications().size());
 		dispatcher.addApplication(application, appProperties);
 		assertEquals(2, dispatcher.getApplications().size());
@@ -173,7 +173,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	//@Test
 	public void testDispatcherLegacyApplicationRemove() {
-		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
+		JakartarsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -189,7 +189,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * 1. addApplication test: add test: false,
 		 * 2. removeApplication test: remove test: true,
 		 */
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(true, false, true);
+		when(whiteboard.isRegistered(Mockito.any(JakartarsApplicationProvider.class))).thenReturn(true, false, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -200,7 +200,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		Map<String, Object> appProperties = new HashMap<>();
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE, "test");
 		appProperties.put(Constants.SERVICE_ID, Long.valueOf(10));
 		Application application = new TestLegacyApplication();
 		
@@ -230,13 +230,13 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, times(1)).reloadApplication(Mockito.any());
 	}
 	
-	private JaxRsWhiteboardDispatcher createDispatcherWithDefaultApplication() {
+	private JakartarsWhiteboardDispatcher createDispatcherWithDefaultApplication() {
 		JerseyWhiteboardDispatcher dispatcher = new JerseyWhiteboardDispatcher();
 		
 		//actually register default Application
 		Map<String, Object> defaultProperties = new HashMap<>();
-		defaultProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, ".default");
-		defaultProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "/");
+		defaultProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, ".default");
+		defaultProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE, "/");
 		dispatcher.addApplication(new DefaultApplication(), defaultProperties);
 		
 		return dispatcher;
@@ -247,7 +247,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	//@Test
 	public void testDispatcherReloadDefaultApplication() {
-		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
+		JakartarsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -263,7 +263,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * 2. addResource: Application test: true,
 		 * 3. Deactivate test - application: true
 		 */
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(true, false, false, true);
+		when(whiteboard.isRegistered(Mockito.any(JakartarsApplicationProvider.class))).thenReturn(true, false, false, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -274,7 +274,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		Map<String, Object> appProperties = new HashMap<>();
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE, "test");
 		Application application = new Application();
 		
 		assertEquals(0, dispatcher.getApplications().size());
@@ -289,7 +289,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		TestResource resource = new TestResource();
 		when(serviceObject.getService()).thenReturn(resource);
 		Map<String, Object> resProperties = new HashMap<>();
-		resProperties.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		resProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE, "true");
 		assertEquals(0, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties);
 		assertEquals(1, dispatcher.getResources().size());
@@ -312,7 +312,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	//@Test
 	public void testDispatcherLegacyApplicationAddRemoveResourceDefault() {
-		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
+		JakartarsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -328,7 +328,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * 2. addResource: Application test: true,
 		 * 3. Deactivate test - application: true
 		 */
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(true, false, false, true, true);
+		when(whiteboard.isRegistered(Mockito.any(JakartarsApplicationProvider.class))).thenReturn(true, false, false, true, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -339,7 +339,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		Map<String, Object> appProperties = new HashMap<>();
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE, "test");
 		Application application = new TestLegacyApplication();
 		
 		assertEquals(0, dispatcher.getApplications().size());
@@ -354,7 +354,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		TestResource resource = new TestResource();
 		when(serviceObject.getService()).thenReturn(resource);
 		Map<String, Object> resProperties = new HashMap<>();
-		resProperties.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
+		resProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE, "true");
 		assertEquals(0, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties);
 		assertEquals(1, dispatcher.getResources().size());
@@ -384,7 +384,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	//@Test
 	public void testDispatcherApplicationAddRemoveResource01() {
-		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
+		JakartarsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -402,7 +402,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * 4. removeResource Application test: true,
 		 * 5. Deactivate test - application: true
 		 */
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(true, false, false, false, true, true, true);
+		when(whiteboard.isRegistered(Mockito.any(JakartarsApplicationProvider.class))).thenReturn(true, false, false, false, true, true, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -413,8 +413,8 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		Map<String, Object> appProperties = new HashMap<>();
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "testApp");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE, "test");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "testApp");
 		appProperties.put(Constants.SERVICE_ID, Long.valueOf(100));
 		Application application = new Application();
 		
@@ -430,9 +430,9 @@ public class JaxRsWhiteboardDispatcherTest {
 		TestResource resource01 = new TestResource();
 		when(serviceObject.getService()).thenReturn(resource01);
 		Map<String, Object> resProperties01 = new HashMap<>();
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=testApp)");
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res01");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE, "true");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SELECT, "(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME + "=testApp)");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "res01");
 		resProperties01.put(Constants.SERVICE_ID, Long.valueOf(10));
 		assertEquals(0, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties01);
@@ -446,9 +446,9 @@ public class JaxRsWhiteboardDispatcherTest {
 		TestResource resource02 = new TestResource();
 		when(serviceObject.getService()).thenReturn(resource02);
 		Map<String, Object> resProperties02 = new HashMap<>();
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=testApp)");
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res02");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE, "true");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SELECT, "(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME + "=testApp)");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "res02");
 		resProperties02.put(Constants.SERVICE_ID, Long.valueOf(20));
 		assertEquals(1, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties02);
@@ -481,7 +481,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	//@Test
 	public void testDispatcherApplicationAddRemoveResource02() {
-		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
+		JakartarsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -499,7 +499,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * 4. removeResource Application test: true,
 		 * 5. Deactivate test - application: true
 		 */
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(true, false, false, true, true, true, true);
+		when(whiteboard.isRegistered(Mockito.any(JakartarsApplicationProvider.class))).thenReturn(true, false, false, true, true, true, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -510,8 +510,8 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		Map<String, Object> appProperties = new HashMap<>();
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "testApp");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE, "test");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "testApp");
 		appProperties.put(Constants.SERVICE_ID, Long.valueOf(100));
 		Application application = new Application();
 		
@@ -527,9 +527,9 @@ public class JaxRsWhiteboardDispatcherTest {
 		TestResource resource01 = new TestResource();
 		when(serviceObject.getService()).thenReturn(resource01);
 		Map<String, Object> resProperties01 = new HashMap<>();
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=*)");
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res01");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE, "true");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SELECT, "(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME + "=*)");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "res01");
 		resProperties01.put(Constants.SERVICE_ID, Long.valueOf(10));
 		assertEquals(0, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties01);
@@ -548,9 +548,9 @@ public class JaxRsWhiteboardDispatcherTest {
 		TestResource resource02 = new TestResource();
 		when(serviceObject.getService()).thenReturn(resource02);
 		Map<String, Object> resProperties02 = new HashMap<>();
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=testApp)");
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res02");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE, "true");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SELECT, "(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME + "=testApp)");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "res02");
 		resProperties02.put(Constants.SERVICE_ID, Long.valueOf(20));
 		assertEquals(1, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties02);
@@ -589,7 +589,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	//@Test
 	public void testDispatcherApplicationAddRemoveResource03() {
-		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
+		JakartarsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -607,7 +607,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		 * 4. removeResource Application test: true,
 		 * 5. Deactivate test - application: true
 		 */
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(true, false, false, false, true, true, true);
+		when(whiteboard.isRegistered(Mockito.any(JakartarsApplicationProvider.class))).thenReturn(true, false, false, false, true, true, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -618,8 +618,8 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		Map<String, Object> appProperties = new HashMap<>();
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "testApp");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE, "test");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "testApp");
 		appProperties.put(Constants.SERVICE_ID, Long.valueOf(100));
 		Application application = new Application();
 		
@@ -635,9 +635,9 @@ public class JaxRsWhiteboardDispatcherTest {
 		TestResource resource01 = new TestResource();
 		when(serviceObject.getService()).thenReturn(resource01);
 		Map<String, Object> resProperties01 = new HashMap<>();
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=*)");
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res01");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE, "true");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SELECT, "(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME + "=*)");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "res01");
 		resProperties01.put(Constants.SERVICE_ID, Long.valueOf(10));
 		assertEquals(0, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties01);
@@ -656,9 +656,9 @@ public class JaxRsWhiteboardDispatcherTest {
 		TestResource resource02 = new TestResource();
 		when(serviceObject.getService()).thenReturn(resource02);
 		Map<String, Object> resProperties02 = new HashMap<>();
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=testApp)");
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res02");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE, "true");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SELECT, "(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME + "=testApp)");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "res02");
 		resProperties02.put(Constants.SERVICE_ID, Long.valueOf(20));
 		assertEquals(1, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties02);
@@ -697,7 +697,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	//@Test
 	public void testDispatcherApplicationAddRemoveResourceWhiteboardTarget01() {
-		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
+		JakartarsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -710,7 +710,7 @@ public class JaxRsWhiteboardDispatcherTest {
 				return wbProperties;
 			}
 		});
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(true, false, false, true);
+		when(whiteboard.isRegistered(Mockito.any(JakartarsApplicationProvider.class))).thenReturn(true, false, false, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -721,9 +721,9 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		Map<String, Object> appProperties = new HashMap<>();
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "testApp");
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(name=hello)");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE, "test");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "testApp");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_WHITEBOARD_TARGET, "(name=hello)");
 		appProperties.put(Constants.SERVICE_ID, Long.valueOf(100));
 		Application application = new Application();
 		
@@ -739,9 +739,9 @@ public class JaxRsWhiteboardDispatcherTest {
 		TestResource resource01 = new TestResource();
 		when(serviceObject.getService()).thenReturn(resource01);
 		Map<String, Object> resProperties01 = new HashMap<>();
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=*)");
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res01");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE, "true");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SELECT, "(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME + "=*)");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "res01");
 		resProperties01.put(Constants.SERVICE_ID, Long.valueOf(10));
 		assertEquals(0, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties01);
@@ -760,9 +760,9 @@ public class JaxRsWhiteboardDispatcherTest {
 		TestResource resource02 = new TestResource();
 		when(serviceObject.getService()).thenReturn(resource02);
 		Map<String, Object> resProperties02 = new HashMap<>();
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=testApp)");
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res02");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE, "true");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SELECT, "(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME + "=testApp)");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "res02");
 		resProperties02.put(Constants.SERVICE_ID, Long.valueOf(20));
 		assertEquals(1, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties02);
@@ -801,7 +801,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	//@Test
 	public void testDispatcherApplicationAddRemoveResourceWhiteboardTarget02() {
-		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
+		JakartarsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -814,7 +814,7 @@ public class JaxRsWhiteboardDispatcherTest {
 				return wbProperties;
 			}
 		});
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(true, false, false, false, true, true, true);
+		when(whiteboard.isRegistered(Mockito.any(JakartarsApplicationProvider.class))).thenReturn(true, false, false, false, true, true, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -825,9 +825,9 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		Map<String, Object> appProperties = new HashMap<>();
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "testApp");
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(customer=my)");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE, "test");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "testApp");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_WHITEBOARD_TARGET, "(customer=my)");
 		appProperties.put(Constants.SERVICE_ID, Long.valueOf(100));
 		Application application = new Application();
 		
@@ -843,9 +843,9 @@ public class JaxRsWhiteboardDispatcherTest {
 		TestResource resource01 = new TestResource();
 		when(serviceObject.getService()).thenReturn(resource01);
 		Map<String, Object> resProperties01 = new HashMap<>();
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=*)");
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res01");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE, "true");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SELECT, "(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME + "=*)");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "res01");
 		resProperties01.put(Constants.SERVICE_ID, Long.valueOf(10));
 		assertEquals(0, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties01);
@@ -864,9 +864,9 @@ public class JaxRsWhiteboardDispatcherTest {
 		TestResource resource02 = new TestResource();
 		when(serviceObject.getService()).thenReturn(resource02);
 		Map<String, Object> resProperties02 = new HashMap<>();
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=testApp)");
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res02");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE, "true");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SELECT, "(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME + "=testApp)");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "res02");
 		resProperties02.put(Constants.SERVICE_ID, Long.valueOf(20));
 		assertEquals(1, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties02);
@@ -905,7 +905,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	//@Test
 	public void testDispatcherApplicationAddRemoveResourceWhiteboardTarget03() {
-		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
+		JakartarsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -918,7 +918,7 @@ public class JaxRsWhiteboardDispatcherTest {
 				return wbProperties;
 			}
 		});
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(true, false, false, true, false, true, true);
+		when(whiteboard.isRegistered(Mockito.any(JakartarsApplicationProvider.class))).thenReturn(true, false, false, true, false, true, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -929,9 +929,9 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		Map<String, Object> appProperties = new HashMap<>();
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "testApp");
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(customer=my)");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE, "test");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "testApp");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_WHITEBOARD_TARGET, "(customer=my)");
 		appProperties.put(Constants.SERVICE_ID, Long.valueOf(100));
 		Application application = new Application();
 		
@@ -947,10 +947,10 @@ public class JaxRsWhiteboardDispatcherTest {
 		TestResource resource01 = new TestResource();
 		when(serviceObject.getService()).thenReturn(resource01);
 		Map<String, Object> resProperties01 = new HashMap<>();
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(test=my)");
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=*)");
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res01");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE, "true");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_WHITEBOARD_TARGET, "(test=my)");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SELECT, "(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME + "=*)");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "res01");
 		resProperties01.put(Constants.SERVICE_ID, Long.valueOf(10));
 		assertEquals(0, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties01);
@@ -967,9 +967,9 @@ public class JaxRsWhiteboardDispatcherTest {
 		TestResource resource02 = new TestResource();
 		when(serviceObject.getService()).thenReturn(resource02);
 		Map<String, Object> resProperties02 = new HashMap<>();
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=testApp)");
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res02");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE, "true");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SELECT, "(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME + "=testApp)");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "res02");
 		resProperties02.put(Constants.SERVICE_ID, Long.valueOf(20));
 		assertEquals(1, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties02);
@@ -1009,7 +1009,7 @@ public class JaxRsWhiteboardDispatcherTest {
 	 */
 	//@Test
 	public void testDispatcherApplicationAddRemoveResourceWhiteboardTarget04() {
-		JaxRsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
+		JakartarsWhiteboardDispatcher dispatcher = createDispatcherWithDefaultApplication();
 		assertFalse(dispatcher.isDispatching());
 		assertNotNull(whiteboard);
 		dispatcher.setWhiteboardProvider(whiteboard);
@@ -1022,7 +1022,7 @@ public class JaxRsWhiteboardDispatcherTest {
 				return wbProperties;
 			}
 		});
-		when(whiteboard.isRegistered(Mockito.any(JaxRsApplicationProvider.class))).thenReturn(true, false, false, false, true, true, true);
+		when(whiteboard.isRegistered(Mockito.any(JakartarsApplicationProvider.class))).thenReturn(true, false, false, false, true, true, true);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -1033,9 +1033,9 @@ public class JaxRsWhiteboardDispatcherTest {
 		Mockito.verify(whiteboard, never()).reloadApplication(Mockito.any());
 		
 		Map<String, Object> appProperties = new HashMap<>();
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "testApp");
-		appProperties.put(JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(customer=my)");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE, "test");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "testApp");
+		appProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_WHITEBOARD_TARGET, "(customer=my)");
 		appProperties.put(Constants.SERVICE_ID, Long.valueOf(100));
 		Application application = new Application();
 		
@@ -1051,10 +1051,10 @@ public class JaxRsWhiteboardDispatcherTest {
 		TestResource resource01 = new TestResource();
 		when(serviceObject.getService()).thenReturn(resource01);
 		Map<String, Object> resProperties01 = new HashMap<>();
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_TARGET, "(customer=my)");
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=*)");
-		resProperties01.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res01");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE, "true");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_WHITEBOARD_TARGET, "(customer=my)");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SELECT, "(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME + "=*)");
+		resProperties01.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "res01");
 		resProperties01.put(Constants.SERVICE_ID, Long.valueOf(10));
 		assertEquals(0, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties01);
@@ -1071,9 +1071,9 @@ public class JaxRsWhiteboardDispatcherTest {
 		TestResource resource02 = new TestResource();
 		when(serviceObject.getService()).thenReturn(resource02);
 		Map<String, Object> resProperties02 = new HashMap<>();
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_RESOURCE, "true");
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT, "(" + JaxrsWhiteboardConstants.JAX_RS_NAME + "=testApp)");
-		resProperties02.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "res02");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE, "true");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SELECT, "(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME + "=testApp)");
+		resProperties02.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "res02");
 		resProperties02.put(Constants.SERVICE_ID, Long.valueOf(20));
 		assertEquals(1, dispatcher.getResources().size());
 		dispatcher.addResource(serviceObject, resProperties02);

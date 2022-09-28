@@ -13,7 +13,7 @@
  */
 package org.gecko.rest.jersey.runtime.common;
 
-import javax.ws.rs.client.WebTarget;
+import jakarta.ws.rs.client.WebTarget;
 
 import org.glassfish.jersey.media.sse.internal.JerseySseEventSource;
 import org.glassfish.jersey.media.sse.internal.JerseySseEventSource.Builder;
@@ -25,7 +25,7 @@ import aQute.bnd.annotation.spi.ServiceProvider;
  * @author stbischof
  * @since Apr 10, 2022
  */
-@ServiceProvider(value = javax.ws.rs.sse.SseEventSource.Builder.class)
+@ServiceProvider(value = jakarta.ws.rs.sse.SseEventSource.Builder.class)
 public class SseSourceBuilderService extends JerseySseEventSource.Builder {
 
 	@Override

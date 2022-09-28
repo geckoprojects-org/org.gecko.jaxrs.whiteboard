@@ -13,8 +13,8 @@
  */
 package org.gecko.rest.jersey.resources;
 
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Application;
 
 /**
  * 

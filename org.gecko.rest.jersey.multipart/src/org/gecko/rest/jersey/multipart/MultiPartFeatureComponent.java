@@ -13,21 +13,21 @@ package org.gecko.rest.jersey.multipart;
 
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.FeatureContext;
+import jakarta.ws.rs.core.Feature;
+import jakarta.ws.rs.core.FeatureContext;
 
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsApplicationSelect;
-import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsExtension;
-import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsName;
-import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsWhiteboardTarget;
+import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsApplicationSelect;
+import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsExtension;
+import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsName;
+import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsWhiteboardTarget;
 
-@JaxrsExtension
-@JaxrsName("MultiPartFeatureExtension")
+@JakartarsExtension
+@JakartarsName("MultiPartFeatureExtension")
 @Component(name = "MultiPartFeatureComponent", property = {"multipart=true"})
-@JaxrsApplicationSelect("(!(disableMultipart=true))")
-@JaxrsWhiteboardTarget("(!(disableMultipart=true))")
+@JakartarsApplicationSelect("(!(disableMultipart=true))")
+@JakartarsWhiteboardTarget("(!(disableMultipart=true))")
 public class MultiPartFeatureComponent implements Feature{
 	
 	private Logger logger = Logger.getLogger(MultiPartFeatureComponent.class.getName()); 

@@ -27,11 +27,11 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.gecko.rest.jersey.helper.JaxRsHelper;
+import org.gecko.rest.jersey.helper.JakartarsHelper;
 import org.gecko.rest.jersey.helper.JerseyHelper;
 import org.gecko.rest.jersey.jetty.JettyServerRunnable;
 import org.gecko.rest.jersey.provider.JerseyConstants;
-import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider;
 import org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime;
 import org.gecko.rest.jersey.runtime.common.ResourceConfigWrapper;
 import org.gecko.rest.jersey.runtime.servlet.WhiteboardServletContainer;
@@ -41,7 +41,7 @@ import org.osgi.annotation.bundle.Capability;
 import org.osgi.namespace.implementation.ImplementationNamespace;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
+import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 /**
  * Implementation of the {@link JaxRSServiceRuntime} for a Jersey implementation
@@ -49,8 +49,8 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  * @author Mark Hoffmann
  * @since 12.07.2017
  */
-@Capability(namespace = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, version = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_SPECIFICATION_VERSION, name = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_IMPLEMENTATION, attribute = {
-		"uses:=\"javax.ws.rs,javax.ws.rs.sse,javax.ws.rs.core,javax.ws.rs.ext,javax.ws.rs.client,javax.ws.rs.container,org.osgi.service.jaxrs.whiteboard\"",
+@Capability(namespace = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, version = JakartarsWhiteboardConstants.JAKARTA_RS_WHITEBOARD_SPECIFICATION_VERSION, name = JakartarsWhiteboardConstants.JAKARTA_RS_WHITEBOARD_IMPLEMENTATION, attribute = {
+		"uses:=\"jakarta.ws.rs,jakarta.ws.rs.sse,jakarta.ws.rs.core,jakarta.ws.rs.ext,jakarta.ws.rs.client,jakarta.ws.rs.container,org.osgi.service.jakartars.whiteboard\"",
 		"provider=jersey", "jersey.version=2.35" })
 public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 
@@ -156,7 +156,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 		}
 		String path = JerseyHelper.getPropertyWithDefault(context, JerseyConstants.JERSEY_CONTEXT_PATH,
 				JerseyConstants.WHITEBOARD_DEFAULT_CONTEXT_PATH);
-		path = JaxRsHelper.toServletPath(path);
+		path = JakartarsHelper.toServletPath(path);
 		sb.append(path);
 		return new String[] { sb.substring(0, sb.length() - 1) };
 	}
@@ -169,7 +169,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	 * org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider)
 	 */
 	@Override
-	protected void doRegisterServletContext(JaxRsApplicationProvider applicationProvider, String path,
+	protected void doRegisterServletContext(JakartarsApplicationProvider applicationProvider, String path,
 			ResourceConfig config) {
 		WhiteboardServletContainer container = new WhiteboardServletContainer(config, applicationProvider);
 		if (!applicationProvider.getServletContainers().isEmpty()) {
@@ -201,7 +201,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	 * org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider)
 	 */
 	@Override
-	protected void doRegisterServletContext(JaxRsApplicationProvider applicationProvider, String path) {
+	protected void doRegisterServletContext(JakartarsApplicationProvider applicationProvider, String path) {
 		ResourceConfigWrapper config = createResourceConfig(applicationProvider);
 		WhiteboardServletContainer container = new WhiteboardServletContainer(config, applicationProvider);
 		if (!applicationProvider.getServletContainers().isEmpty()) {
@@ -229,7 +229,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	}
 
 	@Override
-	protected void doUnregisterApplication(JaxRsApplicationProvider applicationProvider) {
+	protected void doUnregisterApplication(JakartarsApplicationProvider applicationProvider) {
 		removeContextHandler(applicationProvider.getPath());
 	}
 

@@ -24,7 +24,7 @@ import org.glassfish.jersey.process.internal.RequestScoped;
 
 /**
  * OSGi injection binder for HK2, that is used in Jersey. This binder is responsible for
- * the creation of JaxRs resource instance of service references of type PROTOTYPE
+ * the creation of JakartaRs resource instance of service references of type PROTOTYPE
  * @author Mark Hoffmann
  * @since 12.07.2017
  */

@@ -30,15 +30,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 
 import org.gecko.rest.jersey.helper.DispatcherHelper;
-import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider;
 import org.gecko.rest.jersey.runtime.application.JerseyApplicationProvider;
 import org.gecko.rest.jersey.runtime.common.DefaultApplication;
 import org.junit.jupiter.api.Test;
 import org.osgi.framework.Constants;
-import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
+import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 /**
  * 
@@ -48,7 +48,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 public class DispatcherHelperTest {
 	
 	/**
-	 * Test method for {@link org.gecko.rest.jersey.helper.JerseyHelper#isEmpty(javax.ws.rs.core.Application)}.
+	 * Test method for {@link org.gecko.rest.jersey.helper.JerseyHelper#isEmpty(jakarta.ws.rs.core.Application)}.
 	 */
 	@Test
 	public void testGetDefaultApplicationIsEmpty() {
@@ -60,14 +60,14 @@ public class DispatcherHelperTest {
 	}
 	
 	/**
-	 * Test method for {@link org.gecko.rest.jersey.helper.JerseyHelper#isEmpty(javax.ws.rs.core.Application)}.
+	 * Test method for {@link org.gecko.rest.jersey.helper.JerseyHelper#isEmpty(jakarta.ws.rs.core.Application)}.
 	 */
 	@Test
 	public void testGetDefaultApplicationNoDefault() {
 		assertNotNull(DispatcherHelper.getDefaultApplications(null));
 		assertEquals(0, DispatcherHelper.getDefaultApplications(null).size());
 		
-		List<JaxRsApplicationProvider> providers = new LinkedList<JaxRsApplicationProvider>();
+		List<JakartarsApplicationProvider> providers = new LinkedList<JakartarsApplicationProvider>();
 		providers.add(createApplicationProvider("test", Integer.valueOf(10), Long.valueOf(1)));
 		providers.add(createApplicationProvider("test3", Integer.valueOf(20), Long.valueOf(2)));
 		providers.add(createApplicationProvider("test54", Integer.valueOf(40), Long.valueOf(3)));
@@ -78,22 +78,22 @@ public class DispatcherHelperTest {
 	}
 	
 	/**
-	 * Test method for {@link org.gecko.rest.jersey.helper.JerseyHelper#isEmpty(javax.ws.rs.core.Application)}.
+	 * Test method for {@link org.gecko.rest.jersey.helper.JerseyHelper#isEmpty(jakarta.ws.rs.core.Application)}.
 	 */
 	@Test
 	public void testGetDefaultApplicationOne() {
 		assertNotNull(DispatcherHelper.getDefaultApplications(null));
 		assertEquals(0, DispatcherHelper.getDefaultApplications(null).size());
 		
-		List<JaxRsApplicationProvider> providers = new LinkedList<JaxRsApplicationProvider>();
+		List<JakartarsApplicationProvider> providers = new LinkedList<JakartarsApplicationProvider>();
 		providers.add(createApplicationProvider("test", Integer.valueOf(10), Long.valueOf(1)));
-		JaxRsApplicationProvider defaultProvider = createApplicationProvider(".default", Integer.valueOf(20), Long.valueOf(2));
+		JakartarsApplicationProvider defaultProvider = createApplicationProvider(".default", Integer.valueOf(20), Long.valueOf(2));
 		providers.add(defaultProvider);
 		providers.add(createApplicationProvider("test54", Integer.valueOf(40), Long.valueOf(3)));
 		
-		Set<JaxRsApplicationProvider> result = DispatcherHelper.getDefaultApplications(providers);
+		Set<JakartarsApplicationProvider> result = DispatcherHelper.getDefaultApplications(providers);
 		assertEquals(1, result.size());
-		Optional<JaxRsApplicationProvider> first = result.stream().findFirst();
+		Optional<JakartarsApplicationProvider> first = result.stream().findFirst();
 		assertTrue(first.isPresent());
 		assertEquals(defaultProvider, first.get());
 		
@@ -105,25 +105,25 @@ public class DispatcherHelperTest {
 	}
 	
 	/**
-	 * Test method for {@link org.gecko.rest.jersey.helper.JerseyHelper#isEmpty(javax.ws.rs.core.Application)}.
+	 * Test method for {@link org.gecko.rest.jersey.helper.JerseyHelper#isEmpty(jakarta.ws.rs.core.Application)}.
 	 */
 	@Test
 	public void testGetDefaultApplicationMany() {
 		assertNotNull(DispatcherHelper.getDefaultApplications(null));
 		assertEquals(0, DispatcherHelper.getDefaultApplications(null).size());
 		
-		List<JaxRsApplicationProvider> providers = new LinkedList<JaxRsApplicationProvider>();
+		List<JakartarsApplicationProvider> providers = new LinkedList<JakartarsApplicationProvider>();
 		providers.add(createApplicationProvider("test", Integer.valueOf(10), Long.valueOf(1)));
-		JaxRsApplicationProvider defaultProvider01 = createApplicationProvider(".default", Integer.valueOf(20), Long.valueOf(2));
+		JakartarsApplicationProvider defaultProvider01 = createApplicationProvider(".default", Integer.valueOf(20), Long.valueOf(2));
 		providers.add(defaultProvider01);
-		JaxRsApplicationProvider defaultProvider02 = createApplicationProvider(".default", Integer.valueOf(30), Long.valueOf(3));
+		JakartarsApplicationProvider defaultProvider02 = createApplicationProvider(".default", Integer.valueOf(30), Long.valueOf(3));
 		providers.add(defaultProvider02);
 		providers.add(createApplicationProvider("test54", Integer.valueOf(40), Long.valueOf(4)));
 		
-		Set<JaxRsApplicationProvider> result = DispatcherHelper.getDefaultApplications(providers);
+		Set<JakartarsApplicationProvider> result = DispatcherHelper.getDefaultApplications(providers);
 		assertEquals(2, result.size());
 		int cnt = 0;
-		for (JaxRsApplicationProvider p : result) {
+		for (JakartarsApplicationProvider p : result) {
 			switch (cnt) {
 			case 0:
 				assertEquals(defaultProvider02, p);
@@ -135,34 +135,34 @@ public class DispatcherHelperTest {
 			cnt++;
 		}
 		
-		Optional<JaxRsApplicationProvider> first = DispatcherHelper.getDefaultApplication(providers);
+		Optional<JakartarsApplicationProvider> first = DispatcherHelper.getDefaultApplication(providers);
 		assertNotNull(first);
 		assertTrue(first.isPresent());
 		assertEquals(defaultProvider02, first.get());
 	}
 	
 	/**
-	 * Test method for {@link org.gecko.rest.jersey.helper.JerseyHelper#isEmpty(javax.ws.rs.core.Application)}.
+	 * Test method for {@link org.gecko.rest.jersey.helper.JerseyHelper#isEmpty(jakarta.ws.rs.core.Application)}.
 	 */
 	@Test
 	public void testGetDefaultApplicationManyWithRealDefault() {
 		assertNotNull(DispatcherHelper.getDefaultApplications(null));
 		assertEquals(0, DispatcherHelper.getDefaultApplications(null).size());
 		
-		List<JaxRsApplicationProvider> providers = new LinkedList<JaxRsApplicationProvider>();
+		List<JakartarsApplicationProvider> providers = new LinkedList<JakartarsApplicationProvider>();
 		providers.add(createApplicationProvider("test", Integer.valueOf(10), Long.valueOf(1)));
-		JaxRsApplicationProvider defaultProvider01 = createApplicationProvider(".default", Integer.valueOf(20), Long.valueOf(2));
+		JakartarsApplicationProvider defaultProvider01 = createApplicationProvider(".default", Integer.valueOf(20), Long.valueOf(2));
 		providers.add(defaultProvider01);
-		JaxRsApplicationProvider defaultProvider02 = createApplicationProvider(".default", Integer.valueOf(30), Long.valueOf(3));
+		JakartarsApplicationProvider defaultProvider02 = createApplicationProvider(".default", Integer.valueOf(30), Long.valueOf(3));
 		providers.add(defaultProvider02);
 		providers.add(createApplicationProvider("test54", Integer.valueOf(40), Long.valueOf(4)));
-		JaxRsApplicationProvider defaultProvider03 = createApplicationProvider(".default", Integer.valueOf(50), Long.valueOf(5), true);
+		JakartarsApplicationProvider defaultProvider03 = createApplicationProvider(".default", Integer.valueOf(50), Long.valueOf(5), true);
 		providers.add(defaultProvider03);
 		
-		Set<JaxRsApplicationProvider> result = DispatcherHelper.getDefaultApplications(providers);
+		Set<JakartarsApplicationProvider> result = DispatcherHelper.getDefaultApplications(providers);
 		assertEquals(2, result.size());
 		int cnt = 0;
-		for (JaxRsApplicationProvider p : result) {
+		for (JakartarsApplicationProvider p : result) {
 			switch (cnt) {
 			case 0:
 				assertEquals(defaultProvider02, p);
@@ -174,7 +174,7 @@ public class DispatcherHelperTest {
 			cnt++;
 		}
 		
-		Optional<JaxRsApplicationProvider> first = DispatcherHelper.getDefaultApplication(providers);
+		Optional<JakartarsApplicationProvider> first = DispatcherHelper.getDefaultApplication(providers);
 		assertNotNull(first);
 		assertTrue(first.isPresent());
 		assertEquals(defaultProvider02, first.get());
@@ -201,9 +201,9 @@ public class DispatcherHelperTest {
 	 * @param name provider name
 	 * @param rank service rank
 	 * @param serviceId the service id
-	 * @return the JaxRsApplicationProvider instance 
+	 * @return the JakartarsApplicationProvider instance 
 	 */
-	private JaxRsApplicationProvider createApplicationProvider(String name, Integer rank, Long serviceId) {
+	private JakartarsApplicationProvider createApplicationProvider(String name, Integer rank, Long serviceId) {
 		return createApplicationProvider(name, rank, serviceId, false);
 	}
 	
@@ -213,12 +213,12 @@ public class DispatcherHelperTest {
 	 * @param rank service rank
 	 * @param serviceId the service id
 	 * @param defauktApp <code>true</code>, to create a real default application
-	 * @return the JaxRsApplicationProvider instance 
+	 * @return the JakartarsApplicationProvider instance 
 	 */
-	private JaxRsApplicationProvider createApplicationProvider(String name, Integer rank, Long serviceId, boolean defaultApp) {
+	private JakartarsApplicationProvider createApplicationProvider(String name, Integer rank, Long serviceId, boolean defaultApp) {
 		Map<String, Object> properties = new HashMap<String, Object>();
 		if (name != null) {
-			properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, name);
+			properties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, name);
 		}
 		if (rank != null) {
 			properties.put(Constants.SERVICE_RANKING, rank);
@@ -226,7 +226,7 @@ public class DispatcherHelperTest {
 		if (serviceId != null) {
 			properties.put(Constants.SERVICE_ID, serviceId);
 		}
-		JaxRsApplicationProvider provider = new JerseyApplicationProvider(defaultApp ? new DefaultApplication() : new Application(), properties);
+		JakartarsApplicationProvider provider = new JerseyApplicationProvider(defaultApp ? new DefaultApplication() : new Application(), properties);
 		return provider;
 	}
 

@@ -13,11 +13,11 @@
  */
 package org.gecko.rest.jersey.runtime.common;
 
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.sse.SseEventSource;
-import javax.ws.rs.sse.SseEventSource.Builder;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.sse.SseEventSource;
+import jakarta.ws.rs.sse.SseEventSource.Builder;
 
-import org.osgi.service.jaxrs.client.SseEventSourceFactory;
+import org.osgi.service.jakartars.client.SseEventSourceFactory;
 
 /**
  * 
@@ -28,7 +28,7 @@ public class SseEventSourceFactoryImpl implements SseEventSourceFactory {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.SseEventSourceFactory#newBuilder(javax.ws.rs.client.WebTarget)
+	 * @see org.osgi.service.jakartars.client.SseEventSourceFactory#newBuilder(jakarta.ws.rs.client.WebTarget)
 	 */
 	@Override
 	public Builder newBuilder(WebTarget target) {		
@@ -37,7 +37,7 @@ public class SseEventSourceFactoryImpl implements SseEventSourceFactory {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.SseEventSourceFactory#newSource(javax.ws.rs.client.WebTarget)
+	 * @see org.osgi.service.jakartars.client.SseEventSourceFactory#newSource(jakarta.ws.rs.client.WebTarget)
 	 */
 	@Override
 	public SseEventSource newSource(WebTarget target) {

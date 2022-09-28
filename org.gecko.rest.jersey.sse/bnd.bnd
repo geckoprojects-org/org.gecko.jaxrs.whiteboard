@@ -17,4 +17,4 @@ Export-Package: \
 	org.glassfish.jersey.core.jersey-server;version=latest,\
 	jakarta.inject.jakarta.inject-api;version=latest,\
 	jakarta.annotation-api;version=latest,\
-	org.apache.geronimo.specs.geronimo-jaxrs_2.1_spec
+	jakarta.ws.rs-api;version=latest

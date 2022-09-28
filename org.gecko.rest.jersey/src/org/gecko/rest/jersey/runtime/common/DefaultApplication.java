@@ -13,20 +13,20 @@
  */
 package org.gecko.rest.jersey.runtime.common;
 
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
-import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsApplicationBase;
-import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsName;
+import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsApplicationBase;
+import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsName;
 
 /**
  * The default Appplication for a Whiteboard 
  * @author Juergen Albert
  */
 @Component(service = Application.class, scope = ServiceScope.PROTOTYPE)
-@JaxrsName(".default")
-@JaxrsApplicationBase("/")
+@JakartarsName(".default")
+@JakartarsApplicationBase("/")
 public class DefaultApplication extends Application {
 
 }

@@ -21,8 +21,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
-import org.gecko.rest.jersey.provider.application.JaxRsProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsProvider;
 
 /**
  * Helper class for the dispatcher
@@ -31,13 +31,13 @@ import org.gecko.rest.jersey.provider.application.JaxRsProvider;
  */
 public class DispatcherHelper {
 	
-	public static Comparator<JaxRsProvider> PROVIDER_COMPARATOR = new Comparator<JaxRsProvider>() {
+	public static Comparator<JakartarsProvider> PROVIDER_COMPARATOR = new Comparator<JakartarsProvider>() {
 		/* 
 		 * (non-Javadoc)
 		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 		 */
 		@Override
-		public int compare(JaxRsProvider p1, JaxRsProvider p2) {
+		public int compare(JakartarsProvider p1, JakartarsProvider p2) {
 			if (p1.getServiceRank() == p2.getServiceRank()) {
 				return p1.getServiceId().compareTo(p2.getServiceId());
 			}
@@ -50,12 +50,12 @@ public class DispatcherHelper {
 	 * @param applications the {@link Collection} of applications
 	 * @return a {@link Set} of application or an empty {@link Set}
 	 */
-	public static Set<JaxRsApplicationProvider> getDefaultApplications(Collection<JaxRsApplicationProvider> applications) {
+	public static Set<JakartarsApplicationProvider> getDefaultApplications(Collection<JakartarsApplicationProvider> applications) {
 		if (applications == null) {
 			return Collections.emptySet();
 		}
 		
-		Set<JaxRsApplicationProvider> resultSet = applications.stream()
+		Set<JakartarsApplicationProvider> resultSet = applications.stream()
 				.filter(app->(".default".equals(app.getName()) || "/*".equals(app.getPath())) && !app.isDefault())
 				.sorted(PROVIDER_COMPARATOR)
 				.collect(Collectors.toCollection(LinkedHashSet::new));
@@ -67,7 +67,7 @@ public class DispatcherHelper {
 	 * @param applications the {@link Collection} of applications
 	 * @return a {@link Optional} of application 
 	 */
-	public static Optional<JaxRsApplicationProvider> getDefaultApplication(Collection<JaxRsApplicationProvider> applications) {
+	public static Optional<JakartarsApplicationProvider> getDefaultApplication(Collection<JakartarsApplicationProvider> applications) {
 		if (applications == null) {
 			return Optional.empty();
 		}

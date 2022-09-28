@@ -13,7 +13,7 @@
  */
 package org.gecko.rest.jersey.dto;
 
-import org.osgi.service.jaxrs.runtime.dto.ExtensionDTO;
+import org.osgi.service.jakartars.runtime.dto.ExtensionDTO;
 
 /**
  * Implementation of the JaxRs extension DTO

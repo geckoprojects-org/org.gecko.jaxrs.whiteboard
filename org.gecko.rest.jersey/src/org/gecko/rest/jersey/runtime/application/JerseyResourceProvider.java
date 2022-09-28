@@ -16,11 +16,11 @@ package org.gecko.rest.jersey.runtime.application;
 import java.util.Map;
 
 import org.gecko.rest.jersey.dto.DTOConverter;
-import org.gecko.rest.jersey.provider.application.JaxRsResourceProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsResourceProvider;
 import org.osgi.framework.ServiceObjects;
-import org.osgi.service.jaxrs.runtime.dto.BaseDTO;
-import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
-import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
+import org.osgi.service.jakartars.runtime.dto.BaseDTO;
+import org.osgi.service.jakartars.runtime.dto.DTOConstants;
+import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 /**
  * A wrapper class for a JaxRs resources 
@@ -28,7 +28,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  * @param <T>
  * @since 09.10.2017
  */
-public class JerseyResourceProvider<T extends Object> extends JerseyApplicationContentProvider<T> implements JaxRsResourceProvider {
+public class JerseyResourceProvider<T extends Object> extends JerseyApplicationContentProvider<T> implements JakartarsResourceProvider {
 
 	public JerseyResourceProvider(ServiceObjects<T> serviceObjects, Map<String, Object> properties) {
 		super(serviceObjects, properties);
@@ -71,7 +71,7 @@ public class JerseyResourceProvider<T extends Object> extends JerseyApplicationC
 	 * @return the {@link JaxRSWhiteboardConstants} for this resource type
 	 */
 	protected String getJaxRsResourceConstant() {
-		return JaxrsWhiteboardConstants.JAX_RS_RESOURCE;
+		return JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE;
 	}
 	
 	/* 

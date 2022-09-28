@@ -23,13 +23,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 
-import org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvider;
-import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsApplicationContentProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider;
 import org.gecko.rest.jersey.runtime.application.feature.WhiteboardFeature;
 import org.osgi.framework.ServiceObjects;
-import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
+import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 /**
  * Special JaxRs application implementation that holds and updates all resource and extension given by the application provider
@@ -40,8 +40,8 @@ public class JerseyApplication extends Application {
 
 	private volatile Map<String, Class<?>> classes = new ConcurrentHashMap<>();
 	private volatile Map<String, Object> singletons = new ConcurrentHashMap<>();
-	private volatile Map<String, JaxRsExtensionProvider> extensions = new ConcurrentHashMap<>();
-	private volatile Map<String, JaxRsApplicationContentProvider> contentProviders = new ConcurrentHashMap<>();
+	private volatile Map<String, JakartarsExtensionProvider> extensions = new ConcurrentHashMap<>();
+	private volatile Map<String, JakartarsApplicationContentProvider> contentProviders = new ConcurrentHashMap<>();
 	private final String applicationName;
 	private final Logger log = Logger.getLogger("jersey.application");
 	private Map<String, Object> properties;
@@ -57,7 +57,7 @@ public class JerseyApplication extends Application {
 		this.sourceApplication = sourceApplication;
 		Map<String, Object> props = new HashMap<String, Object>();
 		if(additionalProperites != null) {
-			props.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SERVICE_PROPERTIES, additionalProperites);
+			props.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SERVICE_PROPERTIES, additionalProperites);
 		}
 		if(sourceApplication.getProperties() != null) {
 			props.putAll(sourceApplication.getProperties());
@@ -72,7 +72,7 @@ public class JerseyApplication extends Application {
 	
 	/* 
 	 * (non-Javadoc)
-	 * @see javax.ws.rs.core.Application#getClasses()
+	 * @see jakarta.ws.rs.core.Application#getClasses()
 	 */
 	@Override
 	public Set<Class<?>> getClasses() {
@@ -84,7 +84,7 @@ public class JerseyApplication extends Application {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see javax.ws.rs.core.Application#getSingletons()
+	 * @see jakarta.ws.rs.core.Application#getSingletons()
 	 */
 	@Override
 	public Set<Object> getSingletons() {
@@ -117,7 +117,7 @@ public class JerseyApplication extends Application {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public boolean addContent(JaxRsApplicationContentProvider contentProvider) {
+	public boolean addContent(JakartarsApplicationContentProvider contentProvider) {
 		
 		if (contentProvider == null) {
 			if (log != null) {
@@ -127,14 +127,14 @@ public class JerseyApplication extends Application {
 		}
 		String key = contentProvider.getId();
 		contentProviders.put(key, contentProvider);
-		if(contentProvider instanceof JaxRsExtensionProvider) {
+		if(contentProvider instanceof JakartarsExtensionProvider) {
 			Class<?> extensionClass = contentProvider.getObjectClass();
 			if (extensionClass == null) {
 				contentProviders.remove(key);
 				Object removed = extensions.remove(key);
 				return removed != null;
 			}
-			JaxRsExtensionProvider result = extensions.put(key, (JaxRsExtensionProvider) contentProvider);
+			JakartarsExtensionProvider result = extensions.put(key, (JakartarsExtensionProvider) contentProvider);
 			return  result == null || !extensionClass.equals(result.getObjectClass());
 		} else if (contentProvider.isSingleton()) {
 			Class<?> resourceClass = contentProvider.getObjectClass();
@@ -181,7 +181,7 @@ public class JerseyApplication extends Application {
 	 * @return Return <code>true</code>, if the content was removed
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public boolean removeContent(JaxRsApplicationContentProvider contentProvider) {
+	public boolean removeContent(JakartarsApplicationContentProvider contentProvider) {
 		if (contentProvider == null) {
 			if (log != null) {
 				log.log(Level.WARNING, "A null resource provider was given to unregister as a JaxRs resource");
@@ -189,9 +189,9 @@ public class JerseyApplication extends Application {
 			return false;
 		}
 		String key = contentProvider.getId();
-		if(contentProvider instanceof JaxRsExtensionProvider) {
+		if(contentProvider instanceof JakartarsExtensionProvider) {
 			synchronized (extensions) {
-				JaxRsExtensionProvider ext = extensions.remove(key);
+				JakartarsExtensionProvider ext = extensions.remove(key);
 				if(ext != null) {
 					if(whiteboardFeature != null) {
 						whiteboardFeature.dispose(ext);
@@ -229,7 +229,7 @@ public class JerseyApplication extends Application {
 	 * Returns all content providers
 	 * @return a Collection of contentProviders
 	 */
-	public Collection<JaxRsApplicationContentProvider> getContentProviders(){
+	public Collection<JakartarsApplicationContentProvider> getContentProviders(){
 		return contentProviders.values();
 	}
 

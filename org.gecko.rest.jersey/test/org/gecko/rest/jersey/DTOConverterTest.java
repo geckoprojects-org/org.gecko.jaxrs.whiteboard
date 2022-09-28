@@ -25,12 +25,12 @@ import java.lang.reflect.Method;
 import java.util.Hashtable;
 import java.util.Map;
 
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 
 import org.gecko.rest.jersey.dto.DTOConverter;
-import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
-import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
-import org.gecko.rest.jersey.provider.application.JaxRsResourceProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsResourceProvider;
 import org.gecko.rest.jersey.resources.TestApplPathApplication;
 import org.gecko.rest.jersey.resources.TestExtension;
 import org.gecko.rest.jersey.resources.TestPathApplication;
@@ -45,15 +45,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.service.component.ComponentConstants;
-import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
-import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
-import org.osgi.service.jaxrs.runtime.dto.ExtensionDTO;
-import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
-import org.osgi.service.jaxrs.runtime.dto.FailedExtensionDTO;
-import org.osgi.service.jaxrs.runtime.dto.FailedResourceDTO;
-import org.osgi.service.jaxrs.runtime.dto.ResourceDTO;
-import org.osgi.service.jaxrs.runtime.dto.ResourceMethodInfoDTO;
-import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
+import org.osgi.service.jakartars.runtime.dto.ApplicationDTO;
+import org.osgi.service.jakartars.runtime.dto.DTOConstants;
+import org.osgi.service.jakartars.runtime.dto.ExtensionDTO;
+import org.osgi.service.jakartars.runtime.dto.FailedApplicationDTO;
+import org.osgi.service.jakartars.runtime.dto.FailedExtensionDTO;
+import org.osgi.service.jakartars.runtime.dto.FailedResourceDTO;
+import org.osgi.service.jakartars.runtime.dto.ResourceDTO;
+import org.osgi.service.jakartars.runtime.dto.ResourceMethodInfoDTO;
+import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 /**
  * Tests the DTO converter
@@ -73,7 +73,7 @@ public class DTOConverterTest {
 	public void testToFailedApplicationDTO() {
 		Map<String, Object> properties = new Hashtable<>();
 		
-		JaxRsApplicationProvider resourceProvider = new JerseyApplicationProvider(new Application(), properties);
+		JakartarsApplicationProvider resourceProvider = new JerseyApplicationProvider(new Application(), properties);
 		
 		FailedApplicationDTO dto = DTOConverter.toFailedApplicationDTO(resourceProvider, DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE);
 		assertNotNull(dto);
@@ -83,8 +83,8 @@ public class DTOConverterTest {
 		assertEquals(DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE, dto.failureReason);
 		
 		properties.put(Constants.SERVICE_ID, Long.valueOf(12));
-		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "MyApp");
-		properties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
+		properties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "MyApp");
+		properties.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE, "test");
 		
 		resourceProvider = new JerseyApplicationProvider(new Application(), properties);
 		dto = DTOConverter.toFailedApplicationDTO(resourceProvider, DTOConstants.FAILURE_REASON_SHADOWED_BY_OTHER_SERVICE);
@@ -104,7 +104,7 @@ public class DTOConverterTest {
 	public void testToApplicationDTO() {
 		Map<String, Object> properties = new Hashtable<>();
 		
-		JaxRsApplicationProvider resourceProvider = new JerseyApplicationProvider(new Application(), properties);
+		JakartarsApplicationProvider resourceProvider = new JerseyApplicationProvider(new Application(), properties);
 		
 		ApplicationDTO dto = DTOConverter.toApplicationDTO(resourceProvider);
 		assertNotNull(dto);
@@ -113,8 +113,8 @@ public class DTOConverterTest {
 		assertEquals(-1, dto.serviceId);
 		
 		properties.put(Constants.SERVICE_ID, Long.valueOf(12));
-		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "MyApp");
-		properties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "test");
+		properties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "MyApp");
+		properties.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE, "test");
 		
 		resourceProvider = new JerseyApplicationProvider(new Application(), properties);
 		dto = DTOConverter.toApplicationDTO(resourceProvider);
@@ -149,7 +149,7 @@ public class DTOConverterTest {
 		Map<String, Object> properties = new Hashtable<>();
 		
 		when(serviceObject.getService()).thenReturn(resource);
-		JaxRsResourceProvider resourceProvider = new JerseyResourceProvider<Object>(serviceObject, properties);
+		JakartarsResourceProvider resourceProvider = new JerseyResourceProvider<Object>(serviceObject, properties);
 		
 		FailedResourceDTO dto = DTOConverter.toFailedResourceDTO(resourceProvider, DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE);
 		assertNotNull(dto);
@@ -158,7 +158,7 @@ public class DTOConverterTest {
 		assertEquals(DTOConstants.FAILURE_REASON_SERVICE_NOT_GETTABLE, dto.failureReason);
 		
 		properties.put(Constants.SERVICE_ID, Long.valueOf(12));
-		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Myresource");
+		properties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "Myresource");
 		
 		resourceProvider = new JerseyResourceProvider<Object>(serviceObject, properties);
 		dto = DTOConverter.toFailedResourceDTO(resourceProvider, DTOConstants.FAILURE_REASON_SHADOWED_BY_OTHER_SERVICE);
@@ -178,7 +178,7 @@ public class DTOConverterTest {
 		TestResource resource = new TestResource();
 		Map<String, Object> properties = new Hashtable<>();
 		when(serviceObject.getService()).thenReturn(resource);
-		JaxRsResourceProvider resourceProvider = new JerseyResourceProvider<Object>(serviceObject, properties);
+		JakartarsResourceProvider resourceProvider = new JerseyResourceProvider<Object>(serviceObject, properties);
 		
 		ResourceDTO dto = DTOConverter.toResourceDTO(resourceProvider);
 		assertNotNull(dto);
@@ -189,7 +189,7 @@ public class DTOConverterTest {
 		assertEquals(2, methodInfoDTOs.length);
 		
 		properties.put(Constants.SERVICE_ID, Long.valueOf(12));
-		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Myresource");
+		properties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "Myresource");
 		
 		resourceProvider = new JerseyResourceProvider<Object>(serviceObject, properties);
 		dto = DTOConverter.toResourceDTO(resourceProvider);
@@ -203,7 +203,7 @@ public class DTOConverterTest {
 		
 		properties = new Hashtable<>();
 		properties.put(ComponentConstants.COMPONENT_ID, Long.valueOf(13));
-		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Myresource2");
+		properties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "Myresource2");
 
 		resourceProvider = new JerseyResourceProvider<Object>(serviceObject, properties);
 		dto = DTOConverter.toResourceDTO(resourceProvider);
@@ -225,7 +225,7 @@ public class DTOConverterTest {
 		Map<String, Object> properties = new Hashtable<>();
 		properties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
 		when(serviceObject.getService()).thenReturn(extension);
-		JaxRsExtensionProvider extensionProvider = new JerseyExtensionProvider<Object>(serviceObject, properties);
+		JakartarsExtensionProvider extensionProvider = new JerseyExtensionProvider<Object>(serviceObject, properties);
 		
 		FailedExtensionDTO dto = DTOConverter.toFailedExtensionDTO(extensionProvider, DTOConstants.FAILURE_REASON_NOT_AN_EXTENSION_TYPE);
 		assertNotNull(dto);
@@ -234,7 +234,7 @@ public class DTOConverterTest {
 		assertEquals(DTOConstants.FAILURE_REASON_NOT_AN_EXTENSION_TYPE, dto.failureReason);
 		
 		properties.put(Constants.SERVICE_ID, Long.valueOf(12));
-		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Myresource");
+		properties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "Myresource");
 		
 		extensionProvider = new JerseyExtensionProvider<Object>(serviceObject, properties);
 		dto = DTOConverter.toFailedExtensionDTO(extensionProvider, DTOConstants.FAILURE_REASON_DUPLICATE_NAME);
@@ -255,7 +255,7 @@ public class DTOConverterTest {
 		Map<String, Object> properties = new Hashtable<>();
 		properties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
 		when(serviceObject.getService()).thenReturn(extension);
-		JaxRsExtensionProvider extensionProvider = new JerseyExtensionProvider<Object>(serviceObject, properties);
+		JakartarsExtensionProvider extensionProvider = new JerseyExtensionProvider<Object>(serviceObject, properties);
 		
 		ExtensionDTO dto = DTOConverter.toExtensionDTO(extensionProvider);
 		assertNotNull(dto);
@@ -263,7 +263,7 @@ public class DTOConverterTest {
 		assertEquals(-1, dto.serviceId);
 		
 		properties.put(Constants.SERVICE_ID, Long.valueOf(12));
-		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Myresource");
+		properties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "Myresource");
 		
 		extensionProvider = new JerseyExtensionProvider<Object>(serviceObject, properties);
 		dto = DTOConverter.toExtensionDTO(extensionProvider);
@@ -276,7 +276,7 @@ public class DTOConverterTest {
 		
 		properties = new Hashtable<>();
 		properties.put(ComponentConstants.COMPONENT_ID, Long.valueOf(13));
-		properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, "Myresource2");
+		properties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, "Myresource2");
 		properties.put(Constants.OBJECTCLASS, new String[] {TestExtension.class.getName()});
 		extensionProvider = new JerseyExtensionProvider<Object>(serviceObject, properties);
 		dto = DTOConverter.toExtensionDTO(extensionProvider);

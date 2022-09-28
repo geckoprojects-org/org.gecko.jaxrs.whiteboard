@@ -23,11 +23,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
-import javax.servlet.Servlet;
+import jakarta.servlet.Servlet;
 
 import org.gecko.rest.jersey.helper.JerseyHelper;
 import org.gecko.rest.jersey.provider.JerseyConstants;
-import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider;
 import org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime;
 import org.gecko.rest.jersey.runtime.common.ResourceConfigWrapper;
 import org.gecko.rest.jersey.runtime.servlet.WhiteboardServletContainer;
@@ -54,10 +54,10 @@ import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
  * @since 12.07.2017
  */
 //@Capability(namespace = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, 
-//version = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_SPECIFICATION_VERSION, 
-//name = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_IMPLEMENTATION, 
+//version = JakartarsWhiteboardConstants.JAKARTA_RS_WHITEBOARD_SPECIFICATION_VERSION, 
+//name = JakartarsWhiteboardConstants.JAKARTA_RS_WHITEBOARD_IMPLEMENTATION, 
 //attribute= { 
-//		"uses:=\"javax.ws.rs,javax.ws.rs.sse,javax.ws.rs.core,javax.ws.rs.ext,javax.ws.rs.client,javax.ws.rs.container,org.osgi.service.jaxrs.whiteboard\"",
+//		"uses:=\"jakarta.ws.rs,jakarta.ws.rs.sse,jakarta.ws.rs.core,jakarta.ws.rs.ext,jakarta.ws.rs.client,jakarta.ws.rs.container,org.osgi.service.jakartars.whiteboard\"",
 //		"provider=jersey", 
 //		"http.whiteboard=true"
 //})
@@ -161,7 +161,7 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#doRegisterServletContainer(org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider, java.lang.String, org.glassfish.jersey.server.ResourceConfig)
 	 */
 	@Override
-	protected void doRegisterServletContext(JaxRsApplicationProvider provider, String path, ResourceConfig config) {
+	protected void doRegisterServletContext(JakartarsApplicationProvider provider, String path, ResourceConfig config) {
 		Dictionary<String, Object> props = new Hashtable<>();
 		props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, basePath + path);
 		props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED, Boolean.TRUE);
@@ -195,7 +195,7 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 		applicationServletRegistrationMap.put(provider.getId(), serviceRegistration);
 	}
 
-	protected void doRegisterServletContext(JaxRsApplicationProvider provider, String path) {
+	protected void doRegisterServletContext(JakartarsApplicationProvider provider, String path) {
 		Dictionary<String, Object> props = new Hashtable<>();
 		props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, basePath + path);
 		props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_ASYNC_SUPPORTED, Boolean.TRUE);
@@ -230,7 +230,7 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 	}
 	
 	@Override
-	protected void doUnregisterApplication(JaxRsApplicationProvider applicationProvider) {
+	protected void doUnregisterApplication(JakartarsApplicationProvider applicationProvider) {
 		ServiceRegistration<Servlet> serviceRegistration = applicationServletRegistrationMap.remove(applicationProvider.getId());
 		if(serviceRegistration != null) {
 			serviceRegistration.unregister();

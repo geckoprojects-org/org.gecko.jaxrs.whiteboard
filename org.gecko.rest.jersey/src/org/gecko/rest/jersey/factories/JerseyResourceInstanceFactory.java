@@ -17,7 +17,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.gecko.rest.jersey.binder.PrototypeServiceBinder;
-import org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsApplicationContentProvider;
 import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.osgi.framework.ServiceObjects;
 
@@ -31,7 +31,7 @@ import org.osgi.framework.ServiceObjects;
 public class JerseyResourceInstanceFactory<T> implements InjectableFactory<T> {
 
 	private volatile Set<T> instanceCache = new HashSet<>();
-	private JaxRsApplicationContentProvider provider;
+	private JakartarsApplicationContentProvider provider;
 	private ServiceObjects<T> serviceObjects;
 	private InjectionManager injectionManager;
 	
@@ -39,7 +39,7 @@ public class JerseyResourceInstanceFactory<T> implements InjectableFactory<T> {
 	 * Creates a new instance. A service reference will be cached lazily, on the first request
 	 * @param clazz the resource class
 	 */
-	public JerseyResourceInstanceFactory(JaxRsApplicationContentProvider provider) {
+	public JerseyResourceInstanceFactory(JakartarsApplicationContentProvider provider) {
 		this.provider = provider;
 		serviceObjects = provider.getProviderObject();;
 	}

@@ -13,24 +13,24 @@
  */
 package {{basePackageName}};
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
-import org.osgi.service.jaxrs.whiteboard.annotations.RequireJaxrsWhiteboard;
-import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsName;
-import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
+import org.osgi.service.jakartars.whiteboard.annotations.RequireJakartarsWhiteboard;
+import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsName;
+import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsResource;
 
 /**
  * 
- * This is a Demo Resource for a Jaxrs Whiteboard 
+ * This is a Demo Resource for a Jakartars Whiteboard 
  * 
  * @since 1.0
  */
-@RequireJaxrsWhiteboard
-@JaxrsResource
-@JaxrsName("demo")
+@RequireJakartarsWhiteboard
+@JakartarsResource
+@JakartarsName("demo")
 @Component(service = DemoResource.class, enabled = true, scope = ServiceScope.PROTOTYPE)
 @Path("/")
 public class DemoResource {

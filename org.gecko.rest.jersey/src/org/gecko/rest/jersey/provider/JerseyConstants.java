@@ -28,8 +28,8 @@ public interface JerseyConstants {
 	public static final String JERSEY_HOST = "jersey.host";
 	public static final String JERSEY_PORT = "jersey.port";
 	public static final String JERSEY_CONTEXT_PATH = "jersey.context.path";
-	public static final String JERSEY_WHITEBOARD_NAME = "jersey.jaxrs.whiteboard.name";
-	public static final String JERSEY_STRICT_MODE = "jersey.jaxrs.whiteboard.strict";
+	public static final String JERSEY_WHITEBOARD_NAME = "jersey.jakartars.whiteboard.name";
+	public static final String JERSEY_STRICT_MODE = "jersey.jakartars.whiteboard.strict";
 	public static final Object JERSEY_DISABLE_SESSION = "jersey.disable.sessions";
 	
 	public static final Integer WHITEBOARD_DEFAULT_PORT = Integer.valueOf(8181);

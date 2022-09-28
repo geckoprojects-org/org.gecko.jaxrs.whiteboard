@@ -15,11 +15,11 @@ package org.gecko.rest.jersey.runtime.common;
 
 import java.util.concurrent.ExecutorService;
 
-import javax.ws.rs.client.RxInvokerProvider;
-import javax.ws.rs.client.SyncInvoker;
+import jakarta.ws.rs.client.RxInvokerProvider;
+import jakarta.ws.rs.client.SyncInvoker;
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.jaxrs.client.PromiseRxInvoker;
+import org.osgi.service.jakartars.client.PromiseRxInvoker;
 
 /**
  * 
@@ -31,7 +31,7 @@ public class RxInvokerProviderImpl implements RxInvokerProvider<PromiseRxInvoker
 	
 	/* 
 	 * (non-Javadoc)
-	 * @see javax.ws.rs.client.RxInvokerProvider#isProviderFor(java.lang.Class)
+	 * @see jakarta.ws.rs.client.RxInvokerProvider#isProviderFor(java.lang.Class)
 	 */
 	@Override
 	public synchronized boolean isProviderFor(Class<?> clazz) {
@@ -43,7 +43,7 @@ public class RxInvokerProviderImpl implements RxInvokerProvider<PromiseRxInvoker
 
 	/* 
 	 * (non-Javadoc)
-	 * @see javax.ws.rs.client.RxInvokerProvider#getRxInvoker(javax.ws.rs.client.SyncInvoker, java.util.concurrent.ExecutorService)
+	 * @see jakarta.ws.rs.client.RxInvokerProvider#getRxInvoker(jakarta.ws.rs.client.SyncInvoker, java.util.concurrent.ExecutorService)
 	 */
 	@Override
 	public synchronized PromiseRxInvoker getRxInvoker(SyncInvoker syncInvoker, ExecutorService executorService) {

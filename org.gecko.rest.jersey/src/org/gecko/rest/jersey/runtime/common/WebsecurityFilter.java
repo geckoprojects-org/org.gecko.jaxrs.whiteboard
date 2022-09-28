@@ -18,24 +18,24 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.container.PreMatching;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.container.PreMatching;
+import jakarta.ws.rs.core.Response;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
-import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsExtension;
-import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsName;
-import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsWhiteboardTarget;
+import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsExtension;
+import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsName;
+import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsWhiteboardTarget;
 
 @Component(name = "WebsecurityFilter", scope = ServiceScope.PROTOTYPE, enabled = false)
-@JaxrsExtension
-@JaxrsName("WebsecurityFilter")
-@JaxrsWhiteboardTarget("(websecurity=false)")
+@JakartarsExtension
+@JakartarsName("WebsecurityFilter")
+@JakartarsWhiteboardTarget("(websecurity=false)")
 @PreMatching
 public class WebsecurityFilter implements ContainerRequestFilter, ContainerResponseFilter {
 

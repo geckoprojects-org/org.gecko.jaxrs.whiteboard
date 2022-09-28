@@ -14,8 +14,8 @@
 package org.gecko.rest.jersey.runtime.common;
 
 import static org.osgi.framework.Constants.SERVICE_CHANGECOUNT;
-import static org.osgi.service.jaxrs.runtime.JaxrsServiceRuntimeConstants.JAX_RS_SERVICE_ENDPOINT;
-import static org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants.JAX_RS_NAME;
+import static org.osgi.service.jakartars.runtime.JakartarsServiceRuntimeConstants.JAKARTA_RS_SERVICE_ENDPOINT;
+import static org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants.JAKARTA_RS_NAME;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 
 import org.gecko.rest.jersey.binder.PrototypeServiceBinder;
 import org.gecko.rest.jersey.dto.DTOConverter;
@@ -41,10 +41,10 @@ import org.gecko.rest.jersey.factories.InjectableFactory;
 import org.gecko.rest.jersey.factories.JerseyResourceInstanceFactory;
 import org.gecko.rest.jersey.helper.JerseyHelper;
 import org.gecko.rest.jersey.provider.JerseyConstants;
-import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
-import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
-import org.gecko.rest.jersey.provider.application.JaxRsResourceProvider;
-import org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsResourceProvider;
+import org.gecko.rest.jersey.provider.whiteboard.JakartarsWhiteboardProvider;
 import org.gecko.rest.jersey.runtime.application.JerseyApplication;
 import org.gecko.rest.jersey.runtime.servlet.WhiteboardServletContainer;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -55,30 +55,30 @@ import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.dto.ServiceReferenceDTO;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime;
-import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
-import org.osgi.service.jaxrs.runtime.dto.BaseApplicationDTO;
-import org.osgi.service.jaxrs.runtime.dto.BaseDTO;
-import org.osgi.service.jaxrs.runtime.dto.ExtensionDTO;
-import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
-import org.osgi.service.jaxrs.runtime.dto.FailedExtensionDTO;
-import org.osgi.service.jaxrs.runtime.dto.FailedResourceDTO;
-import org.osgi.service.jaxrs.runtime.dto.ResourceDTO;
-import org.osgi.service.jaxrs.runtime.dto.ResourceMethodInfoDTO;
-import org.osgi.service.jaxrs.runtime.dto.RuntimeDTO;
+import org.osgi.service.jakartars.runtime.JakartarsServiceRuntime;
+import org.osgi.service.jakartars.runtime.dto.ApplicationDTO;
+import org.osgi.service.jakartars.runtime.dto.BaseApplicationDTO;
+import org.osgi.service.jakartars.runtime.dto.BaseDTO;
+import org.osgi.service.jakartars.runtime.dto.ExtensionDTO;
+import org.osgi.service.jakartars.runtime.dto.FailedApplicationDTO;
+import org.osgi.service.jakartars.runtime.dto.FailedExtensionDTO;
+import org.osgi.service.jakartars.runtime.dto.FailedResourceDTO;
+import org.osgi.service.jakartars.runtime.dto.ResourceDTO;
+import org.osgi.service.jakartars.runtime.dto.ResourceMethodInfoDTO;
+import org.osgi.service.jakartars.runtime.dto.RuntimeDTO;
 
 /**
  * Implementation of the {@link JaxRSServiceRuntime} for a Jersey implementation
  * @author Mark Hoffmann
  * @since 12.07.2017
  */
-public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntime, JaxRsWhiteboardProvider {
+public abstract class AbstractJerseyServiceRuntime implements JakartarsServiceRuntime, JakartarsWhiteboardProvider {
 
 	private volatile RuntimeDTO runtimeDTO = new RuntimeDTO();
 	private volatile String name;
 	protected ComponentContext context;
 	// hold all resource references of the default application 
-	protected final Map<String, JaxRsApplicationProvider> applicationContainerMap = new ConcurrentHashMap<>();
+	protected final Map<String, JakartarsApplicationProvider> applicationContainerMap = new ConcurrentHashMap<>();
 	
 //	hold the failed apps, resources and extensions for this whiteboard
 	protected final List<FailedApplicationDTO> failedApplications = new LinkedList<>();
@@ -86,12 +86,12 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	protected final List<FailedExtensionDTO> failedExtensions = new LinkedList<>();
 
 	private Logger logger = Logger.getLogger("jaxRs.serviceRuntime");
-	private ServiceRegistration<JaxrsServiceRuntime> regJaxrsServiceRuntime;
+	private ServiceRegistration<JakartarsServiceRuntime> regJaxrsServiceRuntime;
 	private AtomicLong changeCount = new AtomicLong();
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.runtime.JaxRSServiceRuntime#getRuntimeDTO()
+	 * @see org.osgi.service.jakartars.runtime.JaxRSServiceRuntime#getRuntimeDTO()
 	 */
 	@Override
 	public RuntimeDTO getRuntimeDTO() {
@@ -120,10 +120,10 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	public void startup() {
 		doStartup();
 		Dictionary<String, Object> properties = getRuntimePropertiesWithNewChangeCount();
-		String[] service = new String[] {JaxrsServiceRuntime.class.getName(), JaxRsWhiteboardProvider.class.getName()};
+		String[] service = new String[] {JakartarsServiceRuntime.class.getName(), JakartarsWhiteboardProvider.class.getName()};
 		try {
 
-			regJaxrsServiceRuntime = (ServiceRegistration<JaxrsServiceRuntime>) context.getBundleContext()
+			regJaxrsServiceRuntime = (ServiceRegistration<JakartarsServiceRuntime>) context.getBundleContext()
 					.registerService(service, this, properties);
 			updateRuntimeDtoAndChangeCount();
 
@@ -142,8 +142,8 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	private Dictionary<String, Object> getRuntimePropertiesWithNewChangeCount() {
 		Dictionary<String, Object> properties = new Hashtable<>();
 		getProperties().entrySet().forEach(e -> properties.put(e.getKey(), e.getValue()));
-		properties.put(JAX_RS_SERVICE_ENDPOINT, getURLs(context));
-		properties.put(JAX_RS_NAME, name);
+		properties.put(JAKARTA_RS_SERVICE_ENDPOINT, getURLs(context));
+		properties.put(JAKARTA_RS_NAME, name);
 		properties.put(SERVICE_CHANGECOUNT, changeCount.incrementAndGet());
 		return properties;
 	}
@@ -299,7 +299,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 
 
 	@Override
-	public void registerApplication(JaxRsApplicationProvider applicationProvider) {
+	public void registerApplication(JakartarsApplicationProvider applicationProvider) {
 		if (applicationProvider == null) {
 			logger.log(Level.WARNING, "Cannot register an null application provider");
 			return;
@@ -319,17 +319,17 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 * @param container the container servlet to add
 	 * @param path to path to add it for
 	 */
-	protected abstract void doRegisterServletContext(JaxRsApplicationProvider provider, String path, ResourceConfig config);
+	protected abstract void doRegisterServletContext(JakartarsApplicationProvider provider, String path, ResourceConfig config);
 	
-	protected abstract void doRegisterServletContext(JaxRsApplicationProvider provider, String path);
+	protected abstract void doRegisterServletContext(JakartarsApplicationProvider provider, String path);
 
 	@Override
-	public void unregisterApplication(JaxRsApplicationProvider applicationProvider) {
+	public void unregisterApplication(JakartarsApplicationProvider applicationProvider) {
 		if (applicationProvider == null) {
 			logger.log(Level.WARNING, "Cannot unregister an null application provider");
 			return;
 		}
-		JaxRsApplicationProvider provider = null;
+		JakartarsApplicationProvider provider = null;
 		synchronized (applicationContainerMap) {
 			provider = applicationContainerMap.remove(applicationProvider.getId()); //we are keeping track of the failed app elsewhere
 		}
@@ -343,17 +343,17 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 
 	/**
 	 * Handles the destinct unregistration of the servlets
-	 * @param applicationProvider {@link JaxRsApplicationProvider} to unregister
+	 * @param applicationProvider {@link JakartarsApplicationProvider} to unregister
 	 */
-	protected abstract void doUnregisterApplication(JaxRsApplicationProvider applicationProvider);
+	protected abstract void doUnregisterApplication(JakartarsApplicationProvider applicationProvider);
 
 	@Override
-	public void reloadApplication(JaxRsApplicationProvider applicationProvider) {
+	public void reloadApplication(JakartarsApplicationProvider applicationProvider) {
 		if (applicationProvider == null) {
 			logger.log(Level.WARNING, "No application provider was given to be reloaded");
 		}
 		logger.log(Level.INFO, "Reload an application provider " + applicationProvider.getName());
-		JaxRsApplicationProvider provider = applicationContainerMap.get(applicationProvider.getId());
+		JakartarsApplicationProvider provider = applicationContainerMap.get(applicationProvider.getId());
 		if (provider == null) {
 			logger.log(Level.INFO, "No application provider was registered nothing to reload, registering instead for " + applicationProvider.getId());
 			registerApplication(applicationProvider);
@@ -388,7 +388,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#isRegistered(org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider)
 	 */
 	@Override
-	public boolean isRegistered(JaxRsApplicationProvider provider) {
+	public boolean isRegistered(JakartarsApplicationProvider provider) {
 		if (provider == null) {
 			return false;
 		}
@@ -432,7 +432,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 * Jersey factories for prototype scoped resource services and singletons separately
 	 * @param applicationProvider the JaxRs application application provider
 	 */
-	protected ResourceConfigWrapper createResourceConfig(JaxRsApplicationProvider applicationProvider) {
+	protected ResourceConfigWrapper createResourceConfig(JakartarsApplicationProvider applicationProvider) {
 		if (applicationProvider == null) {
 			logger.log(Level.WARNING, "Cannot create a resource configuration for null application provider");
 			return null;
@@ -458,7 +458,7 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 				throw new IllegalStateException("Cannot create prototype factories without component context");
 			}
 			InjectableFactory<?> factory = null;
-			if(provider instanceof JaxRsResourceProvider) {
+			if(provider instanceof JakartarsResourceProvider) {
 				resRegistered.set(true);
 				factory = new JerseyResourceInstanceFactory<>(provider);
 				resBinder.register(provider.getObjectClass(), factory);
@@ -480,13 +480,13 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	 */
 	protected void updateProperties(ComponentContext ctx) throws ConfigurationException {
 		if (ctx == null) {
-			throw new ConfigurationException(JAX_RS_SERVICE_ENDPOINT, "No component context is availble to get properties from");
+			throw new ConfigurationException(JAKARTA_RS_SERVICE_ENDPOINT, "No component context is availble to get properties from");
 		}
-		name = JerseyHelper.getPropertyWithDefault(ctx, JAX_RS_NAME, null);
+		name = JerseyHelper.getPropertyWithDefault(ctx, JAKARTA_RS_NAME, null);
 		if (name == null) {
 			name = JerseyHelper.getPropertyWithDefault(ctx, JerseyConstants.JERSEY_WHITEBOARD_NAME, JerseyConstants.JERSEY_WHITEBOARD_NAME);
 			if (name == null) {
-				throw new ConfigurationException(JAX_RS_NAME, "No name was defined for the whiteboard");
+				throw new ConfigurationException(JAKARTA_RS_NAME, "No name was defined for the whiteboard");
 			}
 		}
 		doUpdateProperties(ctx);
@@ -501,9 +501,9 @@ public abstract class AbstractJerseyServiceRuntime implements JaxrsServiceRuntim
 	protected abstract void doUpdateProperties(ComponentContext ctx) throws ConfigurationException;
 	
 	
-	public synchronized void updateFailedContents(Map<String, JaxRsApplicationProvider> failedAppProviders, 
-			Map<String, JaxRsResourceProvider> failedResourcesProviders, 
-			Map<String, JaxRsExtensionProvider> failedExtensionsProviders) {
+	public synchronized void updateFailedContents(Map<String, JakartarsApplicationProvider> failedAppProviders, 
+			Map<String, JakartarsResourceProvider> failedResourcesProviders, 
+			Map<String, JakartarsExtensionProvider> failedExtensionsProviders) {
 
 		failedApplications.clear();
 		failedResources.clear();

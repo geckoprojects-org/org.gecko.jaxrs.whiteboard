@@ -1,10 +1,10 @@
 # This is the version of Mockito that will be used at build time and run time
 
 -buildpath: \
-	org.osgi.service.jaxrs;version=latest,\
+	org.osgi.service.jakartars;version=latest,\
 	org.osgi.service.component.annotations;version=latest,\
 	org.glassfish.jersey.media.jersey-media-multipart;version=latest,\
-	org.apache.geronimo.specs.geronimo-jaxrs_2.1_spec;version=latest
+	jakarta.ws.rs-api;version=latest
 
 Private-Package: org.gecko.rest.jersey.multipart
 Bundle-Name: Gecko JaxRs Multi-Part Extension

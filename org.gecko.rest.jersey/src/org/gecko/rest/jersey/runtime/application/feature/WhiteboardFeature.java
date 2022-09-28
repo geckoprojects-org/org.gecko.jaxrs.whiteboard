@@ -20,13 +20,13 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.Priorities;
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.FeatureContext;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.core.Feature;
+import jakarta.ws.rs.core.FeatureContext;
 
 import org.gecko.rest.jersey.helper.DispatcherHelper;
-import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
-import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider.JaxRsExtension;
+import org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider.JaxRsExtension;
 import org.glassfish.jersey.InjectionManagerProvider;
 
 /**
@@ -36,24 +36,24 @@ import org.glassfish.jersey.InjectionManagerProvider;
  */
 public class WhiteboardFeature implements Feature{
 
-	public static Comparator<Map.Entry<String, JaxRsExtensionProvider>> PROVIDER_COMPARATOR = (e1, e2)-> 
+	public static Comparator<Map.Entry<String, JakartarsExtensionProvider>> PROVIDER_COMPARATOR = (e1, e2)-> 
 		DispatcherHelper.PROVIDER_COMPARATOR.compare(e1.getValue(), e2.getValue());
 		//			if (p1.getServiceRank() == p2.getServiceRank()) {
 		//				return p1.getServiceId().compareTo(p2.getServiceId());
 		//			}
 		//			return p2.getServiceRank().compareTo(p1.getServiceRank());
 
-	Map<String, JaxRsExtensionProvider> extensions;
+	Map<String, JakartarsExtensionProvider> extensions;
 
-	Map<JaxRsExtensionProvider, JaxRsExtension> extensionInstanceTrackingMap = new HashMap<>();
+	Map<JakartarsExtensionProvider, JaxRsExtension> extensionInstanceTrackingMap = new HashMap<>();
 
 
-	public WhiteboardFeature(Map<String, JaxRsExtensionProvider> extensions) {
+	public WhiteboardFeature(Map<String, JakartarsExtensionProvider> extensions) {
 		this.extensions = extensions.entrySet().stream().sorted(PROVIDER_COMPARATOR).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue)->oldValue, LinkedHashMap::new));
 	}
 
 	/* (non-Javadoc)
-	 * @see javax.ws.rs.core.Feature#configure(javax.ws.rs.core.FeatureContext)
+	 * @see jakarta.ws.rs.core.Feature#configure(jakarta.ws.rs.core.FeatureContext)
 	 */
 	@Override
 	public boolean configure(FeatureContext context) {
@@ -85,7 +85,7 @@ public class WhiteboardFeature implements Feature{
 		extensions.clear();
 	}
 
-	public void dispose(JaxRsExtensionProvider extProvider) {
+	public void dispose(JakartarsExtensionProvider extProvider) {
 		JaxRsExtension je = extensionInstanceTrackingMap.remove(extProvider);
 
 		if(je != null) {

@@ -16,8 +16,8 @@ package org.gecko.rest.jersey.runtime.common;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.RxInvokerProvider;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.RxInvokerProvider;
 
 import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.osgi.framework.Bundle;
@@ -31,8 +31,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.condition.Condition;
-import org.osgi.service.jaxrs.client.PromiseRxInvoker;
-import org.osgi.service.jaxrs.client.SseEventSourceFactory;
+import org.osgi.service.jakartars.client.PromiseRxInvoker;
+import org.osgi.service.jakartars.client.SseEventSourceFactory;
 
 /**
  * 

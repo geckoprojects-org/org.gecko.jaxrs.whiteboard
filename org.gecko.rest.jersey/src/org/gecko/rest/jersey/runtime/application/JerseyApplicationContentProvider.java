@@ -19,16 +19,16 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.gecko.rest.jersey.provider.application.AbstractJaxRsProvider;
-import org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvider;
-import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
+import org.gecko.rest.jersey.provider.application.AbstractJakartarsProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsApplicationContentProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceObjects;
-import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
-import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
+import org.osgi.service.jakartars.runtime.dto.DTOConstants;
+import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 /**
  * A wrapper class for a JaxRs resources 
@@ -37,7 +37,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
  * @param <T>
  * @since 09.10.2017
  */
-public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<ServiceObjects<T>> implements JaxRsApplicationContentProvider {
+public class JerseyApplicationContentProvider<T> extends AbstractJakartarsProvider<ServiceObjects<T>> implements JakartarsApplicationContentProvider {
 
 	private static final Logger logger = Logger.getLogger("jersey.contentProvider");
 	private Filter applicationFilter;
@@ -114,7 +114,7 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 	}
 
 	@Override
-	public boolean canHandleApplication(JaxRsApplicationProvider application) {
+	public boolean canHandleApplication(JakartarsApplicationProvider application) {
 		if (applicationFilter != null) {
 			try {
 				boolean applicationMatch = applicationFilter.matches(application.getApplicationProperties());
@@ -154,7 +154,7 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 		if (applicationFilter == null) {
 			return true;
 		} else {
-			Map<String, Object> properties = Collections.singletonMap(JaxrsWhiteboardConstants.JAX_RS_NAME, ".default");
+			Map<String, Object> properties = Collections.singletonMap(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, ".default");
 			return applicationFilter.matches(properties);
 		}
 	}
@@ -165,7 +165,7 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvider#canHandleDefaultApplication(org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider)
 	 */
 	@Override
-	public boolean canHandleDefaultApplication(JaxRsApplicationProvider application) {
+	public boolean canHandleDefaultApplication(JakartarsApplicationProvider application) {
 		if(application.isDefault()) {
 			return canHandleDefaultApplication();
 		}
@@ -184,7 +184,7 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvider#canHandleApplications(java.util.Collection)
 	 */
 	@Override
-	public boolean validateApplications(Collection<JaxRsApplicationProvider> applications) {
+	public boolean validateApplications(Collection<JakartarsApplicationProvider> applications) {
 		if (applications == null) {
 			return false;
 		}
@@ -207,7 +207,7 @@ public class JerseyApplicationContentProvider<T> extends AbstractJaxRsProvider<S
 			updateStatus(INVALID);
 			return;
 		}
-		String filter = (String) properties.get(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_SELECT);
+		String filter = (String) properties.get(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SELECT);
 		if (filter != null) {
 			try {
 				applicationFilter = FrameworkUtil.createFilter(filter);

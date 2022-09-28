@@ -13,7 +13,7 @@
  */
 package org.gecko.rest.jersey.runtime.common;
 
-import javax.ws.rs.ext.RuntimeDelegate;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 
 import org.glassfish.jersey.internal.RuntimeDelegateImpl;
 

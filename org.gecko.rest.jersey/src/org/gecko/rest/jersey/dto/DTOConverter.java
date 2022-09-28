@@ -24,33 +24,33 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
-import javax.ws.rs.NameBinding;
-import javax.ws.rs.OPTIONS;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.container.DynamicFeature;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.ParamConverterProvider;
-import javax.ws.rs.ext.ReaderInterceptor;
-import javax.ws.rs.ext.WriterInterceptor;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HEAD;
+import jakarta.ws.rs.NameBinding;
+import jakarta.ws.rs.OPTIONS;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.container.DynamicFeature;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Feature;
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.ParamConverterProvider;
+import jakarta.ws.rs.ext.ReaderInterceptor;
+import jakarta.ws.rs.ext.WriterInterceptor;
 
-import org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvider;
-import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
-import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
-import org.gecko.rest.jersey.provider.application.JaxRsResourceProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsApplicationContentProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsResourceProvider;
 import org.gecko.rest.jersey.runtime.application.JerseyApplication;
 import org.gecko.rest.jersey.runtime.application.JerseyExtensionProvider;
 import org.gecko.rest.jersey.runtime.application.JerseyResourceProvider;
@@ -59,14 +59,14 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.dto.ServiceReferenceDTO;
-import org.osgi.service.jaxrs.runtime.dto.ApplicationDTO;
-import org.osgi.service.jaxrs.runtime.dto.BaseDTO;
-import org.osgi.service.jaxrs.runtime.dto.ExtensionDTO;
-import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
-import org.osgi.service.jaxrs.runtime.dto.FailedExtensionDTO;
-import org.osgi.service.jaxrs.runtime.dto.FailedResourceDTO;
-import org.osgi.service.jaxrs.runtime.dto.ResourceDTO;
-import org.osgi.service.jaxrs.runtime.dto.ResourceMethodInfoDTO;
+import org.osgi.service.jakartars.runtime.dto.ApplicationDTO;
+import org.osgi.service.jakartars.runtime.dto.BaseDTO;
+import org.osgi.service.jakartars.runtime.dto.ExtensionDTO;
+import org.osgi.service.jakartars.runtime.dto.FailedApplicationDTO;
+import org.osgi.service.jakartars.runtime.dto.FailedExtensionDTO;
+import org.osgi.service.jakartars.runtime.dto.FailedResourceDTO;
+import org.osgi.service.jakartars.runtime.dto.ResourceDTO;
+import org.osgi.service.jakartars.runtime.dto.ResourceMethodInfoDTO;
 
 
 /**
@@ -98,7 +98,7 @@ public class DTOConverter {
 	 * @param svc the service reference
 	 * @return the service reference dto
 	 */
-	public static ApplicationDTO toApplicationDTO(JaxRsApplicationProvider applicationProvider) {
+	public static ApplicationDTO toApplicationDTO(JakartarsApplicationProvider applicationProvider) {
 		if (applicationProvider == null) {
 			throw new IllegalArgumentException("Expected an application provider to create an ApplicationDTO");
 		}
@@ -155,10 +155,10 @@ public class DTOConverter {
 		
 		if (applicationProvider.getContentProviers() != null) {
 
-			for (JaxRsApplicationContentProvider contentProvider : applicationProvider.getContentProviers()) {
+			for (JakartarsApplicationContentProvider contentProvider : applicationProvider.getContentProviers()) {
 
 				if (contentProvider instanceof JerseyResourceProvider) {
-					ResourceDTO resDTO = toResourceDTO((JaxRsResourceProvider) contentProvider);
+					ResourceDTO resDTO = toResourceDTO((JakartarsResourceProvider) contentProvider);
 					rdtos.add(resDTO);
 					if(resDTO.resourceMethods != null) {
 						rmidtos.addAll(Arrays.asList(resDTO.resourceMethods));
@@ -181,7 +181,7 @@ public class DTOConverter {
 	 * @param svc the service reference
 	 * @return the service reference dto
 	 */
-	public static FailedApplicationDTO toFailedApplicationDTO(JaxRsApplicationProvider applicationProvider, int reason) {
+	public static FailedApplicationDTO toFailedApplicationDTO(JakartarsApplicationProvider applicationProvider, int reason) {
 		if (applicationProvider == null) {
 			throw new IllegalArgumentException("Expected an application provider to create a FailedApplicationDTO");
 		}
@@ -195,11 +195,11 @@ public class DTOConverter {
 	}
 
 	/**
-	 * Maps a {@link JaxRsResourceProvider} into a {@link ResourceDTO}
+	 * Maps a {@link JakartarsResourceProvider} into a {@link ResourceDTO}
 	 * @param resourceProvider the resource provider instance, needed to be inspect
 	 * @return a {@link ResourceDTO} or <code>null</code>, if the given object is no JaxRs resource
 	 */
-	public static <T> ResourceDTO toResourceDTO(JaxRsResourceProvider resourceProvider) {
+	public static <T> ResourceDTO toResourceDTO(JakartarsResourceProvider resourceProvider) {
 		if (resourceProvider == null) {
 			throw new IllegalArgumentException("Expected an resource provider to create an ResourceDTO");
 		}
@@ -264,7 +264,7 @@ public class DTOConverter {
 	 * @param reason the error reason
 	 * @return a {@link FailedResourceDTO} or <code>null</code>, if the given object is no JaxRs resource
 	 */
-	public static FailedResourceDTO toFailedResourceDTO(JaxRsResourceProvider resourceProvider, int reason) {
+	public static FailedResourceDTO toFailedResourceDTO(JakartarsResourceProvider resourceProvider, int reason) {
 		if (resourceProvider == null) {
 			throw new IllegalArgumentException("Expected an resource provider to create an FailedResourceDTO");
 		}
@@ -277,11 +277,11 @@ public class DTOConverter {
 	}
 	
 	/**
-	 * Maps a {@link JaxRsExtensionProvider} into a {@link ExtensionDTO}
+	 * Maps a {@link JakartarsExtensionProvider} into a {@link ExtensionDTO}
 	 * @param provider the extension provider instance, needed to be inspect
 	 * @return a {@link ExtensionDTO} or <code>null</code>, if the given object is no JaxRs extension
 	 */
-	public static <T> ExtensionDTO toExtensionDTO(JaxRsExtensionProvider provider) {
+	public static <T> ExtensionDTO toExtensionDTO(JakartarsExtensionProvider provider) {
 		if (provider == null) {
 			throw new IllegalArgumentException("Expected an application content provider to create an ExtensionDTO");
 		}
@@ -335,7 +335,7 @@ public class DTOConverter {
 	 * @param reason the error reason
 	 * @return a {@link FailedExtensionDTO} or <code>null</code>, if the given object is no JaxRs extension
 	 */
-	public static FailedExtensionDTO toFailedExtensionDTO(JaxRsExtensionProvider provider, int reason) {
+	public static FailedExtensionDTO toFailedExtensionDTO(JakartarsExtensionProvider provider, int reason) {
 		if (provider == null) {
 			throw new IllegalArgumentException("Expected an application content provider to create an FailedExtensionDTO");
 		}

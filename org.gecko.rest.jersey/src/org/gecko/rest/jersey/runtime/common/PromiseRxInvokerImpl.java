@@ -15,12 +15,12 @@ package org.gecko.rest.jersey.runtime.common;
 
 import java.util.concurrent.ExecutorService;
 
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.SyncInvoker;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.SyncInvoker;
+import jakarta.ws.rs.core.GenericType;
+import jakarta.ws.rs.core.Response;
 
-import org.osgi.service.jaxrs.client.PromiseRxInvoker;
+import org.osgi.service.jakartars.client.PromiseRxInvoker;
 import org.osgi.util.promise.Promise;
 import org.osgi.util.promise.PromiseFactory;
 
@@ -49,7 +49,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#delete()
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#delete()
 	 */
 	@Override
 	public Promise<Response> delete() {		
@@ -61,7 +61,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#delete(java.lang.Class)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#delete(java.lang.Class)
 	 */
 	@Override
 	public <R> Promise<R> delete(Class<R> arg0) {
@@ -73,7 +73,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#delete(javax.ws.rs.core.GenericType)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#delete(jakarta.ws.rs.core.GenericType)
 	 */
 	@Override
 	public <R> Promise<R> delete(GenericType<R> arg0) {
@@ -85,7 +85,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#get()
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#get()
 	 */
 	@Override
 	public Promise<Response> get() {
@@ -97,7 +97,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#get(java.lang.Class)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#get(java.lang.Class)
 	 */
 	@Override
 	public <R> Promise<R> get(Class<R> arg0) {
@@ -109,7 +109,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#get(javax.ws.rs.core.GenericType)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#get(jakarta.ws.rs.core.GenericType)
 	 */
 	@Override
 	public <R> Promise<R> get(GenericType<R> arg0) {
@@ -121,7 +121,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#head()
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#head()
 	 */
 	@Override
 	public Promise<Response> head() {
@@ -146,7 +146,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 //	
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#method(java.lang.String, java.lang.Class)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#method(java.lang.String, java.lang.Class)
 	 */
 	@Override
 	public <R> Promise<R> method(String arg0, Class<R> arg1) {
@@ -158,7 +158,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#method(java.lang.String, javax.ws.rs.client.Entity, java.lang.Class)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#method(java.lang.String, jakarta.ws.rs.client.Entity, java.lang.Class)
 	 */
 	@Override
 	public <R> Promise<R> method(String arg0, Entity<?> arg1, Class<R> arg2) {
@@ -170,7 +170,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#method(java.lang.String, javax.ws.rs.client.Entity, javax.ws.rs.core.GenericType)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#method(java.lang.String, jakarta.ws.rs.client.Entity, jakarta.ws.rs.core.GenericType)
 	 */
 	@Override
 	public <R> Promise<R> method(String arg0, Entity<?> arg1, GenericType<R> arg2) {
@@ -182,7 +182,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#method(java.lang.String, javax.ws.rs.client.Entity)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#method(java.lang.String, jakarta.ws.rs.client.Entity)
 	 */
 	@Override
 	public Promise<Response> method(String arg0, Entity<?> arg1) {
@@ -194,7 +194,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#method(java.lang.String, javax.ws.rs.core.GenericType)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#method(java.lang.String, jakarta.ws.rs.core.GenericType)
 	 */
 	@Override
 	public <R> Promise<R> method(String arg0, GenericType<R> arg1) {
@@ -206,7 +206,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#method(java.lang.String)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#method(java.lang.String)
 	 */
 	@Override
 	public Promise<Response> method(String arg0) {
@@ -218,7 +218,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#options()
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#options()
 	 */
 	@Override
 	public Promise<Response> options() {
@@ -230,7 +230,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#options(java.lang.Class)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#options(java.lang.Class)
 	 */
 	@Override
 	public <R> Promise<R> options(Class<R> arg0) {
@@ -242,7 +242,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#options(javax.ws.rs.core.GenericType)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#options(jakarta.ws.rs.core.GenericType)
 	 */
 	@Override
 	public <R> Promise<R> options(GenericType<R> arg0) {
@@ -254,7 +254,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#post(javax.ws.rs.client.Entity, java.lang.Class)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#post(jakarta.ws.rs.client.Entity, java.lang.Class)
 	 */
 	@Override
 	public <R> Promise<R> post(Entity<?> arg0, Class<R> arg1) {
@@ -266,7 +266,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#post(javax.ws.rs.client.Entity, javax.ws.rs.core.GenericType)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#post(jakarta.ws.rs.client.Entity, jakarta.ws.rs.core.GenericType)
 	 */
 	@Override
 	public <R> Promise<R> post(Entity<?> arg0, GenericType<R> arg1) {
@@ -278,7 +278,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#post(javax.ws.rs.client.Entity)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#post(jakarta.ws.rs.client.Entity)
 	 */
 	@Override
 	public Promise<Response> post(Entity<?> arg0) {
@@ -290,7 +290,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#put(javax.ws.rs.client.Entity, java.lang.Class)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#put(jakarta.ws.rs.client.Entity, java.lang.Class)
 	 */
 	@Override
 	public <R> Promise<R> put(Entity<?> arg0, Class<R> arg1) {
@@ -302,7 +302,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#put(javax.ws.rs.client.Entity, javax.ws.rs.core.GenericType)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#put(jakarta.ws.rs.client.Entity, jakarta.ws.rs.core.GenericType)
 	 */
 	@Override
 	public <R> Promise<R> put(Entity<?> arg0, GenericType<R> arg1) {
@@ -314,7 +314,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#put(javax.ws.rs.client.Entity)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#put(jakarta.ws.rs.client.Entity)
 	 */
 	@Override
 	public Promise<Response> put(Entity<?> arg0) {
@@ -326,7 +326,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#trace()
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#trace()
 	 */
 	@Override
 	public Promise<Response> trace() {
@@ -338,7 +338,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#trace(java.lang.Class)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#trace(java.lang.Class)
 	 */
 	@Override
 	public <R> Promise<R> trace(Class<R> arg0) {
@@ -350,7 +350,7 @@ public class PromiseRxInvokerImpl implements PromiseRxInvoker {
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jaxrs.client.PromiseRxInvoker#trace(javax.ws.rs.core.GenericType)
+	 * @see org.osgi.service.jakartars.client.PromiseRxInvoker#trace(jakarta.ws.rs.core.GenericType)
 	 */
 	@Override
 	public <R> Promise<R> trace(GenericType<R> arg0) {

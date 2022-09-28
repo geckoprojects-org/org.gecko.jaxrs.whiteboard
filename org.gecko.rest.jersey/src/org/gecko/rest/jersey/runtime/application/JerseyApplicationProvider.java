@@ -21,29 +21,29 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 
 import org.gecko.rest.jersey.dto.DTOConverter;
-import org.gecko.rest.jersey.helper.JaxRsHelper;
+import org.gecko.rest.jersey.helper.JakartarsHelper;
 import org.gecko.rest.jersey.helper.JerseyHelper;
-import org.gecko.rest.jersey.provider.application.AbstractJaxRsProvider;
-import org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvider;
-import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
-import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
-import org.gecko.rest.jersey.provider.application.JaxRsResourceProvider;
+import org.gecko.rest.jersey.provider.application.AbstractJakartarsProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsApplicationContentProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider;
+import org.gecko.rest.jersey.provider.application.JakartarsResourceProvider;
 import org.gecko.rest.jersey.runtime.common.DefaultApplication;
 import org.glassfish.jersey.servlet.ServletContainer;
-import org.osgi.service.jaxrs.runtime.dto.BaseApplicationDTO;
-import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
-import org.osgi.service.jaxrs.runtime.dto.FailedApplicationDTO;
-import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
+import org.osgi.service.jakartars.runtime.dto.BaseApplicationDTO;
+import org.osgi.service.jakartars.runtime.dto.DTOConstants;
+import org.osgi.service.jakartars.runtime.dto.FailedApplicationDTO;
+import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 /**
  * Implementation of the Application Provider
  * @author Mark Hoffmann
  * @since 30.07.2017
  */
-public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application> implements JaxRsApplicationProvider {
+public class JerseyApplicationProvider extends AbstractJakartarsProvider<Application> implements JakartarsApplicationProvider {
 
 	private static final Logger logger = Logger.getLogger("jersey.applicationProvider");
 	private List<ServletContainer> applicationContainers = new LinkedList<>();
@@ -96,7 +96,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 		if (wrappedApplication == null) {
 			throw new IllegalStateException("This application provider does not contain an application, but should have one to create a context path");
 		}
-		return applicationBase == null ? null : JaxRsHelper.getServletPath(wrappedApplication.getSourceApplication() , applicationBase);
+		return applicationBase == null ? null : JakartarsHelper.getServletPath(wrappedApplication.getSourceApplication() , applicationBase);
 	}
 
 	/* 
@@ -186,9 +186,9 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider#addResource(org.gecko.rest.jersey.provider.application.JaxRsResourceProvider)
 	 */
 	@Override
-	public boolean addResource(JaxRsResourceProvider provider) {
+	public boolean addResource(JakartarsResourceProvider provider) {
 		if (!provider.isResource()) {
-			logger.log(Level.WARNING, "The resource to add is not declared with the resource property: " + JaxrsWhiteboardConstants.JAX_RS_RESOURCE);
+			logger.log(Level.WARNING, "The resource to add is not declared with the resource property: " + JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE);
 			return false;
 		}
 		return doAddContent(provider);
@@ -199,13 +199,13 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider#removeResource(org.gecko.rest.jersey.provider.application.JaxRsResourceProvider)
 	 */
 	@Override
-	public boolean removeResource(JaxRsResourceProvider provider) {
+	public boolean removeResource(JakartarsResourceProvider provider) {
 		if (provider == null) {
 			logger.log(Level.WARNING, "The resource provider is null. There is nothing to remove.");
 			return false;
 		}
 		if (!provider.isResource()) {
-			logger.log(Level.WARNING, "The resource to be removed is not declared with the resource property: " + JaxrsWhiteboardConstants.JAX_RS_RESOURCE);
+			logger.log(Level.WARNING, "The resource to be removed is not declared with the resource property: " + JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE);
 			return false;
 		}
 		return doRemoveContent(provider);
@@ -216,9 +216,9 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider#addExtension(org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider)
 	 */
 	@Override
-	public boolean addExtension(JaxRsExtensionProvider provider) {
+	public boolean addExtension(JakartarsExtensionProvider provider) {
 		if (!provider.isExtension()) {
-			logger.log(Level.WARNING, "The extension to add is not declared with the extension property: " + JaxrsWhiteboardConstants.JAX_RS_EXTENSION);
+			logger.log(Level.WARNING, "The extension to add is not declared with the extension property: " + JakartarsWhiteboardConstants.JAKARTA_RS_EXTENSION);
 			return false;
 		}
 		return doAddContent(provider);
@@ -229,13 +229,13 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider#removeExtension(org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider)
 	 */
 	@Override
-	public boolean removeExtension(JaxRsExtensionProvider provider) {
+	public boolean removeExtension(JakartarsExtensionProvider provider) {
 		if (provider == null) {
 			logger.log(Level.WARNING, "The extension provider is null. There is nothing to remove.");
 			return false;
 		}
 		if (!provider.isExtension()) {
-			logger.log(Level.WARNING, "The extension to be removed is not declared with the extension property: " + JaxrsWhiteboardConstants.JAX_RS_EXTENSION);
+			logger.log(Level.WARNING, "The extension to be removed is not declared with the extension property: " + JakartarsWhiteboardConstants.JAKARTA_RS_EXTENSION);
 			return false;
 		}
 		return doRemoveContent(provider);
@@ -259,11 +259,11 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 		String name = null;
 		Map<String, Object> providerProperties = getProviderProperties();
 		if (providerProperties != null) {
-			String baseProperty = (String) providerProperties.get(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE);
+			String baseProperty = (String) providerProperties.get(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE);
 			if (wrappedApplication != null) {
 				baseProperty = getPath();
 			}
-			name = (String) providerProperties.get(JaxrsWhiteboardConstants.JAX_RS_NAME);
+			name = (String) providerProperties.get(JakartarsWhiteboardConstants.JAKARTA_RS_NAME);
 			if (name == null && baseProperty != null) {
 				name = "." + baseProperty;
 			} else if (name != null && !name.equals(".default") && (name.startsWith(".") || name.startsWith("osgi"))) {
@@ -279,7 +279,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 */
 	@Override
 	protected void doValidateProperties(Map<String, Object> properties) {
-		String baseProperty = (String) properties.get(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE);
+		String baseProperty = (String) properties.get(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE);
 		if (applicationBase == null && (baseProperty == null || baseProperty.isEmpty())) {
 			updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
 			return;
@@ -294,7 +294,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 * @param provider the content provider to be added
 	 * @return <code>true</code>, if add was successful, otherwise <code>false</code>
 	 */
-	private boolean doAddContent(JaxRsApplicationContentProvider provider) {
+	private boolean doAddContent(JakartarsApplicationContentProvider provider) {
 		if(getApplicationDTO() instanceof FailedApplicationDTO) {
 			return false;
 		}
@@ -314,7 +314,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 * @param provider the content provider to be removed
 	 * @return <code>true</code>, if removal was successful, otherwise <code>false</code>
 	 */
-	private boolean doRemoveContent(JaxRsApplicationContentProvider provider) {
+	private boolean doRemoveContent(JakartarsApplicationContentProvider provider) {
 		boolean removed = wrappedApplication.removeContent(provider);
 		if (!changed && removed) {
 			changed = removed;
@@ -326,7 +326,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider#getContentProviers()
 	 */
 	@Override
-	public Collection<JaxRsApplicationContentProvider> getContentProviers() {
+	public Collection<JakartarsApplicationContentProvider> getContentProviers() {
 		return wrappedApplication.getContentProviders();
 	}
 	
@@ -335,7 +335,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider#updateApplicationBase(java.lang.String)
 	 */
 	public void updateApplicationBase(String applicationBase) {
-		doValidateProperties(Collections.singletonMap(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, applicationBase));
+		doValidateProperties(Collections.singletonMap(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE, applicationBase));
 	}
 
 	/* 

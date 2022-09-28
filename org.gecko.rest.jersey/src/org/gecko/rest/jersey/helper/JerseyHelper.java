@@ -16,7 +16,7 @@ package org.gecko.rest.jersey.helper;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;

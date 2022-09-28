@@ -21,7 +21,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.core.Application;
+import jakarta.ws.rs.core.Application;
 
 import org.gecko.rest.jersey.helper.JerseyHelper;
 import org.junit.jupiter.api.Test;
@@ -57,7 +57,7 @@ public class JerseyHelperTests {
 	}
 	
 	/**
-	 * Test method for {@link org.gecko.rest.jersey.helper.JerseyHelper#isEmpty(javax.ws.rs.core.Application)}.
+	 * Test method for {@link org.gecko.rest.jersey.helper.JerseyHelper#isEmpty(jakarta.ws.rs.core.Application)}.
 	 */
 	@Test
 	public void testIsEmpty() {
