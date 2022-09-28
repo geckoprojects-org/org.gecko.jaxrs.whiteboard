@@ -47,7 +47,7 @@ import org.osgi.service.jakartars.runtime.dto.DTOConstants;
 import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 /**
- * A wrapper class for a JaxRs extensions 
+ * A wrapper class for a Jakartars extensions 
  * @author Mark Hoffmann
  * @param <T>
  * @since 09.10.2017
@@ -80,8 +80,8 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 	}
 	
 	/**
-	 * If the ExtensionProvider does not advertise the property osgi.jaxrs.extension as true then it is not a 
-	 * valid extenstion
+	 * If the ExtensionProvider does not advertise the property osgi.jakartars.extension as true then it is not a 
+	 * valid extension
 	 * 
 	 * @param properties
 	 */
@@ -116,7 +116,7 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.JaxRsExtensionProvider#isExtension()
+	 * @see org.gecko.rest.jersey.provider.JakartarsExtensionProvider#isExtension()
 	 */
 	@Override
 	public boolean isExtension() {
@@ -125,7 +125,7 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.JaxRsExtensionProvider#getExtensionDTO()
+	 * @see org.gecko.rest.jersey.provider.JakartarsExtensionProvider#getExtensionDTO()
 	 */
 	@Override
 	public BaseExtensionDTO getExtensionDTO() {
@@ -140,7 +140,7 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider#getContracts()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider#getContracts()
 	 */
 	@Override
 	public Class<?>[] getContracts() {
@@ -156,16 +156,16 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 	}
 	
 	/**
-	 * Returns the {@link JaxRSWhiteboardConstants} for this resource type 
-	 * @return the {@link JaxRSWhiteboardConstants} for this resource type
+	 * Returns the {@link JakartarsWhiteboardConstants} for this resource type 
+	 * @return the {@link JakartarsWhiteboardConstants} for this resource type
 	 */
-	protected String getJaxRsResourceConstant() {
+	protected String getJakartarsResourceConstant() {
 		return JakartarsWhiteboardConstants.JAKARTA_RS_EXTENSION;
 	}
 	
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.AbstractJaxRsProvider#updateStatus(int)
+	 * @see org.gecko.rest.jersey.provider.application.AbstractJakartarsProvider#updateStatus(int)
 	 */
 	@Override
 	public void updateStatus(int newStatus) {
@@ -173,13 +173,13 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 	}
 
 	@Override
-	public JaxRsExtension getExtension(InjectionManager injectionManager) {
+	public JakartarsExtension getExtension(InjectionManager injectionManager) {
 		T service = getProviderObject().getService();
 		injectionManager.inject(service);
 		return new JerseyExtension(service);
 	}
 	
-	public class JerseyExtension implements JaxRsExtension {
+	public class JerseyExtension implements JakartarsExtension {
 		
 		private T delegate;
 		

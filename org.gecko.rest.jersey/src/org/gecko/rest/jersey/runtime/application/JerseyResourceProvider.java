@@ -23,7 +23,7 @@ import org.osgi.service.jakartars.runtime.dto.DTOConstants;
 import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 /**
- * A wrapper class for a JaxRs resources 
+ * A wrapper class for a Jakartars resources 
  * @author Mark Hoffmann
  * @param <T>
  * @since 09.10.2017
@@ -36,7 +36,7 @@ public class JerseyResourceProvider<T extends Object> extends JerseyApplicationC
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.JaxRsResourceProvider#isResource()
+	 * @see org.gecko.rest.jersey.provider.JakartarsResourceProvider#isResource()
 	 */
 	@Override
 	public boolean isResource() {
@@ -45,7 +45,7 @@ public class JerseyResourceProvider<T extends Object> extends JerseyApplicationC
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.JaxRsResourceProvider#getResourceDTO()
+	 * @see org.gecko.rest.jersey.provider.JakartarsResourceProvider#getResourceDTO()
 	 */
 	@Override
 	public BaseDTO getResourceDTO() {
@@ -67,16 +67,16 @@ public class JerseyResourceProvider<T extends Object> extends JerseyApplicationC
 	}
 	
 	/**
-	 * Returns the {@link JaxRSWhiteboardConstants} for this resource type 
-	 * @return the {@link JaxRSWhiteboardConstants} for this resource type
+	 * Returns the {@link JakartarsWhiteboardConstants} for this resource type 
+	 * @return the {@link JakartarsWhiteboardConstants} for this resource type
 	 */
-	protected String getJaxRsResourceConstant() {
+	protected String getJakartarsResourceConstant() {
 		return JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE;
 	}
 	
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.AbstractJaxRsProvider#updateStatus(int)
+	 * @see org.gecko.rest.jersey.provider.application.AbstractJakartarsProvider#updateStatus(int)
 	 */
 	@Override
 	public void updateStatus(int newStatus) {

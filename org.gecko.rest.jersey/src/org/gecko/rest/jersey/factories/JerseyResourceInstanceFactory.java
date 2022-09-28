@@ -22,8 +22,8 @@ import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.osgi.framework.ServiceObjects;
 
 /**
- * HK2 creation factory for JaxRs resource instance. These factory instances will be bound using the {@link PrototypeServiceBinder}.
- * The factory is responsible to create or releasing a certain JaxRs resource instances, at request time.
+ * HK2 creation factory for Jakartars resource instance. These factory instances will be bound using the {@link PrototypeServiceBinder}.
+ * The factory is responsible to create or releasing a certain Jakartars resource instances, at request time.
  * @param <T> the type of the resource, which is the class type
  * @author Mark Hoffmann
  * @since 12.07.2017

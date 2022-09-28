@@ -1,8 +1,8 @@
-org.geckoprojects.jaxrs:org.gecko.rest.bnd.project.library:${mvn-base-version}
-org.geckoprojects.jaxrs:org.gecko.rest.jersey:${mvn-base-version}
-org.geckoprojects.jaxrs:org.gecko.rest.jersey.config:${mvn-base-version}
-org.geckoprojects.jaxrs:org.gecko.rest.jersey.sse:${mvn-base-version}
-org.geckoprojects.jaxrs:org.gecko.rest.jersey.multipart:${mvn-base-version}
+org.geckoprojects.jakartars:org.gecko.rest.bnd.project.library:${mvn-base-version}
+org.geckoprojects.jakartars:org.gecko.rest.jersey:${mvn-base-version}
+org.geckoprojects.jakartars:org.gecko.rest.jersey.config:${mvn-base-version}
+org.geckoprojects.jakartars:org.gecko.rest.jersey.sse:${mvn-base-version}
+org.geckoprojects.jakartars:org.gecko.rest.jersey.multipart:${mvn-base-version}
 
 org.apache.felix:org.apache.felix.http.jetty:4.2.0
 org.apache.felix:org.apache.felix.http.servlet-api:1.2.0

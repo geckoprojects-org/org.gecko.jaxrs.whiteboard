@@ -62,7 +62,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsApplicationProvider#setServletContainer(org.glassfish.jersey.servlet.ServletContainer)
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider#addServletContainer(org.glassfish.jersey.servlet.ServletContainer)
 	 */
 	@Override
 	public void addServletContainer(ServletContainer applicationContainer) {
@@ -71,7 +71,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsApplicationProvider#setServletContainer(org.glassfish.jersey.servlet.ServletContainer)
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider#removeServletContainer(org.glassfish.jersey.servlet.ServletContainer)
 	 */
 	@Override
 	public void removeServletContainer(ServletContainer applicationContainer) {
@@ -80,7 +80,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsApplicationPrsovider#getServletContainers()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider#getServletContainers()
 	 */
 	@Override
 	public List<ServletContainer> getServletContainers() {
@@ -89,7 +89,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsApplicationProvider#getPath()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider#getPath()
 	 */
 	@Override
 	public String getPath() {
@@ -101,10 +101,10 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsApplicationProvider#getJaxRsApplication()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider#getJakartarsApplication()
 	 */
 	@Override
-	public Application getJaxRsApplication() {
+	public Application getJakartarsApplication() {
 		if (wrappedApplication == null) {
 			throw new IllegalStateException("This application provider does not contain an application, but should have one to return an application");
 		}
@@ -113,7 +113,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.eclipselabs.osgi.jersey.JaxRsApplicationProvider#getApplicationProperties()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider#getApplicationProperties()
 	 */
 	@Override
 	public Map<String, Object> getApplicationProperties() {
@@ -122,7 +122,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsApplicationProvider#getApplicationDTO()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider#getApplicationDTO()
 	 */
 	@Override
 	public BaseApplicationDTO getApplicationDTO() {
@@ -139,7 +139,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.eclipselabs.osgi.jersey.JaxRsApplicationProvider#isDefault()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider#isDefault()
 	 */
 	public boolean isDefault() {
 		return getProviderObject() instanceof DefaultApplication;
@@ -147,7 +147,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 	
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider#isShadowDefault()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider#isShadowDefault()
 	 */
 	@Override
 	public boolean isShadowDefault() {
@@ -156,7 +156,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider#isEmpty()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider#isEmpty()
 	 */
 	@Override
 	public boolean isEmpty() {
@@ -165,7 +165,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider#isChanged()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider#isChanged()
 	 */
 	@Override
 	public boolean isChanged() {
@@ -174,7 +174,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider#markUnchanged()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider#markUnchanged()
 	 */
 	@Override
 	public void markUnchanged() {
@@ -183,7 +183,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider#addResource(org.gecko.rest.jersey.provider.application.JaxRsResourceProvider)
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider#addResource(org.gecko.rest.jersey.provider.application.JakartarsResourceProvider)
 	 */
 	@Override
 	public boolean addResource(JakartarsResourceProvider provider) {
@@ -196,7 +196,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider#removeResource(org.gecko.rest.jersey.provider.application.JaxRsResourceProvider)
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider#removeResource(org.gecko.rest.jersey.provider.application.JakartarsResourceProvider)
 	 */
 	@Override
 	public boolean removeResource(JakartarsResourceProvider provider) {
@@ -213,7 +213,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider#addExtension(org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider)
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider#addExtension(org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider)
 	 */
 	@Override
 	public boolean addExtension(JakartarsExtensionProvider provider) {
@@ -226,7 +226,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 	
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider#removeExtension(org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider)
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider#removeExtension(org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider)
 	 */
 	@Override
 	public boolean removeExtension(JakartarsExtensionProvider provider) {
@@ -252,7 +252,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.AbstractJaxRsProvider#getProviderName()
+	 * @see org.gecko.rest.jersey.provider.AbstractJakartarsProvider#getProviderName()
 	 */
 	@Override
 	protected String getProviderName() {
@@ -275,7 +275,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.AbstractJaxRsProvider#doValidateProperties(java.util.Map)
+	 * @see org.gecko.rest.jersey.provider.AbstractJakartarsProvider#doValidateProperties(java.util.Map)
 	 */
 	@Override
 	protected void doValidateProperties(Map<String, Object> properties) {
@@ -323,7 +323,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider#getContentProviers()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider#getContentProviers()
 	 */
 	@Override
 	public Collection<JakartarsApplicationContentProvider> getContentProviers() {
@@ -332,7 +332,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 	
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider#updateApplicationBase(java.lang.String)
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider#updateApplicationBase(java.lang.String)
 	 */
 	public void updateApplicationBase(String applicationBase) {
 		doValidateProperties(Collections.singletonMap(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE, applicationBase));
@@ -349,7 +349,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 	
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.AbstractJaxRsProvider#updateStatus(int)
+	 * @see org.gecko.rest.jersey.provider.application.AbstractJakartarsProvider#updateStatus(int)
 	 */
 	@Override
 	public void updateStatus(int newStatus) {

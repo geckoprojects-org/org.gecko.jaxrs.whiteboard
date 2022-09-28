@@ -16,7 +16,7 @@ package org.gecko.rest.jersey.dto;
 import org.osgi.service.jakartars.runtime.dto.ResourceDTO;
 
 /**
- * Implementation of the JaxRs resource DTO
+ * Implementation of the Jakartars resource DTO
  * @author Mark Hoffmann
  * @since 14.07.2017
  */

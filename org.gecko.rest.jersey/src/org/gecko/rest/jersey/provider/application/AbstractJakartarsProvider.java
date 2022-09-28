@@ -59,7 +59,7 @@ public abstract class AbstractJakartarsProvider<T> implements JakartarsProvider,
 	
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsProvider#getId()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsProvider#getId()
 	 */
 	@Override
 	public String getId() {
@@ -86,7 +86,7 @@ public abstract class AbstractJakartarsProvider<T> implements JakartarsProvider,
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsProvider#getServiceRank()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsProvider#getServiceRank()
 	 */
 	@Override
 	public Integer getServiceRank() {
@@ -95,7 +95,7 @@ public abstract class AbstractJakartarsProvider<T> implements JakartarsProvider,
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsProvider#isFailed()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsProvider#isFailed()
 	 */
 	@Override
 	public boolean isFailed() {
@@ -104,7 +104,7 @@ public abstract class AbstractJakartarsProvider<T> implements JakartarsProvider,
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.JaxRsProvider#getProviderProperties()
+	 * @see org.gecko.rest.jersey.provider.JakartarsProvider#getProviderProperties()
 	 */
 	@Override
 	public Map<String, Object> getProviderProperties() {
@@ -113,7 +113,7 @@ public abstract class AbstractJakartarsProvider<T> implements JakartarsProvider,
 	
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsProvider#requiresExtensions()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsProvider#requiresExtensions()
 	 */
 	@Override
 	public boolean requiresExtensions() {
@@ -122,7 +122,7 @@ public abstract class AbstractJakartarsProvider<T> implements JakartarsProvider,
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsProvider#canHandleWhiteboard(java.util.Map)
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsProvider#canHandleWhiteboard(java.util.Map)
 	 */
 	@Override
 	public boolean canHandleWhiteboard(Map<String, Object> runtimeProperties) {
@@ -131,8 +131,8 @@ public abstract class AbstractJakartarsProvider<T> implements JakartarsProvider,
 			return false;
 		}
 		/* 
-		 * Spec table 151.2: osgi.jaxrs.whiteboard.target: ... If this property is not specified,
-		 * all JaxRs Whiteboards can handle this service
+		 * Spec table 151.2: osgi.jakartars.whiteboard.target: ... If this property is not specified,
+		 * all Jakartars Whiteboards can handle this service
 		 */
 		if (whiteboardTargetFilter == null) {
 			return true;
@@ -145,7 +145,7 @@ public abstract class AbstractJakartarsProvider<T> implements JakartarsProvider,
 	
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsProvider#getExtensionFilters()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsProvider#getExtensionFilters()
 	 */
 	@Override
 	public List<Filter> getExtensionFilters() {
@@ -162,7 +162,7 @@ public abstract class AbstractJakartarsProvider<T> implements JakartarsProvider,
 	
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsProvider#getProviderObject()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsProvider#getProviderObject()
 	 */
 	@SuppressWarnings("unchecked")
 	public T getProviderObject() {
@@ -206,10 +206,10 @@ public abstract class AbstractJakartarsProvider<T> implements JakartarsProvider,
 	protected String getProviderName() {
 		String providerName = getProviderId();
 		if (properties != null) {
-			String jaxRsName = (String) properties.get(JakartarsWhiteboardConstants.JAKARTA_RS_NAME);
-			if (jaxRsName != null) {
-				providerName = jaxRsName;
-				if (jaxRsName.startsWith("osgi") || jaxRsName.startsWith(".")) {
+			String jakartarsName = (String) properties.get(JakartarsWhiteboardConstants.JAKARTA_RS_NAME);
+			if (jakartarsName != null) {
+				providerName = jakartarsName;
+				if (jakartarsName.startsWith("osgi") || jakartarsName.startsWith(".")) {
 					updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
 				}
 			}

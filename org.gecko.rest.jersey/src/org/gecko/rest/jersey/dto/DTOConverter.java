@@ -118,8 +118,8 @@ public class DTOConverter {
 		List<ExtensionDTO> edtos = new ArrayList<>();
 		
 //		Create the DTO for the static resources and extensions 
-		if(applicationProvider.getJaxRsApplication() instanceof JerseyApplication) {
-			Application sourceApp = ((JerseyApplication) applicationProvider.getJaxRsApplication()).getSourceApplication();
+		if(applicationProvider.getJakartarsApplication() instanceof JerseyApplication) {
+			Application sourceApp = ((JerseyApplication) applicationProvider.getJakartarsApplication()).getSourceApplication();
 			Set<Object> singletons = sourceApp.getSingletons();
 			Set<Class<?>> classes = sourceApp.getClasses();
 			for(Object obj : singletons) {
@@ -197,7 +197,7 @@ public class DTOConverter {
 	/**
 	 * Maps a {@link JakartarsResourceProvider} into a {@link ResourceDTO}
 	 * @param resourceProvider the resource provider instance, needed to be inspect
-	 * @return a {@link ResourceDTO} or <code>null</code>, if the given object is no JaxRs resource
+	 * @return a {@link ResourceDTO} or <code>null</code>, if the given object is no Jakartars resource
 	 */
 	public static <T> ResourceDTO toResourceDTO(JakartarsResourceProvider resourceProvider) {
 		if (resourceProvider == null) {
@@ -262,7 +262,7 @@ public class DTOConverter {
 	 * Maps resource provider into a {@link FailedResourceDTO}
 	 * @param resourceProvider the resource provider instance, needed to be inspect
 	 * @param reason the error reason
-	 * @return a {@link FailedResourceDTO} or <code>null</code>, if the given object is no JaxRs resource
+	 * @return a {@link FailedResourceDTO} or <code>null</code>, if the given object is no Jakartars resource
 	 */
 	public static FailedResourceDTO toFailedResourceDTO(JakartarsResourceProvider resourceProvider, int reason) {
 		if (resourceProvider == null) {
@@ -279,7 +279,7 @@ public class DTOConverter {
 	/**
 	 * Maps a {@link JakartarsExtensionProvider} into a {@link ExtensionDTO}
 	 * @param provider the extension provider instance, needed to be inspect
-	 * @return a {@link ExtensionDTO} or <code>null</code>, if the given object is no JaxRs extension
+	 * @return a {@link ExtensionDTO} or <code>null</code>, if the given object is no Jakartars extension
 	 */
 	public static <T> ExtensionDTO toExtensionDTO(JakartarsExtensionProvider provider) {
 		if (provider == null) {
@@ -333,7 +333,7 @@ public class DTOConverter {
 	 * Maps resource provider into a {@link FailedExtensionDTO}
 	 * @param provider the extension provider instance, needed to be inspect
 	 * @param reason the error reason
-	 * @return a {@link FailedExtensionDTO} or <code>null</code>, if the given object is no JaxRs extension
+	 * @return a {@link FailedExtensionDTO} or <code>null</code>, if the given object is no Jakartars extension
 	 */
 	public static FailedExtensionDTO toFailedExtensionDTO(JakartarsExtensionProvider provider, int reason) {
 		if (provider == null) {
@@ -468,7 +468,7 @@ public class DTOConverter {
 	}
 
 	/**
-	 * Parses the given method for a JaxRs method annotation. If the method is annotated with more than one
+	 * Parses the given method for a Jakartars method annotation. If the method is annotated with more than one
 	 * method annotation, the values are separated by , 
 	 * @param method the method instance of the class to be parsed.
 	 * @return the HTTP method string or <code>null</code>

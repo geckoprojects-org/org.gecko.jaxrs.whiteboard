@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.2.0" localization="OSGI-INF/l10n/org.gecko.bndtools.templates.emf.model">
-  <OCD id="org.gecko.rest.project-with-config" name="Gecko JaxRS Resource Project Template with configuration" description="Gecko JaxRs Whiteboard Resource with configuration project template">
-    <AD id="host" type="String" name="JaxRS Server Host" description="The hostname where the Jersey REST Server will run." default="localhost"/>
-    <AD id="port" type="String" name="JaxRS Server Port" description="The port the JaxRS Whiteboard will run" default="8082"/>
-    <AD id="whiteboardName" type="String" name="JaxRS Whiteboard Name" description="The name of the JaxRS whiteboard" default="Demo"/>
-    <AD id="contextPath" type="String" name="Contextpath" description="The root context the JaxRS Whiteboard will be available under" default="rest"/>
+  <OCD id="org.gecko.rest.project-with-config" name="Gecko Jakartars Resource Project Template with configuration" description="Gecko Jakartars Whiteboard Resource with configuration project template">
+    <AD id="host" type="String" name="Jakartars Server Host" description="The hostname where the Jersey REST Server will run." default="localhost"/>
+    <AD id="port" type="String" name="Jakartars Server Port" description="The port the Jakartars Whiteboard will run" default="8082"/>
+    <AD id="whiteboardName" type="String" name="Jakartars Whiteboard Name" description="The name of the Jakartars whiteboard" default="Demo"/>
+    <AD id="contextPath" type="String" name="Contextpath" description="The root context the Jakartars Whiteboard will be available under" default="rest"/>
   </OCD>
 </metatype:MetaData>

@@ -31,17 +31,17 @@
 	${junit5},\
 	${mockito}
 
-Bundle-Name: Gecko JaxRS Whiteboard
-Bundle-Description: Gecko Jersey OSGi JaxRs Whiteboard implementation
+Bundle-Name: Gecko Jakartars Whiteboard
+Bundle-Description: Gecko Jersey OSGi Jakartars Whiteboard implementation
 
-Export-Package: org.osgi.service.jaxrs.*
+Export-Package: org.osgi.service.jakartars.*
 	
 Provide-Capability: \
-	osgi.contract; osgi.contract=JavaJAXRS; version:List<Version>="2.1,2";provider=jersey;jersey.version:Version="2.36";uses:="javax.ws.rs, javax.ws.rs.core, javax.ws.rs.sse, javax.ws.rs.ext, javax.ws.rs.client, javax.ws.rs.container",\
-	osgi.service;objectClass:List<String>="org.osgi.service.jaxrs.runtime.JaxrsServiceRuntime";uses:="org.osgi.service.jaxrs.runtime,org.osgi.service.jaxrs.runtime.dto",\
-	osgi.service;objectClass:List<String>="javax.ws.rs.client.ClientBuilder";uses:="javax.ws.rs.client,org.osgi.service.jaxrs.client";service.scope="prototype",\
-	osgi.service;objectClass:List<String>="org.osgi.service.jaxrs.client.SseEventSourceFactory";uses:="org.osgi.service.jaxrs.client",\
-	osgi.serviceloader;osgi.serviceloader="javax.ws.rs.sse.SseEventSource.Builder";register:="org.gecko.rest.jersey.runtime.common.SSESourceBuilderService
+	osgi.contract; osgi.contract=JavaJAXRS; version:List<Version>="2.1,2";provider=jersey;jersey.version:Version="3.08";uses:="jakarta.ws.rs, jakarta.ws.rs.core, jakarta.ws.rs.sse, jakarta.ws.rs.ext, jakarta.ws.rs.client, jakarta.ws.rs.container",\
+	osgi.service;objectClass:List<String>="org.osgi.service.jakartars.runtime.JakartaServiceRuntime";uses:="org.osgi.service.jakartars.runtime,org.osgi.service.jakartars.runtime.dto",\
+	osgi.service;objectClass:List<String>="jakarta.ws.rs.client.ClientBuilder";uses:="jakarta.ws.rs.client,org.osgi.service.jakartars.client";service.scope="prototype",\
+	osgi.service;objectClass:List<String>="org.osgi.service.jakartars.client.SseEventSourceFactory";uses:="org.osgi.service.jakartars.client",\
+	osgi.serviceloader;osgi.serviceloader="jakarta.ws.rs.sse.SseEventSource.Builder";register:="org.gecko.rest.jersey.runtime.common.SSESourceBuilderService
 
 -privatepackage: \
 	org.gecko.rest.jersey.provider.application,\

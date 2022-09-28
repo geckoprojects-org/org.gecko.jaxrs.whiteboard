@@ -49,7 +49,7 @@ import org.osgi.service.http.runtime.HttpServiceRuntimeConstants;
 import org.osgi.service.http.whiteboard.HttpWhiteboardConstants;
 
 /**
- * Implementation of the {@link JaxRSServiceRuntime} for a Jersey implementation
+ * Implementation of the {@link JakartarsServiceRuntime} for a Jersey implementation
  * @author Mark Hoffmann
  * @since 12.07.2017
  */
@@ -93,7 +93,7 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.eclipselabs.osgi.jersey.runtime.JaxRsJerseyHandler#getURLs(org.osgi.service.component.ComponentContext)
+	 * @see org.eclipselabs.osgi.jersey.runtime.JakartarsJerseyHandler#getURLs(org.osgi.service.component.ComponentContext)
 	 */
 	@SuppressWarnings("unchecked")
 	public String[] getURLs(ComponentContext context) {
@@ -158,7 +158,7 @@ public class HTTPWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServi
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#doRegisterServletContainer(org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider, java.lang.String, org.glassfish.jersey.server.ResourceConfig)
+	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#doRegisterServletContainer(org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider, java.lang.String, org.glassfish.jersey.server.ResourceConfig)
 	 */
 	@Override
 	protected void doRegisterServletContext(JakartarsApplicationProvider provider, String path, ResourceConfig config) {

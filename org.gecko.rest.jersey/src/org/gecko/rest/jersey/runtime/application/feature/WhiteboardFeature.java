@@ -26,7 +26,7 @@ import jakarta.ws.rs.core.FeatureContext;
 
 import org.gecko.rest.jersey.helper.DispatcherHelper;
 import org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider;
-import org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider.JaxRsExtension;
+import org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider.JakartarsExtension;
 import org.glassfish.jersey.InjectionManagerProvider;
 
 /**
@@ -45,7 +45,7 @@ public class WhiteboardFeature implements Feature{
 
 	Map<String, JakartarsExtensionProvider> extensions;
 
-	Map<JakartarsExtensionProvider, JaxRsExtension> extensionInstanceTrackingMap = new HashMap<>();
+	Map<JakartarsExtensionProvider, JakartarsExtension> extensionInstanceTrackingMap = new HashMap<>();
 
 
 	public WhiteboardFeature(Map<String, JakartarsExtensionProvider> extensions) {
@@ -60,7 +60,7 @@ public class WhiteboardFeature implements Feature{
 		AtomicInteger priority = new AtomicInteger(Priorities.USER + 1000);
 		extensions.forEach((k, extension) -> {
 
-			JaxRsExtension je = extension.getExtension(InjectionManagerProvider.getInjectionManager(context));
+			JakartarsExtension je = extension.getExtension(InjectionManagerProvider.getInjectionManager(context));
 
 			extensionInstanceTrackingMap.put(extension, je);
 			Map<Class<?>,Integer> contractPriorities = je.getContractPriorities();
@@ -86,7 +86,7 @@ public class WhiteboardFeature implements Feature{
 	}
 
 	public void dispose(JakartarsExtensionProvider extProvider) {
-		JaxRsExtension je = extensionInstanceTrackingMap.remove(extProvider);
+		JakartarsExtension je = extensionInstanceTrackingMap.remove(extProvider);
 
 		if(je != null) {
 			je.dispose();

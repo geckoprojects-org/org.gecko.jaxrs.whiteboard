@@ -1,5 +1,5 @@
-Bundle-Name: Gecko JaxRS Whiteboard bnd Library
-Bundle-Description: Jersey Dependencies for the Gecko JaxRS Whiteboard
+Bundle-Name: Gecko Jakartars Whiteboard bnd Library
+Bundle-Description: Jersey Dependencies for the Gecko Jakartars Whiteboard
 
 -resourceonly: true
 -sources: false

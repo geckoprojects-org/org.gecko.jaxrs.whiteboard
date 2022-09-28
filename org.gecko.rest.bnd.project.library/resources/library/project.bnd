@@ -1,6 +1,6 @@
--buildpath.jaxrs: ${jaxrs.lib}
+-buildpath.jakartars: ${jakartars.lib}
 
-jaxrs.lib: \
+jakartars.lib: \
 	osgi.cmpn;version=latest,\
 	jakarta.ws.rs-api;version='[2.1,3)'
 	

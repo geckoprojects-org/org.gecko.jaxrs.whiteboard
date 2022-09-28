@@ -50,7 +50,7 @@ import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
  * @since 12.10.2017
  */
 @ExtendWith(MockitoExtension.class)
-public class JaxRsWhiteboardDispatcherTest {
+public class JakartarsWhiteboardDispatcherTest {
 
 	@Mock
 	private JakartarsWhiteboardProvider whiteboard;

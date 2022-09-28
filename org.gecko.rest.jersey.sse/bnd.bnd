@@ -1,8 +1,8 @@
 javac.source: 11
 javac.target: 11
 
-Bundle-Name: Jersey JaxRS SSE Fragment
-Bundle-Description: Jersey OSGi JaxRs SSE Fragment
+Bundle-Name: Jersey Jakartars SSE Fragment
+Bundle-Description: Jersey OSGi Jakartars SSE Fragment
 
 Fragment-Host: org.glassfish.jersey.media.jersey-media-sse
 

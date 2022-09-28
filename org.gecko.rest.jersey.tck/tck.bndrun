@@ -25,7 +25,7 @@
 	bnd.identity;id=junit-platform-launcher,\
 	bnd.identity;id='org.gecko.rest.jersey',\
 	bnd.identity;id='org.glassfish.jersey.inject.jersey-hk2',\
-	bnd.identity;id='org.osgi.test.cases.jaxrs',\
+	bnd.identity;id='org.osgi.test.cases.jakartars',\
 	bnd.identity;id=assertj-core,\
 	bnd.identity;id='org.gecko.rest.jersey.tck'
 
@@ -68,7 +68,7 @@
 	junit-platform-launcher;version='[1.8.2,1.8.3)',\
 	org.osgi.test.common;version='[1.1.0,1.1.1)',\
 	org.osgi.test.junit5;version='[1.1.0,1.1.1)',\
-	org.osgi.test.cases.jaxrs;version='[9.0.0,9.0.1)',\
+	org.osgi.test.cases.jakartars;version='[9.0.0,9.0.1)',\
 	org.osgi.util.promise;version='[1.3.0,1.3.1)',\
 	net.bytebuddy.byte-buddy;version='[1.12.8,1.12.9)',\
 	org.apache.aries.spifly.dynamic.framework.extension;version='[1.3.5,1.3.6)',\

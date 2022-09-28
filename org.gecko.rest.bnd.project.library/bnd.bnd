@@ -19,7 +19,7 @@ gecko-icon: ${dataurl},${base64;icons/gecko.ico}
 
 project-template-rest-no-config:\
 	org.bndtools.template; org.bndtools.template=project;\
-		name=Gecko JaxRS Resource Example;\
+		name=Gecko Jakartars Resource Example;\
 		category=${category};\
 		ranking:Double=1001;\
 		dir=templates/rest-no-config;\
@@ -29,7 +29,7 @@ project-template-rest-no-config:\
 
 project-template-rest-with-config:\
 	org.bndtools.template; org.bndtools.template=project;\
-		name=Gecko JaxRS Resource Example with Jersey JaxRSRuntime configuration;\
+		name=Gecko Jakartars Resource Example with Jersey JakartarsRuntime configuration;\
 		category=${category};\
 		ranking:Double=1001;\
 		dir=templates/rest-with-config;\
@@ -40,7 +40,7 @@ project-template-rest-with-config:\
 
 project-template-rest-with-config-wb:\
 	org.bndtools.template; org.bndtools.template=project;\
-		name=Gecko JaxRS Resource Example with JaxRSRuntime configuartion based on a OSGi HTTP Whiteboard;\
+		name=Gecko Jakartars Resource Example with JakartarsRuntime configuartion based on a OSGi HTTP Whiteboard;\
 		category=${category};\
 		ranking:Double=1001;\
 		dir=templates/rest-with-config-http-wb;\

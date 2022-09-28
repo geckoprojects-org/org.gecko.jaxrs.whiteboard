@@ -112,14 +112,14 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 	}
 
 	/* (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher#setBatchMode(boolean)
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsWhiteboardDispatcher#setBatchMode(boolean)
 	 */
 	public void setBatchMode(boolean batchMode) {
 		this.batchMode = batchMode;
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher#batchDispatch()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsWhiteboardDispatcher#batchDispatch()
 	 */
 	public void batchDispatch() {
 		if (isDispatching() && batchMode) {
@@ -129,7 +129,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 	
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher#setWhiteboardProvider(org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider)
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsWhiteboardDispatcher#setWhiteboardProvider(org.gecko.rest.jersey.provider.whiteboard.JakartarsWhiteboardProvider)
 	 */
 	@Override
 	public void setWhiteboardProvider(JakartarsWhiteboardProvider whiteboard) {
@@ -144,7 +144,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher#getWhiteboardProvider()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsWhiteboardDispatcher#getWhiteboardProvider()
 	 */
 	@Override
 	public JakartarsWhiteboardProvider getWhiteboardProvider() {
@@ -153,7 +153,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher#getApplications()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsWhiteboardDispatcher#getApplications()
 	 */
 	@Override
 	public Set<JakartarsApplicationProvider> getApplications() {
@@ -162,7 +162,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher#getResources()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsWhiteboardDispatcher#getResources()
 	 */
 	@Override
 	public Set<JakartarsResourceProvider> getResources() {
@@ -171,7 +171,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher#getExtensions()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsWhiteboardDispatcher#getExtensions()
 	 */
 	@Override
 	public Set<JakartarsExtensionProvider> getExtensions() {
@@ -208,7 +208,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher#removeApplication(jakarta.ws.rs.core.Application, java.util.Map)
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsWhiteboardDispatcher#removeApplication(jakarta.ws.rs.core.Application, java.util.Map)
 	 */
 	@Override
 	public void removeApplication(Application application, Map<String, Object> properties) {
@@ -224,7 +224,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 	}
 
 	/* (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher#addResource(org.osgi.framework.ServiceReference)
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsWhiteboardDispatcher#addResource(org.osgi.framework.ServiceReference)
 	 */
 	@Override
 	public void addResource(ServiceObjects<?> serviceObject, Map<String, Object> properties) {
@@ -264,7 +264,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher#removeResource(java.lang.Object, java.util.Map)
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsWhiteboardDispatcher#removeResource(java.lang.Object, java.util.Map)
 	 */
 	@Override
 	public void removeResource(Map<String, Object> properties) {
@@ -279,7 +279,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher#addExtension(java.lang.Object, java.util.Map)
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsWhiteboardDispatcher#addExtension(java.lang.Object, java.util.Map)
 	 */
 	@Override
 	public void addExtension(ServiceObjects<?> serviceObject, Map<String, Object> properties) {
@@ -315,7 +315,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher#removeExtension(java.lang.Object, java.util.Map)
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsWhiteboardDispatcher#removeExtension(java.lang.Object, java.util.Map)
 	 */
 	@Override
 	public void removeExtension(Map<String, Object> properties) {
@@ -332,7 +332,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher#dispatch()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsWhiteboardDispatcher#dispatch()
 	 */
 	@Override
 	public void dispatch() {
@@ -374,7 +374,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher#isDispatching()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsWhiteboardDispatcher#isDispatching()
 	 */
 	@Override
 	public boolean isDispatching() {
@@ -461,7 +461,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 				 */
 				applicationCandidates = checkPathProperty(applicationCandidates);		
 						
-//				Check the osgi.jaxrs.name property and filter out services with same name and lower rank
+//				Check the osgi.jakartars.name property and filter out services with same name and lower rank
 				List<JakartarsProvider> candidates = checkNameProperty(applicationCandidates, resourceCandidatesMap.get(Boolean.TRUE), extensionCandidatesMap.get(Boolean.TRUE));
 				applicationCandidates = candidates.stream()
 						.filter(JakartarsApplicationProvider.class::isInstance)
@@ -494,7 +494,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 						});
 				
 				
-//				check for osgi.jaxrs.extension.select properties in apps and extensions
+//				check for osgi.jakartars.extension.select properties in apps and extensions
 //				If such property exists we should check that the corresponding extensions are available,
 //				otherwise the service should result in a failure DTO
 				applicationCandidates = checkExtensionSelect(applicationCandidates);	
@@ -554,7 +554,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 					}
 				});
 				
-//				check for osgi.jaxrs.extension.select properties in apps and resources
+//				check for osgi.jakartars.extension.select properties in apps and resources
 //				If such property exists we should check that the corresponding extensions are available,
 //				otherwise the service should result in a failure DTO
 				checkExtensionSelectForResources(applicationCandidates);
@@ -750,7 +750,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 	}
 
 	/**
-	 * Check the osgi.jaxrs.extension.select for apps and extensions. 
+	 * Check the osgi.jakartars.extension.select for apps and extensions. 
 	 * If an app requires an extension and this is not present, then all the extensions previously added to that app
 	 * will be removed and the app itself will be unregistered and recorded as a failure DTO.
 	 * If an extension requires another extension which is not present, the extension is removed from the app. In this
@@ -901,14 +901,14 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 
 	
 	/**
-	 * Check the osgi.jaxrs.name property of all services associated with a whiteboard.
+	 * Check the osgi.jakartars.name property of all services associated with a whiteboard.
 	 * If two or more services have the same name property, only the highest ranked one should be
 	 * kept. The others should result in a failure DTO 
 	 * 
 	 * @param applicationCandidates
 	 * @param resourceCandidates
 	 * @param extensionCandidates
-	 * @return a set of JaxRsProvider containing the surviving services
+	 * @return a set of JakartarsProvider containing the surviving services
 	 */
 	private List<JakartarsProvider> checkNameProperty(List<JakartarsApplicationProvider> applicationCandidates,
 			List<JakartarsResourceProvider> resourceCandidates, List<JakartarsExtensionProvider> extensionCandidates) {			
@@ -1079,7 +1079,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 		if (content instanceof JakartarsExtensionProvider) {
 			return application.addExtension((JakartarsExtensionProvider) content);
 		}
-		logger.warning("unhandled JaxRsApplicationContentProvider. coult not add application " + application + " to content " + content);
+		logger.warning("Unhandled JakartarsApplicationContentProvider. Couldt not add application " + application + " to content " + content);
 		return false;
 	}
 
@@ -1096,7 +1096,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 		if (content instanceof JakartarsExtensionProvider) {
 			return application.removeExtension((JakartarsExtensionProvider) content);
 		}
-		logger.warning("unhandled JaxRsApplicationContentProvider. Can not remove application " + application + " for content " + content);
+		logger.warning("Unhandled JakartarsApplicationContentProvider. Can not remove application " + application + " for content " + content);
 
 		return false;
 	}
@@ -1169,7 +1169,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 	}
 
 	/* (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher#getBatchMode()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsWhiteboardDispatcher#getBatchMode()
 	 */
 	@Override
 	public boolean getBatchMode() {

@@ -19,7 +19,7 @@ import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.osgi.service.jakartars.runtime.dto.BaseExtensionDTO;
 
 /**
- * Provider interface for JaxRs extensions
+ * Provider interface for Jakartars extensions
  * @author Mark Hoffmann
  * @since 11.10.2017
  */
@@ -51,9 +51,9 @@ public interface JakartarsExtensionProvider extends JakartarsApplicationContentP
 	 * @param injectionManager 
 	 * @return the extension
 	 */
-	public JaxRsExtension getExtension(InjectionManager injectionManager);
+	public JakartarsExtension getExtension(InjectionManager injectionManager);
 	
-	public interface JaxRsExtension {
+	public interface JakartarsExtension {
 		
 		/**
 		 * Returns the contract priorities for this extension. The keys will match the values returned by

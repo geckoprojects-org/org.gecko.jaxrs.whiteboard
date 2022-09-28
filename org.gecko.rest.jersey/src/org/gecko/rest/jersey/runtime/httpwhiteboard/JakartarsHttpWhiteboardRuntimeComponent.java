@@ -41,14 +41,14 @@ import org.osgi.service.condition.Condition;
 import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 /**
- * This component handles the lifecycle of a {@link JaxRSServiceRuntime}
+ * This component handles the lifecycle of a {@link JakartarsServiceRuntime}
  * @author Mark Hoffmann
  * @since 30.07.2017
  */
 @Component(name="JakartarsHttpWhiteboardRuntimeComponent", immediate=true, configurationPolicy=ConfigurationPolicy.REQUIRE, reference = @Reference(name = "runtimeCondition", service = Condition.class , target = JerseyConstants.JERSEY_RUNTIME_CONDITION))
 public class JakartarsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardComponent{
 
-	private static Logger logger = Logger.getLogger("o.e.o.j.JaxRsHttpWhiteboardRuntimeComponent");
+	private static Logger logger = Logger.getLogger("o.e.o.j.JakartarsHttpWhiteboardRuntimeComponent");
 
 
 	/**
@@ -105,7 +105,7 @@ public class JakartarsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCom
 	 * @param application the application to add
 	 * @param properties the service properties
 	 */
-	@Reference(name="defaultApplication", cardinality=ReferenceCardinality.AT_LEAST_ONE, policy=ReferencePolicy.DYNAMIC, unbind="unbindDefaultApplication", updated = "modifedDefaultApplication", target="(&(osgi.jaxrs.application.base=*)(osgi.jaxrs.name=.default))")
+	@Reference(name="defaultApplication", cardinality=ReferenceCardinality.AT_LEAST_ONE, policy=ReferencePolicy.DYNAMIC, unbind="unbindDefaultApplication", updated = "modifedDefaultApplication", target="(&(" + JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE	+ "=*)(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME	+ "=.default))")
 	public void addDefaultApplication(Application application, Map<String, Object> properties) {
 		dispatcher.addApplication(application, properties);
 	}
@@ -134,7 +134,7 @@ public class JakartarsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCom
 	 * @param application the application to add
 	 * @param properties the service properties
 	 */
-	@Reference(name="application", service=Application.class,cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="unbindApplication", updated = "modifedApplication", target="(&(osgi.jaxrs.application.base=*)(!(osgi.jaxrs.name=.default)))")
+	@Reference(name="application", service=Application.class,cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="unbindApplication", updated = "modifedApplication", target="(&(" + JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE	+ "=*)(!(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME	+ "=.default)))")
 	public void bindApplication(Application application, Map<String, Object> properties) {
 		dispatcher.addApplication(application, properties);
 	}
@@ -158,35 +158,33 @@ public class JakartarsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCom
 		dispatcher.removeApplication(application, properties);
 	}
 
-	@Reference(service = AnyService.class, target = "(" + JakartarsWhiteboardConstants.JAKARTA_RS_EXTENSION
-			+ "=true)", cardinality = MULTIPLE, policy = DYNAMIC)
-	public void bindJaxRsExtension(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
-		unbindJaxRsExtension(jaxRsExtensionSR,properties);
+	@Reference(service = AnyService.class, target = "(" + JakartarsWhiteboardConstants.JAKARTA_RS_EXTENSION	+ "=true)", cardinality = MULTIPLE, policy = DYNAMIC)
+	public void bindJakartarsExtension(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
+		unbindJakartarsRsExtension(jakartarsExtensionSR,properties);
 	}
 
-	public void updatedJaxRsExtension(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
-		logger.fine("Handle extension " + jaxRsExtensionSR + " properties: " + properties);
-		ServiceObjects<?> so = getServiceObjects(jaxRsExtensionSR);
+	public void updatedJakartarsExtension(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
+		logger.fine("Handle extension " + jakartarsExtensionSR + " properties: " + properties);
+		ServiceObjects<?> so = getServiceObjects(jakartarsExtensionSR);
 		dispatcher.addExtension(so, properties);
 
 	}
-	public void unbindJaxRsExtension(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
+	public void unbindJakartarsRsExtension(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
 		dispatcher.removeExtension(properties);
 	}
 
-	@Reference(service = AnyService.class, target = "(" + JAKARTA_RS_RESOURCE
-			+ "=true)", cardinality = MULTIPLE, policy = DYNAMIC)
-	public void bindJaxRsResource(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
-		updatedJakartarsResource(jaxRsExtensionSR,properties);
+	@Reference(service = AnyService.class, target = "(" + JAKARTA_RS_RESOURCE + "=true)", cardinality = MULTIPLE, policy = DYNAMIC)
+	public void bindJakartarsResource(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
+		updatedJakartarsResource(jakartarsExtensionSR,properties);
 	}
 
-	public void updatedJakartarsResource(ServiceReference<Object> jaxRsResourceSR, Map<String, Object> properties) {
-		logger.fine("Handle resource " + jaxRsResourceSR + " properties: " + properties);
-		ServiceObjects<?> so = getServiceObjects(jaxRsResourceSR);
+	public void updatedJakartarsResource(ServiceReference<Object> jakartarsResourceSR, Map<String, Object> properties) {
+		logger.fine("Handle resource " + jakartarsResourceSR + " properties: " + properties);
+		ServiceObjects<?> so = getServiceObjects(jakartarsResourceSR);
 		dispatcher.addResource(so, properties);
 
 	}
-	public void unbindJaxRsResource(ServiceReference<Object> jaxRsResourceSR, Map<String, Object> properties) {
+	public void unbindJakartarsResource(ServiceReference<Object> jakartarsResourceSR, Map<String, Object> properties) {
 		dispatcher.removeResource(properties);
 	}
 }

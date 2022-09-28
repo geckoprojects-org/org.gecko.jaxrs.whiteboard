@@ -33,7 +33,7 @@ public interface JakartarsProvider extends Cloneable, Comparable<JakartarsProvid
 	public String getId();
 	
 	/**
-	 * Returns the application name which targets to the property osgi.jaxrs.name
+	 * Returns the application name which targets to the property osgi.jakartars.name
 	 * @return the application name
 	 */
 	public String getName();

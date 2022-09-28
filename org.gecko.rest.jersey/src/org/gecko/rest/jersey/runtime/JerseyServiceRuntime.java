@@ -44,7 +44,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 /**
- * Implementation of the {@link JaxRSServiceRuntime} for a Jersey implementation
+ * Implementation of the {@link JakartarsServiceRuntime} for a Jersey implementation
  * 
  * @author Mark Hoffmann
  * @since 12.07.2017
@@ -60,7 +60,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	private volatile Server jettyServer;
 	private Integer port = JerseyConstants.WHITEBOARD_DEFAULT_PORT;
 	private String contextPath = JerseyConstants.WHITEBOARD_DEFAULT_CONTEXT_PATH;
-	private Logger logger = Logger.getLogger("jaxRs.serviceRuntime");
+	private Logger logger = Logger.getLogger("Jakartars.serviceRuntime");
 	private final Map<String, ServletContextHandler> handlerMap = new HashMap<>();
 	private final HandlerList handlers = new HandlerList();
 
@@ -79,7 +79,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#modified(
+	 * org.gecko.rest.jersey.provider.whiteboard.JakartarsWhiteboardProvider#modified(
 	 * org.osgi.service.component.ComponentContext)
 	 */
 	public void doModified(ComponentContext ctx) throws ConfigurationException {
@@ -137,7 +137,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	 * (non-Javadoc)
 	 * 
 	 * @see
-	 * org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#getURLs(org
+	 * org.gecko.rest.jersey.provider.whiteboard.JakartarsWhiteboardProvider#getURLs(org
 	 * .osgi.service.component.ComponentContext)
 	 */
 	public String[] getURLs(ComponentContext context) {
@@ -166,7 +166,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	 * 
 	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#
 	 * doRegisterServletContainer(org.glassfish.jersey.servlet.ServletContainer,
-	 * org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider)
+	 * org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider)
 	 */
 	@Override
 	protected void doRegisterServletContext(JakartarsApplicationProvider applicationProvider, String path,
@@ -198,7 +198,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	 * 
 	 * @see org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime#
 	 * doRegisterServletContainer(org.glassfish.jersey.servlet.ServletContainer,
-	 * org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider)
+	 * org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider)
 	 */
 	@Override
 	protected void doRegisterServletContext(JakartarsApplicationProvider applicationProvider, String path) {
@@ -317,14 +317,14 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 		try {
 			if (jettyServer != null && !jettyServer.isStopped()) {
 				logger.log(Level.WARNING,
-						"Stopping JaxRs white-board server on startup, but it wasn't exepected to run");
+						"Stopping Jakartars whiteboard server on startup, but it wasn't exepected to run");
 				stopContextHandlers();
 				stopServer();
 			}
 			jettyServer = new Server(port);
 			jettyServer.setHandler(handlers);
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Error starting JaxRs white-board because of an exception", e);
+			logger.log(Level.SEVERE, "Error starting Jakartars whiteboard because of an exception", e);
 		}
 	}
 
@@ -339,13 +339,13 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 			Executors.newSingleThreadExecutor().submit(jettyServerRunnable);
 			if (jettyServerRunnable.isStarted(5, TimeUnit.SECONDS)) {
 
-				logger.info("Started JaxRs white-board server for port: " + port + " and context: " + contextPath);
+				logger.info("Started Jakartars whiteboard server for port: " + port + " and context: " + contextPath);
 
 			} else {
 				switch (jettyServerRunnable.getState()) {
 				case INIT:
 
-					logger.severe("Started JaxRs white-board server for port: " + port + " and context: " + contextPath
+					logger.severe("Started Jakartars whiteboard server for port: " + port + " and context: " + contextPath
 							+ " took to long");
 					throw new IllegalStateException("Server Startup took too long");
 				case STARTED:
@@ -353,12 +353,12 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 					break;
 				case STOPPED:
 
-					logger.info("Started JaxRs white-board server for port: " + port + " and context: " + contextPath
+					logger.info("Started Jakartars whiteboard server for port: " + port + " and context: " + contextPath
 							+ " was stopped with unknown reasons");
 					throw new IllegalStateException("Server Startup was stopped with unknown reasons");
 
 				case EXCEPTION:
-					logger.severe("Started JaxRs white-board server for port: " + port + " and context: " + contextPath
+					logger.severe("Started Jakartars whiteboard server for port: " + port + " and context: " + contextPath
 							+ " throws exception");
 					throw new IllegalStateException("Server Startup was stopped with exception",
 							jettyServerRunnable.getThrowable());
@@ -375,11 +375,11 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	 */
 	private void stopServer() {
 		if (jettyServer == null) {
-			logger.log(Level.WARNING, "Try to stop JaxRs whiteboard server, but there is none");
+			logger.log(Level.WARNING, "Try to stop Jakartars whiteboard server, but there is none");
 			return;
 		}
 		if (jettyServer.isStopped()) {
-			logger.log(Level.WARNING, "Try to stop JaxRs whiteboard server, but it was already stopped");
+			logger.log(Level.WARNING, "Try to stop Jakartars whiteboard server, but it was already stopped");
 			return;
 		}
 		try {

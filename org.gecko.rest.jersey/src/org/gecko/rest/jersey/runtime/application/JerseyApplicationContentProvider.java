@@ -31,7 +31,7 @@ import org.osgi.service.jakartars.runtime.dto.DTOConstants;
 import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 /**
- * A wrapper class for a JaxRs resources 
+ * A wrapper class for a Jakartars resources 
  * @author Mark Hoffmann
  * @param <T>
  * @param <T>
@@ -97,7 +97,7 @@ public class JerseyApplicationContentProvider<T> extends AbstractJakartarsProvid
 	
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.JaxRsRandEProvider#getObjectClass()
+	 * @see org.gecko.rest.jersey.provider.JakartarsRandEProvider#getObjectClass()
 	 */
 	@Override
 	public Class<?> getObjectClass() {
@@ -106,7 +106,7 @@ public class JerseyApplicationContentProvider<T> extends AbstractJakartarsProvid
 	
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.JaxRsRandEProvider#getProperties()
+	 * @see org.gecko.rest.jersey.provider.JakartarsRandEProvider#getProperties()
 	 */
 	@Override
 	public Map<String, Object> getProperties() {
@@ -147,7 +147,7 @@ public class JerseyApplicationContentProvider<T> extends AbstractJakartarsProvid
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvider#canHandleDefaultApplication()
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationContentProvider#canHandleDefaultApplication()
 	 */
 	@Override
 	public boolean canHandleDefaultApplication() {
@@ -162,7 +162,7 @@ public class JerseyApplicationContentProvider<T> extends AbstractJakartarsProvid
 	
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvider#canHandleDefaultApplication(org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider)
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationContentProvider#canHandleDefaultApplication(org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider)
 	 */
 	@Override
 	public boolean canHandleDefaultApplication(JakartarsApplicationProvider application) {
@@ -181,7 +181,7 @@ public class JerseyApplicationContentProvider<T> extends AbstractJakartarsProvid
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvider#canHandleApplications(java.util.Collection)
+	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationContentProvider#canHandleApplications(java.util.Collection)
 	 */
 	@Override
 	public boolean validateApplications(Collection<JakartarsApplicationProvider> applications) {
@@ -198,12 +198,12 @@ public class JerseyApplicationContentProvider<T> extends AbstractJakartarsProvid
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.AbstractJaxRsProvider#doValidateProperties(java.util.Map)
+	 * @see org.gecko.rest.jersey.provider.AbstractJakartarsProvider#doValidateProperties(java.util.Map)
 	 */
 	protected void doValidateProperties(Map<String, Object> properties) {
-		Object resourceProp = properties.get(getJaxRsResourceConstant());
+		Object resourceProp = properties.get(getJakartarsResourceConstant());
 		if (resourceProp == null || (resourceProp instanceof Boolean && !((Boolean) resourceProp)) || !Boolean.parseBoolean(resourceProp.toString())) {
-			logger.log(Level.WARNING, "The resource to add is not declared with the resource property: " + getJaxRsResourceConstant());
+			logger.log(Level.WARNING, "The resource to add is not declared with the resource property: " + getJakartarsResourceConstant());
 			updateStatus(INVALID);
 			return;
 		}
@@ -220,10 +220,10 @@ public class JerseyApplicationContentProvider<T> extends AbstractJakartarsProvid
 	}
 	
 	/**
-	 * Returns the {@link JaxRSWhiteboardConstants} for this resource type 
-	 * @return the {@link JaxRSWhiteboardConstants} for this resource type
+	 * Returns the {@link JakartarsWhiteboardConstants} for this resource type 
+	 * @return the {@link JakartarsWhiteboardConstants} for this resource type
 	 */
-	protected String getJaxRsResourceConstant() {
+	protected String getJakartarsResourceConstant() {
 		return new String();
 	}
 

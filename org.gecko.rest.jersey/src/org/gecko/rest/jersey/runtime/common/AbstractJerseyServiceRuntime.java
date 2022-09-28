@@ -68,7 +68,7 @@ import org.osgi.service.jakartars.runtime.dto.ResourceMethodInfoDTO;
 import org.osgi.service.jakartars.runtime.dto.RuntimeDTO;
 
 /**
- * Implementation of the {@link JaxRSServiceRuntime} for a Jersey implementation
+ * Implementation of the {@link JakartarsServiceRuntime} for a Jersey implementation
  * @author Mark Hoffmann
  * @since 12.07.2017
  */
@@ -85,13 +85,13 @@ public abstract class AbstractJerseyServiceRuntime implements JakartarsServiceRu
 	protected final List<FailedResourceDTO> failedResources = new LinkedList<>();
 	protected final List<FailedExtensionDTO> failedExtensions = new LinkedList<>();
 
-	private Logger logger = Logger.getLogger("jaxRs.serviceRuntime");
-	private ServiceRegistration<JakartarsServiceRuntime> regJaxrsServiceRuntime;
+	private Logger logger = Logger.getLogger("Jakartars.serviceRuntime");
+	private ServiceRegistration<JakartarsServiceRuntime> regJakartarsServiceRuntime;
 	private AtomicLong changeCount = new AtomicLong();
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.osgi.service.jakartars.runtime.JaxRSServiceRuntime#getRuntimeDTO()
+	 * @see org.osgi.service.jakartars.runtime.JakartarsServiceRuntime#getRuntimeDTO()
 	 */
 	@Override
 	public RuntimeDTO getRuntimeDTO() {
@@ -102,7 +102,7 @@ public abstract class AbstractJerseyServiceRuntime implements JakartarsServiceRu
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#initialize(org.osgi.service.component.ComponentContext)
+	 * @see org.gecko.rest.jersey.provider.whiteboard.JakartarsWhiteboardProvider#initialize(org.osgi.service.component.ComponentContext)
 	 */
 	@Override
 	public void initialize(ComponentContext context) throws ConfigurationException {
@@ -113,7 +113,7 @@ public abstract class AbstractJerseyServiceRuntime implements JakartarsServiceRu
 	}
 	
 	/* (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#startup()
+	 * @see org.gecko.rest.jersey.provider.whiteboard.JakartarsWhiteboardProvider#startup()
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
@@ -123,14 +123,14 @@ public abstract class AbstractJerseyServiceRuntime implements JakartarsServiceRu
 		String[] service = new String[] {JakartarsServiceRuntime.class.getName(), JakartarsWhiteboardProvider.class.getName()};
 		try {
 
-			regJaxrsServiceRuntime = (ServiceRegistration<JakartarsServiceRuntime>) context.getBundleContext()
+			regJakartarsServiceRuntime = (ServiceRegistration<JakartarsServiceRuntime>) context.getBundleContext()
 					.registerService(service, this, properties);
 			updateRuntimeDtoAndChangeCount();
 
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "Error starting JaxRsRuntimeService ", e);
-			if (regJaxrsServiceRuntime != null) {
-				regJaxrsServiceRuntime.unregister();
+			logger.log(Level.SEVERE, "Error starting JakartarsRuntimeService ", e);
+			if (regJakartarsServiceRuntime != null) {
+				regJakartarsServiceRuntime.unregister();
 			}
 		} 
 	}
@@ -159,7 +159,7 @@ public abstract class AbstractJerseyServiceRuntime implements JakartarsServiceRu
 			 * the value of this property will increase.
 			 * 
 			 * This allows interested parties to be notified of changes to the DTOs by
-			 * observing Service Events of type MODIFIED for the JaxrsServiceRuntime
+			 * observing Service Events of type MODIFIED for the JakartarsServiceRuntime
 			 * service. See org.osgi.framework.Constants.SERVICE_CHANGECOUNT in
 			 */
 			updateChangeCount();
@@ -169,8 +169,8 @@ public abstract class AbstractJerseyServiceRuntime implements JakartarsServiceRu
 
 	private void updateChangeCount() {
 		Dictionary<String, Object> properties = getRuntimePropertiesWithNewChangeCount();
-		if(regJaxrsServiceRuntime!=null) {
-			regJaxrsServiceRuntime.setProperties(properties);
+		if(regJakartarsServiceRuntime!=null) {
+			regJakartarsServiceRuntime.setProperties(properties);
 		}
 
 	}
@@ -187,7 +187,7 @@ public abstract class AbstractJerseyServiceRuntime implements JakartarsServiceRu
 	protected abstract void doInitialize(ComponentContext context) ;
 
 	/* (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#modified(org.osgi.service.component.ComponentContext)
+	 * @see org.gecko.rest.jersey.provider.whiteboard.JakartarsWhiteboardProvider#modified(org.osgi.service.component.ComponentContext)
 	 */
 	@Override
 	public void modified(ComponentContext context) throws ConfigurationException {
@@ -200,16 +200,16 @@ public abstract class AbstractJerseyServiceRuntime implements JakartarsServiceRu
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#teardown()
+	 * @see org.gecko.rest.jersey.provider.whiteboard.JakartarsWhiteboardProvider#teardown()
 	 */
 	public void teardown() {
-		if (regJaxrsServiceRuntime != null) {
+		if (regJakartarsServiceRuntime != null) {
 			try {
-				regJaxrsServiceRuntime.unregister();
+				regJakartarsServiceRuntime.unregister();
 			} catch (IllegalStateException ise) {
-				logger.log(Level.SEVERE, "JaxRsRuntime was already unregistered", ise);
+				logger.log(Level.SEVERE, "JakartarsRuntime was already unregistered", ise);
 			} catch (Exception ise) {
-				logger.log(Level.SEVERE, "Error unregsitering JaxRsRuntime", ise);
+				logger.log(Level.SEVERE, "Error unregsitering JakartarsRuntime", ise);
 			}
 		}
 		doTeardown();
@@ -236,8 +236,8 @@ public abstract class AbstractJerseyServiceRuntime implements JakartarsServiceRu
 				} 	
 			});
 			
-			if (regJaxrsServiceRuntime != null) {
-				ServiceReference<?> serviceRef = regJaxrsServiceRuntime.getReference();
+			if (regJakartarsServiceRuntime != null) {
+				ServiceReference<?> serviceRef = regJakartarsServiceRuntime.getReference();
 				if (serviceRef != null) {
 					ServiceReferenceDTO srDTO = DTOConverter.toServiceReferenceDTO(serviceRef);
 					runtimeDTO.serviceDTO = srDTO;
@@ -385,7 +385,7 @@ public abstract class AbstractJerseyServiceRuntime implements JakartarsServiceRu
 	
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#isRegistered(org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider)
+	 * @see org.gecko.rest.jersey.provider.whiteboard.JakartarsWhiteboardProvider#isRegistered(org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider)
 	 */
 	@Override
 	public boolean isRegistered(JakartarsApplicationProvider provider) {
@@ -397,7 +397,7 @@ public abstract class AbstractJerseyServiceRuntime implements JakartarsServiceRu
 
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#getName()
+	 * @see org.gecko.rest.jersey.provider.whiteboard.JakartarsWhiteboardProvider#getName()
 	 */
 	@Override
 	public String getName() {
@@ -406,17 +406,17 @@ public abstract class AbstractJerseyServiceRuntime implements JakartarsServiceRu
 	
 	/* 
 	 * (non-Javadoc)
-	 * @see org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider#getProperties()
+	 * @see org.gecko.rest.jersey.provider.whiteboard.JakartarsWhiteboardProvider#getProperties()
 	 */
 	@Override
 	public Map<String, Object> getProperties() {
 		Map<String, Object> properties = new HashMap<>();
 		
 		Enumeration<String> keys = context.getProperties().keys();
-		if (regJaxrsServiceRuntime != null) {
-			String[] runtimeKeys = regJaxrsServiceRuntime.getReference().getPropertyKeys();
+		if (regJakartarsServiceRuntime != null) {
+			String[] runtimeKeys = regJakartarsServiceRuntime.getReference().getPropertyKeys();
 			for (String k : runtimeKeys) {
-				properties.put(k, regJaxrsServiceRuntime.getReference().getProperty(k));
+				properties.put(k, regJakartarsServiceRuntime.getReference().getProperty(k));
 			}
 		}
 		while(keys.hasMoreElements()) {
@@ -430,14 +430,14 @@ public abstract class AbstractJerseyServiceRuntime implements JakartarsServiceRu
 	/**
 	 * Creates a new {@link ResourceConfig} for a given application. this method takes care of registering
 	 * Jersey factories for prototype scoped resource services and singletons separately
-	 * @param applicationProvider the JaxRs application application provider
+	 * @param applicationProvider the Jakartars application application provider
 	 */
 	protected ResourceConfigWrapper createResourceConfig(JakartarsApplicationProvider applicationProvider) {
 		if (applicationProvider == null) {
 			logger.log(Level.WARNING, "Cannot create a resource configuration for null application provider");
 			return null;
 		}
-		Application application = applicationProvider.getJaxRsApplication();
+		Application application = applicationProvider.getJakartarsApplication();
 		if(application instanceof JerseyApplication) {
 			((JerseyApplication) application).resetForReload();
 		}

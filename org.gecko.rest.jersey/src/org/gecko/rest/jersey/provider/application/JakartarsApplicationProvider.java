@@ -27,7 +27,7 @@ import org.osgi.service.jakartars.runtime.dto.BaseApplicationDTO;
 import org.osgi.service.jakartars.runtime.dto.FailedApplicationDTO;
 
 /**
- * Wrapper interface to provide an JaxRs application with all necessary properties
+ * Wrapper interface to provide an Jakartars application with all necessary properties
  * @author Mark Hoffmann
  * @since 30.07.2017
  */
@@ -40,10 +40,10 @@ public interface JakartarsApplicationProvider extends JakartarsProvider, Jakarta
 	public String getPath();
 	
 	/**
-	 * Returns the JaxRs application instance
-	 * @return the JaxRs application instance
+	 * Returns the Jakartars application instance
+	 * @return the Jakartars application instance
 	 */
-	public Application getJaxRsApplication();
+	public Application getJakartarsApplication();
 	
 	/**
 	 * Returns the application properties or an empty map
@@ -62,9 +62,9 @@ public interface JakartarsApplicationProvider extends JakartarsProvider, Jakarta
 	public boolean canHandleWhiteboard(Map<String, Object> runtimeProperties);
 	
 	/**
-	 * Returns the {@link ApplicationDTO} for this JaxRsApplication.
+	 * Returns the {@link ApplicationDTO} for this JakartarsApplication.
 	 * In case of an error a {@link FailedApplicationDTO} instance will be returned
-	 * @return the {@link ApplicationDTO} or {@link FailedApplicationDTO} for this JaxRsApplication
+	 * @return the {@link ApplicationDTO} or {@link FailedApplicationDTO} for this JakartarsApplication
 	 */
 	public BaseApplicationDTO getApplicationDTO();
 	
@@ -151,7 +151,7 @@ public interface JakartarsApplicationProvider extends JakartarsProvider, Jakarta
 	public void removeServletContainer(ServletContainer applicationContainer);
 	
 	/**
-	 * Updates the application base property. section 151.6.1 JaxRs Whiteboard Specification
+	 * Updates the application base property. section 151.6.1 Jakartars Whiteboard Specification
 	 * @param applicationBase the property to update
 	 */
 	public void updateApplicationBase(String applicationBase);

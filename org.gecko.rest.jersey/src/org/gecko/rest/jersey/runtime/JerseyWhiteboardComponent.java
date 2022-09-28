@@ -176,36 +176,36 @@ public class JerseyWhiteboardComponent {
 
 	@Reference(service = AnyService.class, target = "(" + JAKARTA_RS_EXTENSION
 			+ "=true)", cardinality = MULTIPLE, policy = DYNAMIC)
-	public void bindJakartarsExtension(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
+	public void bindJakartarsExtension(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
 
-		updatedJakartarExtension(jaxRsExtensionSR, properties);
+		updatedJakartarExtension(jakartarsExtensionSR, properties);
 	}
 
-	public void updatedJakartarExtension(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
-		logger.fine("Handle extension " + jaxRsExtensionSR + " properties: " + properties);
-		ServiceObjects<?> so = getServiceObjects(jaxRsExtensionSR);
+	public void updatedJakartarExtension(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
+		logger.fine("Handle extension " + jakartarsExtensionSR + " properties: " + properties);
+		ServiceObjects<?> so = getServiceObjects(jakartarsExtensionSR);
 		dispatcher.addExtension(so, properties);
 
 	}
 
-	public void unbindJaxRsExtension(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
+	public void unbindJakartarsRsExtension(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
 		dispatcher.removeExtension(properties);
 	}
 
 	@Reference(service = AnyService.class, target = "(" + JAKARTA_RS_RESOURCE
 			+ "=true)", cardinality = MULTIPLE, policy = DYNAMIC)
-	public void bindJakartarsResource(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
-		updatedJakartarsResource(jaxRsExtensionSR, properties);
+	public void bindJakartarsResource(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
+		updatedJakartarsResource(jakartarsExtensionSR, properties);
 	}
 
-	public void updatedJakartarsResource(ServiceReference<Object> jaxRsResourceSR, Map<String, Object> properties) {
-		logger.fine("Handle resource " + jaxRsResourceSR + " properties: " + properties);
-		ServiceObjects<?> so = getServiceObjects(jaxRsResourceSR);
+	public void updatedJakartarsResource(ServiceReference<Object> jakartarsResourceSR, Map<String, Object> properties) {
+		logger.fine("Handle resource " + jakartarsResourceSR + " properties: " + properties);
+		ServiceObjects<?> so = getServiceObjects(jakartarsResourceSR);
 		dispatcher.addResource(so, properties);
 
 	}
 
-	public void unbindJakartarsResource(ServiceReference<Object> jaxRsResourceSR, Map<String, Object> properties) {
+	public void unbindJakartarsResource(ServiceReference<Object> jakartarsResourceSR, Map<String, Object> properties) {
 		dispatcher.removeResource(properties);
 	}
 	/**

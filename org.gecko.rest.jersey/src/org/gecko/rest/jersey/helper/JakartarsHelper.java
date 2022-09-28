@@ -17,7 +17,7 @@ import jakarta.ws.rs.ApplicationPath;
 import jakarta.ws.rs.core.Application;
 
 /**
- * Helper class for JaxRs related stuff
+ * Helper class for Jakartars related stuff
  * @author Mark Hoffmann
  * @since 12.07.2017
  */
@@ -28,7 +28,7 @@ public class JakartarsHelper {
 	 * will be read. If present the value is taken and transformed into a valid Servlet spec format with
 	 * leading '/' and trailing /* to make the resources work.
 	 * If no application instance id given the default value /* is returned.
-	 * @param application the JaxRs application instance
+	 * @param application the Jakartars application instance
 	 * @return the application path
 	 */
 	public static String getServletPath(Application application, String applicationBase) {
@@ -60,7 +60,7 @@ public class JakartarsHelper {
 	 * the default /* is returned. If present the value is taken and transformed into a valid Servlet spec format with
 	 * leading '/' and trailing /* to make the resources work.
 	 * If no application instance id given the default value /* is returned.
-	 * @param application the JaxRs application instance
+	 * @param application the Jakartars application instance
 	 * @return the application path
 	 */
 	public static String toServletPath(String path) {
@@ -72,7 +72,7 @@ public class JakartarsHelper {
 	 * the default /* is returned. If present the value is taken and transformed into a valid Servlet spec format with
 	 * leading '/' and trailing /* to make the resources work.
 	 * If no application instance id given the default value /* is returned.
-	 * @param application the JaxRs application instance
+	 * @param application the Jakartars application instance
 	 * @return the application path
 	 */
 	public static String toApplicationPath(String path) {

@@ -20,7 +20,7 @@ import java.util.Map;
 import org.gecko.rest.jersey.provider.JakartarsConstants;
 
 /**
- * Provider interface for JaxRs resources and extensions. 
+ * Provider interface for Jakartars resources and extensions. 
  * This interface contains common methods for both of them
  * 
  * @author Mark Hoffmann

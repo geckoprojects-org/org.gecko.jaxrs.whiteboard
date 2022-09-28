@@ -32,7 +32,7 @@ import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 /**
- * Special JaxRs application implementation that holds and updates all resource and extension given by the application provider
+ * Special Jakartars application implementation that holds and updates all resource and extension given by the application provider
  * @author Mark Hoffmann
  * @since 15.07.2017
  */
@@ -121,7 +121,7 @@ public class JerseyApplication extends Application {
 		
 		if (contentProvider == null) {
 			if (log != null) {
-				log.log(Level.WARNING, "A null service content provider was given to register as a JaxRs resource or extension");
+				log.log(Level.WARNING, "A null service content provider was given to register as a Jakartars resource or extension");
 			}
 			return false;
 		}
@@ -184,7 +184,7 @@ public class JerseyApplication extends Application {
 	public boolean removeContent(JakartarsApplicationContentProvider contentProvider) {
 		if (contentProvider == null) {
 			if (log != null) {
-				log.log(Level.WARNING, "A null resource provider was given to unregister as a JaxRs resource");
+				log.log(Level.WARNING, "A null resource provider was given to unregister as a Jakartars resource");
 			}
 			return false;
 		}

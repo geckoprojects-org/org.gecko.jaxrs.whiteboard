@@ -7,5 +7,5 @@
 	jakarta.ws.rs-api;version=latest
 
 Private-Package: org.gecko.rest.jersey.multipart
-Bundle-Name: Gecko JaxRs Multi-Part Extension
-Bundle-Description: Gecko Multi-Part Extension for the JaxRs Whiteboard Implementation
+Bundle-Name: Gecko Jakartars Multi-Part Extension
+Bundle-Description: Gecko Multi-Part Extension for the Jakartars Whiteboard Implementation

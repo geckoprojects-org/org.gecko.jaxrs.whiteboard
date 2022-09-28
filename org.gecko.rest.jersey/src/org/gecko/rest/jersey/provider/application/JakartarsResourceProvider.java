@@ -31,9 +31,9 @@ public interface JakartarsResourceProvider extends JakartarsApplicationContentPr
 	public boolean isResource();
 	
 	/**
-	 * Returns the {@link ResourceDTO} or {@link FailedResourceDTO} as {@link BaseDTO} for this JaxRsResource.
+	 * Returns the {@link ResourceDTO} or {@link FailedResourceDTO} as {@link BaseDTO} for this JakartarsResource.
 	 * In case of an error a {@link FailedResourceDTO} instance will be returned
-	 * @return the {@link ResourceDTO} or {@link FailedResourceDTO} for this JaxRsResource
+	 * @return the {@link ResourceDTO} or {@link FailedResourceDTO} for this JakartarsResource
 	 */
 	public BaseDTO getResourceDTO();
 	
