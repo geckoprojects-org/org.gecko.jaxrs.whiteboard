@@ -15,8 +15,9 @@ package org.gecko.rest.jersey.provider.application;
 
 import java.util.Map;
 
-import org.glassfish.jersey.internal.inject.InjectionManager;
 import org.osgi.service.jakartars.runtime.dto.BaseExtensionDTO;
+
+import jakarta.ws.rs.core.FeatureContext;
 
 /**
  * Provider interface for Jakartars extensions
@@ -48,10 +49,10 @@ public interface JakartarsExtensionProvider extends JakartarsApplicationContentP
 	/**
 	 * Returns an Extension instance suitable for binding into an application. This extension must be
 	 * disposed once it is finished with
-	 * @param injectionManager 
+	 * @param context the current context for creation
 	 * @return the extension
 	 */
-	public JakartarsExtension getExtension(InjectionManager injectionManager);
+	public JakartarsExtension getExtension(FeatureContext context);
 	
 	public interface JakartarsExtension {
 		

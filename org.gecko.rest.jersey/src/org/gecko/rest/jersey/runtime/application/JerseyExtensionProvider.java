@@ -23,10 +23,22 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.gecko.rest.jersey.dto.DTOConverter;
+import org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider;
+import org.gecko.rest.jersey.proxy.ExtensionProxyFactory;
+import org.glassfish.jersey.InjectionManagerProvider;
+import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceObjects;
+import org.osgi.framework.wiring.BundleWiring;
+import org.osgi.service.jakartars.runtime.dto.BaseExtensionDTO;
+import org.osgi.service.jakartars.runtime.dto.DTOConstants;
+import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
+
 import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.container.ContainerResponseFilter;
 import jakarta.ws.rs.container.DynamicFeature;
 import jakarta.ws.rs.core.Feature;
+import jakarta.ws.rs.core.FeatureContext;
 import jakarta.ws.rs.ext.ContextResolver;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.MessageBodyReader;
@@ -34,17 +46,6 @@ import jakarta.ws.rs.ext.MessageBodyWriter;
 import jakarta.ws.rs.ext.ParamConverterProvider;
 import jakarta.ws.rs.ext.ReaderInterceptor;
 import jakarta.ws.rs.ext.WriterInterceptor;
-
-import org.gecko.rest.jersey.dto.DTOConverter;
-import org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider;
-import org.gecko.rest.jersey.proxy.ExtensionProxyFactory;
-import org.glassfish.jersey.internal.inject.InjectionManager;
-import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceObjects;
-import org.osgi.framework.wiring.BundleWiring;
-import org.osgi.service.jakartars.runtime.dto.BaseExtensionDTO;
-import org.osgi.service.jakartars.runtime.dto.DTOConstants;
-import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 /**
  * A wrapper class for a Jakartars extensions 
@@ -173,9 +174,9 @@ public class JerseyExtensionProvider<T> extends JerseyApplicationContentProvider
 	}
 
 	@Override
-	public JakartarsExtension getExtension(InjectionManager injectionManager) {
+	public JakartarsExtension getExtension(FeatureContext context) {
 		T service = getProviderObject().getService();
-		injectionManager.inject(service);
+		InjectionManagerProvider.getInjectionManager(context).inject(service);
 		return new JerseyExtension(service);
 	}
 	

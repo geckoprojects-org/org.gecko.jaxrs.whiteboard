@@ -20,14 +20,13 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import jakarta.ws.rs.Priorities;
-import jakarta.ws.rs.core.Feature;
-import jakarta.ws.rs.core.FeatureContext;
-
 import org.gecko.rest.jersey.helper.DispatcherHelper;
 import org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider;
 import org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider.JakartarsExtension;
-import org.glassfish.jersey.InjectionManagerProvider;
+
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.core.Feature;
+import jakarta.ws.rs.core.FeatureContext;
 
 /**
  * A {@link Feature} implementation registering all extensions as singleton and according to there provided contracts. 
@@ -60,7 +59,7 @@ public class WhiteboardFeature implements Feature{
 		AtomicInteger priority = new AtomicInteger(Priorities.USER + 1000);
 		extensions.forEach((k, extension) -> {
 
-			JakartarsExtension je = extension.getExtension(InjectionManagerProvider.getInjectionManager(context));
+			JakartarsExtension je = extension.getExtension(context);
 
 			extensionInstanceTrackingMap.put(extension, je);
 			Map<Class<?>,Integer> contractPriorities = je.getContractPriorities();

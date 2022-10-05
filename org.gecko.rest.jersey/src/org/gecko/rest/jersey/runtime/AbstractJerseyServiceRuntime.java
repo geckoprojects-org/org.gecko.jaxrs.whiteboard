@@ -11,7 +11,7 @@
  *     Stefan Bishof - API and implementation
  *     Tim Ward - implementation
  */
-package org.gecko.rest.jersey.runtime.common;
+package org.gecko.rest.jersey.runtime;
 
 import static org.osgi.framework.Constants.SERVICE_CHANGECOUNT;
 import static org.osgi.service.jakartars.runtime.JakartarsServiceRuntimeConstants.JAKARTA_RS_SERVICE_ENDPOINT;
@@ -46,7 +46,6 @@ import org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider;
 import org.gecko.rest.jersey.provider.application.JakartarsResourceProvider;
 import org.gecko.rest.jersey.provider.whiteboard.JakartarsWhiteboardProvider;
 import org.gecko.rest.jersey.runtime.application.JerseyApplication;
-import org.gecko.rest.jersey.runtime.servlet.WhiteboardServletContainer;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;

@@ -11,7 +11,7 @@
  *     Stefan Bishof - API and implementation
  *     Tim Ward - implementation
  */
-package org.gecko.rest.jersey.runtime.dispatcher;
+package org.gecko.rest.jersey.runtime;
 
 import static java.util.function.Predicate.not;
 
@@ -49,7 +49,6 @@ import org.gecko.rest.jersey.provider.whiteboard.JakartarsWhiteboardProvider;
 import org.gecko.rest.jersey.runtime.application.JerseyApplicationProvider;
 import org.gecko.rest.jersey.runtime.application.JerseyExtensionProvider;
 import org.gecko.rest.jersey.runtime.application.JerseyResourceProvider;
-import org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jakartars.runtime.dto.DTOConstants;

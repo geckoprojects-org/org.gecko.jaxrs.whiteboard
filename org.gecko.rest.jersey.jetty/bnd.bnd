@@ -1,0 +1,17 @@
+-buildpath: \
+	org.osgi.framework;version=latest,\
+	org.osgi.service.cm;version=latest,\
+	org.osgi.service.component;version=latest,\
+	org.osgi.service.jakartars;version=latest,\
+	org.osgi.namespace.implementation;version=latest,\
+	org.gecko.rest.jersey;version=project,\
+	org.glassfish.jersey.containers.jersey-container-servlet-core;version=latest,\
+	org.glassfish.jersey.core.jersey-common;version=latest,\
+	org.glassfish.jersey.core.jersey-client;version=latest,\
+	org.glassfish.jersey.core.jersey-server;version=latest,\
+	org.eclipse.jetty.server,\
+	org.eclipse.jetty.servlet,\
+	org.eclipse.jetty.util,\
+	jakarta.ws.rs-api,\
+	jakarta.servlet-api,\
+	org.osgi.service.condition
