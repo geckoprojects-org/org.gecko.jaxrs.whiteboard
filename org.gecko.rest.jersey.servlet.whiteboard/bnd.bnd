@@ -9,4 +9,5 @@
 	org.osgi.service.servlet.whiteboard,\
 	jakarta.ws.rs-api,\
 	org.osgi.service.condition,\
-	org.osgi.service.jakartars
+	org.osgi.service.jakartars,\
+	org.osgi.namespace.implementation

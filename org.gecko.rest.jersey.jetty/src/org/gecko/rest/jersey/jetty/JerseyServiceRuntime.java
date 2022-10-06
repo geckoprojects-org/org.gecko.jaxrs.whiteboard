@@ -50,7 +50,7 @@ import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
  */
 @Capability(namespace = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, version = JakartarsWhiteboardConstants.JAKARTA_RS_WHITEBOARD_SPECIFICATION_VERSION, name = JakartarsWhiteboardConstants.JAKARTA_RS_WHITEBOARD_IMPLEMENTATION, attribute = {
 		"uses:=\"jakarta.ws.rs,jakarta.ws.rs.sse,jakarta.ws.rs.core,jakarta.ws.rs.ext,jakarta.ws.rs.client,jakarta.ws.rs.container,org.osgi.service.jakartars.whiteboard\"",
-		"provider=jersey", "jersey.version=2.35" })
+		"provider=jersey", "jersey.version=3.0" })
 public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 
 	public enum State {

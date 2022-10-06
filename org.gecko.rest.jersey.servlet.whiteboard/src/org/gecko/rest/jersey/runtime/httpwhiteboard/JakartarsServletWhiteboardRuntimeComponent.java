@@ -45,10 +45,14 @@ import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
  * @author Mark Hoffmann
  * @since 30.07.2017
  */
-@Component(name="JakartarsHttpWhiteboardRuntimeComponent", immediate=true, configurationPolicy=ConfigurationPolicy.REQUIRE, reference = @Reference(name = "runtimeCondition", service = Condition.class , target = JerseyConstants.JERSEY_RUNTIME_CONDITION))
-public class JakartarsHttpWhiteboardRuntimeComponent extends AbstractWhiteboard {
+@Component(name="JakartarsServletWhiteboardRuntimeComponent", 
+	immediate=true, configurationPolicy=ConfigurationPolicy.REQUIRE, 
+	reference = @Reference(name = "runtimeCondition", 
+		service = Condition.class,
+		target = JerseyConstants.JERSEY_RUNTIME_CONDITION))
+public class JakartarsServletWhiteboardRuntimeComponent extends AbstractWhiteboard {
 
-	private static Logger logger = Logger.getLogger("o.e.o.j.JakartarsHttpWhiteboardRuntimeComponent");
+	private static Logger logger = Logger.getLogger(JakartarsServletWhiteboardRuntimeComponent.class.getName());
 
 
 	/**
@@ -65,7 +69,7 @@ public class JakartarsHttpWhiteboardRuntimeComponent extends AbstractWhiteboard 
 		if (whiteboard != null) {
 			whiteboard.teardown();;
 		}
-		whiteboard = new HTTPWhiteboardBasedJerseyServiceRuntime();
+		whiteboard = new ServletWhiteboardBasedJerseyServiceRuntime();
 		whiteboard.initialize(componentContext);
 		dispatcher.setWhiteboardProvider(whiteboard);
 		dispatcher.dispatch();
