@@ -1,5 +1,5 @@
 -buildpath: \
-	jakarta.servlet-api,\
+	org.apache.felix.http.servlet-api,\
 	org.gecko.rest.jersey,\
 	org.glassfish.jersey.core.jersey-server,\
 	org.glassfish.jersey.containers.jersey-container-servlet-core,\
