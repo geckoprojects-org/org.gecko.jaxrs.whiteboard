@@ -13,5 +13,5 @@
 	org.eclipse.jetty.servlet,\
 	org.eclipse.jetty.util,\
 	jakarta.ws.rs-api,\
-	jakarta.servlet-api,\
+	org.apache.felix.http.servlet-api,\
 	org.osgi.service.condition
