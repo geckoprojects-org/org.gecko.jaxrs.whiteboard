@@ -11,7 +11,7 @@
  *     Stefan Bishof - API and implementation
  *     Tim Ward - implementation
  */
-package org.gecko.rest.jersey.runtime.common;
+package org.gecko.rest.jersey.runtime;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,9 +34,9 @@ public class ResourceConfigWrapper {
 
 	public ResourceConfig config;
 	
-	public List<InjectableFactory<?>> factories = new LinkedList<>();
+	List<InjectableFactory<?>> factories = new LinkedList<>();
 	
-	public void setInjectionManager(InjectionManager manager) {
+	void setInjectionManager(InjectionManager manager) {
 		factories.forEach(f -> f.setInjectionManager(manager));
 	}
 	

@@ -11,25 +11,19 @@
  *     Stefan Bishof - API and implementation
  *     Tim Ward - implementation
  */
-package org.gecko.rest.jersey.runtime;
+package org.gecko.rest.jersey.runtime.httpwhiteboard;
 
-import static org.gecko.rest.jersey.provider.JerseyConstants.JERSEY_WHITEBOARD_NAME;
-import static org.osgi.service.component.annotations.ReferenceCardinality.AT_LEAST_ONE;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
-import static org.osgi.service.jakartars.runtime.JakartarsServiceRuntimeConstants.JAKARTA_RS_SERVICE_ENDPOINT;
-import static org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants.JAKARTA_RS_EXTENSION;
-import static org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants.JAKARTA_RS_NAME;
 import static org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE;
 
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.gecko.rest.jersey.helper.JerseyHelper;
+import jakarta.ws.rs.core.Application;
+
 import org.gecko.rest.jersey.provider.JerseyConstants;
-import org.gecko.rest.jersey.provider.application.JakartarsWhiteboardDispatcher;
-import org.gecko.rest.jersey.provider.whiteboard.JakartarsWhiteboardProvider;
-import org.gecko.rest.jersey.runtime.dispatcher.JerseyWhiteboardDispatcher;
+import org.gecko.rest.jersey.runtime.AbstractWhiteboard;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
@@ -41,48 +35,38 @@ import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.condition.Condition;
 import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
-import jakarta.ws.rs.core.Application;
-
 /**
- * A configurable component, that establishes a whiteboard
+ * This component handles the lifecycle of a {@link JakartarsServiceRuntime}
  * @author Mark Hoffmann
- * @since 11.10.2017
+ * @since 30.07.2017
  */
+@Component(name="JakartarsHttpWhiteboardRuntimeComponent", immediate=true, configurationPolicy=ConfigurationPolicy.REQUIRE, reference = @Reference(name = "runtimeCondition", service = Condition.class , target = JerseyConstants.JERSEY_RUNTIME_CONDITION))
+public class JakartarsHttpWhiteboardRuntimeComponent extends AbstractWhiteboard {
 
-@Component(name = "JakartarsWhiteboardComponent", 
-	reference = @Reference(name = "runtimeCondition", service = Condition.class , target = JerseyConstants.JERSEY_RUNTIME_CONDITION),
-	configurationPolicy = ConfigurationPolicy.REQUIRE
+	private static Logger logger = Logger.getLogger("o.e.o.j.JakartarsHttpWhiteboardRuntimeComponent");
 
-)
-public class JerseyWhiteboardComponent {
 
-	Logger logger = Logger.getLogger("o.e.o.j.runtimeComponent");
-	private volatile String name;
-	
-
-	protected JakartarsWhiteboardDispatcher dispatcher= new JerseyWhiteboardDispatcher();
-	
-	protected volatile JakartarsWhiteboardProvider whiteboard;
-	
 	/**
 	 * Called on component activation
 	 * @param componentContext the component context
 	 * @throws ConfigurationException 
 	 */
+	/* (non-Javadoc)
+	 * @see org.gecko.rest.jersey.runtime.JerseyWhiteboardComponent#activate(org.osgi.service.component.ComponentContext)
+	 */
 	@Activate
-	public void activate(ComponentContext componentContext) throws ConfigurationException {
+	public void activate(final ComponentContext componentContext) throws ConfigurationException {
 		updateProperties(componentContext);
-		
 		if (whiteboard != null) {
-			whiteboard.teardown();
+			whiteboard.teardown();;
 		}
-		whiteboard = new JerseyServiceRuntime();
-		// activate and start server
+		whiteboard = new HTTPWhiteboardBasedJerseyServiceRuntime();
 		whiteboard.initialize(componentContext);
-//		dispatcher.setBatchMode(true);
 		dispatcher.setWhiteboardProvider(whiteboard);
 		dispatcher.dispatch();
 		whiteboard.startup();
@@ -96,8 +80,8 @@ public class JerseyWhiteboardComponent {
 	@Modified
 	public void modified(ComponentContext context) throws ConfigurationException {
 		updateProperties(context);
-		dispatcher.dispatch();
 		whiteboard.modified(context);
+		dispatcher.dispatch();
 	}
 
 	/**
@@ -114,14 +98,14 @@ public class JerseyWhiteboardComponent {
 			whiteboard = null;
 		}
 	}
-	
+
 	/**
 	 * Adds a new default application
 	 * @param application the application to add
 	 * @param properties the service properties
 	 */
-	@Reference(cardinality = AT_LEAST_ONE, policy = DYNAMIC, target = "(&(" + JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE + "=*)(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME + "=.default))")
-	public void bindDefaultApplication(Application application, Map<String, Object> properties) {
+	@Reference(name="defaultApplication", cardinality=ReferenceCardinality.AT_LEAST_ONE, policy=ReferencePolicy.DYNAMIC, unbind="unbindDefaultApplication", updated = "modifedDefaultApplication", target="(&(" + JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE	+ "=*)(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME	+ "=.default))")
+	public void addDefaultApplication(Application application, Map<String, Object> properties) {
 		dispatcher.addApplication(application, properties);
 	}
 
@@ -143,18 +127,17 @@ public class JerseyWhiteboardComponent {
 	public void unbindDefaultApplication(Application application, Map<String, Object> properties) {
 		dispatcher.removeApplication(application, properties);
 	}
-	
+
 	/**
 	 * Adds a new application
 	 * @param application the application to add
 	 * @param properties the service properties
 	 */
-	@Reference(service = Application.class, cardinality = MULTIPLE, policy = DYNAMIC, target = "(&(" + JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE + "=*)(!(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME + "=.default)))")
+	@Reference(name="application", service=Application.class,cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="unbindApplication", updated = "modifedApplication", target="(&(" + JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE	+ "=*)(!(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME	+ "=.default)))")
 	public void bindApplication(Application application, Map<String, Object> properties) {
 		dispatcher.addApplication(application, properties);
-	
 	}
-	
+
 	/**
 	 * Adds a new application
 	 * @param application the application to add
@@ -164,7 +147,7 @@ public class JerseyWhiteboardComponent {
 		dispatcher.removeApplication(application, properties);
 		dispatcher.addApplication(application, properties);
 	}
-	
+
 	/**
 	 * Removes a application 
 	 * @param application the application to remove
@@ -174,28 +157,24 @@ public class JerseyWhiteboardComponent {
 		dispatcher.removeApplication(application, properties);
 	}
 
-	@Reference(service = AnyService.class, target = "(" + JAKARTA_RS_EXTENSION
-			+ "=true)", cardinality = MULTIPLE, policy = DYNAMIC)
+	@Reference(service = AnyService.class, target = "(" + JakartarsWhiteboardConstants.JAKARTA_RS_EXTENSION	+ "=true)", cardinality = MULTIPLE, policy = DYNAMIC)
 	public void bindJakartarsExtension(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
-
-		updatedJakartarExtension(jakartarsExtensionSR, properties);
+		unbindJakartarsExtension(jakartarsExtensionSR,properties);
 	}
 
-	public void updatedJakartarExtension(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
+	public void updatedJakartarsExtension(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
 		logger.fine("Handle extension " + jakartarsExtensionSR + " properties: " + properties);
 		ServiceObjects<?> so = getServiceObjects(jakartarsExtensionSR);
 		dispatcher.addExtension(so, properties);
 
 	}
-
 	public void unbindJakartarsExtension(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
 		dispatcher.removeExtension(properties);
 	}
 
-	@Reference(service = AnyService.class, target = "(" + JAKARTA_RS_RESOURCE
-			+ "=true)", cardinality = MULTIPLE, policy = DYNAMIC)
+	@Reference(service = AnyService.class, target = "(" + JAKARTA_RS_RESOURCE + "=true)", cardinality = MULTIPLE, policy = DYNAMIC)
 	public void bindJakartarsResource(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
-		updatedJakartarsResource(jakartarsExtensionSR, properties);
+		updatedJakartarsResource(jakartarsExtensionSR,properties);
 	}
 
 	public void updatedJakartarsResource(ServiceReference<Object> jakartarsResourceSR, Map<String, Object> properties) {
@@ -204,30 +183,7 @@ public class JerseyWhiteboardComponent {
 		dispatcher.addResource(so, properties);
 
 	}
-
 	public void unbindJakartarsResource(ServiceReference<Object> jakartarsResourceSR, Map<String, Object> properties) {
 		dispatcher.removeResource(properties);
 	}
-	/**
-	 * Updates the fields that are provided by service properties.
-	 * @param ctx the component context
-	 * @throws ConfigurationException thrown when no context is available or the expected property was not provided 
-	 */
-	protected void updateProperties(ComponentContext ctx) throws ConfigurationException {
-		if (ctx == null) {
-			throw new ConfigurationException(JAKARTA_RS_SERVICE_ENDPOINT, "No component context is availble to get properties from");
-		}
-		name = JerseyHelper.getPropertyWithDefault(ctx, JAKARTA_RS_NAME, null);
-		if (name == null) {
-			name = JerseyHelper.getPropertyWithDefault(ctx, JERSEY_WHITEBOARD_NAME, JERSEY_WHITEBOARD_NAME);
-			if (name == null) {
-				throw new ConfigurationException(JAKARTA_RS_NAME, "No name was defined for the whiteboard");
-			}
-		}
-	}
-	
-	protected ServiceObjects<?> getServiceObjects(ServiceReference<?> reference) {
-		return reference.getBundle().getBundleContext().getServiceObjects(reference);
-	}
-	
 }

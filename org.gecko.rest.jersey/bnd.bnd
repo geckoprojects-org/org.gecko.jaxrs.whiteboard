@@ -24,9 +24,6 @@
 	jakarta.inject.jakarta.inject-api;version=latest,\
 	org.objectweb.asm;version=latest,\
 	jakarta.ws.rs-api;version=latest,\
-	org.eclipse.jetty.util;version=latest,\
-	org.eclipse.jetty.server;version=latest,\
-	org.eclipse.jetty.servlet;version=latest,\
 	org.gecko.rest.jersey.sse;version=snapshot
 	
 -testpath: \
@@ -35,8 +32,6 @@
 
 Bundle-Name: Gecko Jakartars Whiteboard
 Bundle-Description: Gecko Jersey OSGi Jakartars Whiteboard implementation
-
-Export-Package: org.osgi.service.jakartars.*
 	
 Provide-Capability: \
 	osgi.contract; osgi.contract=JavaJAXRS; version:List<Version>="2.1,2";provider=jersey;jersey.version:Version="3.08";uses:="jakarta.ws.rs, jakarta.ws.rs.core, jakarta.ws.rs.sse, jakarta.ws.rs.ext, jakarta.ws.rs.client, jakarta.ws.rs.container",\
@@ -45,25 +40,6 @@ Provide-Capability: \
 	osgi.service;objectClass:List<String>="org.osgi.service.jakartars.client.SseEventSourceFactory";uses:="org.osgi.service.jakartars.client",\
 	osgi.serviceloader;osgi.serviceloader="jakarta.ws.rs.sse.SseEventSource.Builder";register:="org.gecko.rest.jersey.runtime.common.SSESourceBuilderService
 
--privatepackage: \
-	org.gecko.rest.jersey.provider.application,\
-	org.gecko.rest.jersey.provider.hk2,\
-	org.gecko.rest.jersey.provider.whiteboard,\
-	org.gecko.rest.jersey.helper,\
-	org.gecko.rest.jersey.provider,\
-	org.gecko.rest.jersey.binder,\
-	org.gecko.rest.jersey.dto,\
-	org.gecko.rest.jersey.factories,\
-	org.gecko.rest.jersey.jetty,\
-	org.gecko.rest.jersey.proxy,\
-	org.gecko.rest.jersey.runtime,\
-	org.gecko.rest.jersey.runtime.application,\
-	org.gecko.rest.jersey.runtime.application.feature,\
-	org.gecko.rest.jersey.runtime.common,\
-	org.gecko.rest.jersey.runtime.dispatcher,\
-	org.gecko.rest.jersey.runtime.httpwhiteboard,\
-	org.gecko.rest.jersey.runtime.servlet
 	
 Import-Package: \
-	org.eclipse.jetty.*;version='[9.4,11)',\
 	*

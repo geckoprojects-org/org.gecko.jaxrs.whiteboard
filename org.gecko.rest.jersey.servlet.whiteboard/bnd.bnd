@@ -1,0 +1,12 @@
+-buildpath: \
+	jakarta.servlet-api,\
+	org.gecko.rest.jersey,\
+	org.glassfish.jersey.core.jersey-server,\
+	org.glassfish.jersey.containers.jersey-container-servlet-core,\
+	org.osgi.framework,\
+	org.osgi.service.cm,\
+	org.osgi.service.component,\
+	org.osgi.service.servlet.whiteboard,\
+	jakarta.ws.rs-api,\
+	org.osgi.service.condition,\
+	org.osgi.service.jakartars

@@ -11,7 +11,7 @@
  *     Stefan Bishof - API and implementation
  *     Tim Ward - implementation
  */
-package org.gecko.rest.jersey.runtime.servlet;
+package org.gecko.rest.jersey.runtime;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
@@ -25,7 +25,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.gecko.rest.jersey.binder.PromiseResponseHandlerBinder;
 import org.gecko.rest.jersey.helper.DestroyListener;
-import org.gecko.rest.jersey.runtime.common.ResourceConfigWrapper;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.ServiceLocatorFactory;
 import org.glassfish.hk2.utilities.ServiceLocatorUtilities;

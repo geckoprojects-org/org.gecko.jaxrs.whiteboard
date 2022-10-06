@@ -11,7 +11,7 @@
  *     Stefan Bishof - API and implementation
  *     Tim Ward - implementation
  */
-package org.gecko.rest.jersey.runtime;
+package org.gecko.rest.jersey.jetty;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -29,12 +29,11 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.gecko.rest.jersey.helper.JakartarsHelper;
 import org.gecko.rest.jersey.helper.JerseyHelper;
-import org.gecko.rest.jersey.jetty.JettyServerRunnable;
 import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider;
-import org.gecko.rest.jersey.runtime.common.AbstractJerseyServiceRuntime;
-import org.gecko.rest.jersey.runtime.common.ResourceConfigWrapper;
-import org.gecko.rest.jersey.runtime.servlet.WhiteboardServletContainer;
+import org.gecko.rest.jersey.runtime.AbstractJerseyServiceRuntime;
+import org.gecko.rest.jersey.runtime.ResourceConfigWrapper;
+import org.gecko.rest.jersey.runtime.WhiteboardServletContainer;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.osgi.annotation.bundle.Capability;
@@ -44,7 +43,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 /**
- * Implementation of the {@link JakartarsServiceRuntime} for a Jersey implementation
+ * Implementation of the {@link JakartarsServiceRuntime} for a Jetty backed implementation
  * 
  * @author Mark Hoffmann
  * @since 12.07.2017
