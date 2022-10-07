@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.condition.Condition;
 
-import aQute.bnd.annotation.spi.ServiceProvider;
+import aQute.bnd.annotation.service.ServiceCapability;
 
 /**
  * 
@@ -40,7 +40,7 @@ import aQute.bnd.annotation.spi.ServiceProvider;
  * @since 12.07.2022
  */
 @Component(immediate = true)
-@ServiceProvider(value = Condition.class)
+@ServiceCapability(value = Condition.class)
 public class JerseyRuntimeCheck implements BundleListener {
 	
 	private static final Logger logger = Logger.getLogger("runtime.check");

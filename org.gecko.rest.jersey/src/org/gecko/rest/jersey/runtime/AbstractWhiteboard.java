@@ -20,17 +20,12 @@ import static org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants
 import java.util.logging.Logger;
 
 import org.gecko.rest.jersey.helper.JerseyHelper;
-import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.gecko.rest.jersey.provider.application.JakartarsWhiteboardDispatcher;
 import org.gecko.rest.jersey.provider.whiteboard.JakartarsWhiteboardProvider;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.condition.Condition;
 
 /**
  * A configurable component, that establishes a whiteboard
@@ -38,14 +33,9 @@ import org.osgi.service.condition.Condition;
  * @since 11.10.2017
  */
 
-@Component(name = "JakartarsWhiteboardComponent", 
-	reference = @Reference(name = "runtimeCondition", service = Condition.class , target = JerseyConstants.JERSEY_RUNTIME_CONDITION),
-	configurationPolicy = ConfigurationPolicy.REQUIRE
-
-)
 public abstract class AbstractWhiteboard {
 
-	Logger logger = Logger.getLogger("o.e.o.j.runtimeComponent");
+	Logger logger = Logger.getLogger(AbstractWhiteboard.class.getName());
 	private volatile String name;
 	
 

@@ -11,13 +11,12 @@
  *     Stefan Bishof - API and implementation
  *     Tim Ward - implementation
  */
-package org.gecko.rest.jersey.runtime.common;
-
-import jakarta.ws.rs.ext.RuntimeDelegate;
+package org.gecko.rest.jersey.provider.jakartars;
 
 import org.glassfish.jersey.internal.RuntimeDelegateImpl;
 
 import aQute.bnd.annotation.spi.ServiceProvider;
+import jakarta.ws.rs.ext.RuntimeDelegate;
 
 /**
  * 

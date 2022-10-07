@@ -85,6 +85,9 @@ org.slf4j:slf4j-simple:1.7.36
 biz.aQute.bnd:biz.aQute.bnd.annotation:jar:6.3.1
 org.apache.felix:org.apache.felix.framework:7.0.5
 org.apache.felix:org.apache.felix.scr:2.2.2
+org.apache.felix:org.apache.felix.gogo.runtime:1.1.6
+org.apache.felix:org.apache.felix.gogo.shell:1.1.4
+org.apache.felix:org.apache.felix.gogo.command:1.1.2
 org.apache.servicemix.bundles:org.apache.servicemix.bundles.junit:4.13.2_1
 org.apache.felix:org.apache.felix.http.jetty:4.1.14
 org.apache.felix:org.apache.felix.configadmin:1.9.24
@@ -103,7 +106,12 @@ jakarta.xml.bind:jakarta.xml.bind-api:4.0.0
 jakarta.xml.ws:jakarta.xml.ws-api:4.0.0
 jakarta.jws:jakarta.jws-api:2.1.0
 jakarta.inject:jakarta.inject-api:2.0.1
-com.sun.xml.bind:jaxb-impl:4.0.1
+
+com.sun.xml.bind:jaxb-osgi:4.0.1
+#org.glassfish.jaxb:jaxb-core:4.0.1
+com.sun.istack:istack-commons-runtime:4.1.1
+#org.glassfish.jaxb:txw2:4.0.1
+#com.sun.xml.fastinfoset:FastInfoset:2.1.0
 com.sun.activation:jakarta.activation:2.0.1
 org.javassist:javassist:3.29.2-GA
 org.glassfish.hk2:hk2-api:3.0.3

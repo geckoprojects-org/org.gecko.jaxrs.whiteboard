@@ -23,11 +23,15 @@
 	bnd.identity;id=junit-platform-commons,\
 	bnd.identity;id=junit-platform-engine,\
 	bnd.identity;id=junit-platform-launcher,\
-	bnd.identity;id='org.gecko.rest.jersey',\
-	bnd.identity;id='org.glassfish.jersey.inject.jersey-hk2',\
-	bnd.identity;id='org.osgi.test.cases.jakartars',\
 	bnd.identity;id=assertj-core,\
-	bnd.identity;id='org.gecko.rest.jersey.tck'
+	bnd.identity;id='jakarta.validation.jakarta.validation-api',\
+	bnd.identity;id='org.glassfish.jersey.containers.jersey-container-servlet',\
+	bnd.identity;id='org.glassfish.jersey.inject.jersey-hk2',\
+	bnd.identity;id='com.sun.xml.bind.jaxb-osgi',\
+	bnd.identity;id='com.sun.activation.jakarta.activation',\
+	bnd.identity;id='org.gecko.rest.jersey',\
+	bnd.identity;id='org.gecko.rest.jersey.tck',\
+	bnd.identity;id='org.osgi.test.cases.jakartars'
 
 
 -runbundles: \
@@ -72,8 +76,25 @@
 	org.glassfish.jersey.core.jersey-server;version='[3.0.8,3.0.9)',\
 	org.glassfish.jersey.inject.jersey-hk2;version='[3.0.8,3.0.9)',\
 	org.glassfish.jersey.media.jersey-media-sse;version='[3.0.8,3.0.9)',\
-	org.osgi.service.servlet.whiteboard;version='[2.0.0,2.0.1)',\
-	org.gecko.rest.jersey.servlet.whiteboard;version=snapshot,\
-	org.osgi.service.jakartars;version='[2.0.0,2.0.1)'
+	org.osgi.service.jakartars;version='[2.0.0,2.0.1)',\
+	org.osgi.test.common;version='[1.1.0,1.1.1)',\
+	org.osgi.test.junit5;version='[1.1.0,1.1.1)',\
+	org.eclipse.jetty.http;version='[11.0.12,11.0.13)',\
+	org.eclipse.jetty.io;version='[11.0.12,11.0.13)',\
+	org.eclipse.jetty.security;version='[11.0.12,11.0.13)',\
+	org.eclipse.jetty.server;version='[11.0.12,11.0.13)',\
+	org.eclipse.jetty.servlet;version='[11.0.12,11.0.13)',\
+	org.eclipse.jetty.util;version='[11.0.12,11.0.13)',\
+	org.gecko.rest.jersey.jetty;version=snapshot,\
+	slf4j.api;version='[1.7.36,1.7.37)',\
+	slf4j.simple;version='[1.7.36,1.7.37)',\
+	com.sun.activation.jakarta.activation;version='[2.0.1,2.0.2)',\
+	jakarta.activation-api;version='[2.1.0,2.1.1)',\
+	com.sun.xml.bind.jaxb-osgi;version='[4.0.1,4.0.2)',\
+	jakarta.validation.jakarta.validation-api;version='[3.0.2,3.0.3)',\
+	jakarta.xml.bind-api;version='[4.0.0,4.0.1)',\
+	org.glassfish.jersey.containers.jersey-container-servlet;version='[3.0.8,3.0.9)'
 -runblacklist: \
-	bnd.identity;id='org.osgi.service.cm'
+	bnd.identity;id='org.osgi.service.cm',\
+	bnd.identity;id='org.gecko.rest.jersey.servlet.whiteboard'
+-runproperties: jakarta.ws.rs.ext.RuntimeDelegate=org.gecko.rest.jersey.provider.jakartars.RuntimeDelegateService

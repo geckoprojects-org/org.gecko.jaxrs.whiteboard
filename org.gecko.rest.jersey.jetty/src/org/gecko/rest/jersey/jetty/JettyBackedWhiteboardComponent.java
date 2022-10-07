@@ -46,14 +46,10 @@ import jakarta.ws.rs.core.Application;
  * @since 11.10.2017
  */
 
-@Component(name = "JakartarsWhiteboardComponent", 
-	reference = @Reference(name = "runtimeCondition", service = Condition.class , target = JerseyConstants.JERSEY_RUNTIME_CONDITION),
-	configurationPolicy = ConfigurationPolicy.REQUIRE
-
-)
+@Component(name = "JakartarsWhiteboardComponent", reference = @Reference(name = "runtimeCondition", service = Condition.class , target = JerseyConstants.JERSEY_RUNTIME_CONDITION),configurationPolicy = ConfigurationPolicy.REQUIRE)
 public class JettyBackedWhiteboardComponent extends AbstractWhiteboard {
 
-	Logger logger = Logger.getLogger("o.e.o.j.runtimeComponent");
+	Logger logger = Logger.getLogger(JettyBackedWhiteboardComponent.class.getName());
 
 	/**
 	 * Called on component activation
