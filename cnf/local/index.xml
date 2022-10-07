@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<repository xmlns="http://www.osgi.org/xmlns/repository/v1.0.0" name="Local" increment="1665056317490">
+<repository xmlns="http://www.osgi.org/xmlns/repository/v1.0.0" name="Local" increment="1665140023661">
   <resource>
     <capability namespace="osgi.identity">
       <attribute name="license" value="Apache-2.0;description=&quot;This program and the accompanying materials are made available under the terms of the Apache License, Version 2.0.&quot;;link=&quot;https://opensource.org/licenses/Apache-2.0&quot;"/>
@@ -7,21 +7,21 @@
       <attribute name="osgi.identity" value="org.osgi.test.cases.jakartars"/>
       <attribute name="documentation" value="https://docs.osgi.org/"/>
       <attribute name="type" value="osgi.bundle"/>
-      <attribute name="version" value="9.0.0.202210061137-SNAPSHOT" type="Version"/>
+      <attribute name="version" value="9.0.0.202210071052-SNAPSHOT" type="Version"/>
     </capability>
     <capability namespace="osgi.wiring.bundle">
-      <attribute name="bundle-version" value="9.0.0.202210061137-SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="9.0.0.202210071052-SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.bundle" value="org.osgi.test.cases.jakartars"/>
     </capability>
     <capability namespace="osgi.wiring.host">
-      <attribute name="bundle-version" value="9.0.0.202210061137-SNAPSHOT" type="Version"/>
+      <attribute name="bundle-version" value="9.0.0.202210071052-SNAPSHOT" type="Version"/>
       <attribute name="osgi.wiring.host" value="org.osgi.test.cases.jakartars"/>
     </capability>
     <capability namespace="osgi.content">
-      <attribute name="size" value="1200815" type="Long"/>
+      <attribute name="size" value="1211122" type="Long"/>
       <attribute name="url" value="org.osgi.test.cases.jakartars/org.osgi.test.cases.jakartars-9.0.0.jar"/>
       <attribute name="mime" value="application/vnd.osgi.bundle"/>
-      <attribute name="osgi.content" value="600D2598A1C47EA6C5B49FDF984B4D1CFAF840E255B5AAA21B3833EEAE4CD65F"/>
+      <attribute name="osgi.content" value="2E118C784341F474FC974DE01EBD1B94FB0BBE4498DC043B883C08606DBA8418"/>
     </capability>
     <requirement namespace="osgi.wiring.package">
       <directive name="filter" value="(&amp;(osgi.wiring.package=org.osgi.service.jakartars.runtime)(version&gt;=2.0.0)(!(version&gt;=3.0.0)))"/>

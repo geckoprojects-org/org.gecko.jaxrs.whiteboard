@@ -49,6 +49,8 @@ import org.gecko.rest.jersey.runtime.application.JerseyApplication;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.dto.ServiceReferenceDTO;
@@ -121,8 +123,8 @@ public abstract class AbstractJerseyServiceRuntime implements JakartarsServiceRu
 		Dictionary<String, Object> properties = getRuntimePropertiesWithNewChangeCount();
 		String[] service = new String[] {JakartarsServiceRuntime.class.getName(), JakartarsWhiteboardProvider.class.getName()};
 		try {
-
-			regJakartarsServiceRuntime = (ServiceRegistration<JakartarsServiceRuntime>) context.getBundleContext()
+			Bundle _bundle = FrameworkUtil.getBundle(AbstractJerseyServiceRuntime.class);
+			regJakartarsServiceRuntime = (ServiceRegistration<JakartarsServiceRuntime>) _bundle.getBundleContext()
 					.registerService(service, this, properties);
 			updateRuntimeDtoAndChangeCount();
 
