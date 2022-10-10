@@ -97,4 +97,4 @@
 -runblacklist: \
 	bnd.identity;id='org.osgi.service.cm',\
 	bnd.identity;id='org.gecko.rest.jersey.servlet.whiteboard'
--runproperties: jakarta.ws.rs.ext.RuntimeDelegate=org.gecko.rest.jersey.provider.jakartars.RuntimeDelegateService
+
