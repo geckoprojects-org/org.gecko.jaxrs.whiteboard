@@ -1,5 +1,6 @@
 -buildpath: \
 	org.apache.felix.http.servlet-api;version=latest,\
+	org.glassfish.jersey.containers.jersey-container-servlet;version=latest,\
 	org.glassfish.jersey.containers.jersey-container-servlet-core;version=latest,\
 	org.glassfish.jersey.core.jersey-common;version=latest,\
 	org.glassfish.jersey.core.jersey-client;version=latest,\
