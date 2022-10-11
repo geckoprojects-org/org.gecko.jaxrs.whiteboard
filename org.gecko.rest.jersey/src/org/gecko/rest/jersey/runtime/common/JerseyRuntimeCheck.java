@@ -124,6 +124,7 @@ public class JerseyRuntimeCheck implements BundleListener {
 			Dictionary<String, Object> properties = new Hashtable<String, Object>();
 			properties.put(Condition.CONDITION_ID, JerseyConstants.JERSEY_RUNTIME);
 			jerseyRuntimeCondition = ctx.registerService(Condition.class, Condition.INSTANCE, properties);
+			logger.info(()->"Registered Jersey Condition");
 		} else {
 			if (jerseyRuntimeCondition != null) {
 				jerseyRuntimeCondition.unregister();
