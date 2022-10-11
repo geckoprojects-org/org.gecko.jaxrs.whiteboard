@@ -160,10 +160,10 @@ public class JettyBackedWhiteboardComponent extends AbstractWhiteboard {
 			+ "=true)", cardinality = MULTIPLE, policy = DYNAMIC)
 	public void bindJakartarsExtension(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
 
-		updatedJakartarExtension(jakartarsExtensionSR, properties);
+		updatedJakartarsExtension(jakartarsExtensionSR, properties);
 	}
 
-	public void updatedJakartarExtension(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
+	public void updatedJakartarsExtension(ServiceReference<Object> jakartarsExtensionSR, Map<String, Object> properties) {
 		logger.fine("Handle extension " + jakartarsExtensionSR + " properties: " + properties);
 		ServiceObjects<?> so = getServiceObjects(jakartarsExtensionSR);
 		dispatcher.addExtension(so, properties);
