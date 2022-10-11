@@ -22,7 +22,6 @@ import static org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.gecko.rest.jersey.runtime.AbstractWhiteboard;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.framework.ServiceReference;
@@ -31,10 +30,10 @@ import org.osgi.service.component.AnyService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.condition.Condition;
 import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 import jakarta.ws.rs.core.Application;
@@ -45,14 +44,7 @@ import jakarta.ws.rs.core.Application;
  * @since 11.10.2017
  */
 
-//@Component(name = "JakartarsWhiteboardComponent", reference = @Reference(name = "runtimeCondition", service = Condition.class , target = JerseyConstants.JERSEY_RUNTIME_CONDITION),configurationPolicy = ConfigurationPolicy.REQUIRE)
-@Component(name = "JakartarsWhiteboardComponent", 
-	reference = @Reference(name = "runtimeCondition", service = Condition.class , target = JerseyConstants.JERSEY_RUNTIME_CONDITION),
-	property = {
-			"jersey.port=8185",
-			"jersey.jakartars.whiteboard.name=test_wb",
-			"jersey.context.path=test" 
-	})
+@Component(name = "JakartarsWhiteboardComponent", configurationPolicy = ConfigurationPolicy.REQUIRE)
 public class JettyBackedWhiteboardComponent extends AbstractWhiteboard {
 
 	Logger logger = Logger.getLogger(JettyBackedWhiteboardComponent.class.getName());
