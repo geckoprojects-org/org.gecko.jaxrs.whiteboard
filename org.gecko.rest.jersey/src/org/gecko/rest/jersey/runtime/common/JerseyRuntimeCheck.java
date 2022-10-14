@@ -45,11 +45,11 @@ import aQute.bnd.annotation.spi.ServiceProvider;
 @Component(immediate = true)
 @ServiceProvider(value = Condition.class)
 @Requirements({ 
-	@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, filter = "(" + IdentityNamespace.IDENTITY_NAMESPACE + "=org.glassfish.hk2.osgi-resource-locator)"), 
-	@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, filter = "(" + IdentityNamespace.IDENTITY_NAMESPACE + "=org.glassfish.jersey.inject.jersey-hk2)"), 
-	@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, filter = "(" + IdentityNamespace.IDENTITY_NAMESPACE + "=org.glassfish.jersey.core.jersey-common)"), 
-	@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, filter = "(" + IdentityNamespace.IDENTITY_NAMESPACE + "=org.glassfish.jersey.core.jersey-client)"), 
-	@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, filter = "(" + IdentityNamespace.IDENTITY_NAMESPACE + "=org.glassfish.jersey.core.jersey-server)") 
+	@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, filter = "(" + IdentityNamespace.IDENTITY_NAMESPACE + "=org.glassfish.hk2.osgi-resource-locator)", effective = "resolve"), 
+	@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, filter = "(" + IdentityNamespace.IDENTITY_NAMESPACE + "=org.glassfish.jersey.inject.jersey-hk2)", effective = "resolve"), 
+	@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, filter = "(" + IdentityNamespace.IDENTITY_NAMESPACE + "=org.glassfish.jersey.core.jersey-common)", effective = "resolve"), 
+	@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, filter = "(" + IdentityNamespace.IDENTITY_NAMESPACE + "=org.glassfish.jersey.core.jersey-client)", effective = "resolve"), 
+	@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, filter = "(" + IdentityNamespace.IDENTITY_NAMESPACE + "=org.glassfish.jersey.core.jersey-server)", effective = "resolve") 
 	})
 public class JerseyRuntimeCheck implements BundleListener {
 	
