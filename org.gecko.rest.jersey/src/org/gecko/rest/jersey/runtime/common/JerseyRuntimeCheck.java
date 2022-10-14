@@ -21,12 +21,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.gecko.rest.jersey.provider.JerseyConstants;
+import org.osgi.annotation.bundle.Requirement;
+import org.osgi.annotation.bundle.Requirements;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.namespace.IdentityNamespace;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -41,6 +44,13 @@ import aQute.bnd.annotation.spi.ServiceProvider;
  */
 @Component(immediate = true)
 @ServiceProvider(value = Condition.class)
+@Requirements({ 
+	@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, filter = "(" + IdentityNamespace.IDENTITY_NAMESPACE + "=org.glassfish.hk2.osgi-resource-locator)"), 
+	@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, filter = "(" + IdentityNamespace.IDENTITY_NAMESPACE + "=org.glassfish.jersey.inject.jersey-hk2)"), 
+	@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, filter = "(" + IdentityNamespace.IDENTITY_NAMESPACE + "=org.glassfish.jersey.core.jersey-common)"), 
+	@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, filter = "(" + IdentityNamespace.IDENTITY_NAMESPACE + "=org.glassfish.jersey.core.jersey-client)"), 
+	@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, filter = "(" + IdentityNamespace.IDENTITY_NAMESPACE + "=org.glassfish.jersey.core.jersey-server)") 
+	})
 public class JerseyRuntimeCheck implements BundleListener {
 	
 	private static final Logger logger = Logger.getLogger("runtime.check");
