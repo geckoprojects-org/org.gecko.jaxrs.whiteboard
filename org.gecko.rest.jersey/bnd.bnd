@@ -60,7 +60,8 @@ Provide-Capability: \
 	org.gecko.rest.jersey.runtime.common,\
 	org.gecko.rest.jersey.runtime.dispatcher,\
 	org.gecko.rest.jersey.runtime.httpwhiteboard,\
-	org.gecko.rest.jersey.runtime.servlet
+	org.gecko.rest.jersey.runtime.servlet,\
+	org.gecko.rest.jersey.runtime.util
 	
 Import-Package: \
 	org.eclipse.jetty.*;version='[9.4,11)',\
