@@ -50,7 +50,6 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 
 	private static Logger logger = Logger.getLogger("o.e.o.j.JaxRsHttpWhiteboardRuntimeComponent");
 
-
 	/**
 	 * Called on component activation
 	 * @param componentContext the component context
@@ -161,7 +160,7 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 	@Reference(service = AnyService.class, target = "(" + JaxrsWhiteboardConstants.JAX_RS_EXTENSION
 			+ "=true)", cardinality = MULTIPLE, policy = DYNAMIC)
 	public void bindJaxRsExtension(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
-		unbindJaxRsExtension(jaxRsExtensionSR,properties);
+		updatedJaxRsExtension(jaxRsExtensionSR, properties);
 	}
 
 	public void updatedJaxRsExtension(ServiceReference<Object> jaxRsExtensionSR, Map<String, Object> properties) {
@@ -186,6 +185,7 @@ public class JaxRsHttpWhiteboardRuntimeComponent extends JerseyWhiteboardCompone
 		dispatcher.addResource(so, properties);
 
 	}
+	
 	public void unbindJaxRsResource(ServiceReference<Object> jaxRsResourceSR, Map<String, Object> properties) {
 		dispatcher.removeResource(properties);
 	}
