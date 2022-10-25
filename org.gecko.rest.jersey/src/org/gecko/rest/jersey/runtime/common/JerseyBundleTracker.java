@@ -15,6 +15,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,7 +32,8 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
 import aQute.bnd.annotation.service.ServiceCapability;
 
 /**
- * Checker that ensures that all Jersey bundles are started properly to make the Jersey whiteboard work
+ * Checker that ensures that all Jersey bundles are started properly
+ * to make the Jersey whiteboard finally start, when jersey is ready
  * @author Mark Hoffmann
  * @since 11.10.2022
  */
@@ -40,9 +42,12 @@ public class JerseyBundleTracker implements BundleTrackerCustomizer<Boolean>{
 
 	private static final Logger logger = Logger.getLogger("runtime.check");
 	private final Map<String, Boolean> bsns =new HashMap<>(5);
-	private ServiceRegistration<Condition> jerseyRuntimeCondition;
-	private BundleContext context;
+	private final boolean isClientOnly;
 	private final BundleTracker<Boolean> tracker;
+	private final BundleContext context;
+	private ServiceRegistration<Condition> jerseyRuntimeCondition;
+	private Consumer<BundleContext> upConsumer;
+	private Consumer<BundleContext> downConsumer;
 
 	/**
 	 * Creates a new instance.
@@ -59,6 +64,7 @@ public class JerseyBundleTracker implements BundleTrackerCustomizer<Boolean>{
 	 */
 	public JerseyBundleTracker(BundleContext context, boolean isClientOnly) {
 		this.context = context;
+		this.isClientOnly = isClientOnly;
 		bsns.put("org.glassfish.hk2.osgi-resource-locator", Boolean.FALSE);
 		bsns.put("org.glassfish.jersey.inject.jersey-hk2", Boolean.FALSE);
 		bsns.put("org.glassfish.jersey.core.jersey-common", Boolean.FALSE);
@@ -69,21 +75,31 @@ public class JerseyBundleTracker implements BundleTrackerCustomizer<Boolean>{
 		startBundles();
 		tracker = new BundleTracker<Boolean>(context, Bundle.ACTIVE, this);
 	}
-	
+
 	/**
 	 * Opens the tracker
 	 */
 	public void open() {
 		tracker.open();
 	}
-	
+
 	/**
 	 * Close the tracker
 	 */
 	public void close() {
 		tracker.close();
 	}
-	
+
+	public JerseyBundleTracker onJerseyUp(Consumer<BundleContext> upConsumer) {
+		this.upConsumer = upConsumer;
+		return this;
+	}
+
+	public JerseyBundleTracker onJerseyDown(Consumer<BundleContext> downConsumer) {
+		this.downConsumer = downConsumer;
+		return this;
+	}
+
 	/* 
 	 * (non-Javadoc)
 	 * @see org.osgi.util.tracker.BundleTrackerCustomizer#addingBundle(org.osgi.framework.Bundle, org.osgi.framework.BundleEvent)
@@ -121,7 +137,7 @@ public class JerseyBundleTracker implements BundleTrackerCustomizer<Boolean>{
 			updateCondition();
 		}
 	}
-	
+
 	/**
 	 * Starts all defined bundles that are necessary to get Jersey running properly
 	 */
@@ -149,9 +165,24 @@ public class JerseyBundleTracker implements BundleTrackerCustomizer<Boolean>{
 			}
 			Dictionary<String, Object> properties = new Hashtable<String, Object>();
 			properties.put(Condition.CONDITION_ID, JerseyConstants.JERSEY_RUNTIME);
+			properties.put(JerseyConstants.JERSEY_CLIENT_ONLY, isClientOnly);
 			jerseyRuntimeCondition = context.registerService(Condition.class, Condition.INSTANCE, properties);
 			logger.info(()->"Registered Jersey runtime condition");
+			if (upConsumer != null) {
+				try {
+					upConsumer.accept(context);
+				} catch (Exception e) {
+					logger.log(Level.SEVERE, "Error in onJerseyUp runnable", e);
+				}
+			}
 		} else {
+			if (downConsumer != null) {
+				try {
+					downConsumer.accept(context);
+				} catch (Exception e) {
+					logger.log(Level.SEVERE, "Error in onJerseyUp runnable", e);
+				}
+			}
 			if (jerseyRuntimeCondition != null) {
 				jerseyRuntimeCondition.unregister();
 				jerseyRuntimeCondition = null;
