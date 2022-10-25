@@ -23,6 +23,7 @@ import org.osgi.service.condition.Condition;
 public interface JerseyConstants {
 	
 	public static final String JERSEY_RUNTIME = "jersey.runtime";
+	public static final String JERSEY_CLIENT_ONLY = "jersey.clientOnly";
 	public static final String JERSEY_RUNTIME_CONDITION = "(" + Condition.CONDITION_ID + "=" + JerseyConstants.JERSEY_RUNTIME + ")";
 	public static final String JERSEY_SCHEMA = "jersey.schema";
 	public static final String JERSEY_HOST = "jersey.host";

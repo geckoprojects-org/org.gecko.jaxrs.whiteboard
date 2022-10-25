@@ -3,7 +3,17 @@ Test-Cases: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.
 -dependson: \
 	org.gecko.rest.jersey
 	
--buildpath: org.osgi.test.cases.jakartars;version=latest
+-buildpath: \
+	org.osgi.test.cases.jakartars;version=latest,\
+	junit-jupiter-api,\
+	org.osgi.test.assertj.framework,\
+	org.osgi.test.assertj.promise,\
+	org.osgi.test.common,\
+	org.osgi.test.junit5,\
+	org.osgi.test.junit5.cm,\
+	org.osgi.framework,\
+	org.osgi.util.tracker
 
 -includeresource: OSGI-INF/configurator/config.json=configs/config.json
+
 Require-Capability: osgi.extender;filter:='(osgi.extender=osgi.configurator)'
