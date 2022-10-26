@@ -104,40 +104,11 @@ public class JakartarsServletWhiteboardRuntimeComponent extends AbstractWhiteboa
 	}
 
 	/**
-	 * Adds a new default application
-	 * @param application the application to add
-	 * @param properties the service properties
-	 */
-	@Reference(name="defaultApplication", cardinality=ReferenceCardinality.AT_LEAST_ONE, policy=ReferencePolicy.DYNAMIC, unbind="unbindDefaultApplication", updated = "modifedDefaultApplication", target="(&(" + JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE	+ "=*)(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME	+ "=.default))")
-	public void addDefaultApplication(Application application, Map<String, Object> properties) {
-		dispatcher.addApplication(application, properties);
-	}
-
-	/**
-	 * Modifies a default application
-	 * @param application the application to add
-	 * @param properties the service properties
-	 */
-	public void updatedDefaultApplication(Application application, Map<String, Object> properties) {
-		dispatcher.removeApplication(application, properties);
-		dispatcher.addApplication(application, properties);
-	}
-
-	/**
-	 * Removes a default application 
-	 * @param application the application to remove
-	 * @param properties the service properties
-	 */
-	public void unbindDefaultApplication(Application application, Map<String, Object> properties) {
-		dispatcher.removeApplication(application, properties);
-	}
-
-	/**
 	 * Adds a new application
 	 * @param application the application to add
 	 * @param properties the service properties
 	 */
-	@Reference(name="application", service=Application.class,cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="unbindApplication", updated = "modifedApplication", target="(&(" + JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE	+ "=*)(!(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME	+ "=.default)))")
+	@Reference(name="application", service=Application.class,cardinality=ReferenceCardinality.MULTIPLE, policy=ReferencePolicy.DYNAMIC, unbind="unbindApplication", updated = "updatedApplication", target="(" + JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE	+ "=*)")
 	public void bindApplication(Application application, Map<String, Object> properties) {
 		dispatcher.addApplication(application, properties);
 	}

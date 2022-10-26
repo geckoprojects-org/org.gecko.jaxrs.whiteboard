@@ -25,15 +25,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import jakarta.ws.rs.core.Application;
-
 import org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider;
 import org.gecko.rest.jersey.provider.application.JakartarsWhiteboardDispatcher;
 import org.gecko.rest.jersey.provider.whiteboard.JakartarsWhiteboardProvider;
 import org.gecko.rest.jersey.resources.TestLegacyApplication;
 import org.gecko.rest.jersey.resources.TestResource;
 import org.gecko.rest.jersey.runtime.JerseyWhiteboardDispatcher;
-import org.gecko.rest.jersey.runtime.common.DefaultApplication;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -43,6 +40,8 @@ import org.mockito.stubbing.Answer;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
+
+import jakarta.ws.rs.core.Application;
 
 /**
  * Tests the whiteboard dispatcher
@@ -91,7 +90,7 @@ public class JakartarsWhiteboardDispatcherTest {
 		Map<String, Object> defaultProperties = new HashMap<>();
 		defaultProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, ".default");
 		defaultProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE, "/");
-		dispatcher.addApplication(new DefaultApplication(), defaultProperties);
+		dispatcher.addApplication(new Application(), defaultProperties);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -237,7 +236,7 @@ public class JakartarsWhiteboardDispatcherTest {
 		Map<String, Object> defaultProperties = new HashMap<>();
 		defaultProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, ".default");
 		defaultProperties.put(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE, "/");
-		dispatcher.addApplication(new DefaultApplication(), defaultProperties);
+		dispatcher.addApplication(new Application(), defaultProperties);
 		
 		return dispatcher;
 	}

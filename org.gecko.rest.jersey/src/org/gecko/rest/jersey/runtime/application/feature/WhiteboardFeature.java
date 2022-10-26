@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import org.gecko.rest.jersey.helper.DispatcherHelper;
 import org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider;
 import org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider.JakartarsExtension;
 
@@ -35,12 +34,8 @@ import jakarta.ws.rs.core.FeatureContext;
  */
 public class WhiteboardFeature implements Feature{
 
-	public static Comparator<Map.Entry<String, JakartarsExtensionProvider>> PROVIDER_COMPARATOR = (e1, e2)-> 
-		DispatcherHelper.PROVIDER_COMPARATOR.compare(e1.getValue(), e2.getValue());
-		//			if (p1.getServiceRank() == p2.getServiceRank()) {
-		//				return p1.getServiceId().compareTo(p2.getServiceId());
-		//			}
-		//			return p2.getServiceRank().compareTo(p1.getServiceRank());
+	public static Comparator<Map.Entry<String, JakartarsExtensionProvider>> PROVIDER_COMPARATOR = (e1, e2) -> 
+		e1.getValue().compareTo(e2.getValue());
 
 	Map<String, JakartarsExtensionProvider> extensions;
 
