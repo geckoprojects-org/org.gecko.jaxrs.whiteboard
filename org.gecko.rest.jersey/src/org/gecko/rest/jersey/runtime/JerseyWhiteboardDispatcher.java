@@ -14,6 +14,8 @@
 package org.gecko.rest.jersey.runtime;
 
 import static java.util.function.Predicate.not;
+import static org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants.JAKARTA_RS_DEFAULT_APPLICATION;
+import static org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants.JAKARTA_RS_NAME;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,7 +26,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,8 +35,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import jakarta.ws.rs.core.Application;
 
 import org.gecko.rest.jersey.helper.DispatcherHelper;
 import org.gecko.rest.jersey.provider.JakartarsConstants;
@@ -54,6 +53,8 @@ import org.osgi.framework.ServiceObjects;
 import org.osgi.service.jakartars.runtime.dto.DTOConstants;
 import org.osgi.service.jakartars.runtime.dto.FailedExtensionDTO;
 import org.osgi.service.jakartars.runtime.dto.FailedResourceDTO;
+
+import jakarta.ws.rs.core.Application;
 
 /**
  * Implementation of the dispatcher.
@@ -98,16 +99,16 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 	private volatile Set<JakartarsResourceProvider> removedResources = new HashSet<>();
 	private volatile Set<JakartarsExtensionProvider> removedExtensions = new HashSet<>();
 	private volatile boolean dispatching = false;
-	// The implicit default application
-	private volatile JakartarsApplicationProvider defaultProvider;
-	// The shadowed default application with name '.default'
-	private volatile JakartarsApplicationProvider currentDefaultProvider;
+	// The implicit default application, may be shadowed by a registered service
+	private final JakartarsApplicationProvider defaultProvider;
 	private ReentrantLock lock = new ReentrantLock();
 	private AtomicBoolean lockedChange = new AtomicBoolean();
 	private boolean batchMode = false;
 
 
 	public JerseyWhiteboardDispatcher() {
+		defaultProvider = new JerseyApplicationProvider(new Application(), 
+				Map.of(JAKARTA_RS_NAME, JAKARTA_RS_DEFAULT_APPLICATION));
 	}
 
 	/* (non-Javadoc)
@@ -136,9 +137,6 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 			throw new IllegalStateException("Error setting whiteboard provider, when dispatching is active");
 		}
 		this.whiteboard = whiteboard;
-		if(currentDefaultProvider != null) {
-			whiteboard.registerApplication(currentDefaultProvider);
-		}
 	}
 
 	/* 
@@ -184,16 +182,6 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 		/*
 		 * Section 151.6.1 The default application can be replaced, with another one using another base path
 		 */
-		if(provider.isDefault()) {
-			defaultProvider = provider;
-			currentDefaultProvider = provider;
-			if(whiteboard != null) {
-				whiteboard.registerApplication(currentDefaultProvider);
-				currentDefaultProvider.markUnchanged();
-				checkDispatch();
-			}
-			return;
-		} 
 		String key = provider.getId();
 		if (!applicationProviderCache.containsKey(key)) {
 			logger.info("Adding Application with id " + provider.getName());
@@ -353,14 +341,13 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 		try {
 			lock.tryLock(5, TimeUnit.SECONDS);
 			dispatching = false;
-			whiteboard.unregisterApplication(currentDefaultProvider);
+			
+			whiteboard.unregisterApplication(defaultProvider);
 			applicationProviderCache.values().forEach((app)->{
 				if (whiteboard.isRegistered(app)) {
 					whiteboard.unregisterApplication(app);
 				}
 			});
-			currentDefaultProvider = null;
-			defaultProvider = null;
 			applicationProviderCache.clear();
 			resourceProviderCache.clear();
 			extensionProviderCache.clear();
@@ -511,9 +498,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 				 * #18 151.6.1
 				 */
 				Set<JakartarsApplicationProvider> defaultApplications = DispatcherHelper.getDefaultApplications(applicationCandidates);
-				final Optional<JakartarsApplicationProvider> defaultApplication = defaultApplications.stream().findFirst();
-				
-				if(defaultApplication.isPresent()) {
+				final JakartarsApplicationProvider defaultApplication = getDefaultApplication(applicationCandidates);
 				
 				defaultApplications
 					.stream()
@@ -526,18 +511,13 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 							failedApplications.put(a.getId(), a);
 						}
 					});
-				} 
 				
 //				Filter out from the application list the default ones which have been added to the failed list
 				applicationCandidates = applicationCandidates.stream().filter(a -> !failedApplications.containsKey(a.getId()))
 						.collect(Collectors.toUnmodifiableList());	
 				
-				substituteDefaultApplication(defaultApplication);
-				
-//				If we did not replace the .default app with any other, we need to apply the extension.select to the contents of the .default app
-				if(!defaultApplication.isPresent()) {
-					checkExtensionSelect(Collections.singletonList(currentDefaultProvider));
-				}				
+//				In case we are using the implicit default application we need to apply the extension.select to the contents of the .default app
+				checkExtensionSelect(Collections.singletonList(defaultApplication));
 				
 //				Assign resources to apps and report a failure DTO for those resources which have not been added to any app
 				Set<JakartarsApplicationContentProvider> noMatchingRes = 
@@ -558,10 +538,8 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 //				otherwise the service should result in a failure DTO
 				checkExtensionSelectForResources(applicationCandidates);
 				
-//				If we did not replace the .default app with any other, we need to apply the extension.select to the contents of the .default app
-				if(!defaultApplication.isPresent()) {
-					checkExtensionSelectForResources(Collections.singletonList(currentDefaultProvider));
-				}		
+//				In case we are using the implicit default application we need to apply the extension.select to the contents of the .default app
+				checkExtensionSelectForResources(Collections.singletonList(defaultApplication));
 				
 //				Remove the default app from the app candidates, because it will be registered in a separate step
 				applicationCandidates = applicationCandidates.stream().filter(a-> !a.getId().equals(defaultProvider.getId()))
@@ -597,14 +575,14 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 				});
 				
 //				We register/reload the default application, if needed
-				if(!whiteboard.isRegistered(currentDefaultProvider)) {
-					whiteboard.registerApplication(currentDefaultProvider);
-					currentDefaultProvider.markUnchanged();
-				} else 	if (currentDefaultProvider != null && currentDefaultProvider.isChanged()) {
-					if (whiteboard.isRegistered(currentDefaultProvider)) {
-						whiteboard.reloadApplication(currentDefaultProvider);
+				if(!whiteboard.isRegistered(defaultApplication)) {
+					whiteboard.registerApplication(defaultApplication);
+					defaultApplication.markUnchanged();
+				} else 	if (defaultApplication.isChanged()) {
+					if (whiteboard.isRegistered(defaultApplication)) {
+						whiteboard.reloadApplication(defaultApplication);
 					}
-					currentDefaultProvider.markUnchanged();
+					defaultApplication.markUnchanged();
 				}
 				
 				if(whiteboard instanceof AbstractJerseyServiceRuntime) {
@@ -988,8 +966,8 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 			});
 		});
 		content.forEach((c)->{
-			if (removeContentFromApplication(currentDefaultProvider, c)) {
-				logger.info("Removed content " + c.getName() + " from default application");
+			if (removeContentFromApplication(defaultProvider, c)) {
+				logger.info("Removed content " + c.getName() + " from implicit default application");
 			}
 		});
 	}
@@ -1036,18 +1014,18 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 		content.stream().
 		map(this::cloneContent).forEach((c)->{
 			if (cc.contains(c)) {
-				if (c.canHandleApplication(currentDefaultProvider)) {
-					if (addContentToApplication(currentDefaultProvider, c)) {
+				if (c.canHandleApplication(defaultProvider)) {
+					if (addContentToApplication(defaultProvider, c)) {
 					}
 				} else {
-					if (removeContentFromApplication(currentDefaultProvider, c)) {
+					if (removeContentFromApplication(defaultProvider, c)) {
 						logger.fine("Removed content candidate " + c.getName() + " from default application");
 					}
 				}
 			} else {
-				if(c.canHandleDefaultApplication(currentDefaultProvider)) {
-					if (addContentToApplication(currentDefaultProvider, c)) {
-						logger.info("Added content " + c.getName() + " to current default application " + currentDefaultProvider.getName() + " " + c.getObjectClass());
+				if(c.canHandleDefaultApplication(defaultProvider)) {
+					if (addContentToApplication(defaultProvider, c)) {
+						logger.info("Added content " + c.getName() + " to current default application " + defaultProvider.getName() + " " + c.getObjectClass());
 					} 				
 					else {
 						logger.info("Current default app cannot handle " + c.getName());
@@ -1117,37 +1095,11 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 		return null;
 	}
 	
-	private void substituteDefaultApplication(Optional<JakartarsApplicationProvider> newDefaultProvider) {
-		/*
-		 * We check, if an un-registration of the application is really necessary
-		 */
-		boolean unregisterNeeded = false;
-		Long providerSID = newDefaultProvider.isPresent() ? newDefaultProvider.get().getServiceId() : null;
-		Long currentSID = currentDefaultProvider != null ? currentDefaultProvider.getServiceId() : null;
-		
-		if (currentSID != null) {
-			if (providerSID != null) {
-				unregisterNeeded = providerSID != currentSID;
-			} else {
-				unregisterNeeded = false; //if another default app is not found we do not need to unregister the basic .default one
-			}
-		}
-		if (whiteboard != null && 
-				unregisterNeeded && 
-				whiteboard.isRegistered(currentDefaultProvider)) {
-			whiteboard.unregisterApplication(currentDefaultProvider);
-			/*			
-			 * If the previous .default is unregistered is because it is shadowed by another app, 
-			 * so we need to record this as a failure DTO
-			 */		
-			if(currentDefaultProvider instanceof JerseyApplicationProvider) {
-				JerseyApplicationProvider ap = (JerseyApplicationProvider) currentDefaultProvider;
-				ap.updateStatus(DTOConstants.FAILURE_REASON_SHADOWED_BY_OTHER_SERVICE);
-				failedApplications.put(currentDefaultProvider.getId(), currentDefaultProvider);
-			}
-		}
-		
-		currentDefaultProvider = newDefaultProvider.orElse(defaultProvider);
+	private JakartarsApplicationProvider getDefaultApplication(Collection<JakartarsApplicationProvider> candidates) {
+		return DispatcherHelper.getDefaultApplications(candidates).stream()
+			.filter(JakartarsApplicationProvider::isDefault)
+			.findFirst()
+			.orElse(defaultProvider);
 	}
 
 	/**
