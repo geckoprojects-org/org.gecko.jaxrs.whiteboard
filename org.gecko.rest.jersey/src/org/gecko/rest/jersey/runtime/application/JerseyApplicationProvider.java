@@ -31,7 +31,6 @@ import org.gecko.rest.jersey.provider.application.JakartarsApplicationContentPro
 import org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider;
 import org.gecko.rest.jersey.provider.application.JakartarsExtensionProvider;
 import org.gecko.rest.jersey.provider.application.JakartarsResourceProvider;
-import org.gecko.rest.jersey.runtime.common.DefaultApplication;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.osgi.service.jakartars.runtime.dto.BaseApplicationDTO;
 import org.osgi.service.jakartars.runtime.dto.DTOConstants;
@@ -142,7 +141,7 @@ public class JerseyApplicationProvider extends AbstractJakartarsProvider<Applica
 	 * @see org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider#isDefault()
 	 */
 	public boolean isDefault() {
-		return getProviderObject() instanceof DefaultApplication;
+		return JakartarsWhiteboardConstants.JAKARTA_RS_DEFAULT_APPLICATION.equals(getName());
 	}
 	
 	/* 

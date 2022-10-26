@@ -13,7 +13,10 @@
  */
 package org.gecko.rest.jersey.runtime;
 
+import static java.lang.Integer.MIN_VALUE;
 import static java.util.function.Predicate.not;
+import static org.osgi.framework.Constants.SERVICE_RANKING;
+import static org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE;
 import static org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants.JAKARTA_RS_DEFAULT_APPLICATION;
 import static org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants.JAKARTA_RS_NAME;
 
@@ -86,29 +89,31 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 
 	private static final Logger logger = Logger.getLogger("jersey.dispatcher");
 	private JakartarsWhiteboardProvider whiteboard;
-	private volatile Map<String, JakartarsApplicationProvider> applicationProviderCache = new ConcurrentHashMap<>();
-	private volatile Map<String, JakartarsResourceProvider> resourceProviderCache = new ConcurrentHashMap<>();
-	private volatile Map<String, JakartarsExtensionProvider> extensionProviderCache = new ConcurrentHashMap<>();
-	private volatile Set<JakartarsApplicationProvider> removedApplications = new HashSet<>();
+	private final Map<String, JakartarsApplicationProvider> applicationProviderCache = new ConcurrentHashMap<>();
+	private final Map<String, JakartarsResourceProvider> resourceProviderCache = new ConcurrentHashMap<>();
+	private final Map<String, JakartarsExtensionProvider> extensionProviderCache = new ConcurrentHashMap<>();
+	private final Set<JakartarsApplicationProvider> removedApplications = new HashSet<>();
 	
 //	Maps to keep track of failing services to update the runtime DTO at the end of the doDispatch
-	private volatile Map<String, JakartarsApplicationProvider> failedApplications = new ConcurrentHashMap<>();
-	private volatile Map<String, JakartarsResourceProvider> failedResources = new ConcurrentHashMap<>();
-	private volatile Map<String, JakartarsExtensionProvider> failedExtensions = new ConcurrentHashMap<>();	
+	private final Map<String, JakartarsApplicationProvider> failedApplications = new ConcurrentHashMap<>();
+	private final Map<String, JakartarsResourceProvider> failedResources = new ConcurrentHashMap<>();
+	private final Map<String, JakartarsExtensionProvider> failedExtensions = new ConcurrentHashMap<>();	
 	
-	private volatile Set<JakartarsResourceProvider> removedResources = new HashSet<>();
-	private volatile Set<JakartarsExtensionProvider> removedExtensions = new HashSet<>();
+	private final Set<JakartarsResourceProvider> removedResources = new HashSet<>();
+	private final Set<JakartarsExtensionProvider> removedExtensions = new HashSet<>();
 	private volatile boolean dispatching = false;
 	// The implicit default application, may be shadowed by a registered service
 	private final JakartarsApplicationProvider defaultProvider;
-	private ReentrantLock lock = new ReentrantLock();
-	private AtomicBoolean lockedChange = new AtomicBoolean();
-	private boolean batchMode = false;
+	private final ReentrantLock lock = new ReentrantLock();
+	private final AtomicBoolean lockedChange = new AtomicBoolean();
+	private volatile boolean batchMode = false;
 
 
 	public JerseyWhiteboardDispatcher() {
 		defaultProvider = new JerseyApplicationProvider(new Application(), 
-				Map.of(JAKARTA_RS_NAME, JAKARTA_RS_DEFAULT_APPLICATION));
+				Map.of(JAKARTA_RS_NAME, JAKARTA_RS_DEFAULT_APPLICATION,
+						JAKARTA_RS_APPLICATION_BASE, "/",
+						SERVICE_RANKING, MIN_VALUE));
 	}
 
 	/* (non-Javadoc)
@@ -382,12 +387,15 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 	 */
 	private void doDispatch() {
 		if (lock.tryLock()) {			
-			Collection<JakartarsApplicationProvider> applications = Collections.unmodifiableCollection(applicationProviderCache.values());
-			Collection<JakartarsResourceProvider> resources = Collections.unmodifiableCollection(resourceProviderCache.values());
-			Collection<JakartarsExtensionProvider> extensions = Collections.unmodifiableCollection(extensionProviderCache.values());
+			Collection<JakartarsApplicationProvider> applications = new HashSet<>(applicationProviderCache.values());
+			Collection<JakartarsResourceProvider> resources = new HashSet<>(resourceProviderCache.values());
+			Collection<JakartarsExtensionProvider> extensions = new HashSet<>(extensionProviderCache.values());
 			Collection<JakartarsApplicationProvider> remApplications = getRemovedList(removedApplications);
 			Collection<JakartarsResourceProvider> remResources = getRemovedList(removedResources);
 			Collection<JakartarsExtensionProvider> remExtensions = getRemovedList(removedExtensions);
+
+			applications.add(defaultProvider);
+			
 			try {				
 				/*
 				 * Unregister all applications that are declared as deleted.
@@ -498,7 +506,6 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 				 * #18 151.6.1
 				 */
 				Set<JakartarsApplicationProvider> defaultApplications = DispatcherHelper.getDefaultApplications(applicationCandidates);
-				final JakartarsApplicationProvider defaultApplication = getDefaultApplication(applicationCandidates);
 				
 				defaultApplications
 					.stream()
@@ -515,9 +522,6 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 //				Filter out from the application list the default ones which have been added to the failed list
 				applicationCandidates = applicationCandidates.stream().filter(a -> !failedApplications.containsKey(a.getId()))
 						.collect(Collectors.toUnmodifiableList());	
-				
-//				In case we are using the implicit default application we need to apply the extension.select to the contents of the .default app
-				checkExtensionSelect(Collections.singletonList(defaultApplication));
 				
 //				Assign resources to apps and report a failure DTO for those resources which have not been added to any app
 				Set<JakartarsApplicationContentProvider> noMatchingRes = 
@@ -538,13 +542,6 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 //				otherwise the service should result in a failure DTO
 				checkExtensionSelectForResources(applicationCandidates);
 				
-//				In case we are using the implicit default application we need to apply the extension.select to the contents of the .default app
-				checkExtensionSelectForResources(Collections.singletonList(defaultApplication));
-				
-//				Remove the default app from the app candidates, because it will be registered in a separate step
-				applicationCandidates = applicationCandidates.stream().filter(a-> !a.getId().equals(defaultProvider.getId()))
-						.collect(Collectors.toUnmodifiableList());
-
 				List<JakartarsApplicationProvider> finalApplicationCandidates = applicationCandidates;					
 				
 //				First we unregister the app that need to be unregistered
@@ -573,18 +570,7 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 						app.markUnchanged();
 					}					
 				});
-				
-//				We register/reload the default application, if needed
-				if(!whiteboard.isRegistered(defaultApplication)) {
-					whiteboard.registerApplication(defaultApplication);
-					defaultApplication.markUnchanged();
-				} else 	if (defaultApplication.isChanged()) {
-					if (whiteboard.isRegistered(defaultApplication)) {
-						whiteboard.reloadApplication(defaultApplication);
-					}
-					defaultApplication.markUnchanged();
-				}
-				
+
 				if(whiteboard instanceof AbstractJerseyServiceRuntime) {
 					AbstractJerseyServiceRuntime ajsr = (AbstractJerseyServiceRuntime) whiteboard;
 					ajsr.updateFailedContents(failedApplications, failedResources, failedExtensions);
@@ -1093,13 +1079,6 @@ public class JerseyWhiteboardDispatcher implements JakartarsWhiteboardDispatcher
 			logger.log(Level.SEVERE, "Cannot clone object " + source.getId() + " because it is not clonable", e);
 		}
 		return null;
-	}
-	
-	private JakartarsApplicationProvider getDefaultApplication(Collection<JakartarsApplicationProvider> candidates) {
-		return DispatcherHelper.getDefaultApplications(candidates).stream()
-			.filter(JakartarsApplicationProvider::isDefault)
-			.findFirst()
-			.orElse(defaultProvider);
 	}
 
 	/**

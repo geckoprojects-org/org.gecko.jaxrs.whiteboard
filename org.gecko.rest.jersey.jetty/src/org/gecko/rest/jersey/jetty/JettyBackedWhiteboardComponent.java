@@ -13,7 +13,6 @@
  */
 package org.gecko.rest.jersey.jetty;
 
-import static org.osgi.service.component.annotations.ReferenceCardinality.AT_LEAST_ONE;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 import static org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants.JAKARTA_RS_EXTENSION;
@@ -98,40 +97,11 @@ public class JettyBackedWhiteboardComponent extends AbstractWhiteboard {
 	}
 	
 	/**
-	 * Adds a new default application
-	 * @param application the application to add
-	 * @param properties the service properties
-	 */
-	@Reference(cardinality = AT_LEAST_ONE, policy = DYNAMIC, target = "(&(" + JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE + "=*)(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME + "=.default))")
-	public void bindDefaultApplication(Application application, Map<String, Object> properties) {
-		dispatcher.addApplication(application, properties);
-	}
-
-	/**
-	 * Modifies a default application
-	 * @param application the application to add
-	 * @param properties the service properties
-	 */
-	public void updatedDefaultApplication(Application application, Map<String, Object> properties) {
-		dispatcher.removeApplication(application, properties);
-		dispatcher.addApplication(application, properties);
-	}
-
-	/**
-	 * Removes a default application 
-	 * @param application the application to remove
-	 * @param properties the service properties
-	 */
-	public void unbindDefaultApplication(Application application, Map<String, Object> properties) {
-		dispatcher.removeApplication(application, properties);
-	}
-	
-	/**
 	 * Adds a new application
 	 * @param application the application to add
 	 * @param properties the service properties
 	 */
-	@Reference(service = Application.class, cardinality = MULTIPLE, policy = DYNAMIC, target = "(&(" + JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE + "=*)(!(" + JakartarsWhiteboardConstants.JAKARTA_RS_NAME + "=.default)))")
+	@Reference(service = Application.class, cardinality = MULTIPLE, policy = DYNAMIC, target = "(" + JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_BASE + "=*)")
 	public void bindApplication(Application application, Map<String, Object> properties) {
 		dispatcher.addApplication(application, properties);
 	

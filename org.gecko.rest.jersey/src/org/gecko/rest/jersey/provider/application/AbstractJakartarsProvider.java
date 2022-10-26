@@ -298,25 +298,47 @@ public abstract class AbstractJakartarsProvider<T> implements JakartarsProvider,
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	@Override
-	public int compareTo(JakartarsProvider o) {
+	public final int compareTo(JakartarsProvider o) {
 		if (o == null) {
-			return -1;
-		}
-		// service id is equal -> same provider
-		int r = getServiceId().compareTo(o.getServiceId());
-		if (r == 0) {
-			return r;
+			throw new NullPointerException();
 		}
 		
-		// same name -> sort descending by service rank
-		//r = getName().compareTo(o.getName());
+		Long si = getServiceId();
+		
+		Long si2 = o.getServiceId();
+
+		// service rank is equal -> same provider
+		if(si != null && si.equals(si2)) {
+			return 0;
+		}
+		
+		
+		Integer sr = getServiceRank();
+		sr = sr == null ? 0 : sr;
+
+		Integer sr2 = o.getServiceRank();
+		sr2 = sr2 == null ? 0 : sr2;
+		
+		// Not the same so sort descending by service rank
+		int r = sr2.compareTo(sr);
+		
 		if (r == 0) {
-			r = getServiceRank().compareTo(o.getServiceRank()) * -1;
-//			same rank -> sort by service id
-			if(r == 0) {
-				r = getServiceId().compareTo(o.getServiceId());
+			// Same rank, so look for lowest service id
+			if(si != null) {
+				if(si2 != null) {
+					return si.compareTo(si2);
+				} else {
+					// Fake services come last
+					r = -1;
+				}
+			} else {
+				if(si2 != null) {
+					// Fake services come last
+					r = 1;
+				} else {
+					r = getName().compareTo(o.getName());
+				}
 			}
-			
 		}		
 		return r;
 	}
