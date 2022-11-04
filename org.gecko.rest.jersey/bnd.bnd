@@ -17,7 +17,6 @@
 	org.osgi.service.component.annotations;version=latest,\
 	org.osgi.service.component;version=latest,\
 	org.osgi.service.condition;version=latest,\
-	org.osgi.service.servlet.whiteboard;version=latest,\
 	org.osgi.service.jakartars;version=latest,\
 	org.osgi.util.pushstream;version=latest,\
 	org.osgi.util.function;version=latest,\
