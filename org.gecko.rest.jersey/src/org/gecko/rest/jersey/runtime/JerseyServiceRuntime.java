@@ -255,7 +255,7 @@ public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 	}
 	
 	private String getContextPath(String path) {
-		String thisPath = path;
+		String thisPath = path == null ? "" : path;
 		thisPath = thisPath.replace("/*", "");
 		thisPath = thisPath.endsWith("/") ? thisPath.substring(0, thisPath.length() -1) : thisPath;
 		thisPath = thisPath.startsWith("/") ? thisPath.substring(1) : thisPath;

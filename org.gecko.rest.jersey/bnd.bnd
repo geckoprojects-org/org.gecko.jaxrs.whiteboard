@@ -25,7 +25,8 @@
 	org.apache.geronimo.specs.geronimo-jaxrs_2.1_spec,\
 	org.objectweb.asm;version=latest,\
 	org.apache.felix.http.jetty;version=latest,\
-	org.gecko.rest.jersey.sse;version=snapshot
+	org.gecko.rest.jersey.sse;version=snapshot,\
+	org.osgi.util.tracker
 	
 -testpath: \
 	${junit5},\

@@ -24,7 +24,6 @@ import javax.ws.rs.Priorities;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
-import org.gecko.rest.jersey.helper.DispatcherHelper;
 import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider.JaxRsExtension;
 import org.glassfish.jersey.InjectionManagerProvider;
@@ -36,12 +35,8 @@ import org.glassfish.jersey.InjectionManagerProvider;
  */
 public class WhiteboardFeature implements Feature{
 
-	public static Comparator<Map.Entry<String, JaxRsExtensionProvider>> PROVIDER_COMPARATOR = (e1, e2)-> 
-		DispatcherHelper.PROVIDER_COMPARATOR.compare(e1.getValue(), e2.getValue());
-		//			if (p1.getServiceRank() == p2.getServiceRank()) {
-		//				return p1.getServiceId().compareTo(p2.getServiceId());
-		//			}
-		//			return p2.getServiceRank().compareTo(p1.getServiceRank());
+	public static Comparator<Map.Entry<String, JaxRsExtensionProvider>> PROVIDER_COMPARATOR = (e1, e2) -> 
+	e1.getValue().compareTo(e2.getValue());
 
 	Map<String, JaxRsExtensionProvider> extensions;
 

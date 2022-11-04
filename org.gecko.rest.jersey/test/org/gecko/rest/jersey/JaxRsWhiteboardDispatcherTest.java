@@ -32,7 +32,6 @@ import org.gecko.rest.jersey.provider.application.JaxRsWhiteboardDispatcher;
 import org.gecko.rest.jersey.provider.whiteboard.JaxRsWhiteboardProvider;
 import org.gecko.rest.jersey.resources.TestLegacyApplication;
 import org.gecko.rest.jersey.resources.TestResource;
-import org.gecko.rest.jersey.runtime.common.DefaultApplication;
 import org.gecko.rest.jersey.runtime.dispatcher.JerseyWhiteboardDispatcher;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -91,7 +90,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		Map<String, Object> defaultProperties = new HashMap<>();
 		defaultProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, ".default");
 		defaultProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "/");
-		dispatcher.addApplication(new DefaultApplication(), defaultProperties);
+		dispatcher.addApplication(new Application(), defaultProperties);
 		
 		dispatcher.dispatch();
 		assertTrue(dispatcher.isDispatching());
@@ -237,7 +236,7 @@ public class JaxRsWhiteboardDispatcherTest {
 		Map<String, Object> defaultProperties = new HashMap<>();
 		defaultProperties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, ".default");
 		defaultProperties.put(JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE, "/");
-		dispatcher.addApplication(new DefaultApplication(), defaultProperties);
+		dispatcher.addApplication(new Application(), defaultProperties);
 		
 		return dispatcher;
 	}

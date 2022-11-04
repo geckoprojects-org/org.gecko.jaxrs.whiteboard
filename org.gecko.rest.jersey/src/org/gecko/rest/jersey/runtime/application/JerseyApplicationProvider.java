@@ -31,7 +31,6 @@ import org.gecko.rest.jersey.provider.application.JaxRsApplicationContentProvide
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsExtensionProvider;
 import org.gecko.rest.jersey.provider.application.JaxRsResourceProvider;
-import org.gecko.rest.jersey.runtime.common.DefaultApplication;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.osgi.service.jaxrs.runtime.dto.BaseApplicationDTO;
 import org.osgi.service.jaxrs.runtime.dto.DTOConstants;
@@ -142,7 +141,7 @@ public class JerseyApplicationProvider extends AbstractJaxRsProvider<Application
 	 * @see org.eclipselabs.osgi.jersey.JaxRsApplicationProvider#isDefault()
 	 */
 	public boolean isDefault() {
-		return getProviderObject() instanceof DefaultApplication;
+		return JaxrsWhiteboardConstants.JAX_RS_DEFAULT_APPLICATION.equals(getName());
 	}
 	
 	/* 

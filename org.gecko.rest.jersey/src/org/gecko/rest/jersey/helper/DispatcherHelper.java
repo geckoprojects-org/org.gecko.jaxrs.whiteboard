@@ -15,14 +15,12 @@ package org.gecko.rest.jersey.helper;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
-import org.gecko.rest.jersey.provider.application.JaxRsProvider;
 
 /**
  * Helper class for the dispatcher
@@ -30,20 +28,6 @@ import org.gecko.rest.jersey.provider.application.JaxRsProvider;
  * @since 20.03.2018
  */
 public class DispatcherHelper {
-	
-	public static Comparator<JaxRsProvider> PROVIDER_COMPARATOR = new Comparator<JaxRsProvider>() {
-		/* 
-		 * (non-Javadoc)
-		 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-		 */
-		@Override
-		public int compare(JaxRsProvider p1, JaxRsProvider p2) {
-			if (p1.getServiceRank() == p2.getServiceRank()) {
-				return p1.getServiceId().compareTo(p2.getServiceId());
-			}
-			return p2.getServiceRank().compareTo(p1.getServiceRank());
-		}
-	};
 	
 	/**
 	 * Returns a {@link Set} of applications with name default, sorted by their ranking
@@ -56,8 +40,8 @@ public class DispatcherHelper {
 		}
 		
 		Set<JaxRsApplicationProvider> resultSet = applications.stream()
-				.filter(app->(".default".equals(app.getName()) || "/*".equals(app.getPath())) && !app.isDefault())
-				.sorted(PROVIDER_COMPARATOR)
+				.filter(JaxRsApplicationProvider::isDefault)
+				.sorted()
 				.collect(Collectors.toCollection(LinkedHashSet::new));
 		return resultSet;
 	}

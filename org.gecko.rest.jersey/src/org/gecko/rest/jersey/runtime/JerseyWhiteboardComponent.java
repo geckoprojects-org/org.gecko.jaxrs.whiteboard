@@ -14,7 +14,6 @@
 package org.gecko.rest.jersey.runtime;
 
 import static org.gecko.rest.jersey.provider.JerseyConstants.JERSEY_WHITEBOARD_NAME;
-import static org.osgi.service.component.annotations.ReferenceCardinality.AT_LEAST_ONE;
 import static org.osgi.service.component.annotations.ReferenceCardinality.MULTIPLE;
 import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 import static org.osgi.service.jaxrs.runtime.JaxrsServiceRuntimeConstants.JAX_RS_SERVICE_ENDPOINT;
@@ -44,6 +43,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.condition.Condition;
+import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 
 /**
  * A configurable component, that establishes a whiteboard
@@ -115,40 +115,11 @@ public class JerseyWhiteboardComponent {
 	}
 	
 	/**
-	 * Adds a new default application
-	 * @param application the application to add
-	 * @param properties the service properties
-	 */
-	@Reference(cardinality = AT_LEAST_ONE, policy = DYNAMIC, target = "(&(osgi.jaxrs.application.base=*)(osgi.jaxrs.name=.default))")
-	public void bindDefaultApplication(Application application, Map<String, Object> properties) {
-		dispatcher.addApplication(application, properties);
-	}
-
-	/**
-	 * Modifies a default application
-	 * @param application the application to add
-	 * @param properties the service properties
-	 */
-	public void updatedDefaultApplication(Application application, Map<String, Object> properties) {
-		dispatcher.removeApplication(application, properties);
-		dispatcher.addApplication(application, properties);
-	}
-
-	/**
-	 * Removes a default application 
-	 * @param application the application to remove
-	 * @param properties the service properties
-	 */
-	public void unbindDefaultApplication(Application application, Map<String, Object> properties) {
-		dispatcher.removeApplication(application, properties);
-	}
-	
-	/**
 	 * Adds a new application
 	 * @param application the application to add
 	 * @param properties the service properties
 	 */
-	@Reference(service = Application.class, cardinality = MULTIPLE, policy = DYNAMIC, target = "(&(osgi.jaxrs.application.base=*)(!(osgi.jaxrs.name=.default)))")
+	@Reference(service = Application.class, cardinality = MULTIPLE, policy = DYNAMIC, unbind="unbindApplication", updated = "updatedApplication", target = "(" + JaxrsWhiteboardConstants.JAX_RS_APPLICATION_BASE + "=*)")
 	public void bindApplication(Application application, Map<String, Object> properties) {
 		dispatcher.addApplication(application, properties);
 	

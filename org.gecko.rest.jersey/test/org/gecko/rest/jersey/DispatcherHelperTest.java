@@ -35,7 +35,6 @@ import javax.ws.rs.core.Application;
 import org.gecko.rest.jersey.helper.DispatcherHelper;
 import org.gecko.rest.jersey.provider.application.JaxRsApplicationProvider;
 import org.gecko.rest.jersey.runtime.application.JerseyApplicationProvider;
-import org.gecko.rest.jersey.runtime.common.DefaultApplication;
 import org.junit.jupiter.api.Test;
 import org.osgi.framework.Constants;
 import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
@@ -156,11 +155,11 @@ public class DispatcherHelperTest {
 		JaxRsApplicationProvider defaultProvider02 = createApplicationProvider(".default", Integer.valueOf(30), Long.valueOf(3));
 		providers.add(defaultProvider02);
 		providers.add(createApplicationProvider("test54", Integer.valueOf(40), Long.valueOf(4)));
-		JaxRsApplicationProvider defaultProvider03 = createApplicationProvider(".default", Integer.valueOf(50), Long.valueOf(5), true);
+		JaxRsApplicationProvider defaultProvider03 = createApplicationProvider(".default", Integer.valueOf(30), Long.valueOf(5));
 		providers.add(defaultProvider03);
 		
 		Set<JaxRsApplicationProvider> result = DispatcherHelper.getDefaultApplications(providers);
-		assertEquals(2, result.size());
+		assertEquals(3, result.size());
 		int cnt = 0;
 		for (JaxRsApplicationProvider p : result) {
 			switch (cnt) {
@@ -168,6 +167,9 @@ public class DispatcherHelperTest {
 				assertEquals(defaultProvider02, p);
 				break;
 			case 1:
+				assertEquals(defaultProvider03, p);
+				break;
+			case 2:
 				assertEquals(defaultProvider01, p);
 				break;
 			}
@@ -204,18 +206,6 @@ public class DispatcherHelperTest {
 	 * @return the JaxRsApplicationProvider instance 
 	 */
 	private JaxRsApplicationProvider createApplicationProvider(String name, Integer rank, Long serviceId) {
-		return createApplicationProvider(name, rank, serviceId, false);
-	}
-	
-	/**
-	 * Creates an application provider
-	 * @param name provider name
-	 * @param rank service rank
-	 * @param serviceId the service id
-	 * @param defauktApp <code>true</code>, to create a real default application
-	 * @return the JaxRsApplicationProvider instance 
-	 */
-	private JaxRsApplicationProvider createApplicationProvider(String name, Integer rank, Long serviceId, boolean defaultApp) {
 		Map<String, Object> properties = new HashMap<String, Object>();
 		if (name != null) {
 			properties.put(JaxrsWhiteboardConstants.JAX_RS_NAME, name);
@@ -226,7 +216,7 @@ public class DispatcherHelperTest {
 		if (serviceId != null) {
 			properties.put(Constants.SERVICE_ID, serviceId);
 		}
-		JaxRsApplicationProvider provider = new JerseyApplicationProvider(defaultApp ? new DefaultApplication() : new Application(), properties);
+		JaxRsApplicationProvider provider = new JerseyApplicationProvider(new Application(), properties);
 		return provider;
 	}
 
