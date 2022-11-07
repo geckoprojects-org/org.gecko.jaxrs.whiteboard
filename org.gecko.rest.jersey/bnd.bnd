@@ -29,7 +29,8 @@
 	
 -testpath: \
 	${junit5},\
-	${mockito}
+	${mockito},\
+	jakarta.xml.bind-api;version=latest
 
 Bundle-Name: Gecko Jakartars Whiteboard
 Bundle-Description: Gecko Jersey OSGi Jakartars Whiteboard implementation
