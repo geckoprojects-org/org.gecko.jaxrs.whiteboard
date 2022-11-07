@@ -27,6 +27,7 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.gecko.rest.jersey.annotations.RequireJersey;
 import org.gecko.rest.jersey.helper.JaxRsHelper;
 import org.gecko.rest.jersey.helper.JerseyHelper;
 import org.gecko.rest.jersey.jetty.JettyServerRunnable;
@@ -52,6 +53,7 @@ import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
 @Capability(namespace = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, version = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_SPECIFICATION_VERSION, name = JaxrsWhiteboardConstants.JAX_RS_WHITEBOARD_IMPLEMENTATION, attribute = {
 		"uses:=\"javax.ws.rs,javax.ws.rs.sse,javax.ws.rs.core,javax.ws.rs.ext,javax.ws.rs.client,javax.ws.rs.container,org.osgi.service.jaxrs.whiteboard\"",
 		"provider=jersey", "jersey.version=2.35" })
+@RequireJersey
 public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 
 	public enum State {
