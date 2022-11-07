@@ -34,7 +34,7 @@ import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsWhiteboardTarget;
  * @author Juergen Albert
  * @since 21 Sep 2022
  */
-//@Component
+@Component
 @JaxrsExtension
 @JaxrsName("OptionalResponse Handler")
 @ServiceRanking(Integer.MIN_VALUE)
@@ -42,7 +42,6 @@ import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsWhiteboardTarget;
 @JaxrsApplicationSelect("(!(optional.handler = false))")
 public class OptionalResponseFilter implements ContainerResponseFilter {
 
-	
     /* 
      * (non-Javadoc)
      * @see javax.ws.rs.container.ContainerResponseFilter#filter(javax.ws.rs.container.ContainerRequestContext, javax.ws.rs.container.ContainerResponseContext)
@@ -50,18 +49,14 @@ public class OptionalResponseFilter implements ContainerResponseFilter {
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext response) throws IOException {
         Object entity = response.getEntity();
-        if(entity instanceof Optional<?> && ((Optional<?>) entity).isPresent()) {
-        	response.setEntity(((Optional<?>) entity).get());
-        	return;
+        if (entity != null && entity instanceof Optional<?>) {
+        	Optional<?> optional = (Optional<?>) entity;
+        	if(optional.isPresent()) {
+        		response.setEntity(((Optional<?>) entity).get());
+        	} else {
+        		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        		response.setEntity(null);
+        	}
         }
-        if(entity == null || isNonPresentOptionalValue(entity)) {
-            response.setStatus(HttpServletResponse.SC_NO_CONTENT);
-            response.setEntity(null);
-        }
-    }
-
-    @SuppressWarnings("rawtypes")
-	private boolean isNonPresentOptionalValue(Object entity) {
-        return entity instanceof Optional<?> && !((Optional)entity).isPresent();
     }
 }
