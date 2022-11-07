@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 
 import jakarta.ws.rs.core.Application;
 
+import org.gecko.rest.jersey.annotations.RequireJersey;
 import org.gecko.rest.jersey.binder.PrototypeServiceBinder;
 import org.gecko.rest.jersey.dto.DTOConverter;
 import org.gecko.rest.jersey.factories.InjectableFactory;
@@ -73,6 +74,7 @@ import org.osgi.service.jakartars.runtime.dto.RuntimeDTO;
  * @author Mark Hoffmann
  * @since 12.07.2017
  */
+@RequireJersey
 public abstract class AbstractJerseyServiceRuntime implements JakartarsServiceRuntime, JakartarsWhiteboardProvider {
 
 	private volatile RuntimeDTO runtimeDTO = new RuntimeDTO();

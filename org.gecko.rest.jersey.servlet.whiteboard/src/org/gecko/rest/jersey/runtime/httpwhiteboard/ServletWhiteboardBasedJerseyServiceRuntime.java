@@ -23,8 +23,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
-import jakarta.servlet.Servlet;
-
 import org.gecko.rest.jersey.helper.JerseyHelper;
 import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider;
@@ -34,6 +32,7 @@ import org.gecko.rest.jersey.runtime.WhiteboardServletContainer;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.osgi.annotation.bundle.Capability;
+import org.osgi.annotation.bundle.Requirement;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -42,14 +41,18 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.PrototypeServiceFactory;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
+import org.osgi.framework.namespace.IdentityNamespace;
 import org.osgi.namespace.implementation.ImplementationNamespace;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.jakartars.runtime.JakartarsServiceRuntime;
 import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 import org.osgi.service.servlet.context.ServletContextHelper;
 import org.osgi.service.servlet.runtime.HttpServiceRuntime;
 import org.osgi.service.servlet.runtime.HttpServiceRuntimeConstants;
 import org.osgi.service.servlet.whiteboard.HttpWhiteboardConstants;
+
+import jakarta.servlet.Servlet;
 
 /**
  * Implementation of the {@link JakartarsServiceRuntime} for a Jersey implementation
@@ -59,6 +62,8 @@ import org.osgi.service.servlet.whiteboard.HttpWhiteboardConstants;
 @Capability(namespace = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, version = JakartarsWhiteboardConstants.JAKARTA_RS_WHITEBOARD_SPECIFICATION_VERSION, name = JakartarsWhiteboardConstants.JAKARTA_RS_WHITEBOARD_IMPLEMENTATION, attribute = {
 		"uses:=\"jakarta.ws.rs,jakarta.ws.rs.sse,jakarta.ws.rs.core,jakarta.ws.rs.ext,jakarta.ws.rs.client,jakarta.ws.rs.container,org.osgi.service.jakartars.whiteboard\"",
 		"provider=jersey", "jersey.version=3.0" })
+@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, name = "org.glassfish.jersey.core.jersey-server")
+@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, name = "org.glassfish.jersey.containers.jersey-container-servlet")
 public class ServletWhiteboardBasedJerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 
 	private final Map<String, ServiceRegistration<Servlet>> applicationServletRegistrationMap = new ConcurrentHashMap<>();
