@@ -13,8 +13,10 @@
  */
 package org.gecko.rest.jersey.runtime.application;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,7 +42,7 @@ import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 public class JerseyApplicationContentProvider<T> extends AbstractJakartarsProvider<ServiceObjects<T>> implements JakartarsApplicationContentProvider {
 
 	private static final Logger logger = Logger.getLogger("jersey.contentProvider");
-	private Filter applicationFilter;
+	private List<Filter> applicationFilter;
 	private Class<? extends Object> clazz;
 
 	public JerseyApplicationContentProvider(ServiceObjects<T> serviceObjects, Map<String, Object> properties) {
@@ -115,9 +117,10 @@ public class JerseyApplicationContentProvider<T> extends AbstractJakartarsProvid
 
 	@Override
 	public boolean canHandleApplication(JakartarsApplicationProvider application) {
-		if (applicationFilter != null) {
+		if (applicationFilter != null && !applicationFilter.isEmpty()) {
 			try {
-				boolean applicationMatch = applicationFilter.matches(application.getApplicationProperties());
+				boolean applicationMatch = applicationFilter.stream()
+						.anyMatch(f -> f.matches(application.getProviderProperties()));
 				if (!applicationMatch) {
 					logger.log(Level.FINE, "[" + getId() + "] The given application select filter does not match to this application " + application.getId() + " for this resource/extension: " + getId());
 					return false;
@@ -151,11 +154,12 @@ public class JerseyApplicationContentProvider<T> extends AbstractJakartarsProvid
 	 */
 	@Override
 	public boolean canHandleDefaultApplication() {
-		if (applicationFilter == null) {
+		if (applicationFilter == null || applicationFilter.isEmpty()) {
 			return true;
 		} else {
 			Map<String, Object> properties = Collections.singletonMap(JakartarsWhiteboardConstants.JAKARTA_RS_NAME, ".default");
-			return applicationFilter.matches(properties);
+			return applicationFilter.stream()
+					.anyMatch(f -> f.matches(properties));
 		}
 	}
 	
@@ -172,10 +176,11 @@ public class JerseyApplicationContentProvider<T> extends AbstractJakartarsProvid
 		if (application.isShadowDefault()) {
 			return false;
 		}
-		if (applicationFilter == null) {
+		if (applicationFilter == null || applicationFilter.isEmpty()) {
 			return true;
 		} else {
-			return applicationFilter.matches(application.getProviderProperties());
+			return applicationFilter.stream()
+					.anyMatch(f -> f.matches(application.getProviderProperties()));
 		}
 	}
 
@@ -207,15 +212,19 @@ public class JerseyApplicationContentProvider<T> extends AbstractJakartarsProvid
 			updateStatus(INVALID);
 			return;
 		}
-		String filter = (String) properties.get(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SELECT);
-		if (filter != null) {
-			try {
-				applicationFilter = FrameworkUtil.createFilter(filter);
-			} catch (InvalidSyntaxException e) {
-				logger.log(Level.SEVERE, "The given application select filter is invalid: " + filter, e);
-				updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
-				return;
+		String[] filters = getStringPlusProperty(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SELECT);
+		if (filters != null) {
+			List<Filter> filterList = new ArrayList<>(filters.length);
+			for(String filter : filters) {
+				try {
+					filterList.add(FrameworkUtil.createFilter(filter));
+				} catch (InvalidSyntaxException e) {
+					logger.log(Level.SEVERE, "The given application select filter is invalid: " + filter, e);
+					updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
+					return;
+				}
 			}
+			applicationFilter = filterList;
 		}
 	}
 	
