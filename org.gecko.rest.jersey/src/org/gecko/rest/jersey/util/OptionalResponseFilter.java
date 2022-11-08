@@ -16,8 +16,6 @@ package org.gecko.rest.jersey.util;
 import java.io.IOException;
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.propertytypes.ServiceRanking;
 import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsApplicationSelect;
@@ -28,6 +26,7 @@ import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsWhiteboardTa
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.core.Response;
 
 /**
  * Handles responses that contain an Optional. 
@@ -57,7 +56,7 @@ public class OptionalResponseFilter implements ContainerResponseFilter {
         	if(optional.isPresent()) {
         		response.setEntity(((Optional<?>) entity).get());
         	} else {
-        		response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+        		response.setStatus(Response.Status.NO_CONTENT.getStatusCode());
         		response.setEntity(null);
         	}
         }
