@@ -247,13 +247,7 @@ public abstract class AbstractJakartarsProvider<T> implements JakartarsProvider,
 				updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
 			}
 		}
-		Object filterObject = properties.get(JakartarsWhiteboardConstants.JAKARTA_RS_EXTENSION_SELECT);
-		String[] filters = null;
-		if (filterObject instanceof String) {
-			filters = new String[] {filterObject.toString()};
-		} else if (filterObject instanceof String[]) {
-			filters = (String[])filterObject;
-		}
+		String[] filters = getStringPlusProperty(JakartarsWhiteboardConstants.JAKARTA_RS_EXTENSION_SELECT);
 		if (filters != null) {
 			for (String f : filters) {
 				try {
@@ -268,6 +262,24 @@ public abstract class AbstractJakartarsProvider<T> implements JakartarsProvider,
 			}
 		}
 		doValidateProperties(properties);
+	}
+
+	/**
+	 * @return
+	 */
+	protected String[] getStringPlusProperty(String propertyName) {
+		Object filterObject = properties.get(propertyName);
+		String[] filters = null;
+		if (filterObject instanceof String) {
+			filters = new String[] {filterObject.toString()};
+		} else if (filterObject instanceof String[]) {
+			filters = (String[])filterObject;
+		} else if (filterObject instanceof List) {
+			filters = ((List<?>) filterObject).stream()
+					.map(String::valueOf)
+					.toArray(String[]::new);
+		}
+		return filters;
 	}
 
 	/**
