@@ -86,6 +86,7 @@ public class JerseyApplication extends Application {
 	 * (non-Javadoc)
 	 * @see jakarta.ws.rs.core.Application#getSingletons()
 	 */
+	@SuppressWarnings("deprecation")
 	@Override
 	public Set<Object> getSingletons() {
 		Set<Object> resutlSingletons = new HashSet<>();

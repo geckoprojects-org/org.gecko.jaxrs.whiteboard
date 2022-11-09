@@ -14,8 +14,14 @@
 package org.gecko.rest.jersey.runtime;
 
 import static org.osgi.framework.Constants.SERVICE_CHANGECOUNT;
+import static org.osgi.namespace.implementation.ImplementationNamespace.IMPLEMENTATION_NAMESPACE;
+import static org.osgi.namespace.service.ServiceNamespace.CAPABILITY_OBJECTCLASS_ATTRIBUTE;
+import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
+import static org.osgi.resource.Namespace.EFFECTIVE_ACTIVE;
 import static org.osgi.service.jakartars.runtime.JakartarsServiceRuntimeConstants.JAKARTA_RS_SERVICE_ENDPOINT;
 import static org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants.JAKARTA_RS_NAME;
+import static org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants.JAKARTA_RS_WHITEBOARD_IMPLEMENTATION;
+import static org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants.JAKARTA_RS_WHITEBOARD_SPECIFICATION_VERSION;
 
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -33,9 +39,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jakarta.ws.rs.core.Application;
-
-import org.gecko.rest.jersey.annotations.RequireJersey;
+import org.gecko.rest.jersey.annotations.RequireJerseyExtras;
+import org.gecko.rest.jersey.annotations.RequireRuntimeAdapter;
 import org.gecko.rest.jersey.binder.PrototypeServiceBinder;
 import org.gecko.rest.jersey.dto.DTOConverter;
 import org.gecko.rest.jersey.factories.InjectableFactory;
@@ -50,6 +55,7 @@ import org.gecko.rest.jersey.runtime.application.JerseyApplication;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
+import org.osgi.annotation.bundle.Capability;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -69,12 +75,36 @@ import org.osgi.service.jakartars.runtime.dto.ResourceDTO;
 import org.osgi.service.jakartars.runtime.dto.ResourceMethodInfoDTO;
 import org.osgi.service.jakartars.runtime.dto.RuntimeDTO;
 
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.container.ResourceInfo;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.ext.Providers;
+import jakarta.ws.rs.sse.Sse;
+
 /**
  * Implementation of the {@link JakartarsServiceRuntime} for a Jersey implementation
  * @author Mark Hoffmann
  * @since 12.07.2017
  */
-@RequireJersey
+
+// Require the Jersey server runtime
+@RequireJerseyExtras
+// Require a gecko adapter to run the whiteboard
+@RequireRuntimeAdapter
+// Advertise the implementation capability for the whiteboard as per the specification
+@Capability(
+		namespace = IMPLEMENTATION_NAMESPACE, 
+		version = JAKARTA_RS_WHITEBOARD_SPECIFICATION_VERSION, 
+		name = JAKARTA_RS_WHITEBOARD_IMPLEMENTATION, 
+		uses = {WebApplicationException.class, ResourceInfo.class, Application.class, Providers.class, Sse.class},
+		attribute = { "provider=jersey", "jersey.version=3.0" }
+)
+@Capability(
+		namespace = SERVICE_NAMESPACE,
+		uses = JakartarsServiceRuntime.class,
+		effective = EFFECTIVE_ACTIVE,
+		attribute = CAPABILITY_OBJECTCLASS_ATTRIBUTE + "=org.osgi.service.jakartars.runtime.JakartarsServiceRuntime"
+)
 public abstract class AbstractJerseyServiceRuntime implements JakartarsServiceRuntime, JakartarsWhiteboardProvider {
 
 	private volatile RuntimeDTO runtimeDTO = new RuntimeDTO();

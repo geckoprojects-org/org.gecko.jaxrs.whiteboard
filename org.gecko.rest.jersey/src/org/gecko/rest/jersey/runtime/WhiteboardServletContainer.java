@@ -23,6 +23,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.gecko.rest.jersey.annotations.RequireJerseyServlet;
 import org.gecko.rest.jersey.binder.PromiseResponseHandlerBinder;
 import org.gecko.rest.jersey.helper.DestroyListener;
 import org.gecko.rest.jersey.provider.jakartars.RuntimeDelegateService;
@@ -42,6 +43,7 @@ import org.glassfish.jersey.servlet.init.FilterUrlMappingsProviderImpl;
  * @author Juergen Albert
  * @since 1.0
  */
+@RequireJerseyServlet
 public class WhiteboardServletContainer extends ServletContainer {
 
 	/**
