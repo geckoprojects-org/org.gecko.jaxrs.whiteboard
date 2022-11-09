@@ -1,0 +1,33 @@
+
+# OSGi Test
+org.osgi:org.osgi.test.junit5:${osgi.test.version}
+org.osgi:org.osgi.test.junit5.cm:${osgi.test.version}
+org.osgi:org.osgi.test.common:${osgi.test.version}
+org.osgi:org.osgi.test.assertj.framework:${osgi.test.version}
+org.osgi:org.osgi.test.assertj.promise:${osgi.test.version}
+
+# JUnit 5 Jupiter
+org.junit.jupiter:junit-jupiter-api:${jupiter.version}
+org.junit.jupiter:junit-jupiter-engine:${jupiter.version}
+org.junit.jupiter:junit-jupiter-params:${jupiter.version}
+org.junit.platform:junit-platform-runner:${platform.version}
+org.junit.platform:junit-platform-commons:${platform.version}
+org.junit.platform:junit-platform-launcher:${platform.version}
+org.junit.platform:junit-platform-engine:${platform.version}
+org.junit.platform:junit-platform-testkit:${platform.version}
+
+# Mockito
+org.mockito:mockito-core:${mockito.version}
+org.mockito:mockito-junit-jupiter:${mockito.version}
+
+# AssertJ
+net.bytebuddy:byte-buddy:${bytebuddy.version}
+net.bytebuddy:byte-buddy-agent:${bytebuddy.version}
+org.opentest4j:opentest4j:1.2.0
+org.hamcrest:hamcrest:2.2
+
+# Others
+org.apiguardian:apiguardian-api:1.1.2
+biz.aQute.bnd:biz.aQute.tester.junit-platform:6.2.0
+org.assertj:assertj-core:3.23.1
+org.objenesis:objenesis:3.3

@@ -1,0 +1,59 @@
+-plugin.junit5: \
+	aQute.bnd.repository.maven.provider.MavenBndRepository;\
+		releaseUrl			= "https://repo.maven.apache.org/maven2/"; \
+		snapshotUrl			= "https://oss.sonatype.org/content/repositories/snapshots/";\
+		index            	= "${.}/osgi-test.maven" ;\
+		poll.time           = -1;\
+		readOnly            = true;\
+		name="OSGi-Tests-JUnit5 Dependencies"
+		
+#Test-Cases: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.annotation.Testable;CONCRETE}
+
+jupiter.version: 5.8.2
+platform.version: 1.8.2
+osgi.test.version: 1.1.0
+mockito.version: 4.4.0
+assertj.version: 3.22.0
+bytebuddy.version: 1.12.8
+
+-buildpath.junit5: ${if;${-enable-junit5};${test.buildpath}}
+-runproperties.junit5: ${if;${-enable-junit5};${test.runproperties}}
+-runbundles.junit5: ${if;${-enable-junit5};${test.runbundles}}
+#-tester: biz.aQute.tester.junit-platform
+
+#Adds the related project to the buildpath 
+-buildpath.test_host: ${if;${-enable-junit5};${replace;${p};.tests}}
+
+#Makes the TestBundle to a Fragment
+Fragment-Host: ${if;${-enable-junit5};${replace;${p};.tests}}
+
+-enable-junit5: false
+
+test.buildpath: \
+	assertj-core,\
+	junit-jupiter-api,\
+	junit-platform-commons,\
+	org.mockito.mockito-core,\
+	org.apiguardian.api,\
+	org.osgi.test.assertj.framework,\
+	org.osgi.test.assertj.promise,\
+	org.osgi.test.common,\
+	org.osgi.test.junit5,\
+	org.osgi.test.junit5.cm
+
+test.runproperties: \
+	tester.trace=true,\
+	tester.continuous=true
+
+test.runbundles: \
+	biz.aQute.tester.junit-platform;version=latest,\
+	org.opentest4j;version='[1.2.0,1.2.1)',\
+	junit-jupiter-api;version='[5.7.0,6)',\
+	junit-jupiter-params;version='[5.7.0,6)',\
+	junit-jupiter-engine;version='[5.7.0,6)',\
+	junit-platform-commons;version='[1.7.0,2)',\
+	junit-platform-engine;version='[1.7.0,2)',\
+	junit-platform-launcher;version='[1.7.0,2)'  
+
+## BndPomRepository could load g_a_v_c sind 6.0.0
+-require-bnd: "(version>=6.2.0)"

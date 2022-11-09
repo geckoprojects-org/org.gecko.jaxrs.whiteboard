@@ -3,9 +3,9 @@
 #	DIMC Github-Configuration - gecko-dimc
 #	Jacoco Support - gecko-jacoco
 -library: \
-	geckoOSGi-Test,\
 	geckoDIMC,\
 	geckoJacoco
+#	geckoOSGi-Test,\
 
 # Needed because we enabled library 'gecko-dimc' 	
 github-project: org.gecko.jaxrs.whiteboard
