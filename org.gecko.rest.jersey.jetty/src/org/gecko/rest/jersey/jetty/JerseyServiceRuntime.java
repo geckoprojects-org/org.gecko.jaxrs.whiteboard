@@ -27,6 +27,7 @@ import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.gecko.rest.jersey.annotations.ProvideRuntimeAdapter;
 import org.gecko.rest.jersey.helper.JakartarsHelper;
 import org.gecko.rest.jersey.helper.JerseyHelper;
 import org.gecko.rest.jersey.provider.JerseyConstants;
@@ -36,14 +37,9 @@ import org.gecko.rest.jersey.runtime.ResourceConfigWrapper;
 import org.gecko.rest.jersey.runtime.WhiteboardServletContainer;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
-import org.osgi.annotation.bundle.Capability;
-import org.osgi.annotation.bundle.Requirement;
-import org.osgi.framework.namespace.IdentityNamespace;
-import org.osgi.namespace.implementation.ImplementationNamespace;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.jakartars.runtime.JakartarsServiceRuntime;
-import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 /**
  * Implementation of the {@link JakartarsServiceRuntime} for a Jetty backed implementation
@@ -51,10 +47,7 @@ import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
  * @author Mark Hoffmann
  * @since 12.07.2017
  */
-@Capability(namespace = ImplementationNamespace.IMPLEMENTATION_NAMESPACE, version = JakartarsWhiteboardConstants.JAKARTA_RS_WHITEBOARD_SPECIFICATION_VERSION, name = JakartarsWhiteboardConstants.JAKARTA_RS_WHITEBOARD_IMPLEMENTATION, attribute = {
-		"uses:=\"jakarta.ws.rs,jakarta.ws.rs.sse,jakarta.ws.rs.core,jakarta.ws.rs.ext,jakarta.ws.rs.client,jakarta.ws.rs.container,org.osgi.service.jakartars.whiteboard\"",
-		"provider=jersey", "jersey.version=3.0" })
-@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, name = "org.glassfish.jersey.core.jersey-server")
+@ProvideRuntimeAdapter("jetty")
 public class JerseyServiceRuntime extends AbstractJerseyServiceRuntime {
 
 	public enum State {

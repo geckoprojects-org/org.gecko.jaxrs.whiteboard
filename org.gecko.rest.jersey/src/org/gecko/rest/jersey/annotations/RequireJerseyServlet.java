@@ -24,7 +24,7 @@ import org.osgi.annotation.bundle.Requirements;
 import org.osgi.framework.namespace.IdentityNamespace;
 
 /**
- * 
+ * Require the "extra" bits of Jersey that are actually mandatory
  * @author Mark Hoffmann
  * @since 07.11.2022
  */
@@ -33,12 +33,13 @@ import org.osgi.framework.namespace.IdentityNamespace;
 @Target({
 		ElementType.TYPE, ElementType.PACKAGE
 })
+@RequireJerseyExtras
 @Requirements(value = {
-		@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, name = "org.glassfish.jersey.inject.jersey-hk2"),
-		@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, name = "org.glassfish.jersey.media.jersey-media-sse"),
-		@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, name = "org.glassfish.jersey.media.jersey-media-jaxb"),
-		@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, name = "jakarta.validation.jakarta.validation-api")
+		@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, name = "org.glassfish.jersey.core.jersey-common"),
+		@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, name = "org.glassfish.jersey.core.jersey-server"),
+		@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, name = "org.glassfish.jersey.containers.jersey-container-servlet-core"),
+		@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, name = "org.glassfish.jersey.containers.jersey-container-servlet")
 })
-public @interface RequireJersey {
+public @interface RequireJerseyServlet {
 
 }

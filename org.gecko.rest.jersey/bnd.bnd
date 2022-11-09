@@ -10,6 +10,7 @@
 	org.osgi.annotation.versioning;version=latest,\
 	org.osgi.annotation.bundle;version=latest,\
 	org.osgi.namespace.implementation;version=latest,\
+	org.osgi.namespace.service;version=latest,\
 	org.osgi.framework;version=latest,\
 	org.osgi.dto;version=latest,\
 	org.osgi.resource;version=latest,\
@@ -35,12 +36,8 @@
 Bundle-Name: Gecko Jakartars Whiteboard
 Bundle-Description: Gecko Jersey OSGi Jakartars Whiteboard implementation
 	
-Provide-Capability: \
-	osgi.contract; osgi.contract=JavaJAXRS; version:List<Version>="2.1,2";provider=jersey;jersey.version:Version="3.08";uses:="jakarta.ws.rs, jakarta.ws.rs.core, jakarta.ws.rs.sse, jakarta.ws.rs.ext, jakarta.ws.rs.client, jakarta.ws.rs.container",\
-	osgi.service;objectClass:List<String>="org.osgi.service.jakartars.runtime.JakartarsServiceRuntime";uses:="org.osgi.service.jakartars.runtime,org.osgi.service.jakartars.runtime.dto",\
-	osgi.service;objectClass:List<String>="jakarta.ws.rs.client.ClientBuilder";uses:="jakarta.ws.rs.client,org.osgi.service.jakartars.client";service.scope="prototype",\
-	osgi.service;objectClass:List<String>="org.osgi.service.jakartars.client.SseEventSourceFactory";uses:="org.osgi.service.jakartars.client",\
-	osgi.serviceloader;osgi.serviceloader="jakarta.ws.rs.sse.SseEventSource.Builder";register:="org.gecko.rest.jersey.runtime.common.SSESourceBuilderService
+#Provide-Capability: \
+#osgi.serviceloader;osgi.serviceloader="jakarta.ws.rs.sse.SseEventSource.Builder";register:="org.gecko.rest.jersey.runtime.common.SSESourceBuilderService
 
 	
 Import-Package: \
