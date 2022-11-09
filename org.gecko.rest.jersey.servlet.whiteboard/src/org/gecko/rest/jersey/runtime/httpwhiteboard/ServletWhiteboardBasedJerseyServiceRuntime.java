@@ -37,6 +37,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.PrototypeServiceFactory;
 import org.osgi.framework.ServiceReference;
@@ -98,7 +99,6 @@ public class ServletWhiteboardBasedJerseyServiceRuntime extends AbstractJerseySe
 	 * (non-Javadoc)
 	 * @see org.eclipselabs.osgi.jersey.runtime.JakartarsJerseyHandler#getURLs(org.osgi.service.component.ComponentContext)
 	 */
-	@SuppressWarnings("unchecked")
 	public String[] getURLs(ComponentContext context) {
 		BundleContext bundleContext = context.getBundleContext();
 		
@@ -128,14 +128,11 @@ public class ServletWhiteboardBasedJerseyServiceRuntime extends AbstractJerseySe
 			whiteboardReferences.forEach(ref -> {
 				pathWithFilter.forEach((path, target) -> {
 					if(target == null || target.match(ref)) {
-						Object object = ref.getProperty(HttpServiceRuntimeConstants.HTTP_SERVICE_ENDPOINT);
-						if(object instanceof String){
-							String endpoint = object.toString();
-							baseUris.add(buildEndPoint(endpoint, path));
-						} else if(object instanceof Collection){
-							Collection<String> endpoints = (Collection<String>) object;
-							for(String endpoint : endpoints){
-								baseUris.add(buildEndPoint(endpoint, path));
+						Map<String,Object> properties = FrameworkUtil.asMap(ref.getProperties());
+						String[] endpoints = JerseyHelper.getStringPlusProperty(HttpServiceRuntimeConstants.HTTP_SERVICE_ENDPOINT, properties);
+						if (endpoints != null) {
+							for (String e : endpoints) {
+								baseUris.add(buildEndPoint(e, path));
 							}
 						}
 					}
@@ -151,13 +148,20 @@ public class ServletWhiteboardBasedJerseyServiceRuntime extends AbstractJerseySe
 	
 
 	private String buildEndPoint(String endpoint, String path) {
+		String rsEndpoint = endpoint;
 		if(!endpoint.endsWith("/")) {
-			endpoint += "/";
+			rsEndpoint += "/";
+		}
+		if (basePath.startsWith("/")) {
+			rsEndpoint += basePath.substring(1);
+		}
+		if (!rsEndpoint.endsWith("/")) {
+			rsEndpoint += "/";
 		}
 		if(path.startsWith("/")) {
-			path = path.substring(1); 
+			rsEndpoint += path.substring(1); 
 		}
-		return endpoint + basePath + path;
+		return rsEndpoint;
 	}
 	
 	/* (non-Javadoc)

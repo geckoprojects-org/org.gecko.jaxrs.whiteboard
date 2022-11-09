@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.gecko.rest.jersey.helper.JerseyHelper;
 import org.gecko.rest.jersey.provider.application.AbstractJakartarsProvider;
 import org.gecko.rest.jersey.provider.application.JakartarsApplicationContentProvider;
 import org.gecko.rest.jersey.provider.application.JakartarsApplicationProvider;
@@ -212,7 +213,7 @@ public class JerseyApplicationContentProvider<T> extends AbstractJakartarsProvid
 			updateStatus(INVALID);
 			return;
 		}
-		String[] filters = getStringPlusProperty(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SELECT);
+		String[] filters = JerseyHelper.getStringPlusProperty(JakartarsWhiteboardConstants.JAKARTA_RS_APPLICATION_SELECT, properties);
 		if (filters != null) {
 			List<Filter> filterList = new ArrayList<>(filters.length);
 			for(String filter : filters) {

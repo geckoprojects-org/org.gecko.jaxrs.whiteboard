@@ -23,6 +23,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.gecko.rest.jersey.helper.JerseyHelper;
 import org.gecko.rest.jersey.provider.JakartarsConstants;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Filter;
@@ -247,7 +248,7 @@ public abstract class AbstractJakartarsProvider<T> implements JakartarsProvider,
 				updateStatus(DTOConstants.FAILURE_REASON_VALIDATION_FAILED);
 			}
 		}
-		String[] filters = getStringPlusProperty(JakartarsWhiteboardConstants.JAKARTA_RS_EXTENSION_SELECT);
+		String[] filters = JerseyHelper.getStringPlusProperty(JakartarsWhiteboardConstants.JAKARTA_RS_EXTENSION_SELECT, properties);
 		if (filters != null) {
 			for (String f : filters) {
 				try {
@@ -262,24 +263,6 @@ public abstract class AbstractJakartarsProvider<T> implements JakartarsProvider,
 			}
 		}
 		doValidateProperties(properties);
-	}
-
-	/**
-	 * @return
-	 */
-	protected String[] getStringPlusProperty(String propertyName) {
-		Object filterObject = properties.get(propertyName);
-		String[] filters = null;
-		if (filterObject instanceof String) {
-			filters = new String[] {filterObject.toString()};
-		} else if (filterObject instanceof String[]) {
-			filters = (String[])filterObject;
-		} else if (filterObject instanceof List) {
-			filters = ((List<?>) filterObject).stream()
-					.map(String::valueOf)
-					.toArray(String[]::new);
-		}
-		return filters;
 	}
 
 	/**

@@ -18,12 +18,14 @@ import static org.osgi.service.component.annotations.ReferencePolicy.DYNAMIC;
 import static org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants.JAKARTA_RS_RESOURCE;
 
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import jakarta.ws.rs.core.Application;
 
 import org.gecko.rest.jersey.provider.JerseyConstants;
 import org.gecko.rest.jersey.runtime.AbstractWhiteboard;
+import org.osgi.framework.Filter;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceObjects;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
@@ -38,7 +40,14 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.condition.Condition;
+import org.osgi.service.jakartars.runtime.JakartarsServiceRuntime;
 import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
+import org.osgi.service.servlet.runtime.HttpServiceRuntime;
+import org.osgi.service.servlet.whiteboard.HttpWhiteboardConstants;
+import org.osgi.util.tracker.ServiceTracker;
+import org.osgi.util.tracker.ServiceTrackerCustomizer;
+
+import jakarta.ws.rs.core.Application;
 
 /**
  * This component handles the lifecycle of a {@link JakartarsServiceRuntime}
@@ -46,34 +55,42 @@ import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
  * @since 30.07.2017
  */
 @Component(name="JakartarsServletWhiteboardRuntimeComponent", 
-	immediate=true, configurationPolicy=ConfigurationPolicy.REQUIRE, 
-	reference = @Reference(name = "runtimeCondition", 
-		service = Condition.class,
-		target = JerseyConstants.JERSEY_RUNTIME_CONDITION))
+immediate=true, configurationPolicy=ConfigurationPolicy.REQUIRE, 
+reference = @Reference(name = "runtimeCondition", 
+service = Condition.class,
+target = JerseyConstants.JERSEY_RUNTIME_CONDITION))
 public class JakartarsServletWhiteboardRuntimeComponent extends AbstractWhiteboard {
 
 	private static Logger logger = Logger.getLogger(JakartarsServletWhiteboardRuntimeComponent.class.getName());
-
+	private ServiceTracker<HttpServiceRuntime, HttpServiceRuntime> httpRuntimeTracker;
+	private ComponentContext componentContext;
 
 	/**
 	 * Called on component activation
 	 * @param componentContext the component context
 	 * @throws ConfigurationException 
 	 */
-	/* (non-Javadoc)
-	 * @see org.gecko.rest.jersey.runtime.JerseyWhiteboardComponent#activate(org.osgi.service.component.ComponentContext)
-	 */
 	@Activate
 	public void activate(final ComponentContext componentContext) throws ConfigurationException {
+		this.componentContext = componentContext;
 		updateProperties(componentContext);
 		if (whiteboard != null) {
-			whiteboard.teardown();;
+			whiteboard.teardown();
 		}
 		whiteboard = new ServletWhiteboardBasedJerseyServiceRuntime();
 		whiteboard.initialize(componentContext);
 		dispatcher.setWhiteboardProvider(whiteboard);
-		dispatcher.dispatch();
-		whiteboard.startup();
+		String target = (String) componentContext.getProperties().get(HttpWhiteboardConstants.HTTP_WHITEBOARD_TARGET);
+		if (target != null) {
+			try {
+				target = String.format("(&(objectClass=org.osgi.service.servlet.runtime.HttpServiceRuntime)%s)", target);
+				Filter f = FrameworkUtil.createFilter(target);
+				httpRuntimeTracker = new ServiceTracker<HttpServiceRuntime, HttpServiceRuntime>(componentContext.getBundleContext(), f, customizer);
+			} catch (InvalidSyntaxException e) {
+				throw new ConfigurationException(HttpWhiteboardConstants.HTTP_WHITEBOARD_TARGET, "Invalid target defined: " + target, e);
+			}
+		}
+		httpRuntimeTracker.open();
 	}
 
 	/**
@@ -83,9 +100,8 @@ public class JakartarsServletWhiteboardRuntimeComponent extends AbstractWhiteboa
 	 */
 	@Modified
 	public void modified(ComponentContext context) throws ConfigurationException {
-		updateProperties(context);
-		whiteboard.modified(context);
-		dispatcher.dispatch();
+		componentContext = context;
+		doUpdate();
 	}
 
 	/**
@@ -94,13 +110,8 @@ public class JakartarsServletWhiteboardRuntimeComponent extends AbstractWhiteboa
 	 */
 	@Deactivate
 	public void deactivate(ComponentContext context) {
-		if (dispatcher != null) {
-			dispatcher.deactivate();
-		}
-		if (whiteboard != null) {
-			whiteboard.teardown();
-			whiteboard = null;
-		}
+		httpRuntimeTracker.close();
+		doShutdown();
 	}
 
 	/**
@@ -161,4 +172,57 @@ public class JakartarsServletWhiteboardRuntimeComponent extends AbstractWhiteboa
 	public void unbindJakartarsResource(ServiceReference<Object> jakartarsResourceSR, Map<String, Object> properties) {
 		dispatcher.removeResource(properties);
 	}
+
+	/**
+	 * Updates the whiteboard and dispatcher
+	 * @throws ConfigurationException
+	 */
+	private void doUpdate() throws ConfigurationException {
+		updateProperties(componentContext);
+		whiteboard.modified(componentContext);
+		dispatcher.dispatch();
+	}
+
+	/**
+	 * Shuts everything down gracefully
+	 */
+	private void doShutdown() {
+		if (dispatcher != null) {
+			dispatcher.deactivate();
+		}
+		if (whiteboard != null) {
+			whiteboard.teardown();
+			whiteboard = null;
+		}
+	}
+
+	private ServiceTrackerCustomizer<HttpServiceRuntime, HttpServiceRuntime> customizer = new ServiceTrackerCustomizer<HttpServiceRuntime, HttpServiceRuntime>() {
+
+		@Override
+		public HttpServiceRuntime addingService(ServiceReference<HttpServiceRuntime> reference) {
+			HttpServiceRuntime service = componentContext.getBundleContext().getService(reference);
+			if (service != null) {
+				dispatcher.dispatch();
+				whiteboard.startup();
+				return service;
+			}
+			return null;
+		}
+
+		@Override
+		public void modifiedService(ServiceReference<HttpServiceRuntime> reference,
+				HttpServiceRuntime service) {
+			try {
+				doUpdate();
+			} catch (ConfigurationException e) {
+				logger.log(Level.SEVERE, "Error while updating Http Servlet Whiteboards, shutting down", e);
+				doShutdown();
+			}
+		}
+
+		@Override
+		public void removedService(ServiceReference<HttpServiceRuntime> reference, HttpServiceRuntime service) {
+			doShutdown();
+		}
+	};
 }

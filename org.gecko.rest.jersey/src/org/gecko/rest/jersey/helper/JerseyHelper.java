@@ -14,12 +14,13 @@
 package org.gecko.rest.jersey.helper;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import jakarta.ws.rs.core.Application;
 
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
+
+import jakarta.ws.rs.core.Application;
 
 /**
  * Helper class for the Jersey whiteboard
@@ -58,7 +59,31 @@ public class JerseyHelper {
 				application.getSingletons().isEmpty();
 
 	}
-
+	
+	/**
+	 * Returns a string+ property with the given property name from the given property map
+	 * @param propertyName the property name
+	 * @param properties the property map
+	 * @return the array of values for the property name or <code>null</code>
+	 */
+	public static String[] getStringPlusProperty(String propertyName, Map<String, Object> properties) {
+		if (propertyName == null || properties == null) {
+			return null;
+		}
+		Object filterObject = properties.get(propertyName);
+		String[] filters = null;
+		if (filterObject instanceof String) {
+			filters = new String[] {filterObject.toString()};
+		} else if (filterObject instanceof String[]) {
+			filters = (String[])filterObject;
+		} else if (filterObject instanceof List) {
+			filters = ((List<?>) filterObject).stream()
+					.map(String::valueOf)
+					.toArray(String[]::new);
+		}
+		return filters;
+	}
+	
 	/**
 	 * Creates a properties map from the service reference properties
 	 * @param reference the service reference

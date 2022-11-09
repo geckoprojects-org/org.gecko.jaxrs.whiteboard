@@ -10,4 +10,7 @@
 	jakarta.ws.rs-api,\
 	org.osgi.service.condition,\
 	org.osgi.service.jakartars,\
-	org.osgi.namespace.implementation
+	org.osgi.namespace.implementation,\
+	org.osgi.util.tracker
+Bundle-Name: Gecko Jakartars Servlet Whiteboard Adapter
+Bundle-Description: Gecko Jersey OSGi Adapter for the Servlet Whiteboard

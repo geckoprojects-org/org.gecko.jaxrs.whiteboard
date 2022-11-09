@@ -13,18 +13,22 @@
  */
 package org.gecko.rest.jersey;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jakarta.ws.rs.core.Application;
-
 import org.gecko.rest.jersey.helper.JerseyHelper;
 import org.junit.jupiter.api.Test;
+
+import jakarta.ws.rs.core.Application;
 
 /**
  * 
@@ -80,4 +84,40 @@ public class JerseyHelperTests {
 		assertTrue(JerseyHelper.isEmpty(app));
 	}
 
+	@Test
+	public void testStringPlus() {
+		Map<String, Object> properties = new HashMap<>();
+		assertNull(JerseyHelper.getStringPlusProperty(null, null));
+		assertNull(JerseyHelper.getStringPlusProperty("test", null));
+		assertNull(JerseyHelper.getStringPlusProperty(null, properties));
+		
+		properties.put("test", Integer.valueOf(1));
+		assertNull(JerseyHelper.getStringPlusProperty("test", properties));
+		properties.put("test", "2");
+		String[] result = new String[] {"2"};
+		assertArrayEquals(result, JerseyHelper.getStringPlusProperty("test", properties));
+		
+		properties.put("test", new Integer[] {Integer.valueOf(1), Integer.valueOf(2)});
+		assertNull(JerseyHelper.getStringPlusProperty("test", properties));
+		properties.put("test", new String[] {"3", "4"});
+		result = new String[] {"3", "4"};
+		assertArrayEquals(result, JerseyHelper.getStringPlusProperty("test", properties));
+		
+		properties.put("test", List.of(Integer.valueOf(1), Integer.valueOf(2)));
+		result = new String[] {"1", "2"};
+		assertArrayEquals(result, JerseyHelper.getStringPlusProperty("test", properties));
+		properties.put("test", List.of("5", "6"));
+		result = new String[] {"5", "6"};
+		assertArrayEquals(result, JerseyHelper.getStringPlusProperty("test", properties));
+		properties.put("test", List.of(Integer.valueOf(2), "Blub", "8", Integer.valueOf(9)));
+		result = new String[] {"2", "Blub", "8", "9"};
+		assertArrayEquals(result, JerseyHelper.getStringPlusProperty("test", properties));
+		
+		properties.put("test", new ArrayList<Integer>());
+		result = new String[0];
+		assertArrayEquals(result, JerseyHelper.getStringPlusProperty("test", properties));
+		properties.put("test", new ArrayList<String>());
+		result = new String[0];
+		assertArrayEquals(result, JerseyHelper.getStringPlusProperty("test", properties));
+	}
 }
