@@ -39,6 +39,12 @@ javac.target: 11
 		releaseUrl=https://oss.sonatype.org/service/local/staging/deploy/maven2/;\
 		index=${.}/sonatype.maven;\
 		name='Sonatype'
+-plugin.3.ApacheSnapshot: \
+	aQute.bnd.repository.maven.provider.MavenBndRepository;\
+		snapshotUrl=https://repository.apache.org/content/groups/snapshots;\
+		releaseUrl=https://repository.apache.org/content/repositories/releases/;\
+		index=${.}/apache.maven;\
+		name='Apache'
 		
 -plugin.5.Local: \
 	aQute.bnd.deployer.repository.LocalIndexedRepo; \

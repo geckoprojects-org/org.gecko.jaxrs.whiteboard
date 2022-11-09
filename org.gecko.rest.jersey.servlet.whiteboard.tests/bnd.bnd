@@ -1,0 +1,26 @@
+Test-Cases: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.annotation.Testable;CONCRETE}
+
+# sets the usually required buildpath using the bnd library, you can extend it with the normal -buildpath to your liking
+-buildpath: \
+	junit-jupiter-api,\
+	org.osgi.test.assertj.framework,\
+	org.osgi.test.assertj.promise,\
+	org.osgi.test.common,\
+	org.osgi.test.junit5,\
+	org.osgi.test.junit5.cm,\
+	org.osgi.framework,\
+	org.osgi.util.tracker,\
+	org.osgi.service.condition,\
+	org.gecko.rest.jersey,\
+	junit-jupiter-params,\
+	org.apiguardian.api,\
+	junit-platform-commons,\
+	jakarta.ws.rs-api,\
+	org.osgi.service.jakartars
+	
+Bundle-Version: 1.0.0.SNAPSHOT
+
+-includeresource: OSGI-INF/configurator/config.json=configs/config.json
+
+Require-Capability: osgi.extender;filter:='(osgi.extender=osgi.configurator)'
+-privatepackage: org.gecko.rest.jersey.servlet.whiteboard.tests
