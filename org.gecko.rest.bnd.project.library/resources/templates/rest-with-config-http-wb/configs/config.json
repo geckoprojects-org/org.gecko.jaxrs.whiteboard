@@ -9,7 +9,7 @@
 		"org.apache.felix.http.name": "{{httpWhiteboardName}}",
 		"org.apache.felix.http.runtime.init.id": "{{httpWhiteboardId}}"
 	},
-	"JakartarsHttpWhiteboardRuntimeComponent~{{jakartarsWhiteboardId}}":
+	"JakartarsServletWhiteboardRuntimeComponent~{{jakartarsWhiteboardId}}":
 	{
 		"jersey.jakartars.whiteboard.name" : "{{jakartarsWhiteboardName}}",
 		"jersey.context.path" : "{{jakartarsContextPath}}",
