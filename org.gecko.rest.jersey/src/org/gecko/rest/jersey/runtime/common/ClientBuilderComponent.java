@@ -13,13 +13,15 @@
  */
 package org.gecko.rest.jersey.runtime.common;
 
+import static org.osgi.namespace.service.ServiceNamespace.CAPABILITY_OBJECTCLASS_ATTRIBUTE;
+import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
+import static org.osgi.resource.Namespace.EFFECTIVE_ACTIVE;
+
 import java.util.Dictionary;
 import java.util.Hashtable;
 
-import jakarta.ws.rs.client.ClientBuilder;
-import jakarta.ws.rs.client.RxInvokerProvider;
-
 import org.gecko.rest.jersey.provider.JerseyConstants;
+import org.osgi.annotation.bundle.Capability;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -34,16 +36,36 @@ import org.osgi.service.condition.Condition;
 import org.osgi.service.jakartars.client.PromiseRxInvoker;
 import org.osgi.service.jakartars.client.SseEventSourceFactory;
 
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.RxInvokerProvider;
+
 /**
  * 
  * @author ilenia
  * @since Jun 11, 2020
  */
 @Component(immediate = true, 
-	service = ClientBuilderComponent.class, 
 	reference = @Reference(name = "runtimeCondition", 
 		service = Condition.class , 
 		target = JerseyConstants.JERSEY_RUNTIME_CONDITION)
+)
+@Capability(
+		namespace = SERVICE_NAMESPACE,
+		uses = ClientBuilder.class,
+		effective = EFFECTIVE_ACTIVE,
+		attribute = {
+				CAPABILITY_OBJECTCLASS_ATTRIBUTE + "=jakarta.ws.rs.client.ClientBuilder",
+				"service.scope=prototype"
+		}
+)
+@Capability(
+		namespace = SERVICE_NAMESPACE,
+		uses = SseEventSourceFactory.class,
+		effective = EFFECTIVE_ACTIVE,
+		attribute = {
+				CAPABILITY_OBJECTCLASS_ATTRIBUTE + "=org.osgi.service.jakartars.client.SseEventSourceFactory",
+				"service.scope=bundle"
+		}
 )
 public class ClientBuilderComponent {
 
