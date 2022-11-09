@@ -46,7 +46,7 @@ jobs:
     - name: Gradle version
       run: ./gradlew --no-daemon --version
     - name: Build with Gradle
-      run: ./gradlew build -x org.gecko.rest.bnd.project.library:testOSGi -x org.gecko.rest.bnd.library:testOSGi -x org.gecko.rest.jersey.multipart:testOSGi
+      run: ./gradlew build -x org.gecko.rest.bnd.project.library:testOSGi -x org.gecko.rest.bnd.library:testOSGi -x org.gecko.rest.jersey.multipart:testOSGi -x org.gecko.rest.jersey.sse:testOSGi
     - name: Upload Test Reports
       if: ${{ always() && ((steps.build.outcome == 'success') || (steps.build.outcome == 'failure')) }}
       uses: actions/upload-artifact@v2
