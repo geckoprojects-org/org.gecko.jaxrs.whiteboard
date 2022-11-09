@@ -48,7 +48,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build -x testOSGi
     - name: Test OSGi Gecko
-      run: ./gradlew :org.gecko.rest.jersey.tests:testOSGi :org.gecko.rest.jersey.servlet.whiteboard.tests:testOSGi
+      run: ./gradlew :org.gecko.rest.jersey.tests:testOSGi 
     - name: Test OSGi TCK
       run: ./gradlew :org.gecko.rest.jersey.tck:testOSGi
     - name: Upload Test Reports
