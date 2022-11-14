@@ -15,7 +15,6 @@ package org.gecko.rest.jersey.runtime.common;
 
 import static org.osgi.namespace.service.ServiceNamespace.CAPABILITY_OBJECTCLASS_ATTRIBUTE;
 import static org.osgi.namespace.service.ServiceNamespace.SERVICE_NAMESPACE;
-import static org.osgi.resource.Namespace.EFFECTIVE_ACTIVE;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -51,19 +50,17 @@ import jakarta.ws.rs.client.RxInvokerProvider;
 )
 @Capability(
 		namespace = SERVICE_NAMESPACE,
-		uses = ClientBuilder.class,
-		effective = EFFECTIVE_ACTIVE,
+		uses = {ClientBuilder.class, PromiseRxInvoker.class},
 		attribute = {
-				CAPABILITY_OBJECTCLASS_ATTRIBUTE + "=jakarta.ws.rs.client.ClientBuilder",
+				CAPABILITY_OBJECTCLASS_ATTRIBUTE + ":List<String>=jakarta.ws.rs.client.ClientBuilder",
 				"service.scope=prototype"
 		}
 )
 @Capability(
 		namespace = SERVICE_NAMESPACE,
 		uses = SseEventSourceFactory.class,
-		effective = EFFECTIVE_ACTIVE,
 		attribute = {
-				CAPABILITY_OBJECTCLASS_ATTRIBUTE + "=org.osgi.service.jakartars.client.SseEventSourceFactory",
+				CAPABILITY_OBJECTCLASS_ATTRIBUTE + ":List<String>=org.osgi.service.jakartars.client.SseEventSourceFactory",
 				"service.scope=bundle"
 		}
 )
