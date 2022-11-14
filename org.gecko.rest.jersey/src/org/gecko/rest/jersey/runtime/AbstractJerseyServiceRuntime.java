@@ -74,8 +74,10 @@ import org.osgi.service.jakartars.runtime.dto.FailedResourceDTO;
 import org.osgi.service.jakartars.runtime.dto.ResourceDTO;
 import org.osgi.service.jakartars.runtime.dto.ResourceMethodInfoDTO;
 import org.osgi.service.jakartars.runtime.dto.RuntimeDTO;
+import org.osgi.service.jakartars.whiteboard.JakartarsWhiteboardConstants;
 
 import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.container.ResourceInfo;
 import jakarta.ws.rs.core.Application;
 import jakarta.ws.rs.ext.Providers;
@@ -96,13 +98,14 @@ import jakarta.ws.rs.sse.Sse;
 		namespace = IMPLEMENTATION_NAMESPACE, 
 		version = JAKARTA_RS_WHITEBOARD_SPECIFICATION_VERSION, 
 		name = JAKARTA_RS_WHITEBOARD_IMPLEMENTATION, 
-		uses = {WebApplicationException.class, ResourceInfo.class, Application.class, Providers.class, Sse.class},
+		uses = {JakartarsWhiteboardConstants.class, WebApplicationException.class, 
+				Client.class, ResourceInfo.class, Application.class, Providers.class, 
+				Sse.class},
 		attribute = { "provider=jersey", "jersey.version=3.0" }
 )
 @Capability(
 		namespace = SERVICE_NAMESPACE,
-		uses = JakartarsServiceRuntime.class,
-		effective = EFFECTIVE_ACTIVE,
+		uses = {JakartarsServiceRuntime.class, ResourceDTO.class},
 		attribute = CAPABILITY_OBJECTCLASS_ATTRIBUTE + "=org.osgi.service.jakartars.runtime.JakartarsServiceRuntime"
 )
 public abstract class AbstractJerseyServiceRuntime implements JakartarsServiceRuntime, JakartarsWhiteboardProvider {
