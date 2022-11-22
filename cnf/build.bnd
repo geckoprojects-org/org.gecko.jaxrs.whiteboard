@@ -9,7 +9,7 @@
 
 # Needed because we enabled library 'gecko-dimc' 	
 github-project: org.gecko.jaxrs.whiteboard
-base-version: 6.0.0-RC1.SNAPSHOT 
+base-version: 6.0.0-RC1 
 mvn-base-version: ${versionmask;===s;${base-version}}
 
 # Maven Central Group-Id
