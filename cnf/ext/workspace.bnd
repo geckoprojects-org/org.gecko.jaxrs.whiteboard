@@ -11,9 +11,9 @@
 
 jupiter.version: 5.8.2
 platform.version: 1.8.2
-osgi.test.version: 1.1.0
+osgi.test.version: 1.2.1
 mockito.version: 4.4.0
-assertj.version: 3.22.0
+assertj.version: 3.23.1
 bytebuddy.version: 1.12.8
 
 -buildpath.junit5: ${if;${-enable-junit5};${test.buildpath}}
@@ -47,7 +47,7 @@ test.runproperties: \
 
 test.runbundles: \
 	biz.aQute.tester.junit-platform;version=latest,\
-	org.opentest4j;version='[1.2.0,1.2.1)',\
+	org.opentest4j;version='[1.2.0,2)',\
 	junit-jupiter-api;version='[5.7.0,6)',\
 	junit-jupiter-params;version='[5.7.0,6)',\
 	junit-jupiter-engine;version='[5.7.0,6)',\

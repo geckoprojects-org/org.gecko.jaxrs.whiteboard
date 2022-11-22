@@ -19,8 +19,6 @@
 	junit-jupiter-params;version='[5.8.2,5.8.3)',\
 	junit-platform-commons;version='[1.8.2,1.8.3)',\
 	org.opentest4j;version='[1.2.0,1.2.1)',\
-	org.osgi.test.common;version='[1.1.0,1.1.1)',\
-	org.osgi.test.junit5;version='[1.1.0,1.1.1)',\
 	jakarta.activation-api;version='[2.1.0,2.1.1)',\
 	jakarta.validation.jakarta.validation-api;version='[3.0.2,3.0.3)',\
 	jakarta.xml.bind-api;version='[4.0.0,4.0.1)',\
@@ -60,7 +58,9 @@
 	org.objectweb.asm;version='[9.3.0,9.3.1)',\
 	slf4j.api;version='[1.7.36,1.7.37)',\
 	slf4j.simple;version='[1.7.36,1.7.37)',\
-	org.gecko.rest.jersey.servlet.whiteboard.tests;version=snapshot
+	org.gecko.rest.jersey.servlet.whiteboard.tests;version=snapshot,\
+	org.osgi.test.common;version='[1.2.1,1.2.2)',\
+	org.osgi.test.junit5;version='[1.2.1,1.2.2)'
 	#org.gecko.rest.jersey.servlet.whiteboard.tests;version=snapshot,\
 	
 -runbundles.junit: \

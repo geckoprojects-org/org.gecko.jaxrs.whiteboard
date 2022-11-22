@@ -19,8 +19,6 @@
 	junit-platform-commons;version='[1.8.2,1.8.3)',\
 	org.gecko.rest.jersey.tests;version=snapshot,\
 	org.opentest4j;version='[1.2.0,1.2.1)',\
-	org.osgi.test.common;version='[1.1.0,1.1.1)',\
-	org.osgi.test.junit5;version='[1.1.0,1.1.1)',\
 	jakarta.annotation-api;version='[2.1.1,2.1.2)',\
 	jakarta.inject.jakarta.inject-api;version='[2.0.1,2.0.2)',\
 	jakarta.ws.rs-api;version='[3.1.0,3.1.1)',\
@@ -55,7 +53,9 @@
 	org.glassfish.jersey.media.jersey-media-jaxb;version='[3.0.8,3.0.9)',\
 	org.apache.felix.http.jetty;version='[5.0.0,5.0.1)',\
 	slf4j.api;version='[1.7.36,1.7.37)',\
-	slf4j.simple;version='[1.7.36,1.7.37)'
+	slf4j.simple;version='[1.7.36,1.7.37)',\
+	org.osgi.test.common;version='[1.2.1,1.2.2)',\
+	org.osgi.test.junit5;version='[1.2.1,1.2.2)'
 	
 -runbundles.junit: \
 	org.opentest4j;version='[1.2.0,1.2.1)',\

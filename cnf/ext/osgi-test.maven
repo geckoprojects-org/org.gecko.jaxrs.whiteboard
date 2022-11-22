@@ -21,6 +21,7 @@ org.mockito:mockito-core:${mockito.version}
 org.mockito:mockito-junit-jupiter:${mockito.version}
 
 # AssertJ
+org.assertj:assertj-core:${assertj.version}
 net.bytebuddy:byte-buddy:${bytebuddy.version}
 net.bytebuddy:byte-buddy-agent:${bytebuddy.version}
 org.opentest4j:opentest4j:1.2.0
@@ -28,6 +29,5 @@ org.hamcrest:hamcrest:2.2
 
 # Others
 org.apiguardian:apiguardian-api:1.1.2
-biz.aQute.bnd:biz.aQute.tester.junit-platform:6.2.0
-org.assertj:assertj-core:3.23.1
 org.objenesis:objenesis:3.3
+biz.aQute.bnd:biz.aQute.tester.junit-platform:6.3.1
