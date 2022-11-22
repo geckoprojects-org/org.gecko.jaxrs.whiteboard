@@ -43,7 +43,7 @@ pipeline  {
                 sh "cp -r cnf/release/* $JENKINS_HOME/repo.gecko/snapshot/org.gecko.jaxrs.whiteboard"
             }
         }
-        stage('Jakarta branch release') {
+        stage('Jakarta branch snapshot') {
             when { 
                 branch 'jakarta'
             }
@@ -53,6 +53,15 @@ pipeline  {
                 sh "mkdir -p $JENKINS_HOME/repo.gecko/jakarta/org.gecko.jakarta.whiteboard"
                 sh "rm -rf $JENKINS_HOME/repo.gecko/jakarta/org.gecko.jakarta.whiteboard/*"
                 sh "cp -r cnf/release/* $JENKINS_HOME/repo.gecko/jakarta/org.gecko.jakarta.whiteboard"
+            }
+        }
+        stage('Jakarta branch release') {
+            when { 
+                branch 'jakarta-main'
+            }
+            steps  {
+                echo "I am building on ${env.JOB_NAME}"
+                sh "./gradlew clean build release -Drelease.dir=$JENKINS_HOME/repo.gecko/release/org.gecko.jakarta.whiteboard --info --stacktrace -Dmaven.repo.local=${WORKSPACE}/.m2"
             }
         }
     }
