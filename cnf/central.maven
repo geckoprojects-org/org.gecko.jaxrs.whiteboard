@@ -23,6 +23,8 @@ org.eclipse.jetty:jetty-annotations:11.0.12
 org.eclipse.jetty:jetty-security:11.0.12
 org.eclipse.jetty:jetty-io:11.0.12
 
+org.apache.felix:org.apache.felix.http.jetty:5.0.0
+
 ### OSGi Core
 org.osgi:org.osgi.dto:1.1.1
 org.osgi:org.osgi.namespace.contract:1.0.0
@@ -45,7 +47,7 @@ org.osgi:org.osgi.service.log:1.5.0
 org.osgi:org.osgi.service.metatype:1.4.1
 org.osgi:org.osgi.service.metatype.annotations:1.4.1
 org.osgi:org.osgi.service.servlet:2.0.0-RC1
-org.osgi:org.osgi.service.jakartars:2.0.0-RC1
+org.osgi:org.osgi.service.jakartars:2.0.0
 org.osgi:org.osgi.util.promise:1.3.0-RC1
 org.osgi:org.osgi.util.converter:1.0.9
 org.osgi:org.osgi.util.function:1.2.0
