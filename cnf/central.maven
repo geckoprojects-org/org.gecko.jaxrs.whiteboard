@@ -54,6 +54,7 @@ org.osgi:org.osgi.util.function:1.2.0
 org.osgi:org.osgi.util.pushstream:1.0.2
 org.osgi:org.osgi.util.tracker:1.5.4
 org.osgi:org.osgi.util.xml:1.0.2
+org.osgi:org.osgi.test.cases.jakartars:8.1.0
 
 # Jakarta EE API
 #org.apache.geronimo.specs:geronimo-jaxrs_2.1_spec:jar:1.1
