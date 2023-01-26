@@ -18,8 +18,6 @@ Test-Cases: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.
 	jakarta.ws.rs-api,\
 	org.osgi.service.jakartars
 	
-Bundle-Version: 1.0.0.SNAPSHOT
-
 -includeresource: OSGI-INF/configurator/config.json=configs/config.json
 
 Require-Capability: osgi.extender;filter:='(osgi.extender=osgi.configurator)'
