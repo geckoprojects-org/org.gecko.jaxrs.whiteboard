@@ -120,17 +120,25 @@ public class ServletWhiteboardBasedJerseyServiceRuntime extends AbstractJerseySe
 			
 			Collection<ServiceReference<HttpServiceRuntime>> whiteboardReferences = bundleContext.getServiceReferences(HttpServiceRuntime.class, httpWhiteboardTarget != null ? httpWhiteboardTarget.toString() : null);
 			whiteboardReferences.forEach(ref -> {
-				pathWithFilter.forEach((path, target) -> {
-					if(target == null || target.match(ref)) {
-						Map<String,Object> properties = FrameworkUtil.asMap(ref.getProperties());
-						String[] endpoints = JerseyHelper.getStringPlusProperty(HttpServiceRuntimeConstants.HTTP_SERVICE_ENDPOINT, properties);
-						if (endpoints != null) {
-							for (String e : endpoints) {
-								baseUris.add(buildEndPoint(e, path));
-							}
+				Map<String,Object> properties = FrameworkUtil.asMap(ref.getProperties());
+				String[] endpoints = JerseyHelper.getStringPlusProperty(HttpServiceRuntimeConstants.HTTP_SERVICE_ENDPOINT, properties);
+				if (pathWithFilter.isEmpty()) {
+					if (endpoints != null) {
+						for (String e : endpoints) {
+							baseUris.add(buildEndPoint(e, null));
 						}
 					}
-				});
+				} else {
+					pathWithFilter.forEach((path, target) -> {
+						if(target == null || target.match(ref)) {
+							if (endpoints != null) {
+								for (String e : endpoints) {
+									baseUris.add(buildEndPoint(e, path));
+								}
+							}
+						}
+					});
+				}
 			});
 			
 		} catch (InvalidSyntaxException e1) {
@@ -152,7 +160,7 @@ public class ServletWhiteboardBasedJerseyServiceRuntime extends AbstractJerseySe
 		if (!rsEndpoint.endsWith("/")) {
 			rsEndpoint += "/";
 		}
-		if(path.startsWith("/")) {
+		if(path != null && path.startsWith("/")) {
 			rsEndpoint += path.substring(1); 
 		}
 		return rsEndpoint;

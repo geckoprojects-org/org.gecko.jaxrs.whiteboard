@@ -9,7 +9,7 @@
 
 # Needed because we enabled library 'gecko-dimc' 	
 github-project: org.gecko.jaxrs.whiteboard
-base-version: 6.0.0.RC1 
+base-version: 6.0.0.SNAPSHOT
 mvn-base-version: ${versionmask;===s;${base-version}}
 
 # Maven Central Group-Id
@@ -24,7 +24,7 @@ mvn-base-version: ${versionmask;===s;${base-version}}
 javac.source: 11
 javac.target: 11
 
--require-bnd "(version>=6.3.1)"
+-require-bnd "(version>=6.4.0)"
 
 # Configure Repositories
 -plugin.1.Central: \

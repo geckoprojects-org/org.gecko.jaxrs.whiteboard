@@ -1,7 +1,7 @@
--buildpath:  \
+-buildpath: \
 	osgi.annotation;version=latest,\
 	osgi.core;version=latest,\
-	osgi.cmpn;version=latest
+	org.osgi.service.servlet;version=latest
 
 -library: enableJersey
 

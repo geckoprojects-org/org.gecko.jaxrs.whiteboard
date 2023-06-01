@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.2.0" localization="OSGI-INF/l10n/org.gecko.bndtools.templates.emf.model">
-  <OCD id="org.gecko.rest.project-with-http-whiteboard" name="Gecko Jakartars Resource Project Template with HTTP Whiteboard configuration" description="Gecko Jakartars Whiteboard Resource with HTTP Whiteboard configuration project template">
+  <OCD id="org.gecko.rest.project-with-http-whiteboard" name="Gecko JakartaRs Resource Project Template with HTTP Whiteboard configuration" description="Gecko JakartaRs Whiteboard Resource with HTTP Whiteboard configuration project template">
     <AD id="host" type="String" name="HTTP Whiteboard  Server Host" description="he hostname where the HTTP Whiteboard will run." default="localhost"/>
     <AD id="port" type="String" name="HTTP Whiteboard port" description="The port the HTTP Whiteboard will listen on" default="8082"/>
     <AD id="httpWhiteboardName" type="String" name="HTTP Whiteboard Name" description="The name of the HTTP Whiteboard" default="HTTPWB"/>
     <AD id="httpWhiteboarContextPath" type="String" name="HTTP Whiteboard context path" description="The context URL segment, the HTTP Whiteboard will be available under" default="/"/>
     <AD id="httpWhiteboardId" type="String" name="HTTP Whiteboards ID" description="An ID for the HTTP Whiteboard. Avoid whitespaces!" default="httpId"/>
 
-    <AD id="jakartarsWhiteboardName" type="String" name="Jakartars Whiteboard Name" description="The name of the Jakartars Whiteboard" default="Jakartars"/>
-    <AD id="jakartarsContextPath" type="String" name="Jakartars Whiteboard context path" description="The URL segment the Jakartars will be available under. It comes after the HTTP Whiteboard context path" default="rest"/>
-    <AD id="jakartarsWhiteboardId" type="String" name="Jakartars Whiteboards ID" description="An ID for the Jakartars Whiteboard. Avoid whitespaces!" default="jakartarsId"/>
+    <AD id="jakartarsWhiteboardName" type="String" name="JakartaRs Whiteboard Name" description="The name of the JakartaRs Whiteboard" default="JakartaRs"/>
+    <AD id="jakartarsContextPath" type="String" name="JakartaRs Whiteboard context path" description="The URL segment the JakartaRs will be available under. It comes after the HTTP Whiteboard context path" default="rest"/>
+    <AD id="jakartarsWhiteboardId" type="String" name="JakartaRs Whiteboards ID" description="An ID for the JakartaRs Whiteboard. Avoid whitespaces!" default="JakartaRsId"/>
   </OCD>
 </metatype:MetaData>

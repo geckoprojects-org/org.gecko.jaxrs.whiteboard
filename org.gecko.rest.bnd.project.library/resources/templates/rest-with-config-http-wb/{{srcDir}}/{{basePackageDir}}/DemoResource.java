@@ -18,10 +18,10 @@ import jakarta.ws.rs.Path;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
-import org.osgi.service.http.whiteboard.annotations.RequireHttpWhiteboard;
 import org.osgi.service.jakartars.whiteboard.annotations.RequireJakartarsWhiteboard;
 import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsName;
 import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsResource;
+import org.osgi.service.servlet.whiteboard.annotations.RequireHttpWhiteboard;
 
 /**
  * This is a Demo Resource for a Jakartars Whiteboard 

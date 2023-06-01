@@ -28,7 +28,7 @@ import org.osgi.service.jakartars.whiteboard.propertytypes.JakartarsResource;
  */
 @RequireJakartarsWhiteboard
 @JakartarsResource
-@JakartarsName("demo-no-config")
+@JakartarsName("demo-simple-config")
 @Component(service = DemoResource.class, enabled = true, scope = ServiceScope.PROTOTYPE)
 @Path("/")
 public class DemoResource {

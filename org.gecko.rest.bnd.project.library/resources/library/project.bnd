@@ -1,7 +1,7 @@
 -buildpath.jakartars: ${jakartars.lib}
 
 jakartars.lib: \
-	osgi.cmpn;version=latest,\
-	jakarta.ws.rs-api;version='[2.1,3)'
+	org.osgi.service.jakartars;version='[2.0,3)',\
+	jakarta.ws.rs-api;version='[3.1,4)'
 	
--require-bnd: "(version>=6.3.1)"
+-require-bnd: "(version>=6.4.0)"

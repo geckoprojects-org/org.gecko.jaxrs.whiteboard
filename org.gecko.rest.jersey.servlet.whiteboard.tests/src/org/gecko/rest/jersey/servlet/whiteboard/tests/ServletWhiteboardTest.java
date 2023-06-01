@@ -111,9 +111,13 @@ public class ServletWhiteboardTest {
 			return (String) value;
 		} else if (value instanceof String[]) {
 			String[] values = (String[]) value;
-			return values[values.length -1];
+			if (values.length > 0) {
+				return values[values.length -1];
+			}
 		} else if (value instanceof Collection) {
-			return String.valueOf(((Collection< ? >) value).iterator().next());
+			if (!((Collection<?>)value).isEmpty()) { 
+				return String.valueOf(((Collection< ? >) value).iterator().next());
+			}
 		}
 
 		throw new IllegalArgumentException(

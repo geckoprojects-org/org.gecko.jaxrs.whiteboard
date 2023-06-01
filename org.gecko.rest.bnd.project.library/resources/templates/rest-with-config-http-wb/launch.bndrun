@@ -16,6 +16,7 @@
 
 # we need to run our project
 -runbundles.project: \
+	org.gecko.rest.jersey.servlet.whiteboard;version=latest,\
 	{{projectName}};version=snapshot
 
 -runblacklist: \

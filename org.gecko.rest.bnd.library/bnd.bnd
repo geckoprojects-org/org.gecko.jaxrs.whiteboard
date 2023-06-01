@@ -4,6 +4,9 @@ Bundle-Description: Jersey Dependencies for the Gecko Jakartars Whiteboard
 -resourceonly: true
 -sources: false
 
+jersey.version: 3.1.2
+hk2.version: 3.0.4
+
 -includeresource: resources,\
 	{library/workspace/gecko-jersey.mvn=resources/library/workspace/gecko-jersey.mvn}
 
