@@ -70,7 +70,12 @@ pipeline  {
             }
             steps  {
                 echo "I am building on ${env.JOB_NAME}"
-                sh "mvn clean build -Dmaven.repo.local=${WORKSPACE}/.m2"
+                sh "mvn clean install -Dmaven.repo.local=${WORKSPACE}/.m2"
+            }
+            post {
+                success {
+                    junit 'target/surefire-reports/**/*.xml' 
+                }
             }
         }
     }
