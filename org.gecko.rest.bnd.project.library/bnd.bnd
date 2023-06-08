@@ -61,4 +61,3 @@ Provide-Capability: \
 	${project-template-rest-with-config-wb}
 
 -resourceonly: true
--includeresource: resources
