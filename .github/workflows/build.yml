@@ -23,39 +23,21 @@ defaults:
     shell: bash
 
 jobs:
-  Build_Matrix:
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, windows-latest ]
-        java: [ 11, 17 ]
-        runner: [ 'xvfb-run --auto-servernum {0}' ]
-    name: JDK${{ matrix.java }} ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+  build:
     steps:
     - name: Git Checkout
       uses: actions/checkout@v3
-    - name: Gradle Wrapper Validation
-      uses: gradle/wrapper-validation-action@v1
-    - name: Set up Java ${{ matrix.java }}
+    - name: Set up Java 17
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
-        java-version: ${{ matrix.java }}
-    - name: Grant execute permission for gradlew
-      run: chmod +x ./gradlew
-    - name: Gradle version
-      run: ./gradlew --no-daemon --version
-    - name: Build with Gradle
-      run: ./gradlew build -x testOSGi
-    - name: Test OSGi Gecko
-      run: ./gradlew :org.gecko.rest.jersey.tests:testOSGi 
-    - name: Test OSGi TCK
-      run: ./gradlew :org.gecko.rest.jersey.tck:testOSGi
+        java-version: 17
+        cache: maven
+    - name: Build Maven
+      run: mvn clean verify
     - name: Upload Test Reports
-      if: ${{ always() && ((steps.build.outcome == 'success') || (steps.build.outcome == 'failure')) }}
-      uses: actions/upload-artifact@v2
+      uses: mikepenz/action-junit-report@v3
+      if: success() || failure() 
       with:
-        name: JDK${{ matrix.java }}_${{ matrix.os }}-test-reports
-        path: |
-          */generated/test-reports/*/TEST-*.xml
+        report_paths:: */target/test-reports/*/TEST-*.xml
 
