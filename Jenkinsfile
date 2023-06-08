@@ -75,7 +75,7 @@ pipeline  {
             }
             post {
                 success {
-                    junit 'target/test-reports/**/*.xml' 
+                    junit '**/target/test-reports/**/*.xml' 
                 }
             }
         }
