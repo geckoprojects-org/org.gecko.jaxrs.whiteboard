@@ -64,5 +64,14 @@ pipeline  {
                 sh "./gradlew clean build release -Drelease.dir=$JENKINS_HOME/repo.gecko/release/org.gecko.jakarta.whiteboard -x testOSGi --info --stacktrace -Dmaven.repo.local=${WORKSPACE}/.m2"
             }
         }
+        stage('Jakarta-Maven branch release') {
+            when { 
+                branch 'jakarta-maven'
+            }
+            steps  {
+                echo "I am building on ${env.JOB_NAME}"
+                sh "mvn clean build -Dmaven.repo.local=${WORKSPACE}/.m2"
+            }
+        }
     }
 }
