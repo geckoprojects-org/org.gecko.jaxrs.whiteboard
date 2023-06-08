@@ -37,7 +37,8 @@ jobs:
       run: mvn clean verify
     - name: Upload Test Reports
       uses: mikepenz/action-junit-report@v3
-      if: success() || failure() 
+      if: success() || failure()
       with:
-        report_paths: */target/test-reports/*/TEST-*.xml
+        name: Java 17 -test-reports
+        report_paths: '**/target/test-reports/*/TEST-*.xml'
 
