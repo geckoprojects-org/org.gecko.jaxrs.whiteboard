@@ -595,13 +595,8 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>3.1.2</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-surefire-report-plugin</artifactId>
-					<version>3.1.2</version>
 					<configuration>
-						<outputDirectory>${basedir}/target/test-reports/junit</outputDirectory>
+						<reportsDirectory>${basedir}/target/test-reports/junit</reportsDirectory>
 					</configuration>
 				</plugin>
 				<plugin>
