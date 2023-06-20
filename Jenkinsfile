@@ -79,5 +79,14 @@ pipeline  {
                 }
             }
         }
+        stage('Jakarta-Maven branch Sonatype Deploy') {
+            when { 
+                branch 'jakarta-maven'
+            }
+            steps  {
+                echo "Deploying artifacts to Maven Central on ${env.JOB_NAME}"
+                sh "mvn deploy -Prelease -DskipTests -Dgpg.homedir=${GNUPG_HOMEDIR}"
+            }
+        }
     }
 }
