@@ -85,7 +85,7 @@ pipeline  {
             }
             steps  {
                 echo "Deploying artifacts to Maven Central on ${env.JOB_NAME}"
-                withMaven(maven: 'Maven 3.9.2', mavenSettingsConfig: 'central-settings') {
+                withMaven(maven: 'Maven 3.9.2', globalMavenSettingsConfig: 'central-global') {
                     sh "mvn deploy -X -e -Prelease --batch-mode -Dgpg.homedir=${GNUPG_HOMEDIR} -Dgpg.passphrase=${GNUPG_PASSPHRASE}"
                 }
             }
