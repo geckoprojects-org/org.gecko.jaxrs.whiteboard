@@ -83,7 +83,9 @@ pipeline  {
             when { 
                 branch 'jakarta-maven'
             }
-            steps  {
+            withMaven  (
+                maven: 'Maven 3.9.2',
+                mavenSettingsConfig: 'central-settings') {
                 echo "Deploying artifacts to Maven Central on ${env.JOB_NAME}"
                 sh "mvn deploy -X -e -Prelease --batch-mode -Dgpg.homedir=${GNUPG_HOMEDIR} -Dgpg.passphrase=${GNUPG_PASSPHRASE}"
             }
