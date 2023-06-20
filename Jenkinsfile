@@ -4,7 +4,6 @@ pipeline  {
     tools {
         jdk 'OpenJDK17'
         maven 'Maven 3.9.2'
-        mavenSettingsConfig: 'central-settings'
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '5'))
@@ -85,8 +84,11 @@ pipeline  {
                 branch 'jakarta-maven'
             }
             steps  {
-                echo "Deploying artifacts to Maven Central on ${env.JOB_NAME}"
-                sh "mvn deploy -X -e -Prelease --batch-mode -Dgpg.homedir=${GNUPG_HOMEDIR} -Dgpg.passphrase=${GNUPG_PASSPHRASE}"
+                withMaven(maven: 'Maven 3.9.2', mavenSettingsConfig: 'central-settings') {
+                    sh "mvn deploy -X -e -Prelease --batch-mode -Dgpg.homedir=${GNUPG_HOMEDIR} -Dgpg.passphrase=${GNUPG_PASSPHRASE}"
+                    echo "Deploying artifacts to Maven Central on ${env.JOB_NAME}"
+                }
+               
             }
         }
     }
