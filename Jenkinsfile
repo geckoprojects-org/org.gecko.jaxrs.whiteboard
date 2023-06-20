@@ -85,7 +85,7 @@ pipeline  {
             }
             steps  {
                 echo "Deploying artifacts to Maven Central on ${env.JOB_NAME}"
-                sh "mvn deploy -Prelease -DskipTests -Dgpg.homedir=${GNUPG_HOMEDIR}"
+                sh "mvn deploy -Prelease --batch-mode -Dgpg.homedir=${GNUPG_HOMEDIR}"
             }
         }
     }
