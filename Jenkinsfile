@@ -4,7 +4,6 @@ pipeline  {
     tools {
         jdk 'OpenJDK17'
         maven 'Maven 3.9.2'
-        mavenSettingsConfig 'central-settings'
     }
     options {
         buildDiscarder(logRotator(numToKeepStr: '5'))
