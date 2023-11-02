@@ -6,9 +6,11 @@ https://github.com/osgi/jakartarest-osgi
 It is the compiant implementation for the Jakarta RESTful Web Services Whiteboard:
 https://docs.osgi.org/specification/osgi.cmpn/8.1.0/service.jakartars.html
 
+**NOTE:** Because this implementation still uses the **javax** namespace, this project will be deprecated in favor to the new project at https://github.com/osgi/jakartarest-osgi!
+
 # Gecko.io JaxRs Whiteboard Implementation
 
-This is a OSGi JaxRs Whiteboard Implementation based on Eclipse Jersey.
+This is a OSGi JaxRs Whiteboard Implementation based on Eclipse Jersey. 
 
 https://docs.osgi.org/specification/osgi.cmpn/7.0.0/service.jaxrs.html
 
