@@ -39,7 +39,7 @@ import org.osgi.framework.namespace.IdentityNamespace;
 		@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, name = "org.glassfish.jersey.containers.jersey-container-servlet"),
 		@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, name = "org.glassfish.jersey.media.jersey-media-sse"),
 		@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, name = "org.glassfish.jersey.media.jersey-media-jaxb"),
-		@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, name = "jakarta.validation.jakarta.validation-api")
+		@Requirement(namespace = IdentityNamespace.IDENTITY_NAMESPACE, name = "jakarta.validation.jakarta.validation-api", version = "2.0")
 })
 public @interface RequireJersey {
 
