@@ -1,3 +1,7 @@
+> [!CAUTION]
+> **This repository is deprecated and archived.**
+> It is no longer maintained. Development continues in [eclipse-osgi-technology/jakartarest-osgi](https://github.com/eclipse-osgi-technology/jakartarest-osgi).
+
 # Jakarta RESTful Web Services Whiteboard Implementation
 
 This implementation for the Jakarta namespace has moved it home to the Eclipse foundation:
